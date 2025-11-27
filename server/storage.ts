@@ -1,7 +1,7 @@
 import { db } from "@db";
-import { users, vehicles, deals, hallmarks } from "@shared/schema";
-import type { User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark } from "@shared/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { users, vehicles, deals, hallmarks, carts, cartItems, orders, orderItems } from "@shared/schema";
+import type { User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, Cart, InsertCart, CartItem, InsertCartItem, Order, InsertOrder, OrderItem, InsertOrderItem } from "@shared/schema";
+import { eq, and, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -26,6 +26,25 @@ export interface IStorage {
   // Hallmarks
   getHallmarkByUserId(userId: string): Promise<Hallmark | undefined>;
   createHallmark(hallmark: InsertHallmark): Promise<Hallmark>;
+
+  // Cart
+  getOrCreateCart(userId?: string, sessionId?: string): Promise<Cart>;
+  getCartItems(cartId: string): Promise<CartItem[]>;
+  addToCart(cartId: string, item: Omit<InsertCartItem, 'cartId'>): Promise<CartItem>;
+  updateCartItem(itemId: string, quantity: number): Promise<CartItem | undefined>;
+  removeCartItem(itemId: string): Promise<boolean>;
+  clearCart(cartId: string): Promise<boolean>;
+
+  // Orders
+  createOrder(order: InsertOrder): Promise<Order>;
+  createOrderItems(items: InsertOrderItem[]): Promise<OrderItem[]>;
+  getOrdersByUserId(userId: string): Promise<Order[]>;
+  getOrder(id: string): Promise<Order | undefined>;
+  updateOrderStatus(id: string, status: string): Promise<Order | undefined>;
+
+  // Stripe data queries
+  getStripeProducts(): Promise<any[]>;
+  getStripePrices(): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -114,6 +133,108 @@ export class DatabaseStorage implements IStorage {
   async createHallmark(insertHallmark: InsertHallmark): Promise<Hallmark> {
     const [hallmark] = await db.insert(hallmarks).values(insertHallmark).returning();
     return hallmark;
+  }
+
+  // Cart
+  async getOrCreateCart(userId?: string, sessionId?: string): Promise<Cart> {
+    let existingCart: Cart | undefined;
+    
+    if (userId) {
+      [existingCart] = await db.select().from(carts).where(eq(carts.userId, userId));
+    } else if (sessionId) {
+      [existingCart] = await db.select().from(carts).where(eq(carts.sessionId, sessionId));
+    }
+    
+    if (existingCart) {
+      return existingCart;
+    }
+    
+    const [newCart] = await db.insert(carts).values({
+      userId: userId || null,
+      sessionId: sessionId || null,
+    }).returning();
+    
+    return newCart;
+  }
+
+  async getCartItems(cartId: string): Promise<CartItem[]> {
+    return await db.select().from(cartItems).where(eq(cartItems.cartId, cartId)).orderBy(desc(cartItems.createdAt));
+  }
+
+  async addToCart(cartId: string, item: Omit<InsertCartItem, 'cartId'>): Promise<CartItem> {
+    const existingItems = await db.select().from(cartItems)
+      .where(and(eq(cartItems.cartId, cartId), eq(cartItems.priceId, item.priceId)));
+    
+    if (existingItems.length > 0) {
+      const [updated] = await db.update(cartItems)
+        .set({ quantity: existingItems[0].quantity + (item.quantity || 1) })
+        .where(eq(cartItems.id, existingItems[0].id))
+        .returning();
+      return updated;
+    }
+    
+    const [cartItem] = await db.insert(cartItems).values({ ...item, cartId }).returning();
+    return cartItem;
+  }
+
+  async updateCartItem(itemId: string, quantity: number): Promise<CartItem | undefined> {
+    if (quantity <= 0) {
+      await this.removeCartItem(itemId);
+      return undefined;
+    }
+    const [item] = await db.update(cartItems).set({ quantity }).where(eq(cartItems.id, itemId)).returning();
+    return item;
+  }
+
+  async removeCartItem(itemId: string): Promise<boolean> {
+    const result = await db.delete(cartItems).where(eq(cartItems.id, itemId));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async clearCart(cartId: string): Promise<boolean> {
+    const result = await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
+    return result.rowCount ? result.rowCount >= 0 : true;
+  }
+
+  // Orders
+  async createOrder(order: InsertOrder): Promise<Order> {
+    const [newOrder] = await db.insert(orders).values(order).returning();
+    return newOrder;
+  }
+
+  async createOrderItems(items: InsertOrderItem[]): Promise<OrderItem[]> {
+    return await db.insert(orderItems).values(items).returning();
+  }
+
+  async getOrdersByUserId(userId: string): Promise<Order[]> {
+    return await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.createdAt));
+  }
+
+  async getOrder(id: string): Promise<Order | undefined> {
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order;
+  }
+
+  async updateOrderStatus(id: string, status: string): Promise<Order | undefined> {
+    const [order] = await db.update(orders).set({ status, updatedAt: new Date() }).where(eq(orders.id, id)).returning();
+    return order;
+  }
+
+  // Stripe data queries
+  async getStripeProducts(): Promise<any[]> {
+    const result = await db.execute(sql`
+      SELECT p.*, pr.id as price_id, pr.unit_amount, pr.currency
+      FROM stripe.products p
+      LEFT JOIN stripe.prices pr ON pr.product = p.id AND pr.active = true
+      WHERE p.active = true
+      ORDER BY p.created DESC
+    `);
+    return result.rows;
+  }
+
+  async getStripePrices(): Promise<any[]> {
+    const result = await db.execute(sql`SELECT * FROM stripe.prices WHERE active = true`);
+    return result.rows;
   }
 }
 
