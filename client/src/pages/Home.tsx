@@ -32,10 +32,10 @@ export default function Home() {
       <Nav />
       
       {/* Split Layout: High Density */}
-      <div className="pt-20 h-[calc(100vh)] container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12">
+      <div className="pt-20 min-h-screen container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12">
         
         {/* Left Column: Search Interface */}
-        <div className="flex flex-col justify-center py-8 lg:py-0 h-full">
+        <div className="flex flex-col justify-center py-8 lg:py-0">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -136,6 +136,18 @@ export default function Home() {
           <CategoryGrid />
         </div>
       </div>
+      
+      <footer className="py-8 border-t border-white/5 mt-0 bg-black/40 backdrop-blur-md relative overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+           {/* Use the uploaded image as a centered watermark in the footer */}
+           <img src="attached_assets/copilot_image_1764282859449_1764282878495.jpeg" className="h-32 w-auto object-contain mix-blend-screen" />
+        </div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <p className="font-mono text-xs text-muted-foreground/60">
+            © 2025 DARKWAVE STUDIOS LLC. ALL RIGHTS RESERVED.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
