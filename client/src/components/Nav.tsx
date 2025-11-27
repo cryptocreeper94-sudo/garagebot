@@ -21,6 +21,9 @@ export default function Nav() {
           <Link href="/garage">
             <span className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer">My Garage</span>
           </Link>
+          <Link href="/dashboard">
+            <span className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer">Dashboard</span>
+          </Link>
           <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Track Order</a>
           <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Support</a>
         </div>
