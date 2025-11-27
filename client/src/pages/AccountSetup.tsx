@@ -28,13 +28,34 @@ export default function AccountSetup() {
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-transparent" />
             
             <div className="mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-secondary/30 bg-secondary/5 text-secondary text-[10px] font-mono mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+                GENESIS BLOCK OPEN // EARLY ACCESS
+              </div>
               <h1 className="font-tech text-4xl font-bold uppercase tracking-wide mb-2">
                 Initialize <span className="text-primary">PartScout</span> ID
               </h1>
               <p className="text-muted-foreground font-mono text-sm">
-                SECURE ACCESS // FLEET MANAGEMENT // WEB3 CHECKOUT
+                JOIN THE FIRST ON-CHAIN AUTO PARTS CONSORTIUM
               </p>
             </div>
+
+            <Card className="mb-8 bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20 p-4 relative overflow-hidden group cursor-pointer hover:border-primary/50 transition-all">
+              <div className="absolute top-0 right-0 p-2 opacity-20">
+                <Shield className="w-16 h-16 text-primary" />
+              </div>
+              <h3 className="font-tech font-bold text-lg uppercase text-foreground flex items-center gap-2">
+                Claim Genesis Hallmark
+                <span className="text-[10px] bg-primary text-black px-1.5 py-0.5 rounded font-bold">FREE</span>
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1 mb-3 max-w-[80%]">
+                Mint your "Founder's Edition" Hallmark. Permanently records your early support on the PartScout Audit Trail.
+              </p>
+              <div className="flex items-center gap-2 text-[10px] font-mono text-primary">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full" />
+                <span>0.00 ETH Gas (Sponsored)</span>
+              </div>
+            </Card>
 
             <div className="space-y-6">
               <Button variant="outline" className="w-full h-14 text-lg font-tech uppercase tracking-wider border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary transition-all group">

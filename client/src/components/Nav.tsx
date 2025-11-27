@@ -6,10 +6,10 @@ export default function Nav() {
   return (
     <nav className="w-full h-16 border-b border-border/40 bg-background/80 backdrop-blur-md fixed top-0 z-50">
       <div className="container mx-auto h-full flex items-center justify-between px-4">
-        <Link href="/">
+          <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center transform group-hover:rotate-12 transition-transform">
-              <Wrench className="w-5 h-5 text-primary-foreground" />
+            <div className="w-8 h-8 bg-primary/10 border border-primary/50 rounded-sm flex items-center justify-center transform group-hover:rotate-180 transition-transform duration-700">
+              <Wrench className="w-5 h-5 text-primary" />
             </div>
             <span className="font-tech font-bold text-2xl tracking-wide uppercase text-foreground">
               Part<span className="text-primary">Scout</span>

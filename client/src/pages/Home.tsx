@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight } from "lucide-react";
+import { Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon } from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import bgImage from "@assets/generated_images/futuristic_watermark_background_with_subtle_blue_nebula_and_geometric_lines.png";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -21,105 +22,117 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-white overflow-hidden">
+    <div className="min-h-screen text-foreground font-sans selection:bg-primary selection:text-black overflow-hidden relative">
+      {/* Global Watermark Background */}
+      <div 
+        className="fixed inset-0 z-[-1] bg-cover bg-center opacity-30 pointer-events-none"
+        style={{ backgroundImage: `url(${bgImage})` }}
+      />
+      
       <Nav />
       
       {/* Split Layout: High Density */}
-      <div className="pt-20 h-[calc(100vh)] container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-8">
+      <div className="pt-20 h-[calc(100vh)] container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12">
         
         {/* Left Column: Search Interface */}
         <div className="flex flex-col justify-center py-8 lg:py-0 h-full">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-6 max-w-xl"
+            className="space-y-8 max-w-xl"
           >
             <div>
-              <div className="inline-flex items-center gap-2 px-2 py-1 rounded border border-primary/30 bg-primary/10 text-primary text-[10px] font-mono mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                SYSTEM ONLINE // WEB3 ENABLED
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-[10px] font-mono mb-6 tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--color-primary)]" />
+                SYSTEM ONLINE // WEB3 VERIFIED
               </div>
-              <h1 className="text-5xl md:text-6xl font-tech font-bold uppercase leading-[0.9] mb-4">
-                Part<span className="text-primary">Scout</span>
-                <br />
-                <span className="text-muted-foreground text-3xl md:text-4xl">Aggregator Protocol</span>
+              <h1 className="text-6xl md:text-7xl font-tech font-bold uppercase leading-[0.85] mb-2 tracking-tight">
+                Part<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Scout</span>
               </h1>
+              <p className="text-xl md:text-2xl font-light text-muted-foreground">
+                Next-Gen Aggregator Protocol
+              </p>
             </div>
 
-            {/* Personalized Deal Widget */}
+            {/* Personalized Deal Widget - Updated Colors */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="bg-gradient-to-r from-orange-900/20 to-primary/10 border-l-2 border-orange-500 p-4 rounded-r mb-4"
+              className="glass-panel border-l-2 border-l-primary p-5 rounded-r-xl"
             >
-              <div className="flex items-start gap-3">
-                <Tag className="w-5 h-5 text-orange-500 mt-1" />
+              <div className="flex items-start gap-4">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Tag className="w-5 h-5 text-primary" />
+                </div>
                 <div className="flex-1">
-                  <h3 className="font-tech font-bold text-lg uppercase text-white">Deal Alert: 2022 Tacoma</h3>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Castrol GTX High Mileage is 20% off at your local AutoZone (0.8 mi).
+                  <h3 className="font-tech font-bold text-lg uppercase text-white flex items-center gap-2">
+                    Deal Alert: 2022 Tacoma
+                    <span className="text-[10px] bg-secondary/20 text-secondary px-1.5 py-0.5 rounded">NEW</span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                    Castrol GTX High Mileage is <span className="text-white font-bold">20% off</span> at your local AutoZone (0.8 mi).
                   </p>
-                  <Button size="sm" className="h-7 text-[10px] font-mono bg-orange-500 hover:bg-orange-600 text-white border-none">
+                  <Button size="sm" className="h-8 text-[10px] font-mono bg-primary hover:bg-primary/80 text-black border-none rounded-sm">
                     CLAIM OFFER <ArrowRight className="w-3 h-3 ml-1" />
                   </Button>
                 </div>
               </div>
             </motion.div>
 
-            <Card className="bg-card/50 border-border p-1 backdrop-blur-sm">
+            <Card className="glass-panel border-0 p-1">
               <Tabs defaultValue="standard" className="w-full">
-                <TabsList className="w-full grid grid-cols-2 bg-black/20 h-10 p-1">
-                  <TabsTrigger value="standard" className="font-mono text-xs uppercase data-[state=active]:bg-primary data-[state=active]:text-black">Standard Search</TabsTrigger>
-                  <TabsTrigger value="web3" className="font-mono text-xs uppercase data-[state=active]:bg-primary data-[state=active]:text-black flex items-center gap-2">
-                    <Wallet className="w-3 h-3" /> Web3 Search
+                <TabsList className="w-full grid grid-cols-2 bg-black/40 h-12 p-1 rounded-lg">
+                  <TabsTrigger value="standard" className="font-mono text-xs uppercase rounded-md data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Standard Search</TabsTrigger>
+                  <TabsTrigger value="web3" className="font-mono text-xs uppercase rounded-md data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary flex items-center gap-2">
+                    <Hexagon className="w-3 h-3" /> Web3 Search
                   </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="standard" className="p-4 space-y-4">
-                  <div className="grid grid-cols-3 gap-2">
+                <TabsContent value="standard" className="p-5 space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
                     <Select>
-                      <SelectTrigger className="h-10 bg-background border-white/10 font-mono text-xs"><SelectValue placeholder="Year" /></SelectTrigger>
+                      <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors"><SelectValue placeholder="Year" /></SelectTrigger>
                       <SelectContent><SelectItem value="2024">2024</SelectItem></SelectContent>
                     </Select>
                     <Select>
-                      <SelectTrigger className="h-10 bg-background border-white/10 font-mono text-xs"><SelectValue placeholder="Make" /></SelectTrigger>
+                      <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors"><SelectValue placeholder="Make" /></SelectTrigger>
                       <SelectContent><SelectItem value="toyota">Toyota</SelectItem></SelectContent>
                     </Select>
                     <Select>
-                      <SelectTrigger className="h-10 bg-background border-white/10 font-mono text-xs"><SelectValue placeholder="Model" /></SelectTrigger>
+                      <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors"><SelectValue placeholder="Model" /></SelectTrigger>
                       <SelectContent><SelectItem value="tacoma">Tacoma</SelectItem></SelectContent>
                     </Select>
                   </div>
-                  <div className="flex gap-2">
-                    <Input className="h-12 bg-background border-white/10 font-tech text-lg" placeholder="SEARCH PART NUMBER OR NAME..." />
-                    <Button className="h-12 w-12 shrink-0 bg-primary text-black hover:bg-primary/90" onClick={handleSearch}>
+                  <div className="flex gap-3">
+                    <Input className="h-14 bg-black/20 border-white/5 font-tech text-lg placeholder:text-muted-foreground/50 focus:border-primary/50 hover:bg-black/30 transition-colors" placeholder="SEARCH PART NUMBER OR NAME..." />
+                    <Button className="h-14 w-14 shrink-0 bg-primary text-black hover:bg-primary/90 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.3)]" onClick={handleSearch}>
                       <ChevronRight className="w-6 h-6" />
                     </Button>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="web3" className="p-4 space-y-4">
-                  <div className="p-4 border border-dashed border-primary/30 rounded bg-primary/5 text-center">
-                    <p className="font-mono text-xs text-primary mb-2">CONNECT WALLET TO SCAN NFT PARTS</p>
-                    <Button size="sm" variant="outline" className="font-tech uppercase border-primary text-primary hover:bg-primary hover:text-black">
+                <TabsContent value="web3" className="p-5 space-y-4">
+                  <div className="p-6 border border-dashed border-secondary/30 rounded-lg bg-secondary/5 text-center group hover:bg-secondary/10 transition-colors cursor-pointer">
+                    <p className="font-mono text-xs text-secondary mb-3">CONNECT WALLET TO SCAN NFT PARTS</p>
+                    <Button size="sm" variant="outline" className="font-tech uppercase border-secondary text-secondary hover:bg-secondary hover:text-black">
                       Connect Wallet
                     </Button>
                   </div>
-                  <Input className="h-10 bg-background border-white/10 font-mono text-mono text-xs" placeholder="ENTER CONTRACT ADDRESS OR TOKEN ID..." />
+                  <Input className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-secondary/50" placeholder="ENTER CONTRACT ADDRESS OR TOKEN ID..." />
                 </TabsContent>
               </Tabs>
             </Card>
 
-            <div className="flex gap-4 text-[10px] font-mono text-muted-foreground">
-              <span className="flex items-center gap-1"><Database className="w-3 h-3" /> 15M+ PARTS INDEXED</span>
-              <span className="flex items-center gap-1"><Cpu className="w-3 h-3" /> AI MATCHING ACTIVE</span>
+            <div className="flex gap-6 text-[10px] font-mono text-muted-foreground/60 pt-2">
+              <span className="flex items-center gap-1.5"><Database className="w-3 h-3 text-primary/50" /> 15M+ PARTS INDEXED</span>
+              <span className="flex items-center gap-1.5"><Cpu className="w-3 h-3 text-secondary/50" /> AI MATCHING ACTIVE</span>
             </div>
           </motion.div>
         </div>
 
         {/* Right Column: Featured / Visuals (No wasted space) */}
-        <div className="hidden lg:flex flex-col justify-center h-full py-12 pl-8 border-l border-white/5">
+        <div className="hidden lg:flex flex-col justify-center h-full py-12 pl-12 border-l border-white/5">
           <CategoryGrid />
         </div>
       </div>

@@ -125,11 +125,11 @@ export default function Dashboard() {
             </div>
             <div className="relative z-10">
               <div className="flex items-center gap-2 text-muted-foreground font-mono text-xs uppercase mb-2">
-                <Database className="w-4 h-4" /> Parts Indexed
+                <Shield className="w-4 h-4 text-secondary" /> Hallmarks Minted
               </div>
-              <div className="text-4xl font-tech font-bold text-white">8.4M</div>
-              <div className="text-xs text-primary mt-1">
-                Across 15 Vendors
+              <div className="text-4xl font-tech font-bold text-white">8,492</div>
+              <div className="text-xs text-secondary mt-1 flex items-center">
+                 On-Chain Audit Trail Active
               </div>
             </div>
           </Card>
