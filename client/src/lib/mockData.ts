@@ -1,4 +1,13 @@
-import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike } from "lucide-react";
+import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge } from "lucide-react";
+
+export const VEHICLE_TYPES = [
+  { id: "cars", name: "Cars & Trucks", icon: Car, description: "Sedans, SUVs, Trucks, Vans" },
+  { id: "motorcycles", name: "Motorcycles", icon: Bike, description: "Street, Sport, Cruiser, Touring" },
+  { id: "atvs", name: "ATVs & UTVs", icon: Mountain, description: "Quads, Side-by-Sides, Can-Am" },
+  { id: "boats", name: "Boats & Marine", icon: Ship, description: "Outboard, Inboard, PWC, Pontoon" },
+  { id: "powersports", name: "Powersports", icon: Gauge, description: "Dirt Bikes, Snowmobiles, Go-Karts" },
+  { id: "rv", name: "RV & Trailer", icon: Truck, description: "Motorhomes, Campers, Utility" },
+];
 
 export const CATEGORIES = [
   { id: "brakes", name: "Brakes", icon: Disc },
@@ -10,6 +19,7 @@ export const CATEGORIES = [
   { id: "filters", name: "Filters", icon: Wrench },
   { id: "batteries", name: "Batteries", icon: Battery },
   { id: "powersports", name: "Powersports", icon: Bike },
+  { id: "marine", name: "Marine", icon: Waves },
 ];
 
 export const MOCK_RESULTS = [
@@ -46,7 +56,7 @@ export const MOCK_RESULTS = [
     name: "Bosch Icon Wiper Blade 26\"",
     partNumber: "26A",
     fitment: "Universal Hook Arm",
-    image: "https://images.unsplash.com/photo-1619646972479-6d4e46936235?auto=format&fit=crop&q=80&w=400",
+    image: "https://images.unsplash.com/photo-1619646972479-6d4e46936635?auto=format&fit=crop&q=80&w=400",
     prices: [
       { store: "O'Reilly", price: 28.99, shipping: "Free Pickup", inStock: true, location: "1.2 mi • Broadway" },
       { store: "Amazon", price: 24.50, shipping: "Prime", inStock: true, location: "Online Only" },
@@ -66,5 +76,31 @@ export const MOCK_RESULTS = [
     ],
     rating: 4.8,
     reviews: 560,
+  },
+  {
+    id: 5,
+    name: "Mercury Outboard Gear Lube",
+    partNumber: "92-858064K01",
+    fitment: "Mercury / Mariner Outboards",
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=400",
+    prices: [
+      { store: "West Marine", price: 24.99, shipping: "Free Pickup", inStock: true, location: "5.2 mi • Marina Dr" },
+      { store: "Amazon", price: 19.95, shipping: "Prime", inStock: true, location: "Online Only" },
+    ],
+    rating: 4.9,
+    reviews: 890,
+  },
+  {
+    id: 6,
+    name: "Can-Am Maverick X3 Belt",
+    partNumber: "422280652",
+    fitment: "2017-2024 Can-Am Maverick X3",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=400",
+    prices: [
+      { store: "Dennis Kirk", price: 189.99, shipping: "Free Ship", inStock: true, location: "Online Only" },
+      { store: "Rocky Mountain ATV", price: 179.95, shipping: "+$8.00 Ship", inStock: true, location: "Online Only" },
+    ],
+    rating: 4.6,
+    reviews: 425,
   },
 ];

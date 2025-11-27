@@ -5,6 +5,7 @@ import { Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon }
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
+import VehicleTypeSelector from "@/components/VehicleTypeSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -113,6 +114,11 @@ export default function Home() {
                 <span className="flex items-center gap-1.5"><Cpu className="w-3 h-3 text-secondary/50" /> AI MATCHING ACTIVE</span>
               </div>
 
+              {/* Vehicle Type Selector (Mobile) */}
+              <div className="lg:hidden pt-6">
+                <VehicleTypeSelector />
+              </div>
+
               {/* Mobile Category Grid Insertion */}
               <div className="lg:hidden pt-6">
                 <CategoryGrid />
@@ -122,6 +128,7 @@ export default function Home() {
 
           {/* Right Column: Featured / Visuals (Desktop Only) */}
           <div className="hidden lg:flex flex-col justify-center h-full py-12 pl-12 border-l border-white/5 space-y-10">
+            <VehicleTypeSelector />
             <CategoryGrid />
             <FeaturedCarousel />
           </div>
