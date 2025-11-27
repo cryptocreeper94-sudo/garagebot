@@ -62,6 +62,51 @@ export const hallmarks = pgTable("hallmarks", {
   metadata: text("metadata"),
 });
 
+export const carts = pgTable("carts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  sessionId: text("session_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const cartItems = pgTable("cart_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  cartId: varchar("cart_id").notNull().references(() => carts.id, { onDelete: "cascade" }),
+  productId: text("product_id").notNull(),
+  priceId: text("price_id").notNull(),
+  productName: text("product_name").notNull(),
+  productImage: text("product_image"),
+  quantity: integer("quantity").notNull().default(1),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const orders = pgTable("orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  stripeSessionId: text("stripe_session_id"),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  status: text("status").notNull().default("pending"),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").default("usd"),
+  customerEmail: text("customer_email"),
+  shippingAddress: jsonb("shipping_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const orderItems = pgTable("order_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderId: varchar("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  productId: text("product_id").notNull(),
+  priceId: text("price_id").notNull(),
+  productName: text("product_name").notNull(),
+  quantity: integer("quantity").notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
@@ -77,3 +122,20 @@ export type Deal = typeof deals.$inferSelect;
 
 export type InsertHallmark = z.infer<typeof insertHallmarkSchema>;
 export type Hallmark = typeof hallmarks.$inferSelect;
+
+export const insertCartSchema = createInsertSchema(carts).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: true, createdAt: true });
+export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true, createdAt: true });
+
+export type InsertCart = z.infer<typeof insertCartSchema>;
+export type Cart = typeof carts.$inferSelect;
+
+export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
+export type CartItem = typeof cartItems.$inferSelect;
+
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type Order = typeof orders.$inferSelect;
+
+export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
+export type OrderItem = typeof orderItems.$inferSelect;
