@@ -126,17 +126,16 @@ export default function Home() {
         </div>
       </div>
       
-      <footer className="py-8 border-t border-white/5 mt-0 bg-black/60 backdrop-blur-xl relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center opacity-80 pointer-events-none">
-           {/* Use the uploaded image as a centered watermark in the footer */}
+      <footer className="py-12 border-t border-primary/20 mt-0 bg-gradient-to-t from-[#0a0f1e] to-transparent relative overflow-hidden">
+        <div className="absolute inset-0 w-full h-full opacity-100 pointer-events-none">
            <img 
              src={footerWave} 
              alt="DarkWave Signature" 
-             className="h-full w-auto object-cover mix-blend-screen opacity-80"
+             className="w-full h-full object-cover mix-blend-screen"
            />
         </div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <p className="font-mono text-xs text-muted-foreground/80 drop-shadow-md">
+          <p className="font-mono text-xs text-blue-200/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             © 2025 DARKWAVE STUDIOS LLC. ALL RIGHTS RESERVED.
           </p>
         </div>
