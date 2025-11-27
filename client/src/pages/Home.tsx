@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import bgImage from "@assets/generated_images/futuristic_watermark_background_with_subtle_blue_nebula_and_geometric_lines.png";
 import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
+import MarketTicker from "@/components/MarketTicker";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -32,9 +33,10 @@ export default function Home() {
       />
       
       <Nav />
+      <MarketTicker />
       
       {/* Layout Wrapper */}
-      <div className="pt-20 min-h-screen container mx-auto px-4 pb-20">
+      <div className="pt-28 min-h-screen container mx-auto px-4 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12">
         
           {/* Left Column: Search Interface */}
