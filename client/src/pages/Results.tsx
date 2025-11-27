@@ -166,7 +166,7 @@ export default function Results() {
                          <Button variant="outline" className="h-8 text-[10px] font-tech uppercase border-primary/30 text-primary hover:bg-primary hover:text-black">
                            <MapPin className="w-3 h-3 mr-1" /> Reserve at Store
                          </Button>
-                         <Button variant="default" className="h-8 text-[10px] font-tech uppercase bg-white/10 hover:bg-white/20">
+                         <Button variant="default" className="h-8 text-[10px] font-tech uppercase bg-white/10 hover:bg-white/20" onClick={() => window.location.href = "/checkout"}>
                            <Truck className="w-3 h-3 mr-1" /> Ship to Home
                          </Button>
                       </div>
