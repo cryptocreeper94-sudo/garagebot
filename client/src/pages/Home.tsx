@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import bgImage from "@assets/generated_images/futuristic_watermark_background_with_subtle_blue_nebula_and_geometric_lines.png";
+import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
+import alLogo from "@assets/generated_images/al_gear_logo_emblem.png";
 import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
 import MarketTicker from "@/components/MarketTicker";
 
@@ -67,6 +68,22 @@ export default function Home() {
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--color-primary)]" />
             SYSTEM ONLINE // WEB3 VERIFIED
           </div>
+          
+          {/* AL Logo Emblem */}
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="mb-4"
+          >
+            <img 
+              src={alLogo} 
+              alt="AutoLedger Emblem" 
+              className="w-20 h-20 md:w-28 md:h-28 mx-auto rounded-xl border border-primary/30 shadow-[0_0_30px_rgba(6,182,212,0.3)]"
+              data-testid="img-al-logo"
+            />
+          </motion.div>
+          
           <h1 className="text-4xl md:text-7xl font-tech font-bold uppercase leading-[0.9] mb-2 tracking-tight">
             Auto<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Ledger</span>
           </h1>
