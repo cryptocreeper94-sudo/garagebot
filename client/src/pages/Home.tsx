@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Search, ChevronRight, Wallet, Database, Cpu } from "lucide-react";
+import { Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight } from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,27 @@ export default function Home() {
               </h1>
             </div>
 
+            {/* Personalized Deal Widget */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="bg-gradient-to-r from-orange-900/20 to-primary/10 border-l-2 border-orange-500 p-4 rounded-r mb-4"
+            >
+              <div className="flex items-start gap-3">
+                <Tag className="w-5 h-5 text-orange-500 mt-1" />
+                <div className="flex-1">
+                  <h3 className="font-tech font-bold text-lg uppercase text-white">Deal Alert: 2022 Tacoma</h3>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Castrol GTX High Mileage is 20% off at your local AutoZone (0.8 mi).
+                  </p>
+                  <Button size="sm" className="h-7 text-[10px] font-mono bg-orange-500 hover:bg-orange-600 text-white border-none">
+                    CLAIM OFFER <ArrowRight className="w-3 h-3 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+
             <Card className="bg-card/50 border-border p-1 backdrop-blur-sm">
               <Tabs defaultValue="standard" className="w-full">
                 <TabsList className="w-full grid grid-cols-2 bg-black/20 h-10 p-1">
@@ -85,7 +106,7 @@ export default function Home() {
                       Connect Wallet
                     </Button>
                   </div>
-                  <Input className="h-10 bg-background border-white/10 font-mono text-xs" placeholder="ENTER CONTRACT ADDRESS OR TOKEN ID..." />
+                  <Input className="h-10 bg-background border-white/10 font-mono text-mono text-xs" placeholder="ENTER CONTRACT ADDRESS OR TOKEN ID..." />
                 </TabsContent>
               </Tabs>
             </Card>

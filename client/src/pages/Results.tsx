@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List } from "lucide-react";
+import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info } from "lucide-react";
 import Nav from "@/components/Nav";
 import { MOCK_RESULTS } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ const SCANNING_STORES = [
   "RockAuto API...",
   "NAPA Inventory...",
   "Amazon Automotive...",
+  "VMC Chinese Parts...",
+  "eBay Motors..."
 ];
 
 export default function Results() {
@@ -61,9 +63,21 @@ export default function Results() {
               </div>
 
               <div className="space-y-2">
+                <h3 className="font-mono text-xs uppercase text-muted-foreground">Category</h3>
+                 <div className="space-y-1">
+                  {["Brakes", "Engine", "Suspension", "Powersports"].map(cat => (
+                    <div key={cat} className="flex items-center space-x-2">
+                      <Checkbox id={cat} className="w-3 h-3" />
+                      <label htmlFor={cat} className="text-xs font-medium leading-none">{cat}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <h3 className="font-mono text-xs uppercase text-muted-foreground">Manufacturers</h3>
                 <div className="space-y-1">
-                  {["Brembo", "Bosch", "Wagner", "ACDelco"].map(brand => (
+                  {["Brembo", "Bosch", "Wagner", "TaoTao"].map(brand => (
                     <div key={brand} className="flex items-center space-x-2">
                       <Checkbox id={brand} className="w-3 h-3" />
                       <label htmlFor={brand} className="text-xs font-medium leading-none">{brand}</label>
@@ -80,6 +94,9 @@ export default function Results() {
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="font-mono text-[10px] border-green-500/30 text-green-400">
                   <Check className="w-3 h-3 mr-1" /> 2022 TACOMA
+                </Badge>
+                <Badge variant="outline" className="font-mono text-[10px] border-yellow-500/30 text-yellow-400 ml-2">
+                  <Info className="w-3 h-3 mr-1" /> UNIVERSAL FIT INCLUDED
                 </Badge>
               </div>
               <div className="flex gap-1">
@@ -125,19 +142,33 @@ export default function Results() {
                       <div className="p-0 flex-1 bg-background/30">
                         {part.prices.slice(0, 3).map((price, idx) => (
                           <div key={price.store} className="flex items-center justify-between px-3 py-2 border-b border-white/5 last:border-0 text-xs">
-                            <span className={`font-bold ${idx===0 ? 'text-primary' : 'text-muted-foreground'}`}>{price.store}</span>
+                            <div className="flex flex-col">
+                              <span className={`font-bold ${idx===0 ? 'text-primary' : 'text-muted-foreground'}`}>{price.store}</span>
+                              {price.location && price.location !== "Online Only" ? (
+                                <span className="text-[9px] text-green-400 flex items-center gap-1">
+                                  <MapPin className="w-2 h-2" /> {price.location}
+                                </span>
+                              ) : (
+                                <span className="text-[9px] text-muted-foreground/50 flex items-center gap-1">
+                                  <Truck className="w-2 h-2" /> Shipped
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-3">
-                              <span className="font-mono text-muted-foreground">{price.shipping}</span>
+                              <span className="font-mono text-muted-foreground hidden sm:block">{price.shipping}</span>
                               <span className="font-mono font-bold text-white">${price.price}</span>
                             </div>
                           </div>
                         ))}
                       </div>
                       
-                      <div className="p-2 bg-card border-t border-white/5">
-                        <Button className="w-full h-8 font-tech uppercase text-xs bg-white/5 hover:bg-primary hover:text-black transition-colors border border-white/10">
-                          Compare 12 Prices <ExternalLink className="w-3 h-3 ml-2" />
-                        </Button>
+                      <div className="grid grid-cols-2 gap-1 p-2 bg-card border-t border-white/5">
+                         <Button variant="outline" className="h-8 text-[10px] font-tech uppercase border-primary/30 text-primary hover:bg-primary hover:text-black">
+                           <MapPin className="w-3 h-3 mr-1" /> Reserve at Store
+                         </Button>
+                         <Button variant="default" className="h-8 text-[10px] font-tech uppercase bg-white/10 hover:bg-white/20">
+                           <Truck className="w-3 h-3 mr-1" /> Ship to Home
+                         </Button>
                       </div>
                     </Card>
                   </motion.div>
