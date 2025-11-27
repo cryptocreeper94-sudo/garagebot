@@ -33,7 +33,7 @@ export default function AccountSetup() {
                 GENESIS BLOCK OPEN // EARLY ACCESS
               </div>
               <h1 className="font-tech text-4xl font-bold uppercase tracking-wide mb-2">
-                Initialize <span className="text-primary">PartScout</span> ID
+                Initialize <span className="text-primary">AutoLedger</span> ID
               </h1>
               <p className="text-muted-foreground font-mono text-sm">
                 JOIN THE FIRST ON-CHAIN AUTO PARTS CONSORTIUM
@@ -49,7 +49,7 @@ export default function AccountSetup() {
                 <span className="text-[10px] bg-primary text-black px-1.5 py-0.5 rounded font-bold">FREE</span>
               </h3>
               <p className="text-xs text-muted-foreground mt-1 mb-3 max-w-[80%]">
-                Mint your "Founder's Edition" Hallmark. Permanently records your early support on the PartScout Audit Trail.
+                Mint your "Founder's Edition" Hallmark. Permanently records your early support on the AutoLedger Audit Trail.
               </p>
               <div className="flex items-center gap-2 text-[10px] font-mono text-primary">
                 <span className="w-1.5 h-1.5 bg-primary rounded-full" />

@@ -47,10 +47,10 @@ export default function Home() {
                 SYSTEM ONLINE // WEB3 VERIFIED
               </div>
               <h1 className="text-6xl md:text-7xl font-tech font-bold uppercase leading-[0.85] mb-2 tracking-tight">
-                Part<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Scout</span>
+                Auto<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Ledger</span>
               </h1>
               <p className="text-xl md:text-2xl font-light text-muted-foreground">
-                Next-Gen Aggregator Protocol
+                Aggregator Protocol by <span className="text-white font-bold">DarkWave Studios</span>
               </p>
             </div>
 
