@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import bgImage from "@assets/generated_images/futuristic_watermark_background_with_subtle_blue_nebula_and_geometric_lines.png";
+import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -125,13 +126,17 @@ export default function Home() {
         </div>
       </div>
       
-      <footer className="py-8 border-t border-white/5 mt-0 bg-black/40 backdrop-blur-md relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+      <footer className="py-8 border-t border-white/5 mt-0 bg-black/60 backdrop-blur-xl relative overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center opacity-80 pointer-events-none">
            {/* Use the uploaded image as a centered watermark in the footer */}
-           <img src="attached_assets/copilot_image_1764282859449_1764282878495.jpeg" className="h-32 w-auto object-contain mix-blend-screen" />
+           <img 
+             src={footerWave} 
+             alt="DarkWave Signature" 
+             className="h-full w-auto object-cover mix-blend-screen opacity-80"
+           />
         </div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <p className="font-mono text-xs text-muted-foreground/60">
+          <p className="font-mono text-xs text-muted-foreground/80 drop-shadow-md">
             © 2025 DARKWAVE STUDIOS LLC. ALL RIGHTS RESERVED.
           </p>
         </div>
