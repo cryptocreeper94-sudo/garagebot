@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 
@@ -9,11 +10,25 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
-  // Vehicles API
-  app.get("/api/vehicles", async (req, res) => {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      // For now, using a mock user ID until we implement authentication
-      const userId = "mock-user-id";
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Vehicles API (protected)
+  app.get("/api/vehicles", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
       const vehicles = await storage.getVehiclesByUserId(userId);
       res.json(vehicles);
     } catch (error) {
@@ -21,9 +36,10 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/vehicles", async (req, res) => {
+  app.post("/api/vehicles", isAuthenticated, async (req: any, res) => {
     try {
-      const result = insertVehicleSchema.safeParse(req.body);
+      const userId = req.user.claims.sub;
+      const result = insertVehicleSchema.safeParse({ ...req.body, userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
       }
@@ -34,7 +50,7 @@ export async function registerRoutes(
     }
   });
 
-  app.patch("/api/vehicles/:id", async (req, res) => {
+  app.patch("/api/vehicles/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const vehicle = await storage.updateVehicle(id, req.body);
@@ -47,7 +63,7 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/vehicles/:id", async (req, res) => {
+  app.delete("/api/vehicles/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const success = await storage.deleteVehicle(id);
@@ -60,10 +76,10 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/vehicles/:id/set-primary", async (req, res) => {
+  app.post("/api/vehicles/:id/set-primary", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const userId = "mock-user-id"; // Will be replaced with actual auth
+      const userId = req.user.claims.sub;
       await storage.setPrimaryVehicle(userId, id);
       res.json({ success: true });
     } catch (error) {
@@ -71,7 +87,7 @@ export async function registerRoutes(
     }
   });
 
-  // Deals API
+  // Deals API (public)
   app.get("/api/deals", async (req, res) => {
     try {
       const deals = await storage.getActiveDeals();
@@ -81,7 +97,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/deals", async (req, res) => {
+  app.post("/api/deals", isAuthenticated, async (req, res) => {
     try {
       const result = insertDealSchema.safeParse(req.body);
       if (!result.success) {
@@ -94,10 +110,10 @@ export async function registerRoutes(
     }
   });
 
-  // Hallmarks API
-  app.get("/api/hallmarks/me", async (req, res) => {
+  // Hallmarks API (protected)
+  app.get("/api/hallmarks/me", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = "mock-user-id"; // Will be replaced with actual auth
+      const userId = req.user.claims.sub;
       const hallmark = await storage.getHallmarkByUserId(userId);
       res.json(hallmark || null);
     } catch (error) {
@@ -105,13 +121,29 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/hallmarks", async (req, res) => {
+  app.post("/api/hallmarks", isAuthenticated, async (req: any, res) => {
     try {
-      const result = insertHallmarkSchema.safeParse(req.body);
-      if (!result.success) {
-        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      const userId = req.user.claims.sub;
+      const existingHallmark = await storage.getHallmarkByUserId(userId);
+      if (existingHallmark) {
+        return res.status(400).json({ error: "User already has a Genesis Hallmark" });
       }
-      const hallmark = await storage.createHallmark(result.data);
+      
+      const tokenId = `GENESIS-${Date.now()}-${userId.slice(-4)}`;
+      const hallmark = await storage.createHallmark({
+        userId,
+        tokenId,
+        transactionHash: `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+        metadata: JSON.stringify({
+          type: "GENESIS_HALLMARK",
+          edition: "Founder's Edition",
+          mintedAt: new Date().toISOString(),
+        }),
+      });
+      
+      // Mark user as having genesis badge
+      await storage.updateUser(userId, { hasGenesisBadge: true });
+      
       res.json(hallmark);
     } catch (error) {
       res.status(500).json({ error: "Failed to mint hallmark" });
