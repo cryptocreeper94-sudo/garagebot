@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, ShoppingCart, ExternalLink, Filter, Check, AlertCircle } from "lucide-react";
+import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List } from "lucide-react";
 import Nav from "@/components/Nav";
 import { MOCK_RESULTS } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,6 @@ const SCANNING_STORES = [
   "RockAuto API...",
   "NAPA Inventory...",
   "Amazon Automotive...",
-  "Summit Racing...",
-  "CarParts.com...",
-  "Advance Auto Parts...",
-  "O'Reilly Auto Parts..."
 ];
 
 export default function Results() {
@@ -31,9 +27,9 @@ export default function Results() {
       if (step < SCANNING_STORES.length) {
         setScanText(SCANNING_STORES[step]);
       }
-    }, 200);
+    }, 300);
 
-    const timer = setTimeout(() => setIsLoading(false), 2000);
+    const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => {
       clearTimeout(timer);
       clearInterval(interval);
@@ -44,211 +40,110 @@ export default function Results() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
-      <div className="pt-20 pb-10 container mx-auto px-4">
-        {/* Breadcrumb / Header */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-tech font-bold uppercase">
-              Search Results: <span className="text-primary">"Brake Pads"</span>
-            </h1>
-            <p className="text-muted-foreground font-mono text-sm mt-2 flex items-center gap-2">
-              <Check className="w-4 h-4 text-green-500" />
-              VEHICLE: 2022 TOYOTA TACOMA TRD OFF-ROAD
-            </p>
-          </div>
-          <div className="flex gap-2">
-             <Badge variant="outline" className="font-mono border-primary/50 text-primary bg-primary/10">
-               15 SOURCES SCANNED
-             </Badge>
-             <Badge variant="outline" className="font-mono border-border text-muted-foreground">
-               4 MATCHES FOUND
-             </Badge>
-          </div>
-        </div>
+      <div className="pt-20 h-[calc(100vh-5rem)] container mx-auto px-4 overflow-hidden">
+        <div className="grid grid-cols-12 gap-6 h-full">
+          
+          {/* Left Column: Filters (Compact Sidebar) */}
+          <div className="hidden lg:block col-span-3 h-full border-r border-white/5 pr-6 overflow-y-auto pb-20">
+            <div className="mb-8">
+              <h2 className="font-tech font-bold text-2xl uppercase mb-1 text-primary">Results</h2>
+              <p className="font-mono text-[10px] text-muted-foreground">4 MATCHES FOUND // 0.45s</p>
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar Filters */}
-          <aside className="hidden lg:block lg:col-span-1 space-y-8">
-            <div className="glass-panel p-6 rounded-lg border border-border sticky top-24">
-              <div className="flex items-center gap-2 mb-6 text-primary">
-                <Filter className="w-4 h-4" />
-                <span className="font-tech font-bold uppercase tracking-wider">Smart Filters</span>
+            <div className="space-y-6">
+              <div className="p-4 rounded bg-white/5 border border-white/5">
+                <h3 className="font-mono text-xs uppercase text-muted-foreground mb-3">Price Range</h3>
+                <Slider defaultValue={[65]} max={100} step={1} className="mb-2" />
+                <div className="flex justify-between text-[10px] font-mono">
+                  <span>$0</span>
+                  <span>$100+</span>
+                </div>
               </div>
-              
-              <div className="space-y-8">
-                <div>
-                  <h4 className="text-sm font-bold mb-3 uppercase tracking-wide">Price Range</h4>
-                  <Slider defaultValue={[65]} max={100} step={1} className="mb-2" />
-                  <div className="flex justify-between text-xs font-mono text-muted-foreground">
-                    <span>$0</span>
-                    <span>$100+</span>
-                  </div>
-                </div>
 
-                <div className="space-y-3">
-                  <h4 className="text-sm font-bold uppercase tracking-wide">Brand</h4>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="brembo" />
-                    <label htmlFor="brembo" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Brembo</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="bosch" />
-                    <label htmlFor="bosch" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Bosch</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="wagner" />
-                    <label htmlFor="wagner" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Wagner</label>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="text-sm font-bold uppercase tracking-wide">Availability</h4>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="instock" defaultChecked />
-                    <label htmlFor="instock" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">In Stock Only</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="sameday" />
-                    <label htmlFor="sameday" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Same Day Pickup</label>
-                  </div>
+              <div className="space-y-2">
+                <h3 className="font-mono text-xs uppercase text-muted-foreground">Manufacturers</h3>
+                <div className="space-y-1">
+                  {["Brembo", "Bosch", "Wagner", "ACDelco"].map(brand => (
+                    <div key={brand} className="flex items-center space-x-2">
+                      <Checkbox id={brand} className="w-3 h-3" />
+                      <label htmlFor={brand} className="text-xs font-medium leading-none">{brand}</label>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          </aside>
+          </div>
 
-          {/* Results List */}
-          <div className="lg:col-span-3 space-y-6">
-            <AnimatePresence mode="wait">
+          {/* Right Column: Grid Results (High Density) */}
+          <div className="col-span-12 lg:col-span-9 h-full overflow-y-auto pb-20">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="font-mono text-[10px] border-green-500/30 text-green-400">
+                  <Check className="w-3 h-3 mr-1" /> 2022 TACOMA
+                </Badge>
+              </div>
+              <div className="flex gap-1">
+                <Button size="icon" variant="ghost" className="w-8 h-8"><Grid className="w-4 h-4" /></Button>
+                <Button size="icon" variant="ghost" className="w-8 h-8 text-muted-foreground"><List className="w-4 h-4" /></Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {isLoading ? (
-                <motion.div 
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex flex-col items-center justify-center py-20 space-y-6 bg-card/30 rounded-xl border border-white/5"
-                >
-                  <div className="relative">
-                    <div className="w-20 h-20 border-4 border-primary/30 rounded-full animate-spin" />
-                    <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-ping" />
-                    </div>
-                  </div>
-                  <div className="text-center space-y-2">
-                    <p className="font-tech text-xl font-bold text-primary uppercase tracking-widest animate-pulse">
-                      AGGREGATING DATA
-                    </p>
-                    <p className="font-mono text-sm text-muted-foreground">
-                      {scanText}
-                    </p>
-                  </div>
-                </motion.div>
+                // Loading Skeletons
+                [1,2,3,4].map(i => (
+                  <div key={i} className="h-64 bg-card/30 rounded border border-white/5 animate-pulse" />
+                ))
               ) : (
-                <div className="space-y-6">
-                  {/* Best Match Banner */}
+                MOCK_RESULTS.map((part, index) => (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-primary/10 border border-primary/30 p-4 rounded-lg flex items-start gap-3"
+                    key={part.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
                   >
-                    <AlertCircle className="w-5 h-5 text-primary mt-0.5" />
-                    <div>
-                      <h3 className="font-bold text-primary uppercase text-sm">Smart Recommendation</h3>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Based on your 2022 Tacoma, the Brembo Ceramic pads offer the best balance of price and performance.
-                      </p>
-                    </div>
-                  </motion.div>
-
-                  {MOCK_RESULTS.map((part, index) => (
-                    <motion.div
-                      key={part.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Card className="bg-card border-border overflow-hidden hover:border-primary/50 transition-colors group relative">
-                        <div className="flex flex-col md:flex-row h-full">
-                          {/* Image Section */}
-                          <div className="w-full md:w-56 h-56 md:h-auto bg-black/20 relative shrink-0 overflow-hidden">
-                            <img 
-                              src={part.image} 
-                              alt={part.name} 
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                            <div className="absolute top-2 left-2">
-                              <Badge variant="secondary" className="bg-black/80 backdrop-blur font-mono text-[10px] text-white border-primary/30">
-                                FITMENT VERIFIED
-                              </Badge>
-                            </div>
+                    <Card className="bg-card border-border hover:border-primary/50 transition-all group overflow-hidden h-full flex flex-col">
+                      <div className="flex h-32 border-b border-white/5">
+                        <div className="w-32 bg-black/20 relative shrink-0">
+                           <img src={part.image} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="p-3 flex-1 min-w-0">
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-tech font-bold text-lg truncate pr-2">{part.name}</h3>
+                            <span className="font-mono text-xs text-yellow-500 flex items-center gap-1">
+                              {part.rating} <Star className="w-3 h-3 fill-current" />
+                            </span>
                           </div>
-
-                          {/* Content Section */}
-                          <div className="flex-1 p-6 flex flex-col justify-between">
-                            <div>
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h3 className="font-bold text-xl font-tech uppercase tracking-wide text-foreground group-hover:text-primary transition-colors">
-                                    {part.name}
-                                  </h3>
-                                  <p className="text-sm font-mono text-muted-foreground mt-1">PART #: {part.partNumber} // {part.fitment}</p>
-                                </div>
-                                <div className="flex items-center gap-1 text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded border border-yellow-500/20">
-                                  <Star className="w-3.5 h-3.5 fill-current" />
-                                  <span className="text-sm font-bold">{part.rating}</span>
-                                  <span className="text-xs text-muted-foreground ml-1">({part.reviews})</span>
-                                </div>
-                              </div>
-                              
-                              {/* Vendor Comparison Table */}
-                              <div className="mt-6 bg-background/50 rounded-md border border-white/5 p-1">
-                                <div className="grid grid-cols-12 gap-2 px-3 py-2 text-[10px] font-mono text-muted-foreground uppercase border-b border-white/5 mb-1">
-                                  <div className="col-span-3">Seller</div>
-                                  <div className="col-span-3">Shipping</div>
-                                  <div className="col-span-3">Availability</div>
-                                  <div className="col-span-3 text-right">Total Price</div>
-                                </div>
-                                {part.prices.map((price, idx) => (
-                                  <div 
-                                    key={price.store} 
-                                    className={`grid grid-cols-12 gap-2 items-center p-3 rounded ${idx === 0 ? 'bg-primary/10 border border-primary/20' : 'hover:bg-white/5'}`}
-                                  >
-                                    <div className="col-span-3 flex items-center gap-2">
-                                      {idx === 0 && <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
-                                      <span className={`font-bold text-sm ${idx === 0 ? 'text-primary' : 'text-muted-foreground'}`}>
-                                        {price.store}
-                                      </span>
-                                    </div>
-                                    <div className="col-span-3">
-                                      <span className="text-xs font-mono text-muted-foreground">
-                                        {price.shipping}
-                                      </span>
-                                    </div>
-                                    <div className="col-span-3">
-                                      <span className={`text-xs font-mono ${price.inStock ? 'text-green-400' : 'text-red-400'}`}>
-                                        {price.inStock ? 'In Stock' : 'Out of Stock'}
-                                      </span>
-                                    </div>
-                                    <div className="col-span-3 flex items-center justify-end gap-3">
-                                      <span className={`font-mono font-bold ${idx === 0 ? 'text-white' : 'text-muted-foreground'}`}>
-                                        ${price.price}
-                                      </span>
-                                      <Button size="icon" variant={idx === 0 ? "default" : "outline"} className="h-6 w-6 md:h-8 md:w-8 text-xs">
-                                        <ExternalLink className="w-3 h-3" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
+                          <p className="font-mono text-[10px] text-muted-foreground mt-1">#{part.partNumber}</p>
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            <Badge variant="secondary" className="text-[10px] h-5 px-1.5">Fitment Verified</Badge>
+                            {index === 0 && <Badge className="text-[10px] h-5 px-1.5 bg-primary text-black">Best Value</Badge>}
                           </div>
                         </div>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
+                      </div>
+                      
+                      <div className="p-0 flex-1 bg-background/30">
+                        {part.prices.slice(0, 3).map((price, idx) => (
+                          <div key={price.store} className="flex items-center justify-between px-3 py-2 border-b border-white/5 last:border-0 text-xs">
+                            <span className={`font-bold ${idx===0 ? 'text-primary' : 'text-muted-foreground'}`}>{price.store}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="font-mono text-muted-foreground">{price.shipping}</span>
+                              <span className="font-mono font-bold text-white">${price.price}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="p-2 bg-card border-t border-white/5">
+                        <Button className="w-full h-8 font-tech uppercase text-xs bg-white/5 hover:bg-primary hover:text-black transition-colors border border-white/10">
+                          Compare 12 Prices <ExternalLink className="w-3 h-3 ml-2" />
+                        </Button>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))
               )}
-            </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>

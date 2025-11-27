@@ -32,9 +32,11 @@ export default function Nav() {
           <Button variant="ghost" size="icon" className="hover:text-primary">
             <Search className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="hover:text-primary">
-            <User className="w-5 h-5" />
-          </Button>
+          <Link href="/account">
+            <Button variant="ghost" size="icon" className="hover:text-primary">
+              <User className="w-5 h-5" />
+            </Button>
+          </Link>
           <Button variant="outline" className="hidden md:flex gap-2 border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary">
             <ShoppingCart className="w-4 h-4" />
             <span className="font-tech">Cart (0)</span>
