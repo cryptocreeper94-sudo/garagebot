@@ -21,7 +21,77 @@ export interface PartSearchResult {
   searchTerms: string[];
 }
 
-const SYSTEM_PROMPT = `You are a friendly, helpful automotive parts assistant mascot. Your personality is upbeat, knowledgeable, and eager to help.
+export interface VehicleContext {
+  id?: string;
+  year?: string;
+  make?: string;
+  model?: string;
+  trim?: string;
+  mileage?: number;
+  lastService?: string;
+  nickname?: string;
+}
+
+export interface UserContext {
+  userId?: string;
+  username?: string;
+  isPro?: boolean;
+  vehicles?: VehicleContext[];
+  selectedVehicle?: VehicleContext;
+  recentSearches?: string[];
+  location?: string;
+}
+
+// In-memory conversation store (would be Redis/DB in production)
+const conversationStore = new Map<string, ChatMessage[]>();
+
+export function getConversationHistory(sessionId: string): ChatMessage[] {
+  return conversationStore.get(sessionId) || [];
+}
+
+export function addToConversation(sessionId: string, message: ChatMessage): void {
+  const history = conversationStore.get(sessionId) || [];
+  history.push(message);
+  // Keep last 20 messages for context
+  if (history.length > 20) {
+    history.splice(0, history.length - 20);
+  }
+  conversationStore.set(sessionId, history);
+}
+
+export function clearConversation(sessionId: string): void {
+  conversationStore.delete(sessionId);
+}
+
+function buildContextualPrompt(userContext?: UserContext): string {
+  let contextInfo = "";
+  
+  if (userContext) {
+    if (userContext.username) {
+      contextInfo += `\nUser: ${userContext.username}`;
+    }
+    if (userContext.isPro) {
+      contextInfo += ` (Pro Member)`;
+    }
+    if (userContext.vehicles && userContext.vehicles.length > 0) {
+      contextInfo += `\n\nUser's Garage (${userContext.vehicles.length} vehicles):`;
+      userContext.vehicles.forEach((v, i) => {
+        contextInfo += `\n${i + 1}. ${v.year || ''} ${v.make || ''} ${v.model || ''}${v.nickname ? ` "${v.nickname}"` : ''}${v.mileage ? ` - ${v.mileage.toLocaleString()} miles` : ''}`;
+      });
+    }
+    if (userContext.selectedVehicle) {
+      const v = userContext.selectedVehicle;
+      contextInfo += `\n\nCurrently selected vehicle: ${v.year} ${v.make} ${v.model}${v.mileage ? ` with ${v.mileage.toLocaleString()} miles` : ''}`;
+    }
+    if (userContext.location) {
+      contextInfo += `\nUser location: ${userContext.location}`;
+    }
+  }
+  
+  return contextInfo;
+}
+
+const SYSTEM_PROMPT = `You are Buddy, GarageBot's friendly AI assistant mascot. Your personality is upbeat, knowledgeable, and eager to help.
 
 Your job is to:
 1. Help users find the right parts for ANY vehicle type - cars, trucks, motorcycles, ATVs, UTVs, boats, RVs, diesels, small engines, Chinese imports, and more
@@ -47,12 +117,15 @@ Vehicle types you support:
 
 Always be helpful, never condescending. Remember: Right Part. First Time. Every Engine.`;
 
-export async function chat(messages: ChatMessage[]): Promise<string> {
+export async function chat(messages: ChatMessage[], userContext?: UserContext): Promise<string> {
   try {
+    const contextInfo = buildContextualPrompt(userContext);
+    const systemPrompt = SYSTEM_PROMPT + (contextInfo ? `\n\n--- USER CONTEXT ---${contextInfo}` : '');
+    
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         ...messages,
       ],
       max_tokens: 500,
@@ -64,6 +137,290 @@ export async function chat(messages: ChatMessage[]): Promise<string> {
     console.error("AI chat error:", error);
     throw new Error("Failed to get AI response");
   }
+}
+
+// Unified chat with session memory
+export async function chatWithMemory(
+  sessionId: string, 
+  userMessage: string, 
+  userContext?: UserContext
+): Promise<string> {
+  // Add user message to history
+  addToConversation(sessionId, { role: "user", content: userMessage });
+  
+  // Get conversation history
+  const history = getConversationHistory(sessionId);
+  
+  // Get AI response
+  const response = await chat(history, userContext);
+  
+  // Add response to history
+  addToConversation(sessionId, { role: "assistant", content: response });
+  
+  return response;
+}
+
+// Smart recommendations based on vehicle and mileage
+export async function getSmartRecommendations(vehicle: VehicleContext): Promise<{
+  urgentParts: string[];
+  upcomingMaintenance: string[];
+  seasonalSuggestions: string[];
+  message: string;
+}> {
+  try {
+    const vehicleInfo = `${vehicle.year} ${vehicle.make} ${vehicle.model}${vehicle.mileage ? ` with ${vehicle.mileage.toLocaleString()} miles` : ''}`;
+    const month = new Date().toLocaleString('default', { month: 'long' });
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are an automotive maintenance expert. Based on vehicle info and mileage, recommend parts and maintenance.
+
+Return ONLY a JSON object:
+{
+  "urgentParts": ["part1", "part2"], // Parts likely needed soon based on mileage
+  "upcomingMaintenance": ["service1", "service2"], // Maintenance due in next 5k miles
+  "seasonalSuggestions": ["item1"], // Seasonal items for current month
+  "message": "Brief friendly summary"
+}
+
+Common mileage intervals:
+- 3-5k: Oil change
+- 15k: Air filter, cabin filter
+- 30k: Brake inspection, transmission fluid
+- 50k: Spark plugs, coolant flush
+- 60k: Timing belt check (some vehicles)
+- 75k: Major service interval`
+        },
+        {
+          role: "user",
+          content: `Vehicle: ${vehicleInfo}\nCurrent month: ${month}\nProvide maintenance recommendations.`
+        }
+      ],
+      max_tokens: 400,
+      temperature: 0.4,
+    });
+
+    const content = response.choices[0]?.message?.content || "{}";
+    const parsed = JSON.parse(content.replace(/```json\n?|\n?```/g, ''));
+    
+    return {
+      urgentParts: parsed.urgentParts || [],
+      upcomingMaintenance: parsed.upcomingMaintenance || [],
+      seasonalSuggestions: parsed.seasonalSuggestions || [],
+      message: parsed.message || "Here are some recommendations for your vehicle."
+    };
+  } catch (error) {
+    console.error("Recommendations error:", error);
+    return {
+      urgentParts: [],
+      upcomingMaintenance: ["Regular oil change", "Tire rotation"],
+      seasonalSuggestions: [],
+      message: "Based on typical maintenance schedules, here are some suggestions."
+    };
+  }
+}
+
+// Generate DIY repair guide
+export async function generateDIYGuide(
+  vehicle: VehicleContext, 
+  repairTask: string
+): Promise<{
+  title: string;
+  difficulty: 'Easy' | 'Moderate' | 'Advanced';
+  estimatedTime: string;
+  toolsNeeded: string[];
+  partsNeeded: string[];
+  steps: { step: number; instruction: string; tip?: string }[];
+  warnings: string[];
+  costSavings: string;
+}> {
+  try {
+    const vehicleInfo = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert mechanic creating DIY repair guides. Write clear, safe instructions for home mechanics.
+
+Return ONLY a JSON object:
+{
+  "title": "How to [task] on [vehicle]",
+  "difficulty": "Easy" | "Moderate" | "Advanced",
+  "estimatedTime": "30 minutes - 1 hour",
+  "toolsNeeded": ["tool1", "tool2"],
+  "partsNeeded": ["part1", "part2"],
+  "steps": [
+    { "step": 1, "instruction": "Step description", "tip": "Optional pro tip" }
+  ],
+  "warnings": ["Safety warning 1"],
+  "costSavings": "Save $X vs shop price"
+}
+
+Always include safety warnings. Be specific to the vehicle when possible.`
+        },
+        {
+          role: "user",
+          content: `Create a DIY guide for: ${repairTask} on a ${vehicleInfo}`
+        }
+      ],
+      max_tokens: 1000,
+      temperature: 0.4,
+    });
+
+    const content = response.choices[0]?.message?.content || "{}";
+    return JSON.parse(content.replace(/```json\n?|\n?```/g, ''));
+  } catch (error) {
+    console.error("DIY guide error:", error);
+    return {
+      title: `How to ${repairTask}`,
+      difficulty: 'Moderate',
+      estimatedTime: "1-2 hours",
+      toolsNeeded: ["Basic socket set", "Screwdrivers"],
+      partsNeeded: [],
+      steps: [{ step: 1, instruction: "Consult your vehicle's service manual for specific instructions." }],
+      warnings: ["Always disconnect the battery before electrical work.", "Use jack stands when working under a vehicle."],
+      costSavings: "DIY can save 50-70% on labor costs"
+    };
+  }
+}
+
+// Get mechanic estimate
+export async function getMechanicEstimate(
+  vehicle: VehicleContext,
+  repairTask: string,
+  location?: string
+): Promise<{
+  laborHours: string;
+  laborCostRange: string;
+  partsEstimate: string;
+  totalRange: string;
+  diyOption: { possible: boolean; savings: string; difficulty: string };
+  tips: string[];
+}> {
+  try {
+    const vehicleInfo = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are an automotive repair cost estimator. Provide realistic repair cost estimates.
+
+Return ONLY a JSON object:
+{
+  "laborHours": "1.5 - 2 hours",
+  "laborCostRange": "$120 - $200",
+  "partsEstimate": "$50 - $150",
+  "totalRange": "$170 - $350",
+  "diyOption": {
+    "possible": true,
+    "savings": "Save $100-$180 on labor",
+    "difficulty": "Moderate - needs basic tools"
+  },
+  "tips": ["Get multiple quotes", "Ask about warranty on parts"]
+}
+
+Base estimates on average US shop rates ($80-$120/hr). Be realistic.`
+        },
+        {
+          role: "user",
+          content: `Estimate cost for: ${repairTask} on a ${vehicleInfo}${location ? ` in ${location}` : ''}`
+        }
+      ],
+      max_tokens: 400,
+      temperature: 0.4,
+    });
+
+    const content = response.choices[0]?.message?.content || "{}";
+    return JSON.parse(content.replace(/```json\n?|\n?```/g, ''));
+  } catch (error) {
+    console.error("Estimate error:", error);
+    return {
+      laborHours: "1-3 hours (varies)",
+      laborCostRange: "$80 - $300",
+      partsEstimate: "Varies by part",
+      totalRange: "Get quotes from local shops",
+      diyOption: { possible: true, savings: "Can save on labor", difficulty: "Varies" },
+      tips: ["Get 2-3 quotes from local shops", "Ask if they warranty their work"]
+    };
+  }
+}
+
+// Proactive alerts based on vehicle data
+export async function getProactiveAlerts(vehicles: VehicleContext[]): Promise<{
+  vehicleId: string;
+  alertType: 'maintenance' | 'recall' | 'seasonal' | 'milestone';
+  priority: 'high' | 'medium' | 'low';
+  title: string;
+  message: string;
+  action?: string;
+}[]> {
+  const alerts: any[] = [];
+  const currentMonth = new Date().getMonth();
+  
+  for (const vehicle of vehicles) {
+    const mileage = vehicle.mileage || 0;
+    
+    // Mileage-based alerts
+    if (mileage > 0) {
+      const nextInterval = Math.ceil(mileage / 5000) * 5000;
+      if (nextInterval - mileage < 500) {
+        alerts.push({
+          vehicleId: vehicle.id,
+          alertType: 'maintenance',
+          priority: 'high',
+          title: 'Oil Change Due Soon',
+          message: `Your ${vehicle.year} ${vehicle.make} ${vehicle.model} is approaching ${nextInterval.toLocaleString()} miles`,
+          action: 'Search for oil and filters'
+        });
+      }
+      
+      // Major service intervals
+      const majorIntervals = [30000, 60000, 90000, 100000];
+      for (const interval of majorIntervals) {
+        if (mileage < interval && mileage > interval - 2000) {
+          alerts.push({
+            vehicleId: vehicle.id,
+            alertType: 'milestone',
+            priority: 'medium',
+            title: `${(interval/1000)}K Mile Service`,
+            message: `Time for a comprehensive ${(interval/1000)}K mile service`,
+            action: 'View maintenance checklist'
+          });
+          break;
+        }
+      }
+    }
+    
+    // Seasonal alerts
+    if (currentMonth >= 9 && currentMonth <= 11) { // Fall
+      alerts.push({
+        vehicleId: vehicle.id,
+        alertType: 'seasonal',
+        priority: 'low',
+        title: 'Winter Prep',
+        message: 'Time to check antifreeze and battery before winter',
+        action: 'Shop winter prep items'
+      });
+    } else if (currentMonth >= 2 && currentMonth <= 4) { // Spring
+      alerts.push({
+        vehicleId: vehicle.id,
+        alertType: 'seasonal',
+        priority: 'low',
+        title: 'Spring Maintenance',
+        message: 'Good time for wiper blades and cabin filter',
+        action: 'Shop spring items'
+      });
+    }
+  }
+  
+  return alerts;
 }
 
 export async function parsePartSearch(query: string): Promise<PartSearchResult> {
