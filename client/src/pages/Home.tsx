@@ -15,14 +15,6 @@ import PhotoSearch from "@/components/PhotoSearch";
 import VoiceSearch from "@/components/VoiceSearch";
 import AIMascot from "@/components/AIMascot";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
-import { 
-  AnimatedStats, 
-  RetailerLogos, 
-  HowItWorks, 
-  Testimonials, 
-  CTABanner,
-  TrustBadges
-} from "@/components/LandingPageSections";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -131,15 +123,16 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Vehicle Type Selector - True Full Width Edge-to-Edge */}
+        {/* Unified Navigation Section - Vehicle Types + Categories */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="w-screen relative left-1/2 right-1/2 -mx-[50vw] mb-6 bg-black/20 py-4 border-y border-white/5"
         >
-          <div className="px-4 lg:px-8 xl:px-16">
+          <div className="px-4 lg:px-8 xl:px-16 space-y-4">
             <VehicleTypeSelector />
+            <CategoryGrid />
           </div>
         </motion.div>
 
@@ -385,21 +378,17 @@ export default function Home() {
                   </Card>
                 </div>
 
-                {/* Weather Widget */}
-                <div className="hidden lg:block">
-                  <WeatherWidget />
-                </div>
               </motion.div>
             </div>
 
-            {/* Right Column - Categories & Deals */}
+            {/* Right Column - Weather & Info */}
             <div className="lg:col-span-3 space-y-4">
               <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.25 }}
               >
-                <CategoryGrid />
+                <WeatherWidget />
               </motion.div>
             </div>
           </div>
@@ -410,40 +399,10 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="w-full px-4 lg:px-8 xl:px-16 mt-4"
+          className="w-full px-4 lg:px-8 xl:px-16 mt-6 mb-6"
         >
           <FeaturedCarousel />
         </motion.div>
-
-        {/* Animated Stats */}
-        <div className="w-full px-4 lg:px-8 xl:px-16">
-          <AnimatedStats />
-        </div>
-
-        {/* Retailer Logo Parade */}
-        <div className="w-full px-4 lg:px-8 xl:px-16">
-          <RetailerLogos />
-        </div>
-
-        {/* How It Works */}
-        <div className="w-full px-4 lg:px-8 xl:px-16">
-          <HowItWorks />
-        </div>
-
-        {/* CTA Banner */}
-        <div className="w-full px-4 lg:px-8 xl:px-16">
-          <CTABanner />
-        </div>
-
-        {/* Testimonials */}
-        <div className="w-full px-4 lg:px-8 xl:px-16">
-          <Testimonials />
-        </div>
-
-        {/* Trust Badges */}
-        <div className="w-full px-4 lg:px-8 xl:px-16 mb-6">
-          <TrustBadges />
-        </div>
       </div>
       
       {/* Footer with Wave Background */}
