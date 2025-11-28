@@ -42,21 +42,21 @@ export default function Nav() {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-3 lg:gap-5">
           <Link href="/garage">
-            <span className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/garage' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-garage">My Garage</span>
+            <span className={`text-[11px] lg:text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/garage' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-garage">My Garage</span>
           </Link>
           <Link href="/dashboard">
-            <span className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/dashboard' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-dashboard">Dashboard</span>
+            <span className={`text-[11px] lg:text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/dashboard' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-dashboard">Dashboard</span>
           </Link>
           <Link href="/shop-portal">
-            <span className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/shop-portal' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-shop-portal">Shop Portal</span>
+            <span className={`text-[11px] lg:text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/shop-portal' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-shop-portal">Shop Portal</span>
           </Link>
           <Link href="/insurance">
-            <span className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/insurance' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-insurance">Insurance</span>
+            <span className={`text-[11px] lg:text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/insurance' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-insurance">Insurance</span>
           </Link>
           <Link href="/pro">
-            <Button size="sm" className="bg-gradient-to-r from-primary to-yellow-500 text-black hover:from-primary/90 hover:to-yellow-500/90 font-tech uppercase gap-1 h-7 text-xs px-3">
+            <Button size="sm" className="bg-gradient-to-r from-primary to-yellow-500 text-black hover:from-primary/90 hover:to-yellow-500/90 font-tech uppercase gap-1 h-6 lg:h-7 text-[10px] lg:text-xs px-2 lg:px-3">
               <Crown className="w-3 h-3" />
               Pro
             </Button>
@@ -64,42 +64,42 @@ export default function Nav() {
         </div>
 
         <div className="flex items-center gap-2 lg:gap-3">
-          <Button variant="ghost" size="icon" className="hover:text-primary hidden lg:flex">
-            <Search className="w-5 h-5" />
+          <Button variant="ghost" size="icon" className="hover:text-primary hidden md:flex h-8 w-8">
+            <Search className="w-4 h-4" />
           </Button>
           
           {isAuthenticated ? (
             <>
               <Link href="/account">
-                <Button variant="ghost" size="icon" className={`hover:text-primary hidden lg:flex ${location === '/account' ? 'text-primary bg-primary/10' : ''}`}>
+                <Button variant="ghost" size="icon" className={`hover:text-primary hidden md:flex h-8 w-8 ${location === '/account' ? 'text-primary bg-primary/10' : ''}`}>
                   {user?.profileImageUrl ? (
-                    <img src={user.profileImageUrl} alt="" className="w-6 h-6 rounded-full object-cover" />
+                    <img src={user.profileImageUrl} alt="" className="w-5 h-5 rounded-full object-cover" />
                   ) : (
-                    <User className="w-5 h-5" />
+                    <User className="w-4 h-4" />
                   )}
                 </Button>
               </Link>
-              <Button variant="ghost" size="icon" className="hover:text-red-400 hidden lg:flex" title="Log out" onClick={logout}>
-                <LogOut className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="hover:text-red-400 hidden md:flex h-8 w-8" title="Log out" onClick={logout}>
+                <LogOut className="w-4 h-4" />
               </Button>
             </>
           ) : (
             <Link href="/auth">
-              <Button variant="outline" size="sm" className="hidden lg:flex gap-2 border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary font-tech text-xs">
+              <Button variant="outline" size="sm" className="hidden md:flex gap-1 border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary font-tech text-[10px] h-7 px-2">
                 <LogIn className="w-3 h-3" />
                 Sign In
               </Button>
             </Link>
           )}
           
-          <div className="hidden lg:block">
+          <div className="hidden md:block">
             <CartButton />
           </div>
           
-          {/* Mobile/Tablet Hamburger Menu */}
+          {/* Mobile Hamburger Menu */}
           <Drawer open={isOpen} onOpenChange={setIsOpen}>
             <DrawerTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden text-foreground hover:bg-primary/10">
+              <Button variant="ghost" size="icon" className="md:hidden text-foreground hover:bg-primary/10">
                 <Menu className="w-6 h-6" />
               </Button>
             </DrawerTrigger>
