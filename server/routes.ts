@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { nhtsaService } from "./services/nhtsa";
@@ -2187,7 +2187,11 @@ export async function registerRoutes(
   // Create affiliate network
   app.post('/api/affiliates/networks', async (req, res) => {
     try {
-      const network = await storage.createAffiliateNetwork(req.body);
+      const result = insertAffiliateNetworkSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      const network = await storage.createAffiliateNetwork(result.data);
       res.json(network);
     } catch (error) {
       console.error("Create affiliate network error:", error);
@@ -2228,7 +2232,11 @@ export async function registerRoutes(
   // Create affiliate partner
   app.post('/api/affiliates/partners', async (req, res) => {
     try {
-      const partner = await storage.createAffiliatePartner(req.body);
+      const result = insertAffiliatePartnerSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      const partner = await storage.createAffiliatePartner(result.data);
       res.json(partner);
     } catch (error) {
       console.error("Create affiliate partner error:", error);
@@ -2392,7 +2400,11 @@ export async function registerRoutes(
   // Create commission (webhook endpoint for networks)
   app.post('/api/affiliates/commissions', async (req, res) => {
     try {
-      const commission = await storage.createAffiliateCommission(req.body);
+      const result = insertAffiliateCommissionSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      const commission = await storage.createAffiliateCommission(result.data);
       res.json(commission);
     } catch (error) {
       console.error("Create commission error:", error);
