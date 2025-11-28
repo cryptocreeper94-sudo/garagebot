@@ -98,7 +98,7 @@ export default function Home() {
             />
           </motion.div>
           
-          <h1 className="text-xl md:text-2xl font-tech font-medium uppercase tracking-widest text-muted-foreground -mt-4 md:-mt-6">
+          <h1 className="text-xl md:text-2xl font-tech font-medium uppercase tracking-widest text-muted-foreground -mt-8 md:-mt-12 lg:-mt-14">
             Garage<span className="text-primary">Bot</span>
           </h1>
           <p className="text-sm md:text-base font-light text-muted-foreground/70 mt-0">
