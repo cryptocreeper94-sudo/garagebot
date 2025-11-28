@@ -7,6 +7,7 @@ import { fromZodError } from "zod-validation-error";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { nhtsaService } from "./services/nhtsa";
 import { weatherService } from "./services/weather";
+import * as authService from "./services/auth";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -16,7 +17,7 @@ export async function registerRoutes(
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes
+  // Auth routes (Replit OIDC)
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -25,6 +26,292 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Custom PIN-based Auth Routes
+  app.post('/api/auth/signup', async (req, res) => {
+    try {
+      const { username, mainPin, quickPin, firstName, lastName, phone, email, address, city, state, zipCode, enablePersistence } = req.body;
+      
+      // Validate username
+      const usernameValidation = authService.validateUsername(username);
+      if (!usernameValidation.valid) {
+        return res.status(400).json({ error: usernameValidation.error });
+      }
+      
+      // Validate main PIN (8 digits)
+      const pinValidation = authService.validateMainPin(mainPin);
+      if (!pinValidation.valid) {
+        return res.status(400).json({ error: pinValidation.error });
+      }
+      
+      // Validate quick PIN if provided (4 digits)
+      if (quickPin) {
+        const quickPinValidation = authService.validateQuickPin(quickPin);
+        if (!quickPinValidation.valid) {
+          return res.status(400).json({ error: quickPinValidation.error });
+        }
+      }
+      
+      // Check if username exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already taken" });
+      }
+      
+      // Hash passwords
+      const passwordHash = authService.hashPassword(mainPin);
+      const quickPinHash = quickPin ? authService.hashPin(quickPin) : null;
+      
+      // Generate recovery codes
+      const { codes, hash: recoveryHash } = authService.generateRecoveryCodes();
+      
+      // Create user
+      const user = await storage.upsertUser({
+        id: crypto.randomUUID(),
+        username,
+        passwordHash,
+        quickPin: quickPinHash,
+        recoveryCodesHash: recoveryHash,
+        firstName,
+        lastName,
+        phone,
+        email,
+        address,
+        city,
+        state,
+        zipCode,
+        persistenceEnabled: enablePersistence || false,
+        persistenceExpiresAt: enablePersistence ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null,
+      });
+      
+      // Set session
+      (req.session as any).userId = user.id;
+      (req.session as any).isCustomAuth = true;
+      
+      if (enablePersistence) {
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+      }
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          firstName: user.firstName,
+          subscriptionTier: user.subscriptionTier 
+        },
+        recoveryCodes: codes,
+        message: "Account created successfully. Save your recovery codes!"
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      res.status(500).json({ error: "Failed to create account" });
+    }
+  });
+
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { username, mainPin, enablePersistence } = req.body;
+      
+      const user = await storage.getUserByUsername(username);
+      if (!user || !user.passwordHash) {
+        return res.status(401).json({ error: "Invalid username or PIN" });
+      }
+      
+      const valid = authService.verifyPassword(mainPin, user.passwordHash);
+      if (!valid) {
+        return res.status(401).json({ error: "Invalid username or PIN" });
+      }
+      
+      // Update last login
+      await storage.updateUser(user.id, { 
+        lastLoginAt: new Date(),
+        persistenceEnabled: enablePersistence || false,
+        persistenceExpiresAt: enablePersistence ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null,
+      });
+      
+      // Set session
+      (req.session as any).userId = user.id;
+      (req.session as any).isCustomAuth = true;
+      
+      if (enablePersistence) {
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+      }
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          firstName: user.firstName,
+          subscriptionTier: user.subscriptionTier,
+          hasQuickPin: !!user.quickPin
+        }
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Failed to login" });
+    }
+  });
+
+  app.post('/api/auth/quick-login', async (req, res) => {
+    try {
+      const { username, quickPin } = req.body;
+      
+      const user = await storage.getUserByUsername(username);
+      if (!user || !user.quickPin) {
+        return res.status(401).json({ error: "Quick PIN not available" });
+      }
+      
+      const valid = authService.verifyPin(quickPin, user.quickPin);
+      if (!valid) {
+        return res.status(401).json({ error: "Invalid Quick PIN" });
+      }
+      
+      // Update last login
+      await storage.updateUser(user.id, { lastLoginAt: new Date() });
+      
+      // Set session
+      (req.session as any).userId = user.id;
+      (req.session as any).isCustomAuth = true;
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          firstName: user.firstName,
+          subscriptionTier: user.subscriptionTier
+        }
+      });
+    } catch (error) {
+      console.error("Quick login error:", error);
+      res.status(500).json({ error: "Failed to login" });
+    }
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to logout" });
+      }
+      res.json({ success: true });
+    });
+  });
+
+  app.get('/api/auth/me', async (req, res) => {
+    try {
+      const userId = (req.session as any)?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
+      }
+      
+      res.json({ 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          subscriptionTier: user.subscriptionTier,
+          hasQuickPin: !!user.quickPin,
+          hasGenesisBadge: user.hasGenesisBadge,
+          profileImageUrl: user.profileImageUrl
+        }
+      });
+    } catch (error) {
+      console.error("Auth check error:", error);
+      res.status(500).json({ error: "Failed to check auth" });
+    }
+  });
+
+  app.post('/api/auth/setup-quick-pin', async (req, res) => {
+    try {
+      const userId = (req.session as any)?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const { quickPin } = req.body;
+      const validation = authService.validateQuickPin(quickPin);
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
+      }
+      
+      const quickPinHash = authService.hashPin(quickPin);
+      await storage.updateUser(userId, { quickPin: quickPinHash });
+      
+      res.json({ success: true, message: "Quick PIN set up successfully" });
+    } catch (error) {
+      console.error("Quick PIN setup error:", error);
+      res.status(500).json({ error: "Failed to set up Quick PIN" });
+    }
+  });
+
+  app.post('/api/auth/send-recovery-sms', async (req, res) => {
+    try {
+      const { phone } = req.body;
+      
+      const user = await storage.getUserByPhone(phone);
+      if (!user) {
+        return res.json({ success: true }); // Don't reveal if phone exists
+      }
+      
+      const code = authService.generateSmsCode();
+      // Store code temporarily (in production, use Redis or similar)
+      (req.session as any).recoveryCode = code;
+      (req.session as any).recoveryUserId = user.id;
+      (req.session as any).recoveryExpires = Date.now() + 10 * 60 * 1000; // 10 min
+      
+      // TODO: Send via Twilio when approved
+      console.log(`Recovery code for ${phone}: ${code}`);
+      
+      res.json({ success: true, message: "Recovery code sent (pending Twilio)" });
+    } catch (error) {
+      console.error("Recovery SMS error:", error);
+      res.status(500).json({ error: "Failed to send recovery code" });
+    }
+  });
+
+  app.post('/api/auth/verify-recovery', async (req, res) => {
+    try {
+      const { code, newPin } = req.body;
+      
+      const storedCode = (req.session as any)?.recoveryCode;
+      const userId = (req.session as any)?.recoveryUserId;
+      const expires = (req.session as any)?.recoveryExpires;
+      
+      if (!storedCode || !userId || Date.now() > expires) {
+        return res.status(400).json({ error: "Recovery code expired or invalid" });
+      }
+      
+      if (code !== storedCode) {
+        return res.status(400).json({ error: "Invalid recovery code" });
+      }
+      
+      // Validate and set new PIN
+      const validation = authService.validateMainPin(newPin);
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
+      }
+      
+      const passwordHash = authService.hashPassword(newPin);
+      await storage.updateUser(userId, { passwordHash });
+      
+      // Clear recovery session
+      delete (req.session as any).recoveryCode;
+      delete (req.session as any).recoveryUserId;
+      delete (req.session as any).recoveryExpires;
+      
+      res.json({ success: true, message: "PIN reset successfully" });
+    } catch (error) {
+      console.error("Recovery verify error:", error);
+      res.status(500).json({ error: "Failed to verify recovery" });
     }
   });
 

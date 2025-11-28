@@ -16,6 +16,9 @@ import CheckoutSuccess from "@/pages/CheckoutSuccess";
 import CheckoutCancel from "@/pages/CheckoutCancel";
 import ShopPortal from "@/pages/ShopPortal";
 import Insurance from "@/pages/Insurance";
+import Auth from "@/pages/Auth";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import Investors from "@/pages/Investors";
 
 function Router() {
   return (
@@ -25,6 +28,9 @@ function Router() {
       <Route path="/garage" component={Garage} />
       <Route path="/shop-portal" component={ShopPortal} />
       <Route path="/insurance" component={Insurance} />
+      <Route path="/auth" component={Auth} />
+      <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/investors" component={Investors} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/account" component={AccountSetup} />
       <Route path="/checkout" component={Checkout} />
