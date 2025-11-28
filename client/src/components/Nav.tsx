@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
@@ -59,6 +59,12 @@ export default function Nav() {
             Services
             <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] px-1 py-0 font-mono">SOON</Badge>
           </span>
+          <Link href="/pro">
+            <Button size="sm" className="bg-gradient-to-r from-primary to-yellow-500 text-black hover:from-primary/90 hover:to-yellow-500/90 font-tech uppercase gap-1">
+              <Crown className="w-3 h-3" />
+              Pro
+            </Button>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">
@@ -166,6 +172,17 @@ export default function Nav() {
                     <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Genesis Hallmark</span>
                     <Badge className="bg-secondary/20 text-secondary border-secondary/30 text-[9px] font-mono">NFT</Badge>
                   </span>
+                  
+                  {/* Pro Upgrade Button */}
+                  <Link href="/pro" onClick={() => setIsOpen(false)}>
+                    <div className="py-3 px-4 mt-2 rounded-lg bg-gradient-to-r from-primary/20 to-yellow-500/20 border border-primary/30 flex items-center justify-between">
+                      <span className="flex items-center gap-2 text-lg font-medium">
+                        <Crown className="w-5 h-5 text-yellow-500" /> Upgrade to Pro
+                      </span>
+                      <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30 text-[9px] font-mono">$2.99/mo</Badge>
+                    </div>
+                  </Link>
+                  
                   <div className="pt-4 flex flex-col gap-3">
                     <MobileCartButton />
                     {isAuthenticated ? (

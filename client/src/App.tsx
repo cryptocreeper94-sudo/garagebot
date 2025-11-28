@@ -21,6 +21,8 @@ import Insurance from "@/pages/Insurance";
 import Auth from "@/pages/Auth";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Investors from "@/pages/Investors";
+import DevPortal from "@/pages/DevPortal";
+import Pro from "@/pages/Pro";
 
 function Router() {
   return (
@@ -38,6 +40,8 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />
+      <Route path="/dev" component={DevPortal} />
+      <Route path="/pro" component={Pro} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1503,6 +1503,382 @@ export async function registerRoutes(
     }
   });
 
+  // ============ Subscription Management ============
+
+  app.get('/api/subscription/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const user = await storage.getUser(userId);
+      
+      const isPro = user?.subscriptionTier === 'pro' && 
+        (!user?.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
+      
+      res.json({
+        isPro,
+        tier: user?.subscriptionTier || 'free',
+        status: isPro ? 'active' : 'inactive',
+        expiresAt: user?.subscriptionExpiresAt || null,
+      });
+    } catch (error) {
+      console.error("Subscription status error:", error);
+      res.status(500).json({ error: "Failed to get subscription status" });
+    }
+  });
+
+  app.post('/api/subscription/checkout', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const { billingPeriod } = req.body;
+      
+      // In production, create a Stripe checkout session
+      // For now, return a placeholder
+      const priceId = billingPeriod === 'annual' 
+        ? process.env.STRIPE_ANNUAL_PRICE_ID 
+        : process.env.STRIPE_MONTHLY_PRICE_ID;
+      
+      // Placeholder - in production, create actual Stripe checkout
+      res.json({
+        message: "Subscription checkout initiated",
+        checkoutUrl: `/pro?demo=true`,
+        billingPeriod,
+      });
+    } catch (error) {
+      console.error("Subscription checkout error:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  // ============ Vehicle Sharing (Family Garage) ============
+
+  app.get('/api/vehicles/shares', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const shares = await storage.getVehicleSharesByOwner(userId);
+      res.json(shares);
+    } catch (error) {
+      console.error("Get shares error:", error);
+      res.status(500).json({ error: "Failed to get shares" });
+    }
+  });
+
+  app.get('/api/vehicles/shared-with-me', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const shares = await storage.getVehicleSharesWithUser(userId);
+      res.json(shares);
+    } catch (error) {
+      console.error("Get shared with me error:", error);
+      res.status(500).json({ error: "Failed to get shared vehicles" });
+    }
+  });
+
+  app.post('/api/vehicles/shares', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const { vehicleId, email, shareType } = req.body;
+      
+      // Generate invite code
+      const inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+      const inviteExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      
+      const share = await storage.createVehicleShare({
+        vehicleId,
+        ownerId: userId,
+        sharedWithEmail: email,
+        shareType,
+        inviteCode,
+        inviteExpiresAt,
+      });
+      
+      res.json(share);
+    } catch (error) {
+      console.error("Create share error:", error);
+      res.status(500).json({ error: "Failed to create share" });
+    }
+  });
+
+  app.post('/api/vehicles/shares/accept', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const { inviteCode } = req.body;
+      
+      const share = await storage.acceptVehicleShare(inviteCode, userId);
+      if (!share) {
+        return res.status(404).json({ error: "Invalid or expired invite code" });
+      }
+      
+      res.json(share);
+    } catch (error) {
+      console.error("Accept share error:", error);
+      res.status(500).json({ error: "Failed to accept share" });
+    }
+  });
+
+  app.delete('/api/vehicles/shares/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      
+      await storage.deleteVehicleShare(id, userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete share error:", error);
+      res.status(500).json({ error: "Failed to delete share" });
+    }
+  });
+
+  // ============ AI Part Identification ============
+
+  app.post('/api/ai/identify-part', async (req, res) => {
+    try {
+      const { image, vehicleContext } = req.body;
+      
+      if (!image) {
+        return res.status(400).json({ error: "No image provided" });
+      }
+
+      // Check for OpenAI API key
+      const openaiKey = process.env.OPENAI_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+      
+      if (!openaiKey) {
+        // Return mock data for demo purposes when no API key
+        return res.json({
+          partName: "Brake Rotor",
+          partNumber: "BR-12345",
+          description: "Front brake disc rotor for passenger vehicles. This component is part of the disc brake system and works with brake pads to slow the vehicle.",
+          category: "Brakes",
+          confidence: 0.85,
+          alternateNames: ["Brake Disc", "Rotor", "Front Rotor"],
+          estimatedPrice: "45-120",
+          searchQuery: "brake rotor front",
+          compatibleVehicles: vehicleContext 
+            ? [`${vehicleContext.year} ${vehicleContext.make} ${vehicleContext.model}`]
+            : ["Most passenger vehicles"]
+        });
+      }
+
+      // Use OpenAI Vision API to identify the part
+      const OpenAI = require('openai');
+      const openai = new OpenAI({ apiKey: openaiKey });
+
+      const vehicleContextStr = vehicleContext 
+        ? `The part is from a ${vehicleContext.year} ${vehicleContext.make} ${vehicleContext.model}.`
+        : "No specific vehicle context provided.";
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are an expert automotive parts identifier. Analyze the image and identify the automotive part shown. ${vehicleContextStr}
+            
+            Respond with a JSON object containing:
+            - partName: Common name of the part
+            - partNumber: Estimated OEM or aftermarket part number if identifiable (or null)
+            - description: Brief description of what the part does (1-2 sentences)
+            - category: Category (Engine, Brakes, Suspension, Electrical, Body, Interior, Exhaust, Cooling, Transmission, Fuel System, Steering, Other)
+            - confidence: Your confidence level (0.0-1.0)
+            - alternateNames: Array of other names this part might be called
+            - estimatedPrice: Price range estimate in USD (e.g., "50-150")
+            - searchQuery: Best search terms to find this part online
+            
+            Only respond with valid JSON, no other text.`
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "image_url",
+                image_url: {
+                  url: image,
+                  detail: "high"
+                }
+              },
+              {
+                type: "text",
+                text: "What automotive part is this? Identify it and provide details in JSON format."
+              }
+            ]
+          }
+        ],
+        max_tokens: 500,
+        response_format: { type: "json_object" }
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content) {
+        throw new Error("No response from AI");
+      }
+
+      const partInfo = JSON.parse(content);
+      res.json(partInfo);
+
+    } catch (error) {
+      console.error("AI part identification error:", error);
+      res.status(500).json({ 
+        error: "Failed to identify part",
+        message: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // ============ NHTSA API ============
+
+  // Decode VIN
+  app.get('/api/nhtsa/decode/:vin', async (req, res) => {
+    try {
+      const { vin } = req.params;
+      const result = await nhtsaService.decodeVin(vin);
+      
+      // Map NHTSA fields to our format
+      res.json({
+        vin: result.vin,
+        year: parseInt(result.year) || 0,
+        make: result.make,
+        model: result.model,
+        trim: result.trim,
+        bodyStyle: result.bodyClass,
+        engineType: result.engineCylinders ? `${result.engineCylinders}-Cylinder` : undefined,
+        engineSize: result.engineDisplacement ? `${result.engineDisplacement}L` : undefined,
+        fuelType: result.fuelType,
+        transmission: result.transmission,
+        drivetrain: result.driveType,
+        vehicleType: result.vehicleType,
+        manufacturer: result.manufacturerName,
+        plantCountry: result.plantCountry,
+        errorCode: result.errorCode,
+        errorText: result.errorText,
+      });
+    } catch (error) {
+      console.error("VIN decode error:", error);
+      res.status(500).json({ error: "Failed to decode VIN" });
+    }
+  });
+
+  // Get recalls for a vehicle
+  app.get('/api/nhtsa/recalls/:year/:make/:model', async (req, res) => {
+    try {
+      const { year, make, model } = req.params;
+      const recalls = await nhtsaService.getRecalls(year, make, model);
+      res.json(recalls);
+    } catch (error) {
+      console.error("Get recalls error:", error);
+      res.status(500).json({ error: "Failed to fetch recalls" });
+    }
+  });
+
+  // Get recalls by VIN
+  app.get('/api/nhtsa/recalls/vin/:vin', async (req, res) => {
+    try {
+      const { vin } = req.params;
+      const recalls = await nhtsaService.getRecallsByVin(vin);
+      res.json(recalls);
+    } catch (error) {
+      console.error("Get recalls by VIN error:", error);
+      res.status(500).json({ error: "Failed to fetch recalls" });
+    }
+  });
+
+  // Get safety rating
+  app.get('/api/nhtsa/safety/:year/:make/:model', async (req, res) => {
+    try {
+      const { year, make, model } = req.params;
+      const rating = await nhtsaService.getSafetyRating(year, make, model);
+      res.json(rating || { overallRating: 'Not Rated' });
+    } catch (error) {
+      console.error("Get safety rating error:", error);
+      res.status(500).json({ error: "Failed to fetch safety rating" });
+    }
+  });
+
+  // Get makes
+  app.get('/api/nhtsa/makes', async (req, res) => {
+    try {
+      const makes = await nhtsaService.getMakes();
+      res.json(makes);
+    } catch (error) {
+      console.error("Get makes error:", error);
+      res.status(500).json({ error: "Failed to fetch makes" });
+    }
+  });
+
+  // Get models for make
+  app.get('/api/nhtsa/models/:make', async (req, res) => {
+    try {
+      const { make } = req.params;
+      const year = req.query.year as string | undefined;
+      const models = await nhtsaService.getModels(make, year);
+      res.json(models);
+    } catch (error) {
+      console.error("Get models error:", error);
+      res.status(500).json({ error: "Failed to fetch models" });
+    }
+  });
+
+  // ============ Dev Portal Tasks ============
+  
+  // Get all dev tasks
+  app.get('/api/dev/tasks', async (req, res) => {
+    try {
+      const tasks = await storage.getDevTasks();
+      res.json(tasks);
+    } catch (error) {
+      console.error("Get dev tasks error:", error);
+      res.status(500).json({ error: "Failed to fetch tasks" });
+    }
+  });
+
+  // Initialize default tasks
+  app.post('/api/dev/tasks/init', async (req, res) => {
+    try {
+      const { tasks } = req.body;
+      const results = [];
+      for (const task of tasks) {
+        const created = await storage.createDevTask(task);
+        results.push(created);
+      }
+      res.json({ message: "Tasks initialized", count: results.length });
+    } catch (error) {
+      console.error("Init dev tasks error:", error);
+      res.status(500).json({ error: "Failed to initialize tasks" });
+    }
+  });
+
+  // Create a new dev task
+  app.post('/api/dev/tasks', async (req, res) => {
+    try {
+      const task = await storage.createDevTask(req.body);
+      res.json(task);
+    } catch (error) {
+      console.error("Create dev task error:", error);
+      res.status(500).json({ error: "Failed to create task" });
+    }
+  });
+
+  // Update a dev task
+  app.patch('/api/dev/tasks/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const task = await storage.updateDevTask(id, req.body);
+      res.json(task);
+    } catch (error) {
+      console.error("Update dev task error:", error);
+      res.status(500).json({ error: "Failed to update task" });
+    }
+  });
+
+  // Delete a dev task
+  app.delete('/api/dev/tasks/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteDevTask(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete dev task error:", error);
+      res.status(500).json({ error: "Failed to delete task" });
+    }
+  });
+
   return httpServer;
 }
 
