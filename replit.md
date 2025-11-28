@@ -22,6 +22,15 @@
 
 # User Preferences
 
+## CRITICAL - ALWAYS CONFIRM BEFORE CHANGES
+**STOP AND ASK before implementing ANY changes.** Jason often gives voice commands while busy (driving, etc.) and needs to review the plan before work begins. Never start coding until explicit approval is given. This applies to ALL tasks - no exceptions.
+
+**Workflow:**
+1. Summarize what you understood from the request
+2. Confirm which project (GarageBot vs DarkWave Studios vs other)
+3. Ask "Should I proceed with this?" and WAIT for response
+4. Only begin work after receiving explicit "yes" or approval
+
 Preferred communication style: Simple, everyday language.
 
 # Developer Access
