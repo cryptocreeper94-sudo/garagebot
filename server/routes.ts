@@ -2169,6 +2169,452 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // AFFILIATE TRACKING ROUTES
+  // ============================================
+
+  // Get all affiliate networks
+  app.get('/api/affiliates/networks', async (req, res) => {
+    try {
+      const networks = await storage.getAffiliateNetworks();
+      res.json(networks);
+    } catch (error) {
+      console.error("Get affiliate networks error:", error);
+      res.status(500).json({ error: "Failed to fetch networks" });
+    }
+  });
+
+  // Create affiliate network
+  app.post('/api/affiliates/networks', async (req, res) => {
+    try {
+      const network = await storage.createAffiliateNetwork(req.body);
+      res.json(network);
+    } catch (error) {
+      console.error("Create affiliate network error:", error);
+      res.status(500).json({ error: "Failed to create network" });
+    }
+  });
+
+  // Get all affiliate partners
+  app.get('/api/affiliates/partners', async (req, res) => {
+    try {
+      const { category, active } = req.query;
+      const filters: { category?: string; isActive?: boolean } = {};
+      if (category) filters.category = category as string;
+      if (active !== undefined) filters.isActive = active === 'true';
+      
+      const partners = await storage.getAffiliatePartners(filters);
+      res.json(partners);
+    } catch (error) {
+      console.error("Get affiliate partners error:", error);
+      res.status(500).json({ error: "Failed to fetch partners" });
+    }
+  });
+
+  // Get single affiliate partner
+  app.get('/api/affiliates/partners/:id', async (req, res) => {
+    try {
+      const partner = await storage.getAffiliatePartner(req.params.id);
+      if (!partner) {
+        return res.status(404).json({ error: "Partner not found" });
+      }
+      res.json(partner);
+    } catch (error) {
+      console.error("Get affiliate partner error:", error);
+      res.status(500).json({ error: "Failed to fetch partner" });
+    }
+  });
+
+  // Create affiliate partner
+  app.post('/api/affiliates/partners', async (req, res) => {
+    try {
+      const partner = await storage.createAffiliatePartner(req.body);
+      res.json(partner);
+    } catch (error) {
+      console.error("Create affiliate partner error:", error);
+      res.status(500).json({ error: "Failed to create partner" });
+    }
+  });
+
+  // Update affiliate partner
+  app.patch('/api/affiliates/partners/:id', async (req, res) => {
+    try {
+      const partner = await storage.updateAffiliatePartner(req.params.id, req.body);
+      res.json(partner);
+    } catch (error) {
+      console.error("Update affiliate partner error:", error);
+      res.status(500).json({ error: "Failed to update partner" });
+    }
+  });
+
+  // Track affiliate click and redirect
+  app.get('/api/affiliates/click/:partnerSlug', async (req, res) => {
+    try {
+      const { partnerSlug } = req.params;
+      const { product, sku, search, source, utm_source, utm_medium, utm_campaign, utm_content, vehicleId } = req.query;
+      
+      // Find partner
+      const partner = await storage.getAffiliatePartnerBySlug(partnerSlug);
+      if (!partner) {
+        return res.status(404).json({ error: "Partner not found" });
+      }
+
+      // Get user ID if authenticated
+      const userId = (req.session as any)?.userId || null;
+      const sessionId = req.sessionID;
+
+      // Detect device type from user agent
+      const userAgent = req.headers['user-agent'] || '';
+      let deviceType = 'desktop';
+      if (/mobile/i.test(userAgent)) deviceType = 'mobile';
+      else if (/tablet/i.test(userAgent)) deviceType = 'tablet';
+
+      // Track the click
+      const click = await storage.trackAffiliateClick({
+        partnerId: partner.id,
+        userId,
+        sessionId,
+        vehicleId: vehicleId as string || null,
+        productName: product as string || null,
+        productSku: sku as string || null,
+        searchQuery: search as string || null,
+        sourceUrl: req.headers.referer || null,
+        destinationUrl: partner.affiliateUrl || partner.websiteUrl,
+        clickContext: source as string || 'search_results',
+        utmSource: utm_source as string || 'garagebot',
+        utmMedium: utm_medium as string || 'affiliate',
+        utmCampaign: utm_campaign as string || null,
+        utmContent: utm_content as string || null,
+        userAgent,
+        ipAddress: req.ip || null,
+        referrer: req.headers.referer || null,
+        deviceType,
+      });
+
+      // Build destination URL with tracking
+      let destinationUrl = partner.affiliateUrl || partner.websiteUrl;
+      
+      // Apply tracking template if available
+      if (partner.trackingTemplate) {
+        destinationUrl = partner.trackingTemplate
+          .replace('{clickId}', click.id)
+          .replace('{affiliateId}', partner.affiliateId || '')
+          .replace('{product}', encodeURIComponent(product as string || ''))
+          .replace('{sku}', encodeURIComponent(sku as string || ''))
+          .replace('{search}', encodeURIComponent(search as string || ''));
+      } else if (search) {
+        // Build search URL using the existing helper
+        destinationUrl = buildVendorSearchUrl(partner.websiteUrl, partnerSlug, search as string, sku as string);
+      }
+
+      // Redirect to affiliate partner
+      res.redirect(302, destinationUrl);
+    } catch (error) {
+      console.error("Affiliate click error:", error);
+      res.status(500).json({ error: "Failed to process click" });
+    }
+  });
+
+  // Track click via POST (for AJAX tracking without redirect)
+  app.post('/api/affiliates/track', async (req, res) => {
+    try {
+      const { partnerId, productName, productSku, searchQuery, vehicleId, sourceUrl, clickContext } = req.body;
+      
+      const userId = (req.session as any)?.userId || null;
+      const sessionId = req.sessionID;
+      const userAgent = req.headers['user-agent'] || '';
+      
+      let deviceType = 'desktop';
+      if (/mobile/i.test(userAgent)) deviceType = 'mobile';
+      else if (/tablet/i.test(userAgent)) deviceType = 'tablet';
+
+      const click = await storage.trackAffiliateClick({
+        partnerId,
+        userId,
+        sessionId,
+        vehicleId,
+        productName,
+        productSku,
+        searchQuery,
+        sourceUrl,
+        destinationUrl: null,
+        clickContext: clickContext || 'button_click',
+        utmSource: 'garagebot',
+        utmMedium: 'affiliate',
+        userAgent,
+        ipAddress: req.ip,
+        referrer: req.headers.referer || null,
+        deviceType,
+      });
+
+      res.json({ clickId: click.id, success: true });
+    } catch (error) {
+      console.error("Track click error:", error);
+      res.status(500).json({ error: "Failed to track click" });
+    }
+  });
+
+  // Get click statistics
+  app.get('/api/affiliates/stats/clicks', async (req, res) => {
+    try {
+      const { partnerId, startDate, endDate } = req.query;
+      
+      const filters: { partnerId?: string; startDate?: Date; endDate?: Date } = {};
+      if (partnerId) filters.partnerId = partnerId as string;
+      if (startDate) filters.startDate = new Date(startDate as string);
+      if (endDate) filters.endDate = new Date(endDate as string);
+      
+      const clicks = await storage.getAffiliateClicks(filters);
+      const stats = await storage.getAffiliateClickStats(partnerId as string);
+      
+      res.json({ clicks, stats });
+    } catch (error) {
+      console.error("Get click stats error:", error);
+      res.status(500).json({ error: "Failed to fetch click statistics" });
+    }
+  });
+
+  // Get commissions
+  app.get('/api/affiliates/commissions', async (req, res) => {
+    try {
+      const { partnerId, status } = req.query;
+      const commissions = await storage.getAffiliateCommissions({
+        partnerId: partnerId as string,
+        status: status as string,
+      });
+      res.json(commissions);
+    } catch (error) {
+      console.error("Get commissions error:", error);
+      res.status(500).json({ error: "Failed to fetch commissions" });
+    }
+  });
+
+  // Create commission (webhook endpoint for networks)
+  app.post('/api/affiliates/commissions', async (req, res) => {
+    try {
+      const commission = await storage.createAffiliateCommission(req.body);
+      res.json(commission);
+    } catch (error) {
+      console.error("Create commission error:", error);
+      res.status(500).json({ error: "Failed to create commission" });
+    }
+  });
+
+  // Update commission status
+  app.patch('/api/affiliates/commissions/:id/status', async (req, res) => {
+    try {
+      const { status } = req.body;
+      const commission = await storage.updateCommissionStatus(req.params.id, status);
+      res.json(commission);
+    } catch (error) {
+      console.error("Update commission status error:", error);
+      res.status(500).json({ error: "Failed to update commission status" });
+    }
+  });
+
+  // Get commission summary
+  app.get('/api/affiliates/commissions/summary', async (req, res) => {
+    try {
+      const summary = await storage.getCommissionSummary();
+      res.json(summary);
+    } catch (error) {
+      console.error("Get commission summary error:", error);
+      res.status(500).json({ error: "Failed to fetch commission summary" });
+    }
+  });
+
+  // Get payouts
+  app.get('/api/affiliates/payouts', async (req, res) => {
+    try {
+      const payouts = await storage.getAffiliatePayouts();
+      res.json(payouts);
+    } catch (error) {
+      console.error("Get payouts error:", error);
+      res.status(500).json({ error: "Failed to fetch payouts" });
+    }
+  });
+
+  // Seed initial affiliate partners (for development)
+  app.post('/api/affiliates/seed', async (req, res) => {
+    try {
+      // Create default networks
+      const amazonNetwork = await storage.createAffiliateNetwork({
+        name: "Amazon Associates",
+        slug: "amazon-associates",
+        websiteUrl: "https://affiliate-program.amazon.com",
+        trackingParamName: "tag",
+        commissionType: "percentage",
+        defaultCommissionRate: "4.00",
+        paymentThreshold: "10.00",
+        paymentFrequency: "monthly",
+        isActive: true,
+      });
+
+      const cjNetwork = await storage.createAffiliateNetwork({
+        name: "CJ Affiliate",
+        slug: "cj-affiliate",
+        websiteUrl: "https://www.cj.com",
+        trackingParamName: "cjid",
+        commissionType: "percentage",
+        defaultCommissionRate: "5.00",
+        paymentThreshold: "50.00",
+        paymentFrequency: "monthly",
+        isActive: true,
+      });
+
+      // Create sample partners
+      const partners = [
+        {
+          name: "Amazon Automotive",
+          slug: "amazon",
+          category: "parts",
+          websiteUrl: "https://www.amazon.com",
+          affiliateUrl: "https://www.amazon.com/?tag=garagebot-20",
+          networkId: amazonNetwork.id,
+          commissionRate: "4.00",
+          commissionType: "percentage",
+          cookieDuration: 24,
+          vehicleTypes: ["car", "truck", "motorcycle", "atv", "boat"],
+          partCategories: ["all"],
+          hasLocalPickup: false,
+          hasApi: true,
+          apiStatus: "planned",
+          priority: 90,
+          isActive: true,
+          isFeatured: true,
+        },
+        {
+          name: "RockAuto",
+          slug: "rockauto",
+          category: "parts",
+          websiteUrl: "https://www.rockauto.com",
+          commissionRate: "5.00",
+          commissionType: "percentage",
+          cookieDuration: 30,
+          vehicleTypes: ["car", "truck"],
+          partCategories: ["oem", "aftermarket"],
+          hasLocalPickup: false,
+          hasApi: true,
+          apiStatus: "planned",
+          priority: 85,
+          isActive: true,
+          isFeatured: true,
+        },
+        {
+          name: "AutoZone",
+          slug: "autozone",
+          category: "parts",
+          websiteUrl: "https://www.autozone.com",
+          commissionRate: "3.00",
+          commissionType: "percentage",
+          cookieDuration: 7,
+          vehicleTypes: ["car", "truck", "motorcycle"],
+          partCategories: ["oem", "aftermarket", "accessories"],
+          hasLocalPickup: true,
+          hasApi: false,
+          priority: 80,
+          isActive: true,
+          isFeatured: true,
+        },
+        {
+          name: "O'Reilly Auto Parts",
+          slug: "oreilly",
+          category: "parts",
+          websiteUrl: "https://www.oreillyauto.com",
+          commissionRate: "3.00",
+          commissionType: "percentage",
+          cookieDuration: 7,
+          vehicleTypes: ["car", "truck"],
+          partCategories: ["oem", "aftermarket", "accessories"],
+          hasLocalPickup: true,
+          hasApi: false,
+          priority: 75,
+          isActive: true,
+          isFeatured: true,
+        },
+        {
+          name: "Harbor Freight",
+          slug: "harbor-freight",
+          category: "tools",
+          websiteUrl: "https://www.harborfreight.com",
+          commissionRate: "4.00",
+          commissionType: "percentage",
+          cookieDuration: 14,
+          vehicleTypes: ["car", "truck", "motorcycle", "atv", "boat"],
+          partCategories: ["tools"],
+          hasLocalPickup: true,
+          hasApi: false,
+          priority: 70,
+          isActive: true,
+          isFeatured: false,
+        },
+        {
+          name: "Chemical Guys",
+          slug: "chemical-guys",
+          category: "car_care",
+          websiteUrl: "https://www.chemicalguys.com",
+          commissionRate: "8.00",
+          commissionType: "percentage",
+          cookieDuration: 30,
+          vehicleTypes: ["car", "truck", "motorcycle", "boat"],
+          partCategories: ["car_care", "detailing"],
+          hasLocalPickup: false,
+          hasApi: false,
+          priority: 65,
+          isActive: true,
+          isFeatured: false,
+        },
+        {
+          name: "VMC Chinese Parts",
+          slug: "vmc",
+          category: "parts",
+          websiteUrl: "https://www.vmcchineseparts.com",
+          commissionRate: "6.00",
+          commissionType: "percentage",
+          cookieDuration: 30,
+          vehicleTypes: ["atv", "motorcycle", "scooter"],
+          partCategories: ["chinese_parts"],
+          hasLocalPickup: false,
+          hasApi: false,
+          priority: 60,
+          isActive: true,
+          isFeatured: false,
+        },
+        {
+          name: "West Marine",
+          slug: "west-marine",
+          category: "parts",
+          websiteUrl: "https://www.westmarine.com",
+          commissionRate: "5.00",
+          commissionType: "percentage",
+          cookieDuration: 14,
+          vehicleTypes: ["boat"],
+          partCategories: ["marine_parts", "accessories"],
+          hasLocalPickup: true,
+          hasApi: false,
+          priority: 55,
+          isActive: true,
+          isFeatured: false,
+        },
+      ];
+
+      const createdPartners = [];
+      for (const partner of partners) {
+        const created = await storage.createAffiliatePartner(partner as any);
+        createdPartners.push(created);
+      }
+
+      res.json({ 
+        message: "Affiliate partners seeded successfully",
+        networks: 2,
+        partners: createdPartners.length
+      });
+    } catch (error) {
+      console.error("Seed affiliates error:", error);
+      res.status(500).json({ error: "Failed to seed affiliates" });
+    }
+  });
+
   return httpServer;
 }
 
