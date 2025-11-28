@@ -52,7 +52,13 @@ export default function Auth() {
     phone: "",
     code: "",
     newPin: "",
-    step: "phone" as "phone" | "code"
+    step: "phone" as "phone" | "code" | "backup"
+  });
+
+  const [backupForm, setBackupForm] = useState({
+    username: "",
+    code: "",
+    newPin: ""
   });
 
   const handleSignup = async () => {
@@ -146,6 +152,35 @@ export default function Auth() {
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to verify recovery code", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBackupCodeVerify = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/verify-backup-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(backupForm)
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to verify backup code");
+      }
+      
+      toast({ 
+        title: "PIN Reset", 
+        description: `You can now login with your new PIN. ${data.remainingCodes} recovery codes remaining.` 
+      });
+      setActiveTab("login");
+      setBackupForm({ username: "", code: "", newPin: "" });
+      setRecoveryForm({ ...recoveryForm, step: "phone" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -479,10 +514,10 @@ export default function Auth() {
                   <div className="space-y-4">
                     <div className="text-center mb-4">
                       <h3 className="font-tech uppercase text-lg">Account Recovery</h3>
-                      <p className="text-sm text-muted-foreground">Reset your PIN via SMS</p>
+                      <p className="text-sm text-muted-foreground">Reset your PIN via SMS or backup codes</p>
                     </div>
 
-                    {recoveryForm.step === "phone" ? (
+                    {recoveryForm.step === "phone" && (
                       <>
                         <div>
                           <Label className="text-xs uppercase text-muted-foreground">Phone Number</Label>
@@ -507,11 +542,30 @@ export default function Auth() {
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                           Send Recovery Code
                         </Button>
+                        <div className="relative my-4">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border/50" />
+                          </div>
+                          <div className="relative flex justify-center text-xs">
+                            <span className="bg-card px-2 text-muted-foreground">OR</span>
+                          </div>
+                        </div>
+                        <Button 
+                          variant="outline"
+                          className="w-full font-tech uppercase border-secondary/50 text-secondary hover:bg-secondary/10"
+                          onClick={() => setRecoveryForm({ ...recoveryForm, step: "backup" })}
+                          data-testid="button-use-backup-code"
+                        >
+                          <KeyRound className="w-4 h-4 mr-2" />
+                          Use Backup Recovery Code
+                        </Button>
                       </>
-                    ) : (
+                    )}
+
+                    {recoveryForm.step === "code" && (
                       <>
                         <div>
-                          <Label className="text-xs uppercase text-muted-foreground">Recovery Code</Label>
+                          <Label className="text-xs uppercase text-muted-foreground">SMS Recovery Code</Label>
                           <Input 
                             value={recoveryForm.code}
                             onChange={(e) => setRecoveryForm({ ...recoveryForm, code: e.target.value })}
@@ -548,6 +602,63 @@ export default function Auth() {
                           onClick={() => setRecoveryForm({ ...recoveryForm, step: "phone" })}
                         >
                           Back
+                        </Button>
+                      </>
+                    )}
+
+                    {recoveryForm.step === "backup" && (
+                      <>
+                        <div>
+                          <Label className="text-xs uppercase text-muted-foreground">Username</Label>
+                          <div className="relative mt-1">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input 
+                              value={backupForm.username}
+                              onChange={(e) => setBackupForm({ ...backupForm, username: e.target.value })}
+                              className="pl-10"
+                              placeholder="Enter your username"
+                              data-testid="input-backup-username"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-xs uppercase text-muted-foreground">Backup Recovery Code</Label>
+                          <Input 
+                            value={backupForm.code}
+                            onChange={(e) => setBackupForm({ ...backupForm, code: e.target.value.toUpperCase() })}
+                            className="mt-1 font-mono text-center tracking-widest text-lg"
+                            placeholder="XXXX-XXXX"
+                            data-testid="input-backup-code"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">Enter one of your saved recovery codes</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs uppercase text-muted-foreground">New 8-Digit PIN</Label>
+                          <Input 
+                            type="password"
+                            value={backupForm.newPin}
+                            onChange={(e) => setBackupForm({ ...backupForm, newPin: e.target.value.replace(/\D/g, '').slice(0, 8) })}
+                            className="mt-1 font-mono tracking-widest"
+                            placeholder="Create new PIN"
+                            maxLength={8}
+                            data-testid="input-backup-newpin"
+                          />
+                        </div>
+                        <Button 
+                          className="w-full font-tech uppercase"
+                          onClick={handleBackupCodeVerify}
+                          disabled={isLoading || !backupForm.username || backupForm.code.length < 9 || backupForm.newPin.length !== 8}
+                          data-testid="button-verify-backup"
+                        >
+                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                          Reset PIN with Backup Code
+                        </Button>
+                        <Button 
+                          variant="ghost"
+                          className="w-full"
+                          onClick={() => setRecoveryForm({ ...recoveryForm, step: "phone" })}
+                        >
+                          Back to SMS Recovery
                         </Button>
                       </>
                     )}

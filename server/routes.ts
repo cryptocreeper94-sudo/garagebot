@@ -65,7 +65,7 @@ export async function registerRoutes(
       const quickPinHash = quickPin ? authService.hashPin(quickPin) : null;
       
       // Generate recovery codes
-      const { codes, hash: recoveryHash } = authService.generateRecoveryCodes();
+      const { codes, hashedCodes } = authService.generateRecoveryCodes();
       
       // Create user
       const user = await storage.upsertUser({
@@ -73,7 +73,7 @@ export async function registerRoutes(
         username,
         passwordHash,
         quickPin: quickPinHash,
-        recoveryCodesHash: recoveryHash,
+        recoveryCodesHash: JSON.stringify(hashedCodes),
         firstName,
         lastName,
         phone,
@@ -312,6 +312,49 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Recovery verify error:", error);
       res.status(500).json({ error: "Failed to verify recovery" });
+    }
+  });
+
+  // Verify backup recovery code (the printable codes)
+  app.post('/api/auth/verify-backup-code', async (req, res) => {
+    try {
+      const { username, code, newPin } = req.body;
+      
+      if (!username || !code || !newPin) {
+        return res.status(400).json({ error: "Username, recovery code, and new PIN are required" });
+      }
+      
+      const user = await storage.getUserByUsername(username);
+      if (!user || !user.recoveryCodesHash) {
+        return res.status(400).json({ error: "Invalid username or no recovery codes set" });
+      }
+      
+      const { valid, remainingHashes } = authService.verifyRecoveryCode(code, user.recoveryCodesHash);
+      if (!valid) {
+        return res.status(400).json({ error: "Invalid recovery code" });
+      }
+      
+      // Validate new PIN
+      const validation = authService.validateMainPin(newPin);
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
+      }
+      
+      // Update password and remaining recovery codes
+      const passwordHash = authService.hashPassword(newPin);
+      await storage.updateUser(user.id, { 
+        passwordHash,
+        recoveryCodesHash: JSON.stringify(remainingHashes)
+      });
+      
+      res.json({ 
+        success: true, 
+        message: "PIN reset successfully",
+        remainingCodes: remainingHashes.length
+      });
+    } catch (error) {
+      console.error("Backup code verify error:", error);
+      res.status(500).json({ error: "Failed to verify recovery code" });
     }
   });
 
