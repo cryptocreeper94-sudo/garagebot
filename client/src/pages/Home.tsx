@@ -405,32 +405,54 @@ export default function Home() {
         </motion.div>
       </div>
       
-      {/* Footer with Wave Background */}
-      <footer className="py-10 border-t border-primary/20 bg-gradient-to-t from-[#0a0f1e] to-transparent relative overflow-hidden">
-        {/* Wave Background - Fixed aspect ratio */}
+      {/* Footer with Animated Wave Background */}
+      <footer className="border-t border-primary/20 bg-[#0a0f1e] relative overflow-hidden">
+        {/* Animated Wave Background - Seamless horizontal scroll */}
         <div className="absolute inset-0 w-full pointer-events-none overflow-hidden">
-          <div className="absolute bottom-0 left-0 right-0 h-32 max-h-full">
+          <div 
+            className="absolute bottom-0 left-0 flex"
+            style={{ 
+              animation: 'waveScroll 180s linear infinite',
+              width: '200%'
+            }}
+          >
             <img 
               src={footerWave} 
               alt="" 
-              className="w-full h-full object-cover object-top opacity-40 mix-blend-screen"
+              className="w-1/2 h-[150px] object-cover object-center opacity-70 mix-blend-screen flex-shrink-0"
+            />
+            <img 
+              src={footerWave} 
+              alt="" 
+              className="w-1/2 h-[150px] object-cover object-center opacity-70 mix-blend-screen flex-shrink-0"
+              style={{ transform: 'scaleX(-1)' }}
             />
           </div>
         </div>
-        <div className="container mx-auto px-4 text-center relative z-10 space-y-2">
-          <p className="font-mono text-[10px] text-muted-foreground/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-            © 2025 DARKWAVE STUDIOS LLC. ALL RIGHTS RESERVED.
+        
+        {/* Footer Content - Positioned over wave */}
+        <div className="container mx-auto px-4 text-center relative z-10 py-14 space-y-2">
+          <p className="font-mono text-sm text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+            © 2025 DarkWave Studios LLC. All Rights Reserved.
           </p>
           <a 
-            href="https://darkwave-studios.io" 
+            href="https://darkwavestudios.io" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-block font-mono text-[10px] text-primary/80 hover:text-primary transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+            className="inline-block font-mono text-sm text-primary hover:text-primary/80 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
             data-testid="link-darkwave-studios"
           >
-            darkwave-studios.io
+            Powered by DarkWave Studios LLC
           </a>
         </div>
+        
+        {/* CSS Animation for wave scroll */}
+        <style>{`
+          @keyframes waveScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}</style>
       </footer>
 
       {/* Buddy AI Chat - Always available */}
