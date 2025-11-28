@@ -89,7 +89,7 @@ export default function Home() {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="mb-6"
+            className="mb-1"
           >
             <img 
               src={gbEmblem} 
@@ -99,10 +99,10 @@ export default function Home() {
             />
           </motion.div>
           
-          <h1 className="text-xl md:text-2xl font-tech font-medium uppercase tracking-widest mb-1 text-muted-foreground">
+          <h1 className="text-xl md:text-2xl font-tech font-medium uppercase tracking-widest mb-0 text-muted-foreground -mt-2">
             Garage<span className="text-primary">Bot</span>
           </h1>
-          <p className="text-sm md:text-base font-light text-muted-foreground/70">
+          <p className="text-sm md:text-base font-light text-muted-foreground/70 mt-1">
             Right Part. First Time. Every Engine.
           </p>
         </motion.div>
