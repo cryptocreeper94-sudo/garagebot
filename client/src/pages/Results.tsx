@@ -71,6 +71,88 @@ function getVendorColor(slug: string): string {
   return colors[slug] || 'text-primary';
 }
 
+interface EnhancedVendorResult {
+  vendor: {
+    id: string;
+    name: string;
+    slug: string;
+    logoUrl: string | null;
+    hasLocalPickup: boolean;
+    hasAffiliateProgram: boolean;
+    supportsOEM?: boolean;
+    supportsAftermarket?: boolean;
+    storeLocatorUrl?: string;
+    logoColor?: string;
+  };
+  searchUrl: string;
+  directUrl: string;
+}
+
+function VendorCard({ result, index, displayQuery }: { result: EnhancedVendorResult; index: number; displayQuery: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.03 }}
+      className="flex-shrink-0 w-[280px]"
+    >
+      <Card 
+        className="bg-card border-border hover:border-primary/50 transition-all group overflow-hidden cursor-pointer h-full"
+        onClick={() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer')}
+        data-testid={`card-vendor-${result.vendor.slug}`}
+      >
+        <div className="p-4">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex-1 min-w-0">
+              <h3 className={`font-tech font-bold text-base truncate ${getVendorColor(result.vendor.slug)}`}>
+                {result.vendor.name}
+              </h3>
+              <div className="flex items-center gap-2 mt-1">
+                {result.vendor.hasLocalPickup ? (
+                  <span className="text-[9px] text-green-400 flex items-center gap-1 font-mono">
+                    <MapPin className="w-2.5 h-2.5" /> LOCAL
+                  </span>
+                ) : (
+                  <span className="text-[9px] text-blue-400 flex items-center gap-1 font-mono">
+                    <Truck className="w-2.5 h-2.5" /> SHIPS
+                  </span>
+                )}
+              </div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+          </div>
+
+          <div className="flex flex-wrap gap-1 mb-3">
+            {result.vendor.supportsOEM && (
+              <Badge variant="secondary" className="text-[8px] h-4 px-1 bg-blue-500/10 text-blue-400 border-blue-500/20">
+                OEM
+              </Badge>
+            )}
+            {result.vendor.supportsAftermarket && (
+              <Badge variant="secondary" className="text-[8px] h-4 px-1 bg-purple-500/10 text-purple-400 border-purple-500/20">
+                Aftermarket
+              </Badge>
+            )}
+          </div>
+
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full font-tech uppercase text-xs border-primary/30 text-primary hover:bg-primary hover:text-black"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
+            }}
+            data-testid={`button-search-${result.vendor.slug}`}
+          >
+            <Search className="w-3 h-3 mr-1" /> Check Price
+          </Button>
+        </div>
+      </Card>
+    </motion.div>
+  );
+}
+
 export default function Results() {
   const searchString = useSearch();
   const params = new URLSearchParams(searchString);
@@ -392,24 +474,27 @@ export default function Results() {
                   <Info className="w-3 h-3 mr-1" /> {sortedResults.length} RETAILERS
                 </Badge>
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1 items-center">
+                <span className="text-[9px] text-muted-foreground font-mono mr-1 hidden sm:inline">VIEW:</span>
                 <Button 
-                  size="icon" 
-                  variant="ghost" 
-                  className={`w-8 h-8 ${viewMode === 'grid' ? 'text-primary' : 'text-muted-foreground'}`}
+                  size="sm" 
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  className={`h-7 px-2 text-[10px] gap-1 ${viewMode === 'grid' ? 'bg-primary text-black' : 'text-muted-foreground'}`}
                   onClick={() => setViewMode('grid')}
                   data-testid="button-view-grid"
                 >
-                  <Grid className="w-4 h-4" />
+                  <Grid className="w-3 h-3" />
+                  <span className="hidden sm:inline">Carousel</span>
                 </Button>
                 <Button 
-                  size="icon" 
-                  variant="ghost" 
-                  className={`w-8 h-8 ${viewMode === 'list' ? 'text-primary' : 'text-muted-foreground'}`}
+                  size="sm" 
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  className={`h-7 px-2 text-[10px] gap-1 ${viewMode === 'list' ? 'bg-primary text-black' : 'text-muted-foreground'}`}
                   onClick={() => setViewMode('list')}
                   data-testid="button-view-list"
                 >
-                  <List className="w-4 h-4" />
+                  <List className="w-3 h-3" />
+                  <span className="hidden sm:inline">List</span>
                 </Button>
               </div>
             </div>
@@ -453,98 +538,57 @@ export default function Results() {
                   </div>
                 </div>
               )}
-              <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" : "space-y-3"}>
-                {sortedResults.map((result, index) => (
-                  <motion.div
-                    key={result.vendor.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Card 
-                      className="bg-card border-border hover:border-primary/50 transition-all group overflow-hidden cursor-pointer"
-                      onClick={() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer')}
-                      data-testid={`card-vendor-${result.vendor.slug}`}
+              {viewMode === 'grid' ? (
+                /* Horizontal Carousel View - Always horizontal scroll */
+                <div className="space-y-6">
+                  {/* Single horizontal carousel with all results */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Store className="w-4 h-4 text-primary" />
+                      <h3 className="font-tech text-sm uppercase text-primary">Compare Retailers</h3>
+                      <Badge variant="outline" className="text-[9px] border-primary/30 text-primary ml-auto">
+                        {sortedResults.length} stores
+                      </Badge>
+                      <span className="text-[9px] text-muted-foreground font-mono">← Swipe →</span>
+                    </div>
+                    <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
+                      {sortedResults.map((result, index) => (
+                        <VendorCard key={result.vendor.id} result={result} index={index} displayQuery={displayQuery} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* List View - Compact two-column grid */
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {sortedResults.map((result, index) => (
+                    <motion.div
+                      key={result.vendor.id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.02 }}
                     >
-                      <div className="p-4">
-                        <div className="flex items-start justify-between mb-3">
+                      <Card 
+                        className="bg-card border-border hover:border-primary/50 transition-all group cursor-pointer"
+                        onClick={() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer')}
+                        data-testid={`list-vendor-${result.vendor.slug}`}
+                      >
+                        <div className="p-3 flex items-center gap-3">
                           <div className="flex-1 min-w-0">
-                            <h3 className={`font-tech font-bold text-lg truncate ${getVendorColor(result.vendor.slug)}`}>
+                            <h3 className={`font-tech font-bold text-xs truncate ${getVendorColor(result.vendor.slug)}`}>
                               {result.vendor.name}
                             </h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              {result.vendor.hasLocalPickup ? (
-                                <span className="text-[10px] text-green-400 flex items-center gap-1 font-mono">
-                                  <MapPin className="w-3 h-3" /> LOCAL PICKUP
-                                </span>
-                              ) : (
-                                <span className="text-[10px] text-blue-400 flex items-center gap-1 font-mono">
-                                  <Truck className="w-3 h-3" /> SHIPS TO YOU
-                                </span>
-                              )}
-                            </div>
+                            <span className={`text-[8px] ${result.vendor.hasLocalPickup ? 'text-green-400' : 'text-blue-400'}`}>
+                              {result.vendor.hasLocalPickup ? '● Local' : '○ Ships'}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            <ShareButton 
-                              partName={displayQuery}
-                              vendorName={result.vendor.name}
-                              searchUrl={result.searchUrl}
-                            />
-                            <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                          </div>
+                          <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary shrink-0" />
                         </div>
-
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {result.vendor.hasLocalPickup && (
-                            <Badge variant="secondary" className="text-[9px] h-5 px-1.5 bg-green-500/10 text-green-400 border-green-500/20">
-                              <Store className="w-2.5 h-2.5 mr-1" /> In-Store
-                            </Badge>
-                          )}
-                          {result.vendor.supportsOEM && (
-                            <Badge variant="secondary" className="text-[9px] h-5 px-1.5 bg-blue-500/10 text-blue-400 border-blue-500/20">
-                              <Package className="w-2.5 h-2.5 mr-1" /> OEM
-                            </Badge>
-                          )}
-                          {result.vendor.supportsAftermarket && (
-                            <Badge variant="secondary" className="text-[9px] h-5 px-1.5 bg-purple-500/10 text-purple-400 border-purple-500/20">
-                              <Wrench className="w-2.5 h-2.5 mr-1" /> Aftermarket
-                            </Badge>
-                          )}
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="flex-1 font-tech uppercase text-xs border-primary/30 text-primary hover:bg-primary hover:text-black group-hover:border-primary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
-                            }}
-                            data-testid={`button-search-${result.vendor.slug}`}
-                          >
-                            <Search className="w-3 h-3 mr-1" /> Check Price
-                          </Button>
-                          {result.vendor.storeLocatorUrl && (
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="font-tech uppercase text-xs border-green-500/30 text-green-400 hover:bg-green-500 hover:text-black"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(result.vendor.storeLocatorUrl, '_blank', 'noopener,noreferrer');
-                              }}
-                              data-testid={`button-stores-${result.vendor.slug}`}
-                            >
-                              <Navigation className="w-3 h-3" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
               </>
             )}
 

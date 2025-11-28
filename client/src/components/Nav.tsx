@@ -21,8 +21,9 @@ export default function Nav() {
         <div className="flex items-center gap-4">
           {!isHome && (
             <Link href="/">
-              <Button variant="ghost" size="icon" className="mr-2 hover:bg-primary/10 text-muted-foreground hover:text-primary">
-                <ChevronLeft className="w-5 h-5" />
+              <Button variant="outline" size="sm" className="mr-2 border-primary/50 hover:bg-primary/10 text-primary hover:text-primary gap-1 font-tech uppercase text-xs">
+                <ChevronLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Home</span>
               </Button>
             </Link>
           )}
