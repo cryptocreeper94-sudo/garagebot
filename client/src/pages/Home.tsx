@@ -84,25 +84,25 @@ export default function Home() {
             SYSTEM ONLINE // WEB3 VERIFIED
           </div>
           
-          {/* GarageBot Logo Emblem */}
+          {/* GarageBot Logo Emblem - Featured Large */}
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="mb-4"
+            className="mb-6"
           >
             <img 
               src={gbEmblem} 
               alt="GarageBot Emblem" 
-              className="w-24 h-24 md:w-32 md:h-32 mx-auto drop-shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:drop-shadow-[0_0_40px_rgba(6,182,212,0.7)] transition-all duration-500 hover:scale-105"
+              className="w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto drop-shadow-[0_0_40px_rgba(6,182,212,0.6)] hover:drop-shadow-[0_0_60px_rgba(6,182,212,0.8)] transition-all duration-500 hover:scale-105"
               data-testid="img-garagebot-logo"
             />
           </motion.div>
           
-          <h1 className="text-4xl md:text-7xl font-tech font-bold uppercase leading-[0.9] mb-2 tracking-tight">
-            Garage<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Bot</span>
+          <h1 className="text-xl md:text-2xl font-tech font-medium uppercase tracking-widest mb-1 text-muted-foreground">
+            Garage<span className="text-primary">Bot</span>
           </h1>
-          <p className="text-lg md:text-2xl font-light text-muted-foreground">
+          <p className="text-sm md:text-base font-light text-muted-foreground/70">
             Right Part. First Time. Every Engine.
           </p>
         </motion.div>
