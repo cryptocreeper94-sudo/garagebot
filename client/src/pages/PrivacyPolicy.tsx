@@ -39,7 +39,7 @@ export default function PrivacyPolicy() {
               <div>
                 <h2 className="text-xl font-tech uppercase mb-3">Information We Collect</h2>
                 <div className="space-y-3 text-muted-foreground">
-                  <p>AutoLedger collects information you provide directly to us, including:</p>
+                  <p>GarageBot collects information you provide directly to us, including:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Account information (username, PIN, contact details)</li>
                     <li>Vehicle information (VIN, year, make, model, service history)</li>
@@ -155,7 +155,7 @@ export default function PrivacyPolicy() {
                     <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
                     <li><strong>SMS Reminders:</strong> Enable or disable service notifications</li>
                   </ul>
-                  <p className="mt-4">Contact us at <a href="mailto:privacy@autoledger.io" className="text-primary hover:underline">privacy@autoledger.io</a> for any privacy-related requests.</p>
+                  <p className="mt-4">Contact us at <a href="mailto:privacy@garagebot.io" className="text-primary hover:underline">privacy@garagebot.io</a> for any privacy-related requests.</p>
                 </div>
               </div>
             </div>
@@ -165,12 +165,12 @@ export default function PrivacyPolicy() {
             <h2 className="text-xl font-tech uppercase mb-3">Contact Information</h2>
             <div className="text-muted-foreground">
               <p className="font-bold text-foreground">DarkWave Studios LLC</p>
-              <p>AutoLedger Platform</p>
+              <p>GarageBot Platform</p>
               <p className="mt-2">
-                For privacy inquiries: <a href="mailto:privacy@autoledger.io" className="text-primary hover:underline">privacy@autoledger.io</a>
+                For privacy inquiries: <a href="mailto:privacy@garagebot.io" className="text-primary hover:underline">privacy@garagebot.io</a>
               </p>
               <p>
-                For general support: <a href="mailto:support@autoledger.io" className="text-primary hover:underline">support@autoledger.io</a>
+                For general support: <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a>
               </p>
             </div>
           </Card>

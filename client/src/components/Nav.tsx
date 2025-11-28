@@ -32,7 +32,7 @@ export default function Nav() {
                 <Wrench className="w-5 h-5 text-primary" />
               </div>
               <span className="font-tech font-bold text-xl md:text-2xl tracking-wide uppercase text-foreground">
-                Auto<span className="text-primary">Ledger</span>
+                Garage<span className="text-primary">Bot</span>
               </span>
             </div>
           </Link>

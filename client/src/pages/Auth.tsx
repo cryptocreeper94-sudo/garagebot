@@ -192,12 +192,12 @@ export default function Auth() {
   };
 
   const downloadRecoveryCodes = () => {
-    const content = `AutoLedger Recovery Codes\n${"=".repeat(30)}\n\n${recoveryCodes.join("\n")}\n\nKeep these codes safe. Each code can only be used once.`;
+    const content = `GarageBot Recovery Codes\n${"=".repeat(30)}\n\n${recoveryCodes.join("\n")}\n\nKeep these codes safe. Each code can only be used once.`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "autoledger-recovery-codes.txt";
+    a.download = "garagebot-recovery-codes.txt";
     a.click();
   };
 
@@ -219,7 +219,7 @@ export default function Auth() {
               <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h1 className="text-3xl font-tech font-bold uppercase text-primary">AutoLedger</h1>
+              <h1 className="text-3xl font-tech font-bold uppercase text-primary">GarageBot</h1>
               <p className="text-muted-foreground text-sm font-mono mt-1">SECURE ACCESS</p>
             </div>
 

@@ -37,7 +37,7 @@ export default function Investors() {
               The Future of <span className="text-primary">Vehicle Ownership</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
-              AutoLedger is building the definitive platform for automotive parts aggregation, 
+              GarageBot is building the definitive platform for automotive parts aggregation, 
               vehicle history management, and on-chain vehicle identity. Join us in revolutionizing 
               how 280 million vehicle owners in the US maintain their machines.
             </p>
@@ -227,7 +227,7 @@ export default function Investors() {
                   onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                   className="mt-1"
                   rows={4}
-                  placeholder="Tell us about your interest in AutoLedger..."
+                  placeholder="Tell us about your interest in GarageBot..."
                   data-testid="input-investor-message"
                 />
               </div>
@@ -240,7 +240,7 @@ export default function Investors() {
               </Button>
             </div>
             <p className="text-center text-sm text-muted-foreground mt-4">
-              Or email us directly at <a href="mailto:investors@autoledger.io" className="text-primary hover:underline">investors@autoledger.io</a>
+              Or email us directly at <a href="mailto:investors@garagebot.io" className="text-primary hover:underline">investors@garagebot.io</a>
             </p>
           </Card>
 

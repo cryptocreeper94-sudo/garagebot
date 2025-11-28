@@ -371,7 +371,7 @@ export default function Results() {
               <div className="flex items-start gap-3">
                 <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-tech text-sm font-bold mb-1">How AutoLedger Works</h4>
+                  <h4 className="font-tech text-sm font-bold mb-1">How GarageBot Works</h4>
                   <p className="text-xs text-muted-foreground">
                     We search across major auto parts retailers to help you find the best prices. 
                     Click any retailer card to search their inventory for "{displayQuery}". 

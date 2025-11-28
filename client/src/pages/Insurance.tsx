@@ -341,7 +341,7 @@ export default function Insurance() {
         <div className="max-w-4xl mx-auto mt-12 text-center">
           <p className="text-xs text-muted-foreground">
             <Shield className="w-3 h-3 inline mr-1" />
-            AutoLedger may receive compensation when you click on provider links. This does not influence our rankings.
+            GarageBot may receive compensation when you click on provider links. This does not influence our rankings.
             All quotes are provided directly by insurance carriers. Your information is secure and never sold.
           </p>
         </div>

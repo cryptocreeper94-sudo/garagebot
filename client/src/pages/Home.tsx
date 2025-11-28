@@ -84,7 +84,7 @@ export default function Home() {
             SYSTEM ONLINE // WEB3 VERIFIED
           </div>
           
-          {/* AL Logo Emblem */}
+          {/* GarageBot Logo Emblem */}
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -93,18 +93,45 @@ export default function Home() {
           >
             <img 
               src={alLogo} 
-              alt="AutoLedger Emblem" 
+              alt="GarageBot Emblem" 
               className="w-20 h-20 md:w-28 md:h-28 mx-auto rounded-xl border border-primary/30 shadow-[0_0_30px_rgba(6,182,212,0.3)]"
-              data-testid="img-al-logo"
+              data-testid="img-garagebot-logo"
             />
           </motion.div>
           
           <h1 className="text-4xl md:text-7xl font-tech font-bold uppercase leading-[0.9] mb-2 tracking-tight">
-            Auto<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Ledger</span>
+            Garage<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Bot</span>
           </h1>
           <p className="text-lg md:text-2xl font-light text-muted-foreground">
-            Aggregator Protocol
+            Right Part. First Time. Every Engine.
           </p>
+        </motion.div>
+
+        {/* Mission Statement */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="mb-8"
+        >
+          <Card className="bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 border-primary/20 p-6 md:p-8">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="font-tech text-lg md:text-xl uppercase text-primary mb-3">Our Mission</h2>
+              <p className="text-muted-foreground leading-relaxed md:text-lg">
+                GarageBot is the only parts platform built for <span className="text-foreground font-medium">every vehicle with an engine</span>. 
+                Whether you're fixing a family sedan, building a custom motorcycle, maintaining your fishing boat, 
+                or restoring a vintage ATV — we search <span className="text-primary font-medium">20+ retailers</span> to 
+                find the right part at the best price, with local pickup when you need it now.
+              </p>
+              <div className="flex flex-wrap justify-center gap-2 mt-4">
+                {["Cars", "Trucks", "Motorcycles", "ATVs", "Boats", "RVs", "Diesel", "Small Engines"].map((type) => (
+                  <span key={type} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">
+                    {type}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
         {/* Vehicle Type Selector - Full Width at Top */}
