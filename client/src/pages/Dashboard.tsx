@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ComingSoonCard } from "@/components/ComingSoonBadge";
+import { AffiliatesDashboard } from "@/components/AffiliatesDashboard";
 import { 
   Activity, 
   Server, 
@@ -17,7 +18,8 @@ import {
   Wrench,
   Star,
   FileText,
-  Package
+  Package,
+  Link2
 } from "lucide-react";
 import { 
   LineChart, 
@@ -329,6 +331,20 @@ export default function Dashboard() {
               </div>
             </div>
           </Card>
+        </div>
+
+        {/* Affiliate Tracking Section */}
+        <div className="mt-8 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <Link2 className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-xl font-tech font-bold uppercase text-white">Affiliate Partners</h2>
+              <p className="text-xs text-muted-foreground font-mono">Track clicks, conversions, and earnings</p>
+            </div>
+          </div>
+          <AffiliatesDashboard />
         </div>
       </div>
     </div>
