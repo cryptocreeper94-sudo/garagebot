@@ -321,60 +321,61 @@ export default function Home() {
               </motion.div>
             </div>
 
-            {/* Center Column - Buddy AI + Mission */}
+            {/* Center Column - Buddy AI + Mission Side by Side */}
             <div className="lg:col-span-4 xl:col-span-5 space-y-4">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
               >
-                {/* Buddy AI Card - Main Feature */}
-                <Card className="bg-gradient-to-br from-primary/10 via-card/80 to-secondary/10 border-primary/30 p-4 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.5)]">
-                        <Bot className="w-6 h-6 text-black" />
+                {/* Buddy + Mission in a horizontal grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Buddy AI Card */}
+                  <Card className="bg-gradient-to-br from-primary/10 via-card/80 to-secondary/10 border-primary/30 p-4 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl" />
+                    <div className="relative z-10 h-full flex flex-col">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+                          <Bot className="w-5 h-5 text-black" />
+                        </div>
+                        <div>
+                          <h3 className="font-tech text-xs uppercase text-primary flex items-center gap-1">
+                            Meet Buddy
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                          </h3>
+                          <p className="text-[9px] text-muted-foreground">AI Parts Expert</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-tech text-sm uppercase text-primary flex items-center gap-2">
-                          Meet Buddy
-                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        </h3>
-                        <p className="text-[10px] text-muted-foreground">Your AI Parts Expert</p>
-                      </div>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed mb-3 flex-1">
+                        Tell Buddy what you need, snap a photo, or describe your problem. He'll find the right part across 20+ retailers.
+                      </p>
+                      <Button 
+                        onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
+                        className="w-full bg-primary text-black hover:bg-primary/90 font-tech uppercase text-[10px] h-8 shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                        data-testid="button-chat-buddy"
+                      >
+                        <MessageCircle className="w-3 h-3 mr-1" />
+                        Chat with Buddy
+                      </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                      Tell Buddy what you need in plain English, snap a photo of a part, or describe your problem. 
-                      He'll find the right part across 20+ retailers.
-                    </p>
-                    <Button 
-                      onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
-                      className="w-full bg-primary text-black hover:bg-primary/90 font-tech uppercase text-xs h-9 shadow-[0_0_15px_rgba(6,182,212,0.3)]"
-                      data-testid="button-chat-buddy"
-                    >
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Chat with Buddy
-                    </Button>
-                  </div>
-                </Card>
+                  </Card>
 
-                {/* Mission Statement - Compact */}
-                <Card className="bg-card/50 border-white/10 p-4">
-                  <h2 className="font-tech text-xs uppercase text-primary mb-2">Our Mission</h2>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    GarageBot is the only parts platform built for <span className="text-foreground font-medium">every vehicle with an engine</span>. 
-                    Cars, motorcycles, boats, ATVs, RVs, classics, exotics — we search <span className="text-primary">20+ retailers</span> to 
-                    find the right part at the best price.
-                  </p>
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {["Cars", "Trucks", "Motorcycles", "ATVs", "Boats", "RVs", "Diesel", "Classics", "Exotics"].map((type) => (
-                      <span key={type} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[8px] font-mono border border-primary/20">
-                        {type}
-                      </span>
-                    ))}
-                  </div>
-                </Card>
+                  {/* Mission Statement */}
+                  <Card className="bg-card/50 border-white/10 p-4 flex flex-col">
+                    <h2 className="font-tech text-xs uppercase text-primary mb-2">Our Mission</h2>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed flex-1">
+                      GarageBot is the only parts platform built for <span className="text-foreground font-medium">every vehicle with an engine</span>. 
+                      We search <span className="text-primary">20+ retailers</span> to find the right part at the best price.
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {["Cars", "Trucks", "Motorcycles", "ATVs", "Boats", "RVs", "Diesel"].map((type) => (
+                        <span key={type} className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[7px] font-mono border border-primary/20">
+                          {type}
+                        </span>
+                      ))}
+                    </div>
+                  </Card>
+                </div>
 
                 {/* Weather Widget */}
                 <div className="hidden lg:block">
