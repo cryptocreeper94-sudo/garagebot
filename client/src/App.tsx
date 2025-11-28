@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/hooks/useCart";
 import OnboardingModal from "@/components/OnboardingModal";
+import AIMascot from "@/components/AIMascot";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Results from "@/pages/Results";
@@ -49,6 +50,7 @@ function App() {
           <Toaster />
           <OnboardingModal />
           <Router />
+          <AIMascot mascotName="Buddy" />
         </TooltipProvider>
       </CartProvider>
     </QueryClientProvider>

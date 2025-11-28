@@ -358,6 +358,59 @@ export async function registerRoutes(
     }
   });
 
+  // AI Assistant Routes
+  const aiAssistant = await import("./services/aiAssistant");
+  
+  app.post('/api/ai/chat', async (req, res) => {
+    try {
+      const { messages } = req.body;
+      if (!messages || !Array.isArray(messages)) {
+        return res.status(400).json({ error: "Messages array required" });
+      }
+      const response = await aiAssistant.chat(messages);
+      res.json({ response });
+    } catch (error) {
+      console.error("AI chat error:", error);
+      res.status(500).json({ error: "Failed to get AI response" });
+    }
+  });
+
+  app.post('/api/ai/parse-search', async (req, res) => {
+    try {
+      const { query } = req.body;
+      if (!query) {
+        return res.status(400).json({ error: "Query required" });
+      }
+      const result = await aiAssistant.parsePartSearch(query);
+      res.json(result);
+    } catch (error) {
+      console.error("AI parse error:", error);
+      res.status(500).json({ error: "Failed to parse search" });
+    }
+  });
+
+  app.post('/api/ai/suggestions', async (req, res) => {
+    try {
+      const { partType, vehicleInfo } = req.body;
+      const suggestions = await aiAssistant.getPartSuggestions(partType || "", vehicleInfo || "");
+      res.json({ suggestions });
+    } catch (error) {
+      console.error("AI suggestions error:", error);
+      res.status(500).json({ error: "Failed to get suggestions" });
+    }
+  });
+
+  app.get('/api/ai/greeting', async (req, res) => {
+    try {
+      const context = req.query.context as string | undefined;
+      const greeting = await aiAssistant.getMascotGreeting(context);
+      res.json({ greeting });
+    } catch (error) {
+      console.error("AI greeting error:", error);
+      res.status(500).json({ error: "Failed to get greeting" });
+    }
+  });
+
   // Vehicles API (protected)
   app.get("/api/vehicles", isAuthenticated, async (req: any, res) => {
     try {
