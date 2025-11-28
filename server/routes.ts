@@ -358,10 +358,69 @@ export async function registerRoutes(
     }
   });
 
-  // AI Assistant Routes
+  // AI Assistant Routes with sliding window rate limiting
   const aiAssistant = await import("./services/aiAssistant");
   
+  // Sliding window rate limiter with cleanup
+  interface RateLimitEntry {
+    timestamps: number[];
+    lastCleanup: number;
+  }
+  const aiRateLimiter = new Map<string, RateLimitEntry>();
+  const AI_RATE_LIMIT_AUTHENTICATED = 60; // requests per window for logged in users
+  const AI_RATE_LIMIT_ANONYMOUS = 15; // requests per window for anonymous users
+  const AI_RATE_WINDOW = 60000; // 1 minute sliding window
+  const CLEANUP_INTERVAL = 300000; // cleanup old entries every 5 minutes
+  
+  // Periodic cleanup of old entries to prevent memory leaks
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of aiRateLimiter.entries()) {
+      if (now - entry.lastCleanup > AI_RATE_WINDOW * 2) {
+        aiRateLimiter.delete(key);
+      }
+    }
+  }, CLEANUP_INTERVAL);
+  
+  const checkAIRateLimit = (req: any, res: any): boolean => {
+    const isAuthenticated = !!req.user?.claims?.sub;
+    const userId = req.user?.claims?.sub;
+    const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    const identifier = userId || `ip:${ip}`;
+    const limit = isAuthenticated ? AI_RATE_LIMIT_AUTHENTICATED : AI_RATE_LIMIT_ANONYMOUS;
+    
+    const now = Date.now();
+    const windowStart = now - AI_RATE_WINDOW;
+    
+    let entry = aiRateLimiter.get(identifier);
+    if (!entry) {
+      entry = { timestamps: [], lastCleanup: now };
+      aiRateLimiter.set(identifier, entry);
+    }
+    
+    // Remove timestamps outside the current window
+    entry.timestamps = entry.timestamps.filter(ts => ts > windowStart);
+    entry.lastCleanup = now;
+    
+    if (entry.timestamps.length >= limit) {
+      const oldestInWindow = Math.min(...entry.timestamps);
+      const retryAfter = Math.ceil((oldestInWindow + AI_RATE_WINDOW - now) / 1000);
+      res.status(429).json({ 
+        error: isAuthenticated 
+          ? `You've made too many requests. Please wait ${retryAfter} seconds before trying again.`
+          : `Rate limit reached. Sign in for higher limits, or wait ${retryAfter} seconds.`,
+        retryAfter,
+        authenticated: isAuthenticated
+      });
+      return false;
+    }
+    
+    entry.timestamps.push(now);
+    return true;
+  };
+  
   app.post('/api/ai/chat', async (req, res) => {
+    if (!checkAIRateLimit(req, res)) return;
     try {
       const { messages } = req.body;
       if (!messages || !Array.isArray(messages)) {
@@ -376,6 +435,7 @@ export async function registerRoutes(
   });
 
   app.post('/api/ai/parse-search', async (req, res) => {
+    if (!checkAIRateLimit(req, res)) return;
     try {
       const { query } = req.body;
       if (!query) {
@@ -390,6 +450,7 @@ export async function registerRoutes(
   });
 
   app.post('/api/ai/suggestions', async (req, res) => {
+    if (!checkAIRateLimit(req, res)) return;
     try {
       const { partType, vehicleInfo } = req.body;
       const suggestions = await aiAssistant.getPartSuggestions(partType || "", vehicleInfo || "");
@@ -401,6 +462,7 @@ export async function registerRoutes(
   });
 
   app.get('/api/ai/greeting', async (req, res) => {
+    if (!checkAIRateLimit(req, res)) return;
     try {
       const context = req.query.context as string | undefined;
       const greeting = await aiAssistant.getMascotGreeting(context);
@@ -408,6 +470,22 @@ export async function registerRoutes(
     } catch (error) {
       console.error("AI greeting error:", error);
       res.status(500).json({ error: "Failed to get greeting" });
+    }
+  });
+  
+  // AI image analysis for visual part/vehicle identification
+  app.post('/api/ai/identify-image', async (req, res) => {
+    if (!checkAIRateLimit(req, res)) return;
+    try {
+      const { imageUrl, imageBase64, context } = req.body;
+      if (!imageUrl && !imageBase64) {
+        return res.status(400).json({ error: "Image URL or base64 required" });
+      }
+      const result = await aiAssistant.identifyFromImage(imageUrl || imageBase64, context);
+      res.json(result);
+    } catch (error) {
+      console.error("AI image identify error:", error);
+      res.status(500).json({ error: "Failed to identify image" });
     }
   });
 
