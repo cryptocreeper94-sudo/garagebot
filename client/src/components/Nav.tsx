@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { CartButton, MobileCartButton } from "@/components/CartDrawer";
 import { useCart } from "@/hooks/useCart";
+import gbEmblem from "@assets/generated_images/chrome_holographic_gb_emblem.png";
 
 export default function Nav() {
   const [location] = useLocation();
@@ -28,9 +29,11 @@ export default function Nav() {
           
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer group">
-              <div className="w-8 h-8 bg-primary/10 border border-primary/50 rounded-sm flex items-center justify-center transform group-hover:rotate-180 transition-transform duration-700">
-                <Wrench className="w-5 h-5 text-primary" />
-              </div>
+              <img 
+                src={gbEmblem} 
+                alt="GB" 
+                className="w-9 h-9 md:w-10 md:h-10 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.5)] group-hover:drop-shadow-[0_0_12px_rgba(6,182,212,0.8)] transition-all duration-300 group-hover:scale-110"
+              />
               <span className="font-tech font-bold text-xl md:text-2xl tracking-wide uppercase text-foreground">
                 Garage<span className="text-primary">Bot</span>
               </span>
