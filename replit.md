@@ -85,6 +85,13 @@ Preferred communication style: Simple, everyday language.
 - `sessions` - Express session storage
 - Stripe tables (managed by `stripe-replit-sync`)
 
+**Affiliate Tracking Tables**:
+- `affiliate_networks` - Affiliate networks (Amazon Associates, CJ, Rakuten, Impact, etc.)
+- `affiliate_partners` - Individual retailers/brands with commission rates, tracking templates
+- `affiliate_clicks` - Click tracking with user, device, search context, UTM parameters
+- `affiliate_commissions` - Conversion tracking with order amounts, commission status
+- `affiliate_payouts` - Monthly payout summaries by network
+
 **Data Layer**: Storage abstraction interface (`IStorage`) implemented by `DatabaseStorage` class in `server/storage.ts`, providing clean separation between business logic and data access.
 
 ## Payment Processing
