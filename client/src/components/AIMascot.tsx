@@ -712,28 +712,28 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             setIsMinimized(false);
           }
         }}
-        className="fixed bottom-4 right-4 z-50 p-0 bg-transparent border-0 cursor-pointer"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-0 bg-transparent border-0 cursor-pointer"
         style={{ background: 'none' }}
         data-testid="ai-mascot-toggle"
       >
         {isOpen ? (
           <motion.div 
-            className="w-10 h-10 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center"
+            className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)]"
             style={{ filter: 'drop-shadow(0 2px 6px rgba(0, 255, 255, 0.3))' }}
           >
-            <X className="w-4 h-4 text-primary" />
+            <X className="w-5 h-5 md:w-6 md:h-6 text-primary" />
           </motion.div>
         ) : (
           <div className="relative">
             <motion.img 
               src={mascotWaving} 
               alt="Chat with Buddy" 
-              className="w-10 h-10 object-contain"
+              className="w-14 h-14 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain"
               style={{ 
-                filter: 'drop-shadow(0 1px 4px rgba(0, 255, 255, 0.4)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
+                filter: 'drop-shadow(0 2px 8px rgba(0, 255, 255, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))',
               }}
               animate={{
-                y: [0, -2, 0],
+                y: [0, -4, 0],
               }}
               transition={{
                 duration: 2,
@@ -741,7 +741,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 ease: "easeInOut"
               }}
             />
-            <Sparkles className="w-2.5 h-2.5 text-yellow-300 absolute -top-0.5 -right-0.5 animate-pulse" />
+            <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-yellow-300 absolute -top-1 -right-1 animate-pulse" />
           </div>
         )}
       </motion.button>
