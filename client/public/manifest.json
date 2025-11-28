@@ -1,0 +1,54 @@
+{
+  "name": "GarageBot - Auto Parts Search",
+  "short_name": "GarageBot",
+  "description": "Search 15M+ auto parts from 40+ retailers. AI-powered Buddy helps find parts for cars, trucks, motorcycles, ATVs, boats, RVs, and all vehicles with engines.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#00D9FF",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["shopping", "automotive", "utilities"],
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/attached_assets/hero-blueprint.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GarageBot Parts Search"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search Parts",
+      "short_name": "Search",
+      "description": "Search for auto parts",
+      "url": "/",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Garage",
+      "short_name": "Garage",
+      "description": "View your saved vehicles",
+      "url": "/garage",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

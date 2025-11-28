@@ -7,6 +7,7 @@ import { CartProvider } from "@/hooks/useCart";
 import OnboardingModal from "@/components/OnboardingModal";
 import AIMascot from "@/components/AIMascot";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
+import AddToHomeScreen from "@/components/AddToHomeScreen";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Results from "@/pages/Results";
@@ -56,6 +57,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <OnboardingModal />
+          <AddToHomeScreen />
           <Router />
           <AIMascot mascotName="Buddy" />
           <BuddyHideSeek />
