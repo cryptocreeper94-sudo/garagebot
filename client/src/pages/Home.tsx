@@ -20,11 +20,25 @@ export default function Home() {
   const [_, setLocation] = useLocation();
   const [isSearching, setIsSearching] = useState(false);
   const [webUrl, setWebUrl] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedMake, setSelectedMake] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!searchQuery.trim()) return;
+    
     setIsSearching(true);
-    setTimeout(() => setLocation("/results"), 800);
+    
+    // Build query params
+    const params = new URLSearchParams();
+    params.set('q', searchQuery.trim());
+    if (selectedYear) params.set('year', selectedYear);
+    if (selectedMake) params.set('make', selectedMake);
+    if (selectedModel) params.set('model', selectedModel);
+    
+    setTimeout(() => setLocation(`/results?${params.toString()}`), 600);
   };
 
   const handleWebNavigate = () => {
@@ -127,34 +141,57 @@ export default function Home() {
                   </TabsList>
                   
                   <TabsContent value="standard" className="p-3 md:p-5 space-y-4">
-                    <div className="grid grid-cols-3 gap-2 md:gap-3">
-                      <Select>
-                        <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-year"><SelectValue placeholder="Year" /></SelectTrigger>
-                        <SelectContent><SelectItem value="2024">2024</SelectItem><SelectItem value="2023">2023</SelectItem><SelectItem value="2022">2022</SelectItem></SelectContent>
-                      </Select>
-                      <Select>
-                        <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-make"><SelectValue placeholder="Make" /></SelectTrigger>
-                        <SelectContent><SelectItem value="toyota">Toyota</SelectItem><SelectItem value="honda">Honda</SelectItem><SelectItem value="ford">Ford</SelectItem></SelectContent>
-                      </Select>
-                      <Select>
-                        <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-model"><SelectValue placeholder="Model" /></SelectTrigger>
-                        <SelectContent><SelectItem value="tacoma">Tacoma</SelectItem><SelectItem value="camry">Camry</SelectItem></SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex gap-2 md:gap-3">
-                      <Input 
-                        className="h-14 bg-black/20 border-white/5 font-tech text-base md:text-lg placeholder:text-muted-foreground/50 focus:border-primary/50 hover:bg-black/30 transition-colors" 
-                        placeholder="SEARCH PART NUMBER..." 
-                        data-testid="input-part-search"
-                      />
-                      <Button 
-                        className="h-14 w-14 shrink-0 bg-primary text-black hover:bg-primary/90 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.3)]" 
-                        onClick={handleSearch}
-                        data-testid="button-search"
-                      >
-                        <ChevronRight className="w-6 h-6" />
-                      </Button>
-                    </div>
+                    <form onSubmit={handleSearch}>
+                      <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                        <Select value={selectedYear} onValueChange={setSelectedYear}>
+                          <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-year"><SelectValue placeholder="Year" /></SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 35 }, (_, i) => 2025 - i).map(year => (
+                              <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select value={selectedMake} onValueChange={setSelectedMake}>
+                          <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-make"><SelectValue placeholder="Make" /></SelectTrigger>
+                          <SelectContent>
+                            {["Acura", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge", "Ford", "GMC", "Honda", "Hyundai", "Infiniti", "Jeep", "Kia", "Lexus", "Lincoln", "Mazda", "Mercedes-Benz", "Nissan", "Ram", "Subaru", "Tesla", "Toyota", "Volkswagen", "Volvo"].map(make => (
+                              <SelectItem key={make} value={make.toLowerCase()}>{make}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select value={selectedModel} onValueChange={setSelectedModel}>
+                          <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-model"><SelectValue placeholder="Model" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Models</SelectItem>
+                            <SelectItem value="sedan">Sedan</SelectItem>
+                            <SelectItem value="suv">SUV</SelectItem>
+                            <SelectItem value="truck">Truck</SelectItem>
+                            <SelectItem value="coupe">Coupe</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex gap-2 md:gap-3">
+                        <Input 
+                          className="h-14 bg-black/20 border-white/5 font-tech text-base md:text-lg placeholder:text-muted-foreground/50 focus:border-primary/50 hover:bg-black/30 transition-colors" 
+                          placeholder="SEARCH PARTS, PART NUMBER, OR KEYWORD..." 
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          data-testid="input-part-search"
+                        />
+                        <Button 
+                          type="submit"
+                          className="h-14 w-14 shrink-0 bg-primary text-black hover:bg-primary/90 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.3)]" 
+                          disabled={isSearching || !searchQuery.trim()}
+                          data-testid="button-search"
+                        >
+                          {isSearching ? (
+                            <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                          ) : (
+                            <ChevronRight className="w-6 h-6" />
+                          )}
+                        </Button>
+                      </div>
+                    </form>
                   </TabsContent>
 
                   <TabsContent value="web3" className="p-3 md:p-5 space-y-4">
