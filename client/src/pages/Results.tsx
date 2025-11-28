@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight } from "lucide-react";
 import Nav from "@/components/Nav";
 import VehicleFunFacts from "@/components/VehicleFunFacts";
+import ShareButton from "@/components/ShareButton";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
@@ -324,7 +325,14 @@ export default function Results() {
                               )}
                             </div>
                           </div>
-                          <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                          <div className="flex items-center gap-1 shrink-0">
+                            <ShareButton 
+                              partName={displayQuery}
+                              vendorName={result.vendor.name}
+                              searchUrl={result.searchUrl}
+                            />
+                            <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                          </div>
                         </div>
 
                         <div className="flex flex-wrap gap-1 mb-3">
