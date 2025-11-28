@@ -42,40 +42,36 @@ export default function Nav() {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-6">
           <Link href="/garage">
-            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/garage' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-garage">My Garage</span>
+            <span className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/garage' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-garage">My Garage</span>
           </Link>
           <Link href="/dashboard">
-            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/dashboard' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-dashboard">Dashboard</span>
+            <span className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/dashboard' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-dashboard">Dashboard</span>
           </Link>
           <Link href="/shop-portal">
-            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/shop-portal' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-shop-portal">Shop Portal</span>
+            <span className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/shop-portal' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-shop-portal">Shop Portal</span>
           </Link>
           <Link href="/insurance">
-            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/insurance' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-insurance">Insurance</span>
+            <span className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/insurance' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-insurance">Insurance</span>
           </Link>
-          <span className="text-sm font-medium text-muted-foreground/50 cursor-not-allowed flex items-center gap-1" data-testid="nav-services">
-            Services
-            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] px-1 py-0 font-mono">SOON</Badge>
-          </span>
           <Link href="/pro">
-            <Button size="sm" className="bg-gradient-to-r from-primary to-yellow-500 text-black hover:from-primary/90 hover:to-yellow-500/90 font-tech uppercase gap-1">
+            <Button size="sm" className="bg-gradient-to-r from-primary to-yellow-500 text-black hover:from-primary/90 hover:to-yellow-500/90 font-tech uppercase gap-1 h-7 text-xs px-3">
               <Crown className="w-3 h-3" />
               Pro
             </Button>
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-3">
-          <Button variant="ghost" size="icon" className="hover:text-primary hidden md:flex">
+        <div className="flex items-center gap-2 lg:gap-3">
+          <Button variant="ghost" size="icon" className="hover:text-primary hidden lg:flex">
             <Search className="w-5 h-5" />
           </Button>
           
           {isAuthenticated ? (
             <>
               <Link href="/account">
-                <Button variant="ghost" size="icon" className={`hover:text-primary hidden md:flex ${location === '/account' ? 'text-primary bg-primary/10' : ''}`}>
+                <Button variant="ghost" size="icon" className={`hover:text-primary hidden lg:flex ${location === '/account' ? 'text-primary bg-primary/10' : ''}`}>
                   {user?.profileImageUrl ? (
                     <img src={user.profileImageUrl} alt="" className="w-6 h-6 rounded-full object-cover" />
                   ) : (
@@ -83,27 +79,27 @@ export default function Nav() {
                   )}
                 </Button>
               </Link>
-              <Button variant="ghost" size="icon" className="hover:text-red-400 hidden md:flex" title="Log out" onClick={logout}>
+              <Button variant="ghost" size="icon" className="hover:text-red-400 hidden lg:flex" title="Log out" onClick={logout}>
                 <LogOut className="w-5 h-5" />
               </Button>
             </>
           ) : (
             <Link href="/auth">
-              <Button variant="outline" className="hidden md:flex gap-2 border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary font-tech">
-                <LogIn className="w-4 h-4" />
+              <Button variant="outline" size="sm" className="hidden lg:flex gap-2 border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary font-tech text-xs">
+                <LogIn className="w-3 h-3" />
                 Sign In
               </Button>
             </Link>
           )}
           
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <CartButton />
           </div>
           
-          {/* Mobile Hamburger Menu */}
+          {/* Mobile/Tablet Hamburger Menu */}
           <Drawer open={isOpen} onOpenChange={setIsOpen}>
             <DrawerTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden text-foreground hover:bg-primary/10">
+              <Button variant="ghost" size="icon" className="lg:hidden text-foreground hover:bg-primary/10">
                 <Menu className="w-6 h-6" />
               </Button>
             </DrawerTrigger>
