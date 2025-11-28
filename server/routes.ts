@@ -489,6 +489,149 @@ export async function registerRoutes(
     }
   });
 
+  // ============ Enhanced Buddy AI Routes ============
+
+  // Unified chat with conversation memory
+  app.post('/api/ai/buddy/chat', async (req: any, res) => {
+    if (!checkAIRateLimit(req, res)) return;
+    try {
+      const { message, sessionId } = req.body;
+      if (!message) {
+        return res.status(400).json({ error: "Message required" });
+      }
+      
+      const chatSessionId = sessionId || req.session?.id || 'anonymous';
+      
+      // Build user context
+      let userContext: any = {};
+      if (req.user?.claims?.sub) {
+        const userId = req.user.claims.sub;
+        const user = await storage.getUser(userId);
+        const vehicles = await storage.getVehiclesByUserId(userId);
+        userContext = {
+          userId,
+          username: user?.username || user?.firstName,
+          isPro: false, // Check subscription status
+          vehicles: vehicles.map(v => ({
+            id: v.id,
+            year: v.year?.toString(),
+            make: v.make,
+            model: v.model,
+            mileage: v.currentMileage ?? undefined,
+            nickname: v.trim ?? undefined
+          }))
+        };
+      }
+      
+      const response = await aiAssistant.chatWithMemory(chatSessionId, message, userContext);
+      res.json({ response, sessionId: chatSessionId });
+    } catch (error) {
+      console.error("Buddy chat error:", error);
+      res.status(500).json({ error: "Failed to get Buddy response" });
+    }
+  });
+
+  // Clear conversation history
+  app.post('/api/ai/buddy/clear', async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      if (sessionId) {
+        aiAssistant.clearConversation(sessionId);
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to clear conversation" });
+    }
+  });
+
+  // Smart recommendations based on vehicle
+  app.post('/api/ai/recommendations', async (req: any, res) => {
+    if (!checkAIRateLimit(req, res)) return;
+    try {
+      const { vehicleId } = req.body;
+      let vehicle = req.body.vehicle;
+      
+      // If vehicleId provided, fetch from DB
+      if (vehicleId && req.user?.claims?.sub) {
+        const dbVehicle = await storage.getVehicle(vehicleId);
+        if (dbVehicle) {
+          vehicle = {
+            year: dbVehicle.year?.toString(),
+            make: dbVehicle.make,
+            model: dbVehicle.model,
+            mileage: dbVehicle.currentMileage
+          };
+        }
+      }
+      
+      if (!vehicle) {
+        return res.status(400).json({ error: "Vehicle info required" });
+      }
+      
+      const recommendations = await aiAssistant.getSmartRecommendations(vehicle);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Recommendations error:", error);
+      res.status(500).json({ error: "Failed to get recommendations" });
+    }
+  });
+
+  // Generate DIY repair guide
+  app.post('/api/ai/diy-guide', async (req, res) => {
+    if (!checkAIRateLimit(req, res)) return;
+    try {
+      const { vehicle, repairTask } = req.body;
+      if (!vehicle || !repairTask) {
+        return res.status(400).json({ error: "Vehicle and repair task required" });
+      }
+      
+      const guide = await aiAssistant.generateDIYGuide(vehicle, repairTask);
+      res.json(guide);
+    } catch (error) {
+      console.error("DIY guide error:", error);
+      res.status(500).json({ error: "Failed to generate DIY guide" });
+    }
+  });
+
+  // Get mechanic repair estimate
+  app.post('/api/ai/mechanic-estimate', async (req, res) => {
+    if (!checkAIRateLimit(req, res)) return;
+    try {
+      const { vehicle, repairTask, location } = req.body;
+      if (!vehicle || !repairTask) {
+        return res.status(400).json({ error: "Vehicle and repair task required" });
+      }
+      
+      const estimate = await aiAssistant.getMechanicEstimate(vehicle, repairTask, location);
+      res.json(estimate);
+    } catch (error) {
+      console.error("Estimate error:", error);
+      res.status(500).json({ error: "Failed to get estimate" });
+    }
+  });
+
+  // Get proactive alerts for user's vehicles
+  app.get('/api/ai/alerts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const vehicles = await storage.getVehiclesByUserId(userId);
+      
+      const vehicleContexts = vehicles.map(v => ({
+        id: v.id,
+        year: v.year?.toString(),
+        make: v.make,
+        model: v.model,
+        mileage: v.currentMileage ?? undefined
+      }));
+      
+      const alerts = await aiAssistant.getProactiveAlerts(vehicleContexts);
+      res.json(alerts);
+    } catch (error) {
+      console.error("Alerts error:", error);
+      res.status(500).json({ error: "Failed to get alerts" });
+    }
+  });
+
   // Vehicles API (protected)
   app.get("/api/vehicles", isAuthenticated, async (req: any, res) => {
     try {
