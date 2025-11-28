@@ -12,7 +12,7 @@ export default function Nav() {
   const [location] = useLocation();
   const isHome = location === "/";
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   return (
     <nav className="w-full h-16 border-b border-border/40 bg-background/80 backdrop-blur-md fixed top-0 z-50">
@@ -74,19 +74,17 @@ export default function Nav() {
                   )}
                 </Button>
               </Link>
-              <a href="/api/logout">
-                <Button variant="ghost" size="icon" className="hover:text-red-400 hidden md:flex" title="Log out">
-                  <LogOut className="w-5 h-5" />
-                </Button>
-              </a>
+              <Button variant="ghost" size="icon" className="hover:text-red-400 hidden md:flex" title="Log out" onClick={logout}>
+                <LogOut className="w-5 h-5" />
+              </Button>
             </>
           ) : (
-            <a href="/api/login">
+            <Link href="/auth">
               <Button variant="outline" className="hidden md:flex gap-2 border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary font-tech">
                 <LogIn className="w-4 h-4" />
                 Sign In
               </Button>
-            </a>
+            </Link>
           )}
           
           <div className="hidden md:block">
@@ -168,17 +166,15 @@ export default function Nav() {
                   <div className="pt-4 flex flex-col gap-3">
                     <MobileCartButton />
                     {isAuthenticated ? (
-                      <a href="/api/logout" className="w-full">
-                        <Button variant="outline" className="w-full gap-2 font-tech uppercase border-red-500/50 text-red-400 hover:bg-red-500/10">
-                          <LogOut className="w-4 h-4" /> Sign Out
-                        </Button>
-                      </a>
+                      <Button variant="outline" className="w-full gap-2 font-tech uppercase border-red-500/50 text-red-400 hover:bg-red-500/10" onClick={() => { setIsOpen(false); logout(); }}>
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </Button>
                     ) : (
-                      <a href="/api/login" className="w-full">
+                      <Link href="/auth" onClick={() => setIsOpen(false)} className="w-full">
                         <Button variant="outline" className="w-full gap-2 font-tech uppercase border-primary/50 hover:bg-primary/10">
                           <LogIn className="w-4 h-4" /> Sign In
                         </Button>
-                      </a>
+                      </Link>
                     )}
                   </div>
                 </div>

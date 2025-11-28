@@ -25,21 +25,31 @@ export function verifyPin(pin: string, storedHash: string): boolean {
   return verifyPassword(pin, storedHash);
 }
 
-export function generateRecoveryCodes(count: number = 8): { codes: string[]; hash: string } {
+export function generateRecoveryCodes(count: number = 8): { codes: string[]; hashedCodes: string[] } {
   const codes: string[] = [];
+  const hashedCodes: string[] = [];
   for (let i = 0; i < count; i++) {
     const code = crypto.randomBytes(4).toString("hex").toUpperCase();
-    codes.push(`${code.slice(0, 4)}-${code.slice(4)}`);
+    const formattedCode = `${code.slice(0, 4)}-${code.slice(4)}`;
+    codes.push(formattedCode);
+    hashedCodes.push(hashPassword(formattedCode));
   }
-  const hash = hashPassword(codes.join(","));
-  return { codes, hash };
+  return { codes, hashedCodes };
 }
 
-export function verifyRecoveryCode(code: string, storedHash: string, usedCodes: string[]): boolean {
-  if (usedCodes.includes(code)) return false;
-  const [salt, hash] = storedHash.split(":");
-  if (!salt) return false;
-  return true;
+export function verifyRecoveryCode(code: string, hashedCodesJson: string): { valid: boolean; remainingHashes: string[] } {
+  try {
+    const hashedCodes: string[] = JSON.parse(hashedCodesJson);
+    for (let i = 0; i < hashedCodes.length; i++) {
+      if (verifyPassword(code, hashedCodes[i])) {
+        const remainingHashes = [...hashedCodes.slice(0, i), ...hashedCodes.slice(i + 1)];
+        return { valid: true, remainingHashes };
+      }
+    }
+    return { valid: false, remainingHashes: hashedCodes };
+  } catch {
+    return { valid: false, remainingHashes: [] };
+  }
 }
 
 export function generateSessionToken(): string {
