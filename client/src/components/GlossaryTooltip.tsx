@@ -4,14 +4,14 @@ import { X, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlossaryTerm } from "@/lib/glossary";
 
-import mascotWaving from "@assets/generated_images/robot_mascot_waving_hello.png";
-import mascotThinking from "@assets/generated_images/robot_mascot_thinking_pose.png";
-import mascotBrakePads from "@assets/generated_images/robot_mascot_holding_brake_pads.png";
-import mascotOilFilter from "@assets/generated_images/robot_mascot_holding_oil_filter.png";
-import mascotSparkPlugs from "@assets/generated_images/robot_mascot_holding_spark_plugs.png";
-import mascotBattery from "@assets/generated_images/robot_mascot_holding_car_battery.png";
-import mascotTire from "@assets/generated_images/robot_mascot_holding_tire.png";
-import mascotRotor from "@assets/generated_images/robot_mascot_holding_brake_rotor.png";
+import mascotWaving from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
+import mascotThinking from "@assets/mascot_transparent/robot_mascot_thinking_pose.png";
+import mascotBrakePads from "@assets/mascot_transparent/robot_mascot_holding_brake_pads.png";
+import mascotOilFilter from "@assets/mascot_transparent/robot_mascot_holding_oil_filter.png";
+import mascotSparkPlugs from "@assets/mascot_transparent/robot_mascot_holding_spark_plugs.png";
+import mascotBattery from "@assets/mascot_transparent/robot_mascot_holding_car_battery.png";
+import mascotTire from "@assets/mascot_transparent/robot_mascot_holding_tire.png";
+import mascotRotor from "@assets/mascot_transparent/robot_mascot_holding_brake_rotor.png";
 
 const mascotImages: Record<string, string> = {
   waving: mascotWaving,
