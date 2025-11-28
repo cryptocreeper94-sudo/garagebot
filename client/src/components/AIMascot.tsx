@@ -12,8 +12,8 @@ import {
   ExternalLink, Car, AlertCircle, CheckCircle2
 } from "lucide-react";
 
-import mascotWaving from "@assets/generated_images/robot_mascot_waving_hello.png";
-import mascotThinking from "@assets/generated_images/robot_mascot_thinking_pose.png";
+import mascotWaving from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
+import mascotThinking from "@assets/mascot_transparent/robot_mascot_thinking_pose.png";
 
 interface VehicleInfo {
   type?: string;
@@ -650,13 +650,12 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             <img 
               src={mascotWaving} 
               alt="Chat with Buddy" 
-              className="w-24 h-24 object-contain rounded-lg"
+              className="w-24 h-24 object-contain"
               style={{ 
-                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))',
-                mixBlendMode: 'multiply',
+                filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
               }}
             />
-            <Sparkles className="w-4 h-4 text-yellow-300 absolute top-1 right-1 animate-pulse" />
+            <Sparkles className="w-4 h-4 text-yellow-300 absolute top-0 right-0 animate-pulse" />
           </div>
         )}
       </motion.button>
