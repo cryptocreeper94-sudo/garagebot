@@ -3,7 +3,7 @@ import {
   users, vehicles, deals, hallmarks, carts, cartItems, orders, orderItems, 
   vendors, searchHistory, waitlist, shops, shopStaff, shopCustomers, shopReviews,
   serviceRecords, serviceReminders, messageTemplates, messageLog,
-  userPreferences, auditLog, vehicleRecalls, scanHistory
+  userPreferences, auditLog, vehicleRecalls, scanHistory, devTasks, vehicleShares
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -13,7 +13,8 @@ import type {
   ShopReview, InsertShopReview, ServiceRecord, InsertServiceRecord, ServiceReminder, InsertServiceReminder,
   MessageTemplate, InsertMessageTemplate, MessageLog, InsertMessageLog,
   UserPreferences, InsertUserPreferences, AuditLog, InsertAuditLog,
-  VehicleRecall, InsertVehicleRecall, ScanHistory, InsertScanHistory
+  VehicleRecall, InsertVehicleRecall, ScanHistory, InsertScanHistory,
+  DevTask, InsertDevTask, VehicleShare, InsertVehicleShare
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte } from "drizzle-orm";
 
@@ -143,6 +144,19 @@ export interface IStorage {
   // Waitlist
   addToWaitlist(entry: InsertWaitlist): Promise<Waitlist>;
   getWaitlistByFeature(feature: string): Promise<Waitlist[]>;
+
+  // Dev Tasks
+  getDevTasks(): Promise<DevTask[]>;
+  createDevTask(task: InsertDevTask): Promise<DevTask>;
+  updateDevTask(id: string, updates: Partial<DevTask>): Promise<DevTask | undefined>;
+  deleteDevTask(id: string): Promise<boolean>;
+
+  // Vehicle Sharing (Family Garage)
+  getVehicleSharesByOwner(ownerId: string): Promise<VehicleShare[]>;
+  getVehicleSharesWithUser(userId: string): Promise<VehicleShare[]>;
+  createVehicleShare(share: InsertVehicleShare): Promise<VehicleShare>;
+  acceptVehicleShare(inviteCode: string, userId: string): Promise<VehicleShare | undefined>;
+  deleteVehicleShare(id: string, userId: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -644,6 +658,73 @@ export class DatabaseStorage implements IStorage {
 
   async getWaitlistByFeature(feature: string): Promise<Waitlist[]> {
     return await db.select().from(waitlist).where(eq(waitlist.feature, feature)).orderBy(desc(waitlist.createdAt));
+  }
+
+  // Dev Tasks
+  async getDevTasks(): Promise<DevTask[]> {
+    return await db.select().from(devTasks).orderBy(asc(devTasks.category), asc(devTasks.sortOrder));
+  }
+
+  async createDevTask(task: InsertDevTask): Promise<DevTask> {
+    const [newTask] = await db.insert(devTasks).values(task).returning();
+    return newTask;
+  }
+
+  async updateDevTask(id: string, updates: Partial<DevTask>): Promise<DevTask | undefined> {
+    const [task] = await db.update(devTasks).set({ ...updates, updatedAt: new Date() }).where(eq(devTasks.id, id)).returning();
+    return task;
+  }
+
+  async deleteDevTask(id: string): Promise<boolean> {
+    const result = await db.delete(devTasks).where(eq(devTasks.id, id));
+    return true;
+  }
+
+  // Vehicle Sharing (Family Garage)
+  async getVehicleSharesByOwner(ownerId: string): Promise<VehicleShare[]> {
+    return await db.select().from(vehicleShares)
+      .where(eq(vehicleShares.ownerId, ownerId))
+      .orderBy(desc(vehicleShares.createdAt));
+  }
+
+  async getVehicleSharesWithUser(userId: string): Promise<VehicleShare[]> {
+    return await db.select().from(vehicleShares)
+      .where(eq(vehicleShares.sharedWithId, userId))
+      .orderBy(desc(vehicleShares.createdAt));
+  }
+
+  async createVehicleShare(share: InsertVehicleShare): Promise<VehicleShare> {
+    const [newShare] = await db.insert(vehicleShares).values(share).returning();
+    return newShare;
+  }
+
+  async acceptVehicleShare(inviteCode: string, userId: string): Promise<VehicleShare | undefined> {
+    const [share] = await db.select().from(vehicleShares)
+      .where(and(
+        eq(vehicleShares.inviteCode, inviteCode),
+        gte(vehicleShares.inviteExpiresAt, new Date())
+      ));
+    
+    if (!share) return undefined;
+    
+    const [updated] = await db.update(vehicleShares)
+      .set({ 
+        sharedWithId: userId, 
+        acceptedAt: new Date() 
+      })
+      .where(eq(vehicleShares.id, share.id))
+      .returning();
+    
+    return updated;
+  }
+
+  async deleteVehicleShare(id: string, userId: string): Promise<boolean> {
+    const result = await db.delete(vehicleShares)
+      .where(and(
+        eq(vehicleShares.id, id),
+        eq(vehicleShares.ownerId, userId)
+      ));
+    return true;
   }
 }
 

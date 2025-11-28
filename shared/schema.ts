@@ -511,3 +511,66 @@ export type VehicleRecall = typeof vehicleRecalls.$inferSelect;
 export const insertScanHistorySchema = createInsertSchema(scanHistory).omit({ id: true, createdAt: true });
 export type InsertScanHistory = z.infer<typeof insertScanHistorySchema>;
 export type ScanHistory = typeof scanHistory.$inferSelect;
+
+// Dev Portal Tasks - Daily checklist for owner
+export const devTasks = pgTable("dev_tasks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  category: text("category").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  priority: text("priority").default("medium"),
+  status: text("status").default("pending"),
+  dueDate: timestamp("due_date"),
+  completedAt: timestamp("completed_at"),
+  link: text("link"),
+  notes: text("notes"),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertDevTaskSchema = createInsertSchema(devTasks).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertDevTask = z.infer<typeof insertDevTaskSchema>;
+export type DevTask = typeof devTasks.$inferSelect;
+
+// Family/Trust sharing for vehicles
+export const vehicleShares = pgTable("vehicle_shares", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  vehicleId: varchar("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  ownerId: varchar("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  sharedWithId: varchar("shared_with_id").references(() => users.id, { onDelete: "cascade" }),
+  sharedWithEmail: text("shared_with_email"),
+  shareType: text("share_type").default("view"),
+  inviteCode: text("invite_code"),
+  inviteExpiresAt: timestamp("invite_expires_at"),
+  acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertVehicleShareSchema = createInsertSchema(vehicleShares).omit({ id: true, createdAt: true });
+export type InsertVehicleShare = z.infer<typeof insertVehicleShareSchema>;
+export type VehicleShare = typeof vehicleShares.$inferSelect;
+
+// Part reviews and fitment confirmations
+export const partReviews = pgTable("part_reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  partNumber: text("part_number").notNull(),
+  partName: text("part_name").notNull(),
+  vendorSlug: text("vendor_slug"),
+  rating: integer("rating").notNull(),
+  fitmentConfirmed: boolean("fitment_confirmed").default(false),
+  title: text("title"),
+  content: text("content"),
+  pros: text("pros").array(),
+  cons: text("cons").array(),
+  imageUrls: text("image_urls").array(),
+  isVerifiedPurchase: boolean("is_verified_purchase").default(false),
+  helpfulCount: integer("helpful_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertPartReviewSchema = createInsertSchema(partReviews).omit({ id: true, createdAt: true });
+export type InsertPartReview = z.infer<typeof insertPartReviewSchema>;
+export type PartReview = typeof partReviews.$inferSelect;

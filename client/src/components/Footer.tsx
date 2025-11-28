@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
   Wrench, Shield, Mail, Twitter, Github, Linkedin, 
-  TrendingUp, FileText, Users, Phone, MapPin, Heart
+  TrendingUp, FileText, Users, Phone, MapPin, Heart, Terminal
 } from "lucide-react";
 
 export default function Footer() {
@@ -116,6 +116,12 @@ export default function Footer() {
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             Made with <Heart className="w-3 h-3 text-red-500 fill-red-500" /> in the USA
           </div>
+
+          <Link href="/dev">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary text-xs gap-1">
+              <Terminal className="w-3 h-3" /> Dev Portal
+            </Button>
+          </Link>
         </div>
       </div>
     </footer>

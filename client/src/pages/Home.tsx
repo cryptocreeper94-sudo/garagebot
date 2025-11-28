@@ -1,17 +1,24 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink } from "lucide-react";
+import { 
+  Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink,
+  ScanLine, Camera, Mic, Wrench, Car, Sparkles
+} from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import VehicleTypeSelector from "@/components/VehicleTypeSelector";
 import WeatherWidget from "@/components/WeatherWidget";
+import VinScanner from "@/components/VinScanner";
+import PhotoSearch from "@/components/PhotoSearch";
+import VoiceSearch from "@/components/VoiceSearch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
@@ -25,6 +32,9 @@ export default function Home() {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedMake, setSelectedMake] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
+  const [showVinScanner, setShowVinScanner] = useState(false);
+  const [showPhotoSearch, setShowPhotoSearch] = useState(false);
+  const [showVoiceSearch, setShowVoiceSearch] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,6 +278,66 @@ export default function Home() {
                 <span className="flex items-center gap-1.5"><Database className="w-3 h-3 text-primary/50" /> 15M+ PARTS INDEXED</span>
                 <span className="flex items-center gap-1.5"><Cpu className="w-3 h-3 text-secondary/50" /> AI MATCHING ACTIVE</span>
               </div>
+
+              {/* Quick Tools Section */}
+              <Card className="bg-card/50 border-primary/20 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="font-tech text-xs uppercase text-primary">Quick Tools</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <Dialog open={showVinScanner} onOpenChange={setShowVinScanner}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-3 flex flex-col gap-1.5 border-primary/20 hover:bg-primary/10 hover:border-primary/40"
+                        data-testid="button-vin-scanner"
+                      >
+                        <ScanLine className="w-5 h-5 text-primary" />
+                        <span className="text-[10px] font-tech uppercase">VIN Scan</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg">
+                      <VinScanner />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={showPhotoSearch} onOpenChange={setShowPhotoSearch}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-3 flex flex-col gap-1.5 border-purple-500/20 hover:bg-purple-500/10 hover:border-purple-500/40"
+                        data-testid="button-photo-search"
+                      >
+                        <Camera className="w-5 h-5 text-purple-400" />
+                        <span className="text-[10px] font-tech uppercase">Photo ID</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg">
+                      <PhotoSearch />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={showVoiceSearch} onOpenChange={setShowVoiceSearch}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-3 flex flex-col gap-1.5 border-green-500/20 hover:bg-green-500/10 hover:border-green-500/40"
+                        data-testid="button-voice-search"
+                      >
+                        <Mic className="w-5 h-5 text-green-400" />
+                        <span className="text-[10px] font-tech uppercase">Voice</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg">
+                      <VoiceSearch />
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                <p className="text-[10px] text-muted-foreground text-center mt-2">
+                  Scan VIN • Snap Photo • "Hey Buddy" Voice
+                </p>
+              </Card>
 
               {/* Mobile Category Grid Insertion */}
               <div className="lg:hidden pt-6">
