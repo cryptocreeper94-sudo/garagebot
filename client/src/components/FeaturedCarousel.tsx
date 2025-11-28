@@ -99,67 +99,63 @@ export default function FeaturedCarousel() {
   };
 
   return (
-    <section className="w-full py-6">
-      <div className="flex items-center justify-between mb-4 px-1">
+    <section className="w-full py-4">
+      <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center gap-2">
-          <Zap className="w-5 h-5 text-yellow-400 fill-yellow-400 animate-pulse" />
-          <h2 className="text-xl font-tech font-bold uppercase tracking-wide">
+          <Zap className="w-4 h-4 text-yellow-400 fill-yellow-400 animate-pulse" />
+          <h2 className="text-sm font-tech font-bold uppercase tracking-wide">
             Flash <span className="text-primary">Deals</span>
           </h2>
         </div>
-        <Button variant="link" className="text-[10px] font-mono text-muted-foreground hover:text-primary h-auto p-0">
-          VIEW ALL OFFERS
+        <Button variant="link" className="text-[9px] font-mono text-muted-foreground hover:text-primary h-auto p-0">
+          VIEW ALL
         </Button>
       </div>
 
       <div className="overflow-hidden -mx-4 px-4" ref={emblaRef}>
-        <div className="flex gap-4">
+        <div className="flex gap-2">
           {deals.map((deal) => {
             const timeLeft = formatDistanceToNow(new Date(deal.expiresAt), { addSuffix: false });
             return (
-              <div className="flex-[0_0_85%] min-w-0 sm:flex-[0_0_45%] md:flex-[0_0_40%]" key={deal.id}>
+              <div className="flex-[0_0_55%] min-w-0 sm:flex-[0_0_32%] md:flex-[0_0_24%] lg:flex-[0_0_18%]" key={deal.id}>
                 <Card className="h-full bg-card/50 border-white/10 backdrop-blur-sm overflow-hidden group hover:border-primary/50 transition-all relative">
-                  {/* Image Background Area */}
-                  <div className="h-32 w-full relative overflow-hidden">
+                  {/* Compact Image */}
+                  <div className="h-20 w-full relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
                     <img 
                       src={deal.imageUrl || "https://images.unsplash.com/photo-1635784063748-252802c6c25c?q=80&w=600&auto=format&fit=crop"} 
                       alt={deal.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70"
                     />
-                    <Badge className="absolute top-3 right-3 z-20 bg-primary text-black font-bold font-mono text-[10px]">
+                    <Badge className="absolute top-1.5 right-1.5 z-20 bg-primary text-black font-bold font-mono text-[8px] px-1.5 py-0.5">
                       {deal.discount}
                     </Badge>
-                    <div className="absolute bottom-2 left-3 z-20 flex items-center gap-1 text-[10px] font-mono text-yellow-400">
-                      <Timer className="w-3 h-3" />
-                      <span>ENDS IN {timeLeft}</span>
+                    <div className="absolute bottom-1 left-1.5 z-20 flex items-center gap-1 text-[8px] font-mono text-yellow-400">
+                      <Timer className="w-2.5 h-2.5" />
+                      <span>{timeLeft}</span>
                     </div>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-bold text-sm line-clamp-1 group-hover:text-primary transition-colors">{deal.title}</h3>
-                        <p className="text-xs text-muted-foreground line-clamp-1">{deal.description}</p>
-                      </div>
-                    </div>
+                  {/* Compact Content */}
+                  <div className="p-2">
+                    <h3 className="font-bold text-[10px] line-clamp-1 group-hover:text-primary transition-colors">{deal.title}</h3>
+                    <p className="text-[8px] text-muted-foreground line-clamp-1 mb-1">{deal.description}</p>
 
-                    <div className="flex items-center justify-between mt-4">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-lg text-white">${deal.price}</span>
-                          <span className="text-xs text-muted-foreground line-through decoration-red-500/50">${deal.originalPrice}</span>
+                        <div className="flex items-center gap-1">
+                          <span className="font-mono font-bold text-xs text-white">${deal.price}</span>
+                          <span className="text-[8px] text-muted-foreground line-through">${deal.originalPrice}</span>
                         </div>
-                        <p className="text-[10px] text-muted-foreground uppercase font-mono">Sold by {deal.vendor}</p>
+                        <p className="text-[7px] text-muted-foreground uppercase font-mono">{deal.vendor}</p>
                       </div>
                       <Button 
                         size="sm" 
-                        className="h-8 w-8 p-0 rounded-full bg-primary text-black hover:bg-white transition-colors"
+                        className="h-6 w-6 p-0 rounded-full bg-primary text-black hover:bg-white transition-colors"
                         onClick={() => handleAddToCart(deal)}
                         data-testid={`button-add-to-cart-${deal.id}`}
                       >
-                        <ShoppingCart className="w-4 h-4" />
+                        <ShoppingCart className="w-3 h-3" />
                       </Button>
                     </div>
                   </div>
