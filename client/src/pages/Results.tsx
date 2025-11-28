@@ -3,6 +3,7 @@ import { useSearch } from "wouter";
 import { motion } from "framer-motion";
 import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight } from "lucide-react";
 import Nav from "@/components/Nav";
+import VehicleFunFacts from "@/components/VehicleFunFacts";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
@@ -77,6 +78,7 @@ export default function Results() {
   const make = params.get('make') || '';
   const model = params.get('model') || '';
   const category = params.get('category') || '';
+  const vehicleType = params.get('type') || '';
 
   const [isLoading, setIsLoading] = useState(true);
   const [scanText, setScanText] = useState(SCANNING_STORES[0]);
@@ -219,6 +221,16 @@ export default function Results() {
                   <li>3. Local pickup prioritized for speed</li>
                   <li>4. We earn commissions on some purchases</li>
                 </ul>
+              </div>
+
+              {/* Fun Facts Section */}
+              <div className="mt-6">
+                <VehicleFunFacts 
+                  query={query} 
+                  make={make} 
+                  model={model} 
+                  vehicleType={vehicleType} 
+                />
               </div>
             </div>
           </div>
@@ -364,6 +376,16 @@ export default function Results() {
                   </label>
                 </div>
               </div>
+            </div>
+
+            {/* Mobile Fun Facts */}
+            <div className="lg:hidden mt-6">
+              <VehicleFunFacts 
+                query={query} 
+                make={make} 
+                model={model} 
+                vehicleType={vehicleType} 
+              />
             </div>
 
             {/* Info Banner */}
