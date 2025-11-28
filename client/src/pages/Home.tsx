@@ -88,7 +88,7 @@ export default function Home() {
             Auto<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Ledger</span>
           </h1>
           <p className="text-lg md:text-2xl font-light text-muted-foreground">
-            Aggregator Protocol by <span className="text-white font-bold">DarkWave Studios</span>
+            Aggregator Protocol
           </p>
         </motion.div>
 
@@ -228,10 +228,19 @@ export default function Home() {
              className="w-full h-full object-cover mix-blend-screen"
            />
         </div>
-        <div className="container mx-auto px-4 text-center relative z-10">
+        <div className="container mx-auto px-4 text-center relative z-10 space-y-3">
           <p className="font-mono text-xs text-blue-200/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             © 2025 DARKWAVE STUDIOS LLC. ALL RIGHTS RESERVED.
           </p>
+          <a 
+            href="https://darkwave-studios.io" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block font-mono text-xs text-primary/80 hover:text-primary transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+            data-testid="link-darkwave-studios"
+          >
+            darkwave-studios.io
+          </a>
         </div>
       </footer>
     </div>
