@@ -718,22 +718,22 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
       >
         {isOpen ? (
           <motion.div 
-            className="w-12 h-12 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 255, 255, 0.3))' }}
+            className="w-10 h-10 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center"
+            style={{ filter: 'drop-shadow(0 2px 6px rgba(0, 255, 255, 0.3))' }}
           >
-            <X className="w-5 h-5 text-primary" />
+            <X className="w-4 h-4 text-primary" />
           </motion.div>
         ) : (
           <div className="relative">
             <motion.img 
               src={mascotWaving} 
               alt="Chat with Buddy" 
-              className="w-14 h-14 object-contain"
+              className="w-10 h-10 object-contain"
               style={{ 
-                filter: 'drop-shadow(0 2px 8px rgba(0, 255, 255, 0.4)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3))',
+                filter: 'drop-shadow(0 1px 4px rgba(0, 255, 255, 0.4)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
               }}
               animate={{
-                y: [0, -3, 0],
+                y: [0, -2, 0],
               }}
               transition={{
                 duration: 2,
@@ -741,7 +741,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 ease: "easeInOut"
               }}
             />
-            <Sparkles className="w-3 h-3 text-yellow-300 absolute -top-1 -right-1 animate-pulse" />
+            <Sparkles className="w-2.5 h-2.5 text-yellow-300 absolute -top-0.5 -right-0.5 animate-pulse" />
           </div>
         )}
       </motion.button>
