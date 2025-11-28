@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 
@@ -300,5 +300,310 @@ export async function registerRoutes(
     }
   });
 
+  // Vendors API (public)
+  app.get("/api/vendors", async (req, res) => {
+    try {
+      const vendors = await storage.getActiveVendors();
+      res.json(vendors);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch vendors" });
+    }
+  });
+
+  app.get("/api/vendors/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const vendor = await storage.getVendor(slug);
+      if (!vendor) {
+        return res.status(404).json({ error: "Vendor not found" });
+      }
+      res.json(vendor);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch vendor" });
+    }
+  });
+
+  // Vendor redirect with affiliate tracking
+  app.get("/api/vendors/:slug/redirect", async (req: any, res) => {
+    try {
+      const { slug } = req.params;
+      const { query, partNumber } = req.query;
+      
+      const vendor = await storage.getVendor(slug);
+      if (!vendor) {
+        return res.status(404).json({ error: "Vendor not found" });
+      }
+      
+      // Log the search/click for analytics
+      await storage.logSearch({
+        userId: req.user?.claims?.sub || null,
+        sessionId: req.sessionID,
+        query: (query as string) || (partNumber as string) || '',
+        clickedVendor: vendor.name,
+      });
+      
+      // Build the redirect URL
+      let redirectUrl = vendor.websiteUrl;
+      
+      // If vendor has affiliate link template, use it
+      if (vendor.hasAffiliateProgram && vendor.affiliateLinkTemplate && vendor.affiliateId) {
+        redirectUrl = vendor.affiliateLinkTemplate
+          .replace('{affiliateId}', vendor.affiliateId)
+          .replace('{query}', encodeURIComponent((query as string) || ''))
+          .replace('{partNumber}', encodeURIComponent((partNumber as string) || ''));
+      } else {
+        // Fallback: just append search query to website
+        const searchPath = getVendorSearchPath(slug, query as string, partNumber as string);
+        redirectUrl = vendor.websiteUrl + searchPath;
+      }
+      
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error("Vendor redirect error:", error);
+      res.status(500).json({ error: "Failed to redirect" });
+    }
+  });
+
+  // Waitlist API (public)
+  app.post("/api/waitlist", async (req, res) => {
+    try {
+      const result = insertWaitlistSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const entry = await storage.addToWaitlist(result.data);
+      res.json(entry);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to join waitlist" });
+    }
+  });
+
+  // Search API - aggregates results from multiple vendors
+  app.post("/api/search", async (req: any, res) => {
+    try {
+      const { query, partNumber, year, make, model, category, vehicleType } = req.body;
+      
+      // Log the search
+      await storage.logSearch({
+        userId: req.user?.claims?.sub || null,
+        sessionId: req.sessionID,
+        query: query || partNumber || '',
+        vehicleYear: year,
+        vehicleMake: make,
+        vehicleModel: model,
+        category,
+      });
+      
+      // Get all active vendors
+      const vendors = await storage.getActiveVendors();
+      
+      // Build search results with vendor links
+      // For now, return vendor redirect URLs - actual product data would come from APIs
+      const vendorResults = vendors.map(vendor => ({
+        vendor: {
+          id: vendor.id,
+          name: vendor.name,
+          slug: vendor.slug,
+          logoUrl: vendor.logoUrl,
+          hasLocalPickup: vendor.hasLocalPickup,
+          hasAffiliateProgram: vendor.hasAffiliateProgram,
+        },
+        searchUrl: `/api/vendors/${vendor.slug}/redirect?query=${encodeURIComponent(query || partNumber || '')}&partNumber=${encodeURIComponent(partNumber || '')}`,
+        directUrl: buildVendorSearchUrl(vendor.websiteUrl, vendor.slug, query, partNumber),
+      }));
+      
+      res.json({
+        query: query || partNumber,
+        vehicle: { year, make, model },
+        category,
+        vendorResults,
+        resultsCount: vendorResults.length,
+      });
+    } catch (error) {
+      console.error("Search error:", error);
+      res.status(500).json({ error: "Failed to search" });
+    }
+  });
+
+  // Seed vendors endpoint (for initial setup)
+  app.post("/api/admin/seed-vendors", async (req, res) => {
+    try {
+      const defaultVendors = [
+        {
+          name: "AutoZone",
+          slug: "autozone",
+          websiteUrl: "https://www.autozone.com",
+          hasAffiliateProgram: true,
+          affiliateNetwork: "Impact",
+          commissionRate: "1.00",
+          hasLocalPickup: true,
+          priority: 1,
+        },
+        {
+          name: "O'Reilly Auto Parts",
+          slug: "oreilly",
+          websiteUrl: "https://www.oreillyauto.com",
+          hasAffiliateProgram: false,
+          hasLocalPickup: true,
+          priority: 2,
+        },
+        {
+          name: "Advance Auto Parts",
+          slug: "advance-auto",
+          websiteUrl: "https://shop.advanceautoparts.com",
+          hasAffiliateProgram: true,
+          affiliateNetwork: "CJ",
+          commissionRate: "3.00",
+          hasLocalPickup: true,
+          priority: 3,
+        },
+        {
+          name: "RockAuto",
+          slug: "rockauto",
+          websiteUrl: "https://www.rockauto.com",
+          hasAffiliateProgram: false,
+          hasLocalPickup: false,
+          priority: 4,
+        },
+        {
+          name: "Amazon Automotive",
+          slug: "amazon",
+          websiteUrl: "https://www.amazon.com",
+          hasAffiliateProgram: true,
+          affiliateNetwork: "Amazon Associates",
+          commissionRate: "4.50",
+          hasLocalPickup: false,
+          priority: 5,
+        },
+        {
+          name: "NAPA Auto Parts",
+          slug: "napa",
+          websiteUrl: "https://www.napaonline.com",
+          hasAffiliateProgram: false,
+          hasLocalPickup: true,
+          priority: 6,
+        },
+        {
+          name: "VMC Chinese Parts",
+          slug: "vmc",
+          websiteUrl: "https://www.vmcchineseparts.com",
+          hasAffiliateProgram: false,
+          hasLocalPickup: false,
+          priority: 10,
+        },
+        {
+          name: "eBay Motors",
+          slug: "ebay",
+          websiteUrl: "https://www.ebay.com/motors",
+          hasAffiliateProgram: true,
+          affiliateNetwork: "eBay Partner Network",
+          commissionRate: "3.00",
+          hasLocalPickup: false,
+          priority: 8,
+        },
+        {
+          name: "West Marine",
+          slug: "west-marine",
+          websiteUrl: "https://www.westmarine.com",
+          hasAffiliateProgram: true,
+          hasLocalPickup: true,
+          priority: 15,
+        },
+        {
+          name: "Dennis Kirk",
+          slug: "dennis-kirk",
+          websiteUrl: "https://www.denniskirk.com",
+          hasAffiliateProgram: true,
+          hasLocalPickup: false,
+          priority: 12,
+        },
+        {
+          name: "Rocky Mountain ATV/MC",
+          slug: "rocky-mountain",
+          websiteUrl: "https://www.rockymountainatvmc.com",
+          hasAffiliateProgram: true,
+          hasLocalPickup: false,
+          priority: 11,
+        },
+      ];
+
+      const results = [];
+      for (const vendorData of defaultVendors) {
+        try {
+          const existing = await storage.getVendor(vendorData.slug);
+          if (!existing) {
+            const vendor = await storage.createVendor(vendorData);
+            results.push({ action: "created", vendor: vendor.name });
+          } else {
+            results.push({ action: "exists", vendor: vendorData.name });
+          }
+        } catch (err) {
+          results.push({ action: "error", vendor: vendorData.name, error: String(err) });
+        }
+      }
+      
+      res.json({ message: "Vendors seeded", results });
+    } catch (error) {
+      console.error("Seed vendors error:", error);
+      res.status(500).json({ error: "Failed to seed vendors" });
+    }
+  });
+
   return httpServer;
+}
+
+// Helper function to build vendor-specific search URLs
+function buildVendorSearchUrl(baseUrl: string, slug: string, query?: string, partNumber?: string): string {
+  const searchTerm = partNumber || query || '';
+  if (!searchTerm) return baseUrl;
+  
+  switch (slug) {
+    case 'autozone':
+      return `${baseUrl}/searchresult?searchText=${encodeURIComponent(searchTerm)}`;
+    case 'oreilly':
+      return `${baseUrl}/shop/b/search-results?q=${encodeURIComponent(searchTerm)}`;
+    case 'advance-auto':
+      return `${baseUrl}/web/c3/search?q=${encodeURIComponent(searchTerm)}`;
+    case 'rockauto':
+      return `${baseUrl}/catalog/moreinfo.php?pk=${encodeURIComponent(searchTerm)}`;
+    case 'amazon':
+      return `${baseUrl}/s?k=${encodeURIComponent(searchTerm)}&i=automotive`;
+    case 'napa':
+      return `${baseUrl}/search?text=${encodeURIComponent(searchTerm)}`;
+    case 'vmc':
+      return `${baseUrl}/search.php?search_query=${encodeURIComponent(searchTerm)}`;
+    case 'ebay':
+      return `${baseUrl}/sch/i.html?_nkw=${encodeURIComponent(searchTerm)}`;
+    case 'west-marine':
+      return `${baseUrl}/search?q=${encodeURIComponent(searchTerm)}`;
+    case 'dennis-kirk':
+      return `${baseUrl}/search?term=${encodeURIComponent(searchTerm)}`;
+    case 'rocky-mountain':
+      return `${baseUrl}/search?q=${encodeURIComponent(searchTerm)}`;
+    default:
+      return `${baseUrl}/search?q=${encodeURIComponent(searchTerm)}`;
+  }
+}
+
+// Helper function for vendor search paths (for non-affiliate redirects)
+function getVendorSearchPath(slug: string, query?: string, partNumber?: string): string {
+  const searchTerm = partNumber || query || '';
+  if (!searchTerm) return '';
+  
+  switch (slug) {
+    case 'autozone':
+      return `/searchresult?searchText=${encodeURIComponent(searchTerm)}`;
+    case 'oreilly':
+      return `/shop/b/search-results?q=${encodeURIComponent(searchTerm)}`;
+    case 'advance-auto':
+      return `/web/c3/search?q=${encodeURIComponent(searchTerm)}`;
+    case 'rockauto':
+      return `/catalog/moreinfo.php?pk=${encodeURIComponent(searchTerm)}`;
+    case 'amazon':
+      return `/s?k=${encodeURIComponent(searchTerm)}&i=automotive`;
+    case 'napa':
+      return `/search?text=${encodeURIComponent(searchTerm)}`;
+    default:
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
+  }
 }

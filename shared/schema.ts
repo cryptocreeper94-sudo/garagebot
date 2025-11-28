@@ -62,6 +62,44 @@ export const hallmarks = pgTable("hallmarks", {
   metadata: text("metadata"),
 });
 
+export const vendors = pgTable("vendors", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  logoUrl: text("logo_url"),
+  websiteUrl: text("website_url").notNull(),
+  hasAffiliateProgram: boolean("has_affiliate_program").default(false),
+  affiliateNetwork: text("affiliate_network"),
+  affiliateId: text("affiliate_id"),
+  affiliateLinkTemplate: text("affiliate_link_template"),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }),
+  hasLocalPickup: boolean("has_local_pickup").default(false),
+  isActive: boolean("is_active").default(true),
+  priority: integer("priority").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const searchHistory = pgTable("search_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  sessionId: text("session_id"),
+  query: text("query").notNull(),
+  vehicleYear: integer("vehicle_year"),
+  vehicleMake: text("vehicle_make"),
+  vehicleModel: text("vehicle_model"),
+  category: text("category"),
+  resultsCount: integer("results_count"),
+  clickedVendor: text("clicked_vendor"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const waitlist = pgTable("waitlist", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull(),
+  feature: text("feature").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const carts = pgTable("carts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
@@ -122,6 +160,18 @@ export type Deal = typeof deals.$inferSelect;
 
 export type InsertHallmark = z.infer<typeof insertHallmarkSchema>;
 export type Hallmark = typeof hallmarks.$inferSelect;
+
+export const insertVendorSchema = createInsertSchema(vendors).omit({ id: true, createdAt: true });
+export type InsertVendor = z.infer<typeof insertVendorSchema>;
+export type Vendor = typeof vendors.$inferSelect;
+
+export const insertSearchHistorySchema = createInsertSchema(searchHistory).omit({ id: true, createdAt: true });
+export type InsertSearchHistory = z.infer<typeof insertSearchHistorySchema>;
+export type SearchHistory = typeof searchHistory.$inferSelect;
+
+export const insertWaitlistSchema = createInsertSchema(waitlist).omit({ id: true, createdAt: true });
+export type InsertWaitlist = z.infer<typeof insertWaitlistSchema>;
+export type Waitlist = typeof waitlist.$inferSelect;
 
 export const insertCartSchema = createInsertSchema(carts).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: true, createdAt: true });

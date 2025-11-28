@@ -1,7 +1,7 @@
 import { db } from "@db";
-import { users, vehicles, deals, hallmarks, carts, cartItems, orders, orderItems } from "@shared/schema";
-import type { User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, Cart, InsertCart, CartItem, InsertCartItem, Order, InsertOrder, OrderItem, InsertOrderItem } from "@shared/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { users, vehicles, deals, hallmarks, carts, cartItems, orders, orderItems, vendors, searchHistory, waitlist } from "@shared/schema";
+import type { User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, Cart, InsertCart, CartItem, InsertCartItem, Order, InsertOrder, OrderItem, InsertOrderItem, Vendor, InsertVendor, SearchHistory, InsertSearchHistory, Waitlist, InsertWaitlist } from "@shared/schema";
+import { eq, and, desc, sql, asc } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -45,6 +45,19 @@ export interface IStorage {
   // Stripe data queries
   getStripeProducts(): Promise<any[]>;
   getStripePrices(): Promise<any[]>;
+
+  // Vendors
+  getActiveVendors(): Promise<Vendor[]>;
+  getVendor(slug: string): Promise<Vendor | undefined>;
+  createVendor(vendor: InsertVendor): Promise<Vendor>;
+  updateVendor(id: string, updates: Partial<Vendor>): Promise<Vendor | undefined>;
+
+  // Search History
+  logSearch(search: InsertSearchHistory): Promise<SearchHistory>;
+
+  // Waitlist
+  addToWaitlist(entry: InsertWaitlist): Promise<Waitlist>;
+  getWaitlistByFeature(feature: string): Promise<Waitlist[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -235,6 +248,42 @@ export class DatabaseStorage implements IStorage {
   async getStripePrices(): Promise<any[]> {
     const result = await db.execute(sql`SELECT * FROM stripe.prices WHERE active = true`);
     return result.rows;
+  }
+
+  // Vendors
+  async getActiveVendors(): Promise<Vendor[]> {
+    return await db.select().from(vendors).where(eq(vendors.isActive, true)).orderBy(asc(vendors.priority), asc(vendors.name));
+  }
+
+  async getVendor(slug: string): Promise<Vendor | undefined> {
+    const [vendor] = await db.select().from(vendors).where(eq(vendors.slug, slug));
+    return vendor;
+  }
+
+  async createVendor(vendor: InsertVendor): Promise<Vendor> {
+    const [newVendor] = await db.insert(vendors).values(vendor).returning();
+    return newVendor;
+  }
+
+  async updateVendor(id: string, updates: Partial<Vendor>): Promise<Vendor | undefined> {
+    const [vendor] = await db.update(vendors).set(updates).where(eq(vendors.id, id)).returning();
+    return vendor;
+  }
+
+  // Search History
+  async logSearch(search: InsertSearchHistory): Promise<SearchHistory> {
+    const [entry] = await db.insert(searchHistory).values(search).returning();
+    return entry;
+  }
+
+  // Waitlist
+  async addToWaitlist(entry: InsertWaitlist): Promise<Waitlist> {
+    const [waitlistEntry] = await db.insert(waitlist).values(entry).returning();
+    return waitlistEntry;
+  }
+
+  async getWaitlistByFeature(feature: string): Promise<Waitlist[]> {
+    return await db.select().from(waitlist).where(eq(waitlist.feature, feature)).orderBy(desc(waitlist.createdAt));
   }
 }
 
