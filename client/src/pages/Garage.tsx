@@ -16,8 +16,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Car, Trash2, Settings, AlertTriangle, CheckCircle, 
   RefreshCw, FileText, Wrench, Star, Shield, Search, 
-  Calendar, DollarSign, MapPin, ChevronRight, Loader2
+  Calendar, DollarSign, MapPin, ChevronRight, Loader2, Brain
 } from "lucide-react";
+import SmartRecommendations from "@/components/SmartRecommendations";
 
 interface Vehicle {
   id: string;
@@ -439,9 +440,12 @@ export default function Garage() {
                     </div>
 
                     <Tabs defaultValue="passport" className="p-6">
-                      <TabsList className="grid grid-cols-3 mb-6">
+                      <TabsList className="grid grid-cols-4 mb-6">
                         <TabsTrigger value="passport" className="font-tech uppercase text-xs" data-testid="tab-passport">
                           <Shield className="w-4 h-4 mr-1" /> Passport
+                        </TabsTrigger>
+                        <TabsTrigger value="ai" className="font-tech uppercase text-xs" data-testid="tab-ai">
+                          <Brain className="w-4 h-4 mr-1" /> AI Insights
                         </TabsTrigger>
                         <TabsTrigger value="recalls" className="font-tech uppercase text-xs" data-testid="tab-recalls">
                           <AlertTriangle className="w-4 h-4 mr-1" /> Recalls
@@ -480,6 +484,15 @@ export default function Garage() {
                         <Button className="w-full font-tech uppercase" onClick={() => window.location.href = `/results?year=${selectedVehicle.year}&make=${selectedVehicle.make}&model=${selectedVehicle.model}`} data-testid="button-shop-parts">
                           <Search className="w-4 h-4 mr-2" /> Shop Parts for This Vehicle
                         </Button>
+                      </TabsContent>
+
+                      <TabsContent value="ai" className="space-y-4">
+                        <SmartRecommendations 
+                          vehicleId={selectedVehicle.id}
+                          vehicleYear={selectedVehicle.year}
+                          vehicleMake={selectedVehicle.make}
+                          vehicleModel={selectedVehicle.model}
+                        />
                       </TabsContent>
 
                       <TabsContent value="recalls">

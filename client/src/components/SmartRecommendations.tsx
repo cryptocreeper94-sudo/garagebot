@@ -48,36 +48,57 @@ interface MechanicEstimate {
 }
 
 interface SmartRecommendationsProps {
-  vehicle: Vehicle;
+  vehicle?: Vehicle;
+  vehicleId?: string;
+  vehicleYear?: string;
+  vehicleMake?: string;
+  vehicleModel?: string;
+  vehicleMileage?: number;
   onSearch?: (query: string) => void;
 }
 
-export default function SmartRecommendations({ vehicle, onSearch }: SmartRecommendationsProps) {
+export default function SmartRecommendations({ 
+  vehicle, 
+  vehicleId,
+  vehicleYear,
+  vehicleMake,
+  vehicleModel,
+  vehicleMileage,
+  onSearch 
+}: SmartRecommendationsProps) {
   const [showGuide, setShowGuide] = useState<string | null>(null);
   const [showEstimate, setShowEstimate] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const vehicleLabel = `${vehicle.year || ''} ${vehicle.make || ''} ${vehicle.model || ''}`.trim();
+  const v = vehicle || {
+    id: vehicleId || '',
+    year: vehicleYear ? parseInt(vehicleYear) : undefined,
+    make: vehicleMake,
+    model: vehicleModel,
+    mileage: vehicleMileage
+  };
+
+  const vehicleLabel = `${v.year || ''} ${v.make || ''} ${v.model || ''}`.trim();
 
   const { data: recommendations, isLoading, refetch, isFetching } = useQuery<Recommendations>({
-    queryKey: ['recommendations', vehicle.id],
+    queryKey: ['recommendations', v.id],
     queryFn: async () => {
       const res = await fetch('/api/ai/recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           vehicle: {
-            year: vehicle.year?.toString(),
-            make: vehicle.make,
-            model: vehicle.model,
-            mileage: vehicle.mileage
+            year: v.year?.toString(),
+            make: v.make,
+            model: v.model,
+            mileage: v.mileage
           }
         })
       });
       if (!res.ok) throw new Error('Failed to get recommendations');
       return res.json();
     },
-    enabled: !!vehicle.id && !!(vehicle.year || vehicle.make),
+    enabled: !!v.id && !!(v.year || v.make),
     staleTime: 1000 * 60 * 30, // Cache for 30 minutes
   });
 
@@ -88,9 +109,9 @@ export default function SmartRecommendations({ vehicle, onSearch }: SmartRecomme
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           vehicle: {
-            year: vehicle.year?.toString(),
-            make: vehicle.make,
-            model: vehicle.model
+            year: v.year?.toString(),
+            make: v.make,
+            model: v.model
           },
           repairTask
         })
@@ -107,9 +128,9 @@ export default function SmartRecommendations({ vehicle, onSearch }: SmartRecomme
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           vehicle: {
-            year: vehicle.year?.toString(),
-            make: vehicle.make,
-            model: vehicle.model
+            year: v.year?.toString(),
+            make: v.make,
+            model: v.model
           },
           repairTask
         })
@@ -135,7 +156,7 @@ export default function SmartRecommendations({ vehicle, onSearch }: SmartRecomme
     estimateMutation.mutate(task);
   };
 
-  if (!vehicle.year && !vehicle.make) {
+  if (!v.year && !v.make) {
     return null;
   }
 
