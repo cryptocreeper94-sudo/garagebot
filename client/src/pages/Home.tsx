@@ -123,9 +123,9 @@ export default function Home() {
                 or restoring a vintage ATV — we search <span className="text-primary font-medium">20+ retailers</span> to 
                 find the right part at the best price, with local pickup when you need it now.
               </p>
-              <div className="flex flex-wrap justify-center gap-2 mt-4">
-                {["Cars", "Trucks", "Motorcycles", "ATVs", "Boats", "RVs", "Diesel", "Small Engines"].map((type) => (
-                  <span key={type} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">
+              <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-4">
+                {["Cars", "Classics", "Exotics", "Kit Cars", "Motorcycles", "ATVs", "Boats", "RVs", "Diesel"].map((type) => (
+                  <span key={type} className="px-2 md:px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] md:text-xs font-mono border border-primary/20 hover:bg-primary/20 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all cursor-default whitespace-nowrap">
                     {type}
                   </span>
                 ))}
