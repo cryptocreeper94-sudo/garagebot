@@ -47,7 +47,7 @@ async function initStripe() {
       `${webhookBaseUrl}/api/stripe/webhook`,
       {
         enabled_events: ['*'],
-        description: 'Managed webhook for AutoLedger',
+        description: 'Managed webhook for GarageBot',
       }
     );
     log(`Webhook configured: ${webhook.url}`, 'stripe');

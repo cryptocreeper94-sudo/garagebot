@@ -260,7 +260,7 @@ export default function Dashboard() {
 
             <ComingSoonCard
               title="Service Scheduling"
-              description="Book mechanics and service appointments directly through AutoLedger."
+              description="Book mechanics and service appointments directly through GarageBot."
               icon={<Wrench className="w-6 h-6 text-yellow-400" />}
               features={[
                 "Local shop finder by zip",

@@ -236,7 +236,7 @@ export default function ShopPortal() {
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle className="font-tech text-xl uppercase">Register Your Shop</DialogTitle>
-                <DialogDescription>Add your business to the AutoLedger network</DialogDescription>
+                <DialogDescription>Add your business to the GarageBot network</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="grid grid-cols-2 gap-4">

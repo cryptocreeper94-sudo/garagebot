@@ -60,7 +60,7 @@ export default function OnboardingModal() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const hasSeenOnboarding = localStorage.getItem("autoledger_onboarding_seen");
+    const hasSeenOnboarding = localStorage.getItem("garagebot_onboarding_seen");
     if (!hasSeenOnboarding) {
       const timer = setTimeout(() => setIsOpen(true), 1000);
       return () => clearTimeout(timer);
@@ -68,7 +68,7 @@ export default function OnboardingModal() {
   }, []);
 
   const handleDismiss = () => {
-    localStorage.setItem("autoledger_onboarding_seen", "true");
+    localStorage.setItem("garagebot_onboarding_seen", "true");
     setIsOpen(false);
   };
 
@@ -107,7 +107,7 @@ export default function OnboardingModal() {
               <div className="text-center mb-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-[10px] font-mono mb-4">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  WELCOME TO AUTOLEDGER
+                  WELCOME TO GARAGEBOT
                 </div>
                 
                 <h2 className="text-2xl md:text-3xl font-tech font-bold uppercase mb-2">

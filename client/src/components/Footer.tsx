@@ -19,11 +19,11 @@ export default function Footer() {
                 <Wrench className="w-5 h-5 text-primary" />
               </div>
               <span className="font-tech font-bold text-xl tracking-wide uppercase">
-                Auto<span className="text-primary">Ledger</span>
+                Garage<span className="text-primary">Bot</span>
               </span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              The ultimate parts aggregator for cars, trucks, boats, ATVs, motorcycles, RVs, and everything with an engine.
+              Right Part. First Time. Every Engine. The ultimate parts aggregator for cars, trucks, boats, ATVs, motorcycles, RVs, and everything with an engine.
             </p>
             <Badge className="bg-secondary/20 text-secondary border-secondary/30">
               <Shield className="w-3 h-3 mr-1" /> Genesis Hallmark Enabled
@@ -70,7 +70,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="mailto:support@autoledger.io" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="mailto:support@garagebot.io" className="text-muted-foreground hover:text-primary transition-colors">
                   <Mail className="w-3 h-3 inline mr-1" /> Contact Support
                 </a>
               </li>
@@ -102,13 +102,13 @@ export default function Footer() {
           </div>
           
           <div className="flex items-center gap-4">
-            <a href="https://twitter.com/autoledger" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://twitter.com/garagebot" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
               <Twitter className="w-5 h-5" />
             </a>
             <a href="https://github.com/darkwave-studios" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
               <Github className="w-5 h-5" />
             </a>
-            <a href="https://linkedin.com/company/autoledger" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://linkedin.com/company/garagebot" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
               <Linkedin className="w-5 h-5" />
             </a>
           </div>
