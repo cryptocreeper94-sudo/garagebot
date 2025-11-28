@@ -1,22 +1,101 @@
 # Overview
 
-**GarageBot** (formerly AutoLedger/PartScout) is a modern auto parts aggregator platform that unifies inventory from multiple retailers into a single searchable interface. The application enables users to search for automotive, motorcycle, ATV, boat, and powersports parts across vendors like AutoZone, O'Reilly, RockAuto, Amazon, and specialty suppliers. It prioritizes both price optimization and fulfillment speed, offering local pickup and shipping options.
+**GarageBot** is a comprehensive auto parts aggregator platform that unifies inventory from 40+ retailers into a single searchable interface. The application enables users to search for parts across ALL vehicle types - cars, trucks, diesel/commercial, RVs, boats, ATVs, UTVs, motorcycles, small engines, generators, Chinese imports, classics, kit cars, and exotics.
+
+**Live URL**: https://GarageBot.replit.app  
+**Custom Domain**: garagebot.io (pending DNS verification)
 
 **Brand Identity:**
-- Domain: garagebot.io (primary), garagebot.net (redirect)
+- Domain: garagebot.io (primary)
 - Tagline: "Right Part. First Time. Every Engine."
-- AI Mascot: "Buddy" - the conversational parts-finding assistant
-- Target: All vehicles with engines - cars, trucks, motorcycles, ATVs, boats, RVs, small engines, Chinese imports
+- AI Mascot: "Buddy" - conversational parts-finding assistant with run-in/run-out animation
+- Business Entity: DarkWave Studios, LLC
 
-The platform features vehicle fleet management ("My Garage"), real-time deal tracking, shopping cart functionality with Stripe payments, and a developer dashboard for system monitoring. The business model includes affiliate commissions, premium subscriptions, and planned direct sales with crypto payment support.
+**Key Features:**
+- Vehicle fleet management ("My Garage") with VIN decoding
+- AI-powered part recommendations and DIY repair guides
+- Vehicle-aware affiliate search links with guaranteed fitment
+- Shopping cart with Stripe payments
+- Developer dashboard with partner outreach info (PIN: 0424)
+- Genesis Hallmark NFT system planned ($2/vehicle)
+- Pro subscription planned ($2.99/month)
 
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
 
-# Session Reminders
+# Developer Access
 
-- **DOMAIN REDIRECT TODO**: Help user set up redirect from darkwavestudios.net → darkwavestudios.io (at end of session)
+**Dashboard PIN**: 0424 (Jason's quick access)
+**Dev Task List Location**: Dashboard page → scroll down to Dev Task List section
+
+# Vendor Network (40+ Retailers)
+
+## Automotive - Major Retailers
+- AutoZone (Impact affiliate)
+- O'Reilly Auto Parts (contact for partnership)
+- Advance Auto Parts (CJ Affiliate)
+- RockAuto (no affiliate - direct outreach needed)
+- Amazon Automotive (Amazon Associates - 4.5%)
+- NAPA Auto Parts
+- CarParts.com (CJ Affiliate)
+- eBay Motors (eBay Partner Network)
+- Car-Part.com (salvage network)
+
+## Powersports - ATV/UTV/Motorcycle
+- Rocky Mountain ATV/MC (AvantLink)
+- Dennis Kirk (AvantLink)
+- Partzilla (ShareASale)
+- RevZilla (AvantLink)
+- MotoSport (AvantLink)
+- Cycle Gear (CJ Affiliate)
+- BikeBandit (CJ Affiliate)
+- VMC Chinese Parts
+- Chaparral Motorsports
+
+## Marine / Boat
+- West Marine (CJ Affiliate)
+- Defender Marine (AvantLink)
+- Wholesale Marine (ShareASale)
+- iBoats (CJ Affiliate)
+- Boats.net (ShareASale)
+- MarineEngine.com
+
+## Diesel / Commercial / Heavy Duty
+- TruckPro
+- FleetPride
+- Diesel Parts Direct
+- FinditParts
+- 4 State Trucks
+- Vander Haags
+
+## RV / Motorhome
+- RV Parts Country (ShareASale)
+- PPL Motorhomes
+- Camping World (CJ Affiliate)
+- etrailer (ShareASale)
+
+## Small Engine / Outdoor Power
+- Jack's Small Engines (ShareASale)
+- Tractor Supply (CJ Affiliate)
+- Mower Parts Group
+- Electric Generators Direct (ShareASale)
+
+## Off-Road / 4x4
+- 4 Wheel Parts (CJ Affiliate)
+- ExtremeTerrain (CJ Affiliate)
+- AmericanTrucks (CJ Affiliate)
+
+## Performance / Racing
+- Summit Racing (CJ Affiliate)
+- JEGS (CJ Affiliate)
+- CARiD (CJ Affiliate)
+
+## Classic / Vintage
+- Classic Industries (ShareASale)
+- Year One
+- NPD (National Parts Depot)
+- LMC Truck
 
 # System Architecture
 
@@ -26,11 +105,19 @@ Preferred communication style: Simple, everyday language.
 
 **UI Component System**: shadcn/ui components built on Radix UI primitives, styled with Tailwind CSS. The design system uses a "Deep Space / Future Forward" theme with electric cyan accents, custom fonts (Rajdhani for headers, Inter for body, JetBrains Mono for code), and a dark color palette.
 
+**UI Effects**: Custom CSS classes for professional polish:
+- `.btn-glow` - Hover glow effect for buttons
+- `.btn-3d` - 3D button with depth shadow
+- `.card-hover` - Card lift effect on hover
+- `.text-glow` - Neon text glow
+- `.neon-border` - Glowing border effect
+- `.animate-pulse-glow` - Animated pulsing glow
+
 **State Management**: TanStack Query (React Query) handles server state with custom query client configuration. Cart state is managed through a React Context provider. Authentication state is queried via a custom `useAuth` hook.
 
 **Routing**: Wouter provides client-side routing with key routes: Home (`/`), Results (`/results`), Garage (`/garage`), Dashboard (`/dashboard`), Account Setup (`/account`), and Checkout flow (`/checkout`, `/checkout/success`, `/checkout/cancel`).
 
-**Animation**: Framer Motion powers transitions and UI animations throughout the application.
+**Animation**: Framer Motion powers transitions and UI animations, including Buddy's run-in/run-out animation effect.
 
 ## Backend Architecture
 
@@ -43,6 +130,7 @@ Preferred communication style: Simple, everyday language.
 - `/api/cart/*` - Shopping cart operations
 - `/api/checkout/*` - Payment processing
 - `/api/stripe/webhook` - Stripe webhook handler
+- `/api/admin/seed-vendors` - Seed all 40+ vendors
 
 **Session Management**: Express-session with PostgreSQL session store (`connect-pg-simple`). Sessions persist for 7 days with secure, httpOnly cookies.
 
@@ -52,22 +140,20 @@ Preferred communication style: Simple, everyday language.
 
 **Service**: Unified AI assistant service in `server/services/aiAssistant.ts` powered by OpenAI.
 
+**Animation**: Buddy runs in from the left side of the screen when activated and runs out to the right when dismissed, using spring-based Framer Motion animations.
+
 **Core Capabilities**:
-- **Chat with Memory**: Persistent conversation history with vehicle context awareness (`/api/ai/buddy/chat-with-memory`)
-- **Smart Recommendations**: Predictive part suggestions based on mileage, age, and common failures (`/api/ai/recommendations`, `/api/ai/buddy/smart-recommendations`)
-- **DIY Repair Guides**: AI-generated step-by-step instructions for specific vehicles (`/api/ai/diy-guide`, `/api/ai/buddy/diy-guide`)
-- **Mechanic Estimates**: Labor and parts cost estimates for repairs (`/api/ai/mechanic-estimate`, `/api/ai/buddy/mechanic-estimate`)
-- **Proactive Alerts**: Maintenance reminders and seasonal suggestions (`/api/ai/buddy/alerts`)
+- **Chat with Memory**: Persistent conversation history with vehicle context awareness
+- **Smart Recommendations**: Predictive part suggestions based on mileage, age, and common failures
+- **DIY Repair Guides**: AI-generated step-by-step instructions for specific vehicles
+- **Mechanic Estimates**: Labor and parts cost estimates for repairs
+- **Proactive Alerts**: Maintenance reminders and seasonal suggestions
+- **Part Definitions**: Detailed explanations of what parts do and why they're needed
 
 **Frontend Components**:
-- `SmartRecommendations.tsx`: Displays AI recommendations with DIY guides and mechanic estimates
+- `AIMascot.tsx`: Main Buddy chat component with run-in/run-out animation
+- `SmartRecommendations.tsx`: Displays AI recommendations with DIY guides
 - `ProactiveAlerts.tsx`: Shows maintenance alerts and reminders
-- `BuddyChat.tsx`: Conversational interface with Buddy AI
-
-**Integration Points**:
-- Garage page "AI Insights" tab for vehicle-specific recommendations
-- Home page Buddy chat for natural language parts search
-- Vehicle context automatically included in all AI requests
 
 ## Data Storage
 
@@ -78,21 +164,19 @@ Preferred communication style: Simple, everyday language.
 **Core Tables**:
 - `users` - User profiles with optional wallet addresses and genesis badges
 - `vehicles` - User's saved vehicles with specifications (year, make, model, VIN, oil type, tire size)
+- `vendors` - 40+ retail partners with affiliate info, contact emails, API status
 - `deals` - Time-limited promotions with pricing and vendor info
 - `hallmarks` - Genesis NFT/blockchain credentials for early users
-- `carts` & `cart_items` - Shopping cart state (supports both authenticated and guest sessions)
+- `carts` & `cart_items` - Shopping cart state
 - `orders` & `order_items` - Purchase history
 - `sessions` - Express session storage
-- Stripe tables (managed by `stripe-replit-sync`)
 
 **Affiliate Tracking Tables**:
-- `affiliate_networks` - Affiliate networks (Amazon Associates, CJ, Rakuten, Impact, etc.)
-- `affiliate_partners` - Individual retailers/brands with commission rates, tracking templates
-- `affiliate_clicks` - Click tracking with user, device, search context, UTM parameters
-- `affiliate_commissions` - Conversion tracking with order amounts, commission status
+- `affiliate_networks` - Affiliate networks (Amazon Associates, CJ, ShareASale, AvantLink, Impact)
+- `affiliate_partners` - Individual retailers with commission rates, tracking templates
+- `affiliate_clicks` - Click tracking with user, device, search context
+- `affiliate_commissions` - Conversion tracking with order amounts
 - `affiliate_payouts` - Monthly payout summaries by network
-
-**Data Layer**: Storage abstraction interface (`IStorage`) implemented by `DatabaseStorage` class in `server/storage.ts`, providing clean separation between business logic and data access.
 
 ## Payment Processing
 
@@ -100,9 +184,9 @@ Preferred communication style: Simple, everyday language.
 
 **Architecture**: 
 - Frontend uses `@stripe/react-stripe-js` for card collection
-- Backend manages Stripe clients via `server/stripeClient.ts` with credential fetching from Replit Connectors
-- Webhook handling via managed webhook setup with `stripe-replit-sync` library
-- Environment-aware keys (development vs production) based on `REPLIT_DEPLOYMENT` flag
+- Backend manages Stripe clients via `server/stripeClient.ts`
+- Webhook handling via `stripe-replit-sync` library
+- Environment-aware keys based on `REPLIT_DEPLOYMENT` flag
 
 **Future**: Planned Coinbase Commerce integration for cryptocurrency payments.
 
@@ -115,58 +199,67 @@ Preferred communication style: Simple, everyday language.
 
 **Production Build**:
 - Client: Vite builds to `dist/public`
-- Server: esbuild bundles server to `dist/index.cjs` with selective dependency bundling (allowlist includes common deps like Drizzle, Stripe, Express to reduce cold start times)
+- Server: esbuild bundles server to `dist/index.cjs`
 - Build script in `script/build.ts` coordinates both builds
 
-**Static Assets**: Served from `dist/public` in production, with fallback to index.html for SPA routing.
+**Deployment**: Published via Replit Autoscale deployment at https://GarageBot.replit.app
+
+# Affiliate Strategy (3 Tiers)
+
+## Tier 1: Search Links (Current)
+- Vehicle-aware search URLs include year/make/model for guaranteed fitment
+- All 40+ retailers accessible via generated search links
+- No API integration required - works immediately
+
+## Tier 2: Data Feeds (Requires Partnership)
+- Product data feeds from affiliate networks
+- Requires CJ Affiliate, ShareASale, AvantLink, Impact accounts
+- Enables showing actual prices and product images
+
+## Tier 3: Direct APIs (Requires Business Partnership)
+- Real-time inventory and pricing
+- Requires direct partnerships with retailers
+- PartsTech aggregator API for multi-supplier access
+
+# Partner Outreach Guide
+
+## Affiliate Networks to Join
+1. **CJ Affiliate** (cj.com/join) - Advance Auto, Summit, JEGS, 4 Wheel Parts
+2. **ShareASale** (shareasale.com) - Partzilla, Jack's Small Engines, Classic Industries
+3. **AvantLink** (avantlink.com) - Rocky Mountain, Dennis Kirk, RevZilla
+4. **Impact** (impact.com) - AutoZone, Camping World
+5. **eBay Partner Network** (ebaypartnernetwork.com) - eBay Motors
+6. **Amazon Associates** - Amazon Automotive (4.5% commission)
+
+## Direct Outreach Needed
+- RockAuto: info@rockauto.com
+- O'Reilly: partnerships@oreillyauto.com
+- NAPA: customerservice@napaonline.com
+- VMC Chinese Parts: sales@vmcchineseparts.com
+- Car-Part.com: info@car-part.com
+
+## API Integration Contacts
+- PartsTech: partstech.com/partners (multi-supplier API)
+- WHI Nexpart: nexpart.com (catalog data feeds)
+- ACES/PIES: aftermarket.org (industry standard data)
 
 # External Dependencies
 
 ## Third-Party Services
-
-**Authentication**: Replit OIDC service for user login and session management.
-
-**Database**: Neon PostgreSQL (serverless) with connection pooling via WebSocket driver.
-
-**Payment Processing**: 
-- Stripe for card payments and subscription billing
-- Stripe webhook managed by `stripe-replit-sync` package
-- Stripe Connector on Replit provides API keys per environment
-
-**Planned Integrations** (documented but not yet implemented):
-- AutoZone, O'Reilly, NAPA, RockAuto APIs for inventory
-- Amazon Automotive API
-- VMC Chinese Parts, eBay Motors
-- Coinbase Commerce for crypto payments
-- Geolocation service for local store inventory
+- **Authentication**: Replit OIDC service
+- **Database**: Neon PostgreSQL (serverless)
+- **Payments**: Stripe
+- **AI**: OpenAI GPT-4
 
 ## Key NPM Packages
+**UI/Frontend**: @radix-ui/*, tailwindcss, framer-motion, wouter, @tanstack/react-query
+**Backend**: express, drizzle-orm, @neondatabase/serverless, stripe, openai
+**Build Tools**: vite, esbuild, tsx
 
-**UI/Frontend**:
-- `@radix-ui/*` - Headless UI component primitives
-- `tailwindcss`, `@tailwindcss/vite` - Styling
-- `framer-motion` - Animations
-- `wouter` - Routing
-- `@tanstack/react-query` - Server state
-- `embla-carousel-react` - Carousels
-- `recharts` - Data visualization
+# Session Notes
 
-**Backend**:
-- `express` - Web server
-- `drizzle-orm`, `drizzle-kit` - Database ORM
-- `@neondatabase/serverless` - PostgreSQL driver
-- `stripe` - Payment processing
-- `stripe-replit-sync` - Stripe schema migrations
-- `passport`, `passport-local`, `openid-client` - Authentication
-- `express-session`, `connect-pg-simple` - Session management
-
-**Build Tools**:
-- `vite` - Frontend bundler
-- `esbuild` - Server bundler
-- `tsx` - TypeScript execution
-- `@vitejs/plugin-react` - React fast refresh
-
-**Replit-Specific**:
-- `@replit/vite-plugin-runtime-error-modal` - Dev error overlay
-- `@replit/vite-plugin-cartographer` - Dev tools
-- `@replit/vite-plugin-dev-banner` - Dev environment indicator
+- Custom domain garagebot.io configured in Namecheap, TXT record added for Replit verification
+- Dev portal includes comprehensive partner outreach contacts and email templates
+- Buddy AI has run-in/run-out animation effect
+- UI includes professional hover/glow effects for buttons and cards
+- Mobile-optimized with responsive vehicle type selector

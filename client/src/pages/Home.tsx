@@ -147,7 +147,7 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
               >
                 {/* Search Card */}
-                <Card className="glass-panel border-0 p-1">
+                <Card className="glass-panel border-0 p-1 card-hover">
                   <Tabs defaultValue="standard" className="w-full">
                     <TabsList className="w-full grid grid-cols-2 bg-black/40 h-10 p-1 rounded-lg">
                       <TabsTrigger value="standard" className="font-mono text-[10px] uppercase rounded-md data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Parts Search</TabsTrigger>
@@ -196,7 +196,7 @@ export default function Home() {
                           />
                           <Button 
                             type="submit"
-                            className="h-12 w-12 shrink-0 bg-primary text-black hover:bg-primary/90 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.3)]" 
+                            className="h-12 w-12 shrink-0 bg-primary text-black hover:bg-primary/90 rounded-lg btn-glow" 
                             disabled={isSearching || !searchQuery.trim()}
                             data-testid="button-search"
                           >
@@ -331,7 +331,7 @@ export default function Home() {
                 {/* Buddy + Mission in a horizontal grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Buddy AI Card */}
-                  <Card className="bg-gradient-to-br from-primary/10 via-card/80 to-secondary/10 border-primary/30 p-4 relative overflow-hidden">
+                  <Card className="bg-gradient-to-br from-primary/10 via-card/80 to-secondary/10 border-primary/30 p-4 relative overflow-hidden neon-border">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl" />
                     <div className="relative z-10 h-full flex flex-col">
                       <div className="flex items-center gap-2 mb-2">
@@ -351,7 +351,7 @@ export default function Home() {
                       </p>
                       <Button 
                         onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
-                        className="w-full bg-primary text-black hover:bg-primary/90 font-tech uppercase text-[10px] h-8 shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                        className="w-full bg-primary text-black hover:bg-primary/90 font-tech uppercase text-[10px] h-8 btn-glow"
                         data-testid="button-chat-buddy"
                       >
                         <MessageCircle className="w-3 h-3 mr-1" />

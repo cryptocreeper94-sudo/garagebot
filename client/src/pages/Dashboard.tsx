@@ -345,99 +345,154 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <Card className="bg-card/30 border-white/10 backdrop-blur-md p-6">
-            <div className="space-y-4">
-              {/* High Priority */}
-              <div>
-                <h4 className="font-mono text-xs text-red-400 uppercase mb-3 flex items-center gap-2">
-                  <AlertCircle className="w-3 h-3" /> High Priority
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Apply for Retailer API Access</p>
-                      <p className="text-xs text-muted-foreground mt-1">AutoZone, O'Reilly, Advance Auto partnerships for real-time inventory</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left Column - Tasks */}
+            <Card className="bg-card/30 border-white/10 backdrop-blur-md p-6">
+              <div className="space-y-4">
+                {/* High Priority */}
+                <div>
+                  <h4 className="font-mono text-xs text-red-400 uppercase mb-3 flex items-center gap-2">
+                    <AlertCircle className="w-3 h-3" /> High Priority
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20 hover:border-red-500/40 transition-colors">
+                      <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Apply for Affiliate Networks</p>
+                        <p className="text-xs text-muted-foreground mt-1">CJ Affiliate, ShareASale, AvantLink, Impact Radius</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Set Up Affiliate Programs</p>
-                      <p className="text-xs text-muted-foreground mt-1">Amazon Associates, CJ Affiliate, Impact Radius accounts</p>
+                    <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20 hover:border-red-500/40 transition-colors">
+                      <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Amazon Associates Account</p>
+                        <p className="text-xs text-muted-foreground mt-1">4.5% commission on all automotive purchases</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Connect garagebot.io Domain</p>
-                      <p className="text-xs text-muted-foreground mt-1">DNS settings in Namecheap → Replit custom domain</p>
+                    <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20 hover:border-red-500/40 transition-colors">
+                      <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Verify garagebot.io Domain</p>
+                        <p className="text-xs text-muted-foreground mt-1">TXT record added - check DNS propagation</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Medium Priority */}
-              <div>
-                <h4 className="font-mono text-xs text-yellow-400 uppercase mb-3 flex items-center gap-2">
-                  <Zap className="w-3 h-3" /> Medium Priority
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Insurify Partnership</p>
-                      <p className="text-xs text-muted-foreground mt-1">Insurance comparison integration for all vehicle types</p>
+                {/* Medium Priority */}
+                <div>
+                  <h4 className="font-mono text-xs text-yellow-400 uppercase mb-3 flex items-center gap-2">
+                    <Zap className="w-3 h-3" /> Medium Priority
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20 hover:border-yellow-500/40 transition-colors">
+                      <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Direct Partner Outreach</p>
+                        <p className="text-xs text-muted-foreground mt-1">Email RockAuto, O'Reilly, NAPA for partnerships</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Stripe Pro Subscription Product</p>
-                      <p className="text-xs text-muted-foreground mt-1">Create $2.99/month Pro plan in Stripe dashboard</p>
+                    <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20 hover:border-yellow-500/40 transition-colors">
+                      <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Stripe Pro Subscription</p>
+                        <p className="text-xs text-muted-foreground mt-1">Create $2.99/month Pro plan product</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Coinbase Commerce Integration</p>
-                      <p className="text-xs text-muted-foreground mt-1">Crypto payment option for Genesis Hallmark NFTs</p>
+                    <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20 hover:border-yellow-500/40 transition-colors">
+                      <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Insurify Partnership</p>
+                        <p className="text-xs text-muted-foreground mt-1">Insurance comparison API integration</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Future Features */}
-              <div>
-                <h4 className="font-mono text-xs text-blue-400 uppercase mb-3 flex items-center gap-2">
-                  <Star className="w-3 h-3" /> Future Features
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex items-start gap-3 p-3 rounded bg-blue-500/5 border border-blue-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-blue-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Homepage Slideshow</p>
-                      <p className="text-xs text-muted-foreground mt-1">Implement product slideshow with prepared content data</p>
+                {/* Future Features */}
+                <div>
+                  <h4 className="font-mono text-xs text-blue-400 uppercase mb-3 flex items-center gap-2">
+                    <Star className="w-3 h-3" /> Future Features
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-3 p-3 rounded bg-blue-500/5 border border-blue-500/20 hover:border-blue-500/40 transition-colors">
+                      <div className="w-4 h-4 rounded border-2 border-blue-400/50 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Homepage Slideshow</p>
+                        <p className="text-xs text-muted-foreground mt-1">Content data prepared - needs implementation</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded bg-blue-500/5 border border-blue-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-blue-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Mobile App (React Native)</p>
-                      <p className="text-xs text-muted-foreground mt-1">Barcode/VIN scanner, voice search with Buddy AI</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 rounded bg-blue-500/5 border border-blue-500/20">
-                    <div className="w-4 h-4 rounded border-2 border-blue-400/50 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Shop Portal Launch</p>
-                      <p className="text-xs text-muted-foreground mt-1">Mechanic shop accounts, bulk ordering, wholesale pricing</p>
+                    <div className="flex items-start gap-3 p-3 rounded bg-blue-500/5 border border-blue-500/20 hover:border-blue-500/40 transition-colors">
+                      <div className="w-4 h-4 rounded border-2 border-blue-400/50 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">PartsTech API Integration</p>
+                        <p className="text-xs text-muted-foreground mt-1">Real-time inventory from multiple suppliers</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+
+            {/* Right Column - Partner Outreach Info */}
+            <Card className="bg-card/30 border-white/10 backdrop-blur-md p-6">
+              <h4 className="font-mono text-xs text-primary uppercase mb-4 flex items-center gap-2">
+                <Link2 className="w-3 h-3" /> Partner Outreach Contacts
+              </h4>
+              
+              <div className="space-y-3 text-xs">
+                {/* Affiliate Networks */}
+                <div className="p-3 rounded bg-green-500/5 border border-green-500/20">
+                  <p className="font-medium text-green-400 mb-2">AFFILIATE NETWORKS (Apply First)</p>
+                  <div className="space-y-1 text-muted-foreground">
+                    <p>• CJ Affiliate: cj.com/join - Advance Auto, Summit, JEGS</p>
+                    <p>• ShareASale: shareasale.com - Partzilla, Jack's, Classic Ind.</p>
+                    <p>• AvantLink: avantlink.com - Rocky Mtn, Dennis Kirk, RevZilla</p>
+                    <p>• Impact: impact.com - AutoZone, Camping World</p>
+                    <p>• eBay Partner Network: ebaypartnernetwork.com</p>
+                  </div>
+                </div>
+
+                {/* Direct Outreach Needed */}
+                <div className="p-3 rounded bg-orange-500/5 border border-orange-500/20">
+                  <p className="font-medium text-orange-400 mb-2">DIRECT OUTREACH (Email Template)</p>
+                  <div className="space-y-1 text-muted-foreground">
+                    <p>• RockAuto: info@rockauto.com</p>
+                    <p>• O'Reilly: partnerships@oreillyauto.com</p>
+                    <p>• NAPA: customerservice@napaonline.com</p>
+                    <p>• VMC Chinese: sales@vmcchineseparts.com</p>
+                    <p>• Car-Part.com: info@car-part.com</p>
+                  </div>
+                </div>
+
+                {/* Email Template */}
+                <div className="p-3 rounded bg-primary/5 border border-primary/20">
+                  <p className="font-medium text-primary mb-2">OUTREACH EMAIL TEMPLATE</p>
+                  <div className="text-muted-foreground bg-black/30 p-2 rounded text-[10px] font-mono">
+                    Subject: Partnership Inquiry - GarageBot Parts Aggregator<br/><br/>
+                    Hi,<br/><br/>
+                    I'm the founder of GarageBot (garagebot.io), an auto parts search aggregator covering all vehicle types.<br/><br/>
+                    We'd love to feature [Company] on our platform at no cost. We're interested in:<br/>
+                    • Affiliate partnership (commission per sale)<br/>
+                    • API access for real-time inventory (if available)<br/><br/>
+                    We send targeted traffic from vehicle owners searching for specific parts.<br/><br/>
+                    Best regards,<br/>
+                    Jason - DarkWave Studios, LLC
+                  </div>
+                </div>
+
+                {/* API Contacts */}
+                <div className="p-3 rounded bg-purple-500/5 border border-purple-500/20">
+                  <p className="font-medium text-purple-400 mb-2">API INTEGRATION CONTACTS</p>
+                  <div className="space-y-1 text-muted-foreground">
+                    <p>• PartsTech: partstech.com/partners - Multi-supplier API</p>
+                    <p>• WHI Nexpart: nexpart.com - Catalog data feeds</p>
+                    <p>• ACES/PIES: aftermarket.org - Industry standard data</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
         </div>
 
         {/* Affiliate Tracking Section */}
