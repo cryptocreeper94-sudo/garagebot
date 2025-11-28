@@ -291,7 +291,7 @@ export default function Results() {
                   >
                     <Card 
                       className="bg-card border-border hover:border-primary/50 transition-all group overflow-hidden cursor-pointer"
-                      onClick={() => window.open(result.directUrl, '_blank', 'noopener,noreferrer')}
+                      onClick={() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer')}
                       data-testid={`card-vendor-${result.vendor.slug}`}
                     >
                       <div className="p-4">
@@ -334,7 +334,7 @@ export default function Results() {
                           className="w-full font-tech uppercase text-xs border-primary/30 text-primary hover:bg-primary hover:text-black group-hover:border-primary"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(result.directUrl, '_blank', 'noopener,noreferrer');
+                            window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
                           }}
                           data-testid={`button-search-${result.vendor.slug}`}
                         >
