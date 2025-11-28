@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { useSearch } from "wouter";
 import { motion } from "framer-motion";
-import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight } from "lucide-react";
+import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight, Navigation, Search, Package, Wrench } from "lucide-react";
 import Nav from "@/components/Nav";
 import VehicleFunFacts from "@/components/VehicleFunFacts";
 import ShareButton from "@/components/ShareButton";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
+import { VENDORS, VendorInfo, generateVendorSearchUrl, getVendorsForVehicleType } from "@/lib/mockData";
 
 interface Vendor {
   id: string;
@@ -85,6 +86,9 @@ export default function Results() {
   const [scanText, setScanText] = useState(SCANNING_STORES[0]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showLocalOnly, setShowLocalOnly] = useState(false);
+  const [zipCode, setZipCode] = useState('');
+  const [showOEMOnly, setShowOEMOnly] = useState(false);
+  const [showAftermarketOnly, setShowAftermarketOnly] = useState(false);
 
   // Fetch vendors
   const { data: vendors = [] } = useQuery<Vendor[]>({
@@ -135,17 +139,98 @@ export default function Results() {
   }, []);
 
   const displayQuery = query || partNumber || 'Parts Search';
-  const vendorResults = searchResults?.vendorResults || [];
-  const filteredResults = showLocalOnly 
-    ? vendorResults.filter(r => r.vendor.hasLocalPickup)
-    : vendorResults;
+  
+  // Get backend vendor results
+  const backendResults = searchResults?.vendorResults || [];
+  
+  // Get local vendor metadata to enrich results
+  const localVendorMap = new Map(VENDORS.map(v => [v.id, v]));
+  
+  // Combine backend results with local vendor metadata, or use local vendors as fallback
+  const enhancedVendorResults = backendResults.length > 0
+    ? backendResults.map(result => {
+        const localVendor = localVendorMap.get(result.vendor.id) || VENDORS.find(v => v.slug === result.vendor.slug);
+        
+        // Preserve backend URL by default - it may contain deep links or product-specific paths
+        let finalSearchUrl = result.searchUrl;
+        
+        // Only consider adding ZIP if: we have a ZIP, local vendor has a ZIP template
+        if (zipCode && localVendor?.searchTemplate?.includes('{zip}')) {
+          // Generate the baseline template URL (without ZIP)
+          const templateBaselineUrl = generateVendorSearchUrl(localVendor, query || partNumber || '', { year, make, model });
+          
+          // Only augment with ZIP if the backend URL matches our template baseline
+          // (meaning it's not a custom deep link or product-specific URL)
+          if (result.searchUrl === templateBaselineUrl) {
+            finalSearchUrl = generateVendorSearchUrl(localVendor, query || partNumber || '', { year, make, model, zip: zipCode });
+          }
+          // Otherwise, backend has a custom/deep link - preserve it
+        }
+        
+        return {
+          vendor: {
+            id: result.vendor.id,
+            name: result.vendor.name,
+            slug: result.vendor.slug,
+            logoUrl: result.vendor.logoUrl,
+            // Merge: use backend value if defined, otherwise fall back to local vendor data
+            hasLocalPickup: result.vendor.hasLocalPickup ?? localVendor?.hasLocalPickup ?? false,
+            hasAffiliateProgram: result.vendor.hasAffiliateProgram ?? (localVendor ? !!localVendor.affiliateNetwork : false),
+            // Preserve backend OEM/aftermarket flags if provided, otherwise use local data (default false if unknown)
+            supportsOEM: (result.vendor as any).supportsOEM ?? localVendor?.supportsOEM ?? false,
+            supportsAftermarket: (result.vendor as any).supportsAftermarket ?? localVendor?.supportsAftermarket ?? false,
+            storeLocatorUrl: localVendor?.storeLocatorUrl,
+            logoColor: localVendor?.logoColor || '#06b6d4',
+          },
+          searchUrl: finalSearchUrl,
+          directUrl: result.directUrl,
+        };
+      })
+    : VENDORS
+        .filter(v => !vehicleType || v.categories.includes(vehicleType) || v.categories.includes('cars'))
+        .sort((a, b) => b.priority - a.priority)
+        .map(vendor => ({
+          vendor: {
+            id: vendor.id,
+            name: vendor.name,
+            slug: vendor.slug,
+            logoUrl: null,
+            hasLocalPickup: vendor.hasLocalPickup,
+            hasAffiliateProgram: !!vendor.affiliateNetwork,
+            supportsOEM: vendor.supportsOEM,
+            supportsAftermarket: vendor.supportsAftermarket,
+            storeLocatorUrl: vendor.storeLocatorUrl,
+            logoColor: vendor.logoColor,
+          },
+          searchUrl: generateVendorSearchUrl(vendor, query || partNumber || '', { year, make, model, zip: zipCode }),
+          directUrl: generateVendorSearchUrl(vendor, query || partNumber || '', { year, make, model, zip: zipCode }),
+        }));
 
-  // Sort: local pickup first, then by affiliate status
+  // Apply filters
+  let filteredResults = enhancedVendorResults;
+  
+  if (showLocalOnly) {
+    filteredResults = filteredResults.filter(r => r.vendor.hasLocalPickup);
+  }
+  if (showOEMOnly) {
+    filteredResults = filteredResults.filter(r => r.vendor.supportsOEM);
+  }
+  if (showAftermarketOnly) {
+    filteredResults = filteredResults.filter(r => r.vendor.supportsAftermarket);
+  }
+
+  // Sort: local pickup first, then by priority
   const sortedResults = [...filteredResults].sort((a, b) => {
     if (a.vendor.hasLocalPickup && !b.vendor.hasLocalPickup) return -1;
     if (!a.vendor.hasLocalPickup && b.vendor.hasLocalPickup) return 1;
     return 0;
   });
+  
+  // Generate Google Maps direction URL for a store's location finder
+  const getDirectionsUrl = (storeLocatorUrl?: string) => {
+    if (!storeLocatorUrl) return null;
+    return storeLocatorUrl;
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
@@ -174,6 +259,37 @@ export default function Results() {
                 )}
               </div>
 
+              {/* ZIP Code Input */}
+              <div className="space-y-2">
+                <h3 className="font-mono text-xs uppercase text-muted-foreground">Your Location</h3>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="ZIP Code"
+                    value={zipCode}
+                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                    className="h-8 text-xs bg-black/20 border-white/10"
+                    data-testid="input-zipcode"
+                  />
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="h-8 px-2 text-xs border-primary/30"
+                    onClick={() => {
+                      if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(() => {
+                          // Would integrate with geocoding API
+                        });
+                      }
+                    }}
+                    data-testid="button-use-location"
+                  >
+                    <MapPin className="w-3 h-3" />
+                  </Button>
+                </div>
+                <p className="text-[9px] text-muted-foreground">Enter ZIP for local store results</p>
+              </div>
+
               <div className="space-y-2">
                 <h3 className="font-mono text-xs uppercase text-muted-foreground">Filters</h3>
                 <div className="space-y-2">
@@ -189,6 +305,30 @@ export default function Results() {
                       <MapPin className="w-3 h-3 text-green-400" /> Local Pickup Only
                     </label>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="oemOnly" 
+                      className="w-4 h-4"
+                      checked={showOEMOnly}
+                      onCheckedChange={(checked) => setShowOEMOnly(!!checked)}
+                      data-testid="checkbox-oem-only"
+                    />
+                    <label htmlFor="oemOnly" className="text-xs font-medium leading-none flex items-center gap-1">
+                      <Package className="w-3 h-3 text-blue-400" /> OEM Parts
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="aftermarketOnly" 
+                      className="w-4 h-4"
+                      checked={showAftermarketOnly}
+                      onCheckedChange={(checked) => setShowAftermarketOnly(!!checked)}
+                      data-testid="checkbox-aftermarket-only"
+                    />
+                    <label htmlFor="aftermarketOnly" className="text-xs font-medium leading-none flex items-center gap-1">
+                      <Wrench className="w-3 h-3 text-purple-400" /> Aftermarket
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -200,7 +340,7 @@ export default function Results() {
                       <Store className="w-3 h-3 text-green-400" /> With Local Stores
                     </span>
                     <span className="font-mono text-muted-foreground">
-                      {vendorResults.filter(v => v.vendor.hasLocalPickup).length}
+                      {enhancedVendorResults.filter(v => v.vendor.hasLocalPickup).length}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
@@ -208,7 +348,7 @@ export default function Results() {
                       <Truck className="w-3 h-3 text-blue-400" /> Online Only
                     </span>
                     <span className="font-mono text-muted-foreground">
-                      {vendorResults.filter(v => !v.vendor.hasLocalPickup).length}
+                      {enhancedVendorResults.filter(v => !v.vendor.hasLocalPickup).length}
                     </span>
                   </div>
                 </div>
@@ -291,9 +431,28 @@ export default function Results() {
               <div className="text-center py-20">
                 <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="font-tech text-xl mb-2">No Retailers Found</h3>
-                <p className="text-muted-foreground text-sm">Try searching for a specific part number or name</p>
+                <p className="text-muted-foreground text-sm mb-4">This part may not be available through our current search network.</p>
+                <p className="text-[10px] text-muted-foreground/70">Try removing filters or searching for a different part name.</p>
               </div>
             ) : (
+              <>
+              {/* Limited Results Disclaimer */}
+              {sortedResults.length <= 3 && (
+                <div className="mb-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs text-yellow-400 font-medium">Limited Options Available</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {sortedResults.length === 1 
+                          ? "This is the only retailer available for this search through our network."
+                          : `Only ${sortedResults.length} retailers found. This part may have limited availability.`
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" : "space-y-3"}>
                 {sortedResults.map((result, index) => (
                   <motion.div
@@ -341,30 +500,52 @@ export default function Results() {
                               <Store className="w-2.5 h-2.5 mr-1" /> In-Store
                             </Badge>
                           )}
-                          {result.vendor.hasAffiliateProgram && (
-                            <Badge variant="secondary" className="text-[9px] h-5 px-1.5 bg-yellow-500/10 text-yellow-400 border-yellow-500/20">
-                              <DollarSign className="w-2.5 h-2.5 mr-1" /> Partner
+                          {result.vendor.supportsOEM && (
+                            <Badge variant="secondary" className="text-[9px] h-5 px-1.5 bg-blue-500/10 text-blue-400 border-blue-500/20">
+                              <Package className="w-2.5 h-2.5 mr-1" /> OEM
+                            </Badge>
+                          )}
+                          {result.vendor.supportsAftermarket && (
+                            <Badge variant="secondary" className="text-[9px] h-5 px-1.5 bg-purple-500/10 text-purple-400 border-purple-500/20">
+                              <Wrench className="w-2.5 h-2.5 mr-1" /> Aftermarket
                             </Badge>
                           )}
                         </div>
 
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="w-full font-tech uppercase text-xs border-primary/30 text-primary hover:bg-primary hover:text-black group-hover:border-primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
-                          }}
-                          data-testid={`button-search-${result.vendor.slug}`}
-                        >
-                          Search {result.vendor.name} <ArrowRight className="w-3 h-3 ml-2" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1 font-tech uppercase text-xs border-primary/30 text-primary hover:bg-primary hover:text-black group-hover:border-primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
+                            }}
+                            data-testid={`button-search-${result.vendor.slug}`}
+                          >
+                            <Search className="w-3 h-3 mr-1" /> Check Price
+                          </Button>
+                          {result.vendor.storeLocatorUrl && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="font-tech uppercase text-xs border-green-500/30 text-green-400 hover:bg-green-500 hover:text-black"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(result.vendor.storeLocatorUrl, '_blank', 'noopener,noreferrer');
+                              }}
+                              data-testid={`button-stores-${result.vendor.slug}`}
+                            >
+                              <Navigation className="w-3 h-3" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </Card>
                   </motion.div>
                 ))}
               </div>
+              </>
             )}
 
             {/* Mobile Filters */}
