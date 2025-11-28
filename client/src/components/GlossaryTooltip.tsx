@@ -29,75 +29,122 @@ interface GlossaryTooltipProps {
   term: GlossaryTerm;
   userName?: string;
   onClose: () => void;
-  position?: { x: number; y: number };
+  slideFrom?: 'left' | 'right';
 }
 
-export default function GlossaryTooltip({ term, userName, onClose, position }: GlossaryTooltipProps) {
+export default function GlossaryTooltip({ term, userName, onClose, slideFrom = 'right' }: GlossaryTooltipProps) {
   const mascotImage = mascotImages[term.image || 'general'] || mascotImages.thinking;
   const greeting = userName ? `Hey ${userName}!` : "Hey there!";
+  
+  const slideDirection = slideFrom === 'right' ? 1 : -1;
 
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, scale: 0.8, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.8, y: 20 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 backdrop-blur-sm p-4 pb-8"
         onClick={onClose}
         data-testid="glossary-tooltip-overlay"
       >
         <motion.div
-          initial={{ y: 50 }}
-          animate={{ y: 0 }}
-          className="relative max-w-md w-full"
+          initial={{ x: slideDirection * 400, opacity: 0 }}
+          animate={{ 
+            x: 0, 
+            opacity: 1,
+            transition: {
+              type: "spring",
+              damping: 20,
+              stiffness: 300,
+              mass: 0.8
+            }
+          }}
+          exit={{ x: slideDirection * 400, opacity: 0 }}
+          className="relative flex items-end gap-0"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="relative flex flex-col items-center">
+            <motion.div
+              initial={{ scale: 0, y: 20 }}
+              animate={{ 
+                scale: 1, 
+                y: 0,
+                transition: { delay: 0.2, type: "spring", damping: 15 }
+              }}
+              className="relative mb-[-20px] z-10"
+            >
+              <svg 
+                viewBox="0 0 320 180" 
+                className="w-80 h-44 drop-shadow-lg"
+                style={{ filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.3))' }}
+              >
+                <ellipse 
+                  cx="160" 
+                  cy="80" 
+                  rx="155" 
+                  ry="75" 
+                  fill="white" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth="3"
+                />
+                <path 
+                  d="M 200 145 Q 180 160 160 175 Q 175 155 185 145" 
+                  fill="white" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth="3"
+                />
+                <ellipse 
+                  cx="160" 
+                  cy="80" 
+                  rx="150" 
+                  ry="70" 
+                  fill="white"
+                />
+              </svg>
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-10 py-6">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-2 right-6 h-6 w-6 rounded-full bg-muted/50 hover:bg-muted"
+                  onClick={onClose}
+                  data-testid="glossary-tooltip-close"
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+                
+                <p className="text-primary font-bold text-sm mb-1 text-center">
+                  {greeting}
+                </p>
+                <h3 className="text-lg font-bold capitalize mb-1 text-gray-900 text-center">
+                  {term.term}
+                </h3>
+                <p className="text-sm text-gray-700 leading-snug text-center max-w-[250px]">
+                  {term.definition}
+                </p>
+              </div>
+            </motion.div>
+            
             <motion.img
               src={mascotImage}
               alt="Buddy the GarageBot mascot"
-              className="w-40 h-40 object-contain drop-shadow-lg"
-              initial={{ scale: 0.5, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: "spring", bounce: 0.5 }}
+              className="w-40 h-40 object-contain"
+              style={{ 
+                filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+              }}
+              initial={{ x: slideDirection * 100, rotate: slideDirection * -10 }}
+              animate={{ 
+                x: 0, 
+                rotate: 0,
+                transition: {
+                  type: "spring",
+                  damping: 12,
+                  stiffness: 200,
+                }
+              }}
               data-testid="glossary-mascot-image"
             />
-            
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="relative -mt-4 bg-card border-2 border-primary/50 rounded-2xl p-5 shadow-xl shadow-primary/20 max-w-sm"
-            >
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-card border-l-2 border-t-2 border-primary/50 rotate-45" />
-              
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-2 right-2 h-6 w-6"
-                onClick={onClose}
-                data-testid="glossary-tooltip-close"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-              
-              <div className="pt-2">
-                <p className="text-primary font-tech font-bold text-sm mb-1">
-                  {greeting}
-                </p>
-                <h3 className="text-lg font-bold capitalize mb-2 text-foreground">
-                  {term.term}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {term.definition}
-                </p>
-                <div className="mt-3 pt-3 border-t border-border/50">
-                  <span className="text-xs text-primary/70 font-tech uppercase">
-                    Category: {term.category}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
           </div>
         </motion.div>
       </motion.div>
@@ -130,6 +177,7 @@ export function HighlightedTerm({ children, term, userName }: HighlightedTermPro
           term={term}
           userName={userName}
           onClose={() => setShowTooltip(false)}
+          slideFrom="right"
         />
       )}
     </>
