@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { CartButton, MobileCartButton } from "@/components/CartDrawer";
 import { useCart } from "@/hooks/useCart";
-import gbEmblem from "@assets/generated_images/chrome_holographic_gb_emblem.png";
+import gbEmblem from "@assets/generated_images/transparent_chrome_gb_emblem.png";
 
 export default function Nav() {
   const [location] = useLocation();
