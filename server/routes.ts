@@ -856,9 +856,9 @@ export async function registerRoutes(
   });
 
   // Hallmarks API (protected)
-  app.get("/api/hallmarks/me", isAuthenticated, async (req: any, res) => {
+  app.get("/api/hallmark", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
       const hallmark = await storage.getHallmarkByUserId(userId);
       res.json(hallmark || null);
     } catch (error) {
@@ -866,18 +866,103 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/hallmarks", isAuthenticated, async (req: any, res) => {
+  app.get("/api/hallmarks/me", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const hallmark = await storage.getHallmarkByUserId(userId);
+      res.json(hallmark || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch hallmark" });
+    }
+  });
+
+  app.get("/api/hallmarks/recent", async (req, res) => {
+    try {
+      const hallmarks = await storage.getAllHallmarks();
+      res.json(hallmarks);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch hallmarks" });
+    }
+  });
+
+  app.post("/api/hallmark/mint", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const { vehicleId } = req.body;
+      
       const existingHallmark = await storage.getHallmarkByUserId(userId);
       if (existingHallmark) {
         return res.status(400).json({ error: "User already has a Genesis Hallmark" });
       }
       
-      const tokenId = `GENESIS-${Date.now()}-${userId.slice(-4)}`;
+      // Get the vehicle info
+      const vehicle = await storage.getVehicle(vehicleId);
+      if (!vehicle) {
+        return res.status(404).json({ error: "Vehicle not found" });
+      }
+      
+      // Get next asset number
+      const assetNumber = await storage.getNextAssetNumber();
+      
+      // Create VIN hash for privacy
+      const vinHash = vehicle.vin 
+        ? `0x${Array.from(vehicle.vin).reduce((a, c) => a + c.charCodeAt(0), 0).toString(16).padStart(16, '0')}`
+        : `0x${Date.now().toString(16)}`;
+      
+      const tokenId = `GB-${assetNumber.toString().padStart(6, '0')}`;
       const hallmark = await storage.createHallmark({
         userId,
         tokenId,
+        assetNumber,
+        transactionHash: `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+        metadata: JSON.stringify({
+          type: "GENESIS_HALLMARK",
+          edition: "Founder's Edition",
+          mintedAt: new Date().toISOString(),
+          vehicleInfo: {
+            year: vehicle.year,
+            make: vehicle.make,
+            model: vehicle.model,
+          },
+          vinHash,
+        }),
+      });
+      
+      await storage.updateUser(userId, { 
+        hasGenesisBadge: true,
+        hallmarkAssetNumber: assetNumber,
+      });
+      
+      res.json({
+        ...hallmark,
+        assetNumber,
+        vinHash,
+        vehicleInfo: {
+          year: vehicle.year,
+          make: vehicle.make,
+          model: vehicle.model,
+        },
+      });
+    } catch (error) {
+      console.error("Hallmark mint error:", error);
+      res.status(500).json({ error: "Failed to mint hallmark" });
+    }
+  });
+
+  app.post("/api/hallmarks", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const existingHallmark = await storage.getHallmarkByUserId(userId);
+      if (existingHallmark) {
+        return res.status(400).json({ error: "User already has a Genesis Hallmark" });
+      }
+      
+      const assetNumber = await storage.getNextAssetNumber();
+      const tokenId = `GB-${assetNumber.toString().padStart(6, '0')}`;
+      const hallmark = await storage.createHallmark({
+        userId,
+        tokenId,
+        assetNumber,
         transactionHash: `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
         metadata: JSON.stringify({
           type: "GENESIS_HALLMARK",
@@ -886,7 +971,10 @@ export async function registerRoutes(
         }),
       });
       
-      await storage.updateUser(userId, { hasGenesisBadge: true });
+      await storage.updateUser(userId, { 
+        hasGenesisBadge: true,
+        hallmarkAssetNumber: assetNumber,
+      });
       
       res.json(hallmark);
     } catch (error) {
@@ -1500,6 +1588,65 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Seed vendors error:", error);
       res.status(500).json({ error: "Failed to seed vendors" });
+    }
+  });
+
+  // ============ Trust Circle ============
+
+  app.get('/api/trust-circle', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      // For now, return empty array - trust circle members would be stored in a separate table
+      // This is a placeholder for the trust circle feature
+      res.json([]);
+    } catch (error) {
+      console.error("Get trust circle error:", error);
+      res.status(500).json({ error: "Failed to get trust circle" });
+    }
+  });
+
+  app.get('/api/trust-circle/memberships', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      // Return circles the user is a member of
+      res.json([]);
+    } catch (error) {
+      console.error("Get memberships error:", error);
+      res.status(500).json({ error: "Failed to get memberships" });
+    }
+  });
+
+  app.post('/api/trust-circle/invite', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const { email, memberType } = req.body;
+      
+      // Generate invite code
+      const inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+      
+      // In production, this would save to a trust_circle_members table
+      res.json({
+        id: `tc-${Date.now()}`,
+        userId,
+        memberType,
+        memberEmail: email,
+        inviteCode,
+        createdAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Create invite error:", error);
+      res.status(500).json({ error: "Failed to create invite" });
+    }
+  });
+
+  app.delete('/api/trust-circle/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      // In production, delete from trust_circle_members table
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Remove member error:", error);
+      res.status(500).json({ error: "Failed to remove member" });
     }
   });
 

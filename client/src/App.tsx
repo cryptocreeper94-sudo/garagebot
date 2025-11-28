@@ -23,6 +23,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Investors from "@/pages/Investors";
 import DevPortal from "@/pages/DevPortal";
 import Pro from "@/pages/Pro";
+import GenesisHallmark from "@/pages/GenesisHallmark";
 
 function Router() {
   return (
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/checkout/cancel" component={CheckoutCancel} />
       <Route path="/dev" component={DevPortal} />
       <Route path="/pro" component={Pro} />
+      <Route path="/hallmark" component={GenesisHallmark} />
       <Route component={NotFound} />
     </Switch>
   );

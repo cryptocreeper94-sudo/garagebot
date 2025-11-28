@@ -168,10 +168,12 @@ export default function Nav() {
                     <span className="flex items-center gap-2"><Star className="w-4 h-4" /> Ratings</span>
                     <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">SOON</Badge>
                   </span>
-                  <span className="text-lg font-medium text-muted-foreground/50 py-2 border-b border-white/5 flex items-center justify-between" data-testid="mobile-nav-hallmark">
-                    <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Genesis Hallmark</span>
-                    <Badge className="bg-secondary/20 text-secondary border-secondary/30 text-[9px] font-mono">NFT</Badge>
-                  </span>
+                  <Link href="/hallmark" onClick={() => setIsOpen(false)}>
+                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 flex items-center justify-between" data-testid="mobile-nav-hallmark">
+                      <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Genesis Hallmark</span>
+                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[9px] font-mono">NFT</Badge>
+                    </span>
+                  </Link>
                   
                   {/* Pro Upgrade Button */}
                   <Link href="/pro" onClick={() => setIsOpen(false)}>
