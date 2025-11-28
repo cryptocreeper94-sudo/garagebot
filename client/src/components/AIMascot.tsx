@@ -401,206 +401,260 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
     { label: "ATV carburetor", query: "I have an ATV that needs a new carburetor" },
   ];
 
+  const ComicSpeechBubble = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+    <div className={`relative ${className}`}>
+      <svg 
+        viewBox="0 0 400 280" 
+        className="w-full h-full absolute inset-0"
+        preserveAspectRatio="none"
+        style={{ filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.2))' }}
+      >
+        <ellipse 
+          cx="200" 
+          cy="130" 
+          rx="195" 
+          ry="125" 
+          fill="hsl(var(--card))" 
+          stroke="hsl(var(--primary))" 
+          strokeWidth="3"
+        />
+        <path 
+          d="M 320 230 Q 350 260 380 270 Q 340 250 330 240" 
+          fill="hsl(var(--card))" 
+          stroke="hsl(var(--primary))" 
+          strokeWidth="3"
+        />
+        <ellipse 
+          cx="200" 
+          cy="130" 
+          rx="190" 
+          ry="120" 
+          fill="hsl(var(--card))"
+        />
+      </svg>
+      <div className="relative z-10 p-6">
+        {children}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <AnimatePresence>
         {isOpen && !isMinimized && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="fixed bottom-24 right-4 z-50 w-80 md:w-96 bg-card border border-primary/30 rounded-2xl shadow-2xl shadow-primary/20 overflow-hidden"
-            data-testid="ai-mascot-chat"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+            data-testid="ai-mascot-overlay"
           >
-            <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-4 border-b border-primary/20">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img 
-                    src={isLoading ? mascotThinking : mascotWaving} 
-                    alt="Buddy the GarageBot mascot"
-                    className="w-12 h-12 object-contain"
-                  />
-                  <div>
-                    <h3 className="font-tech font-bold text-sm uppercase">{mascotName}</h3>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <motion.div
+              initial={{ x: -400, opacity: 0 }}
+              animate={{ 
+                x: 0, 
+                opacity: 1,
+                transition: {
+                  type: "spring",
+                  damping: 20,
+                  stiffness: 300,
+                  mass: 0.8
+                }
+              }}
+              exit={{ x: -400, opacity: 0 }}
+              className="fixed bottom-4 left-4 md:left-8 flex flex-col items-start"
+              onClick={(e) => e.stopPropagation()}
+              data-testid="ai-mascot-chat"
+            >
+              <div className="relative w-80 md:w-[420px] h-[320px] mb-[-30px]">
+                <ComicSpeechBubble>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-tech font-bold text-sm uppercase text-primary">{mascotName}</h3>
                       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      Online & ready to help
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8"
-                    onClick={() => setIsMinimized(true)}
-                    data-testid="ai-mascot-minimize"
-                  >
-                    <ChevronDown className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8"
-                    onClick={() => setIsOpen(false)}
-                    data-testid="ai-mascot-close"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <ScrollArea className="h-80 p-4" ref={scrollRef}>
-              <div className="space-y-4">
-                {messages.map((msg, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
-                  >
-                    <div className={`max-w-[90%] rounded-2xl px-4 py-2 ${
-                      msg.role === "user" 
-                        ? "bg-primary text-primary-foreground rounded-br-sm" 
-                        : "bg-muted/50 border border-border/50 rounded-bl-sm"
-                    }`}>
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                     </div>
-                    
-                    {/* Vehicle/Part identification cards */}
-                    {msg.imageIdentification?.success && msg.imageIdentification.vehicleInfo && (
-                      renderVehicleInfo(msg.imageIdentification.vehicleInfo, msg.imageIdentification.confidence)
-                    )}
-                    
-                    {msg.imageIdentification?.success && msg.imageIdentification.partInfo && (
-                      renderPartInfo(msg.imageIdentification.partInfo, msg.imageIdentification.confidence)
-                    )}
-                    
-                    {/* Search button */}
-                    {msg.searchParams && (
-                      <Button
-                        size="sm"
-                        className="mt-2 text-xs bg-primary hover:bg-primary/90"
-                        onClick={() => handleSearch(msg.searchParams!)}
-                        data-testid={`search-action-${i}`}
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6"
+                        onClick={() => setIsMinimized(true)}
+                        data-testid="ai-mascot-minimize"
                       >
-                        <Search className="w-3 h-3 mr-1" />
-                        Search for parts
-                        <ExternalLink className="w-3 h-3 ml-1" />
+                        <ChevronDown className="w-3 h-3" />
                       </Button>
-                    )}
-                    
-                    {/* Suggestion chips for image identification */}
-                    {msg.imageIdentification?.success && msg.imageIdentification.suggestions.length > 1 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        <span className="text-[10px] text-muted-foreground w-full mb-1">Related searches:</span>
-                        {msg.imageIdentification.suggestions.slice(0, 4).map((suggestion, j) => (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6"
+                        onClick={() => setIsOpen(false)}
+                        data-testid="ai-mascot-close"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <ScrollArea className="h-36 mb-2" ref={scrollRef}>
+                    <div className="space-y-3 pr-2">
+                      {messages.map((msg, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
+                        >
+                          <div className={`max-w-[95%] rounded-xl px-3 py-2 ${
+                            msg.role === "user" 
+                              ? "bg-primary text-primary-foreground" 
+                              : "bg-muted/80"
+                          }`}>
+                            <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                          </div>
+                          
+                          {msg.imageIdentification?.success && msg.imageIdentification.vehicleInfo && (
+                            renderVehicleInfo(msg.imageIdentification.vehicleInfo, msg.imageIdentification.confidence)
+                          )}
+                          
+                          {msg.imageIdentification?.success && msg.imageIdentification.partInfo && (
+                            renderPartInfo(msg.imageIdentification.partInfo, msg.imageIdentification.confidence)
+                          )}
+                          
+                          {msg.searchParams && (
+                            <Button
+                              size="sm"
+                              className="mt-2 text-xs bg-primary hover:bg-primary/90"
+                              onClick={() => handleSearch(msg.searchParams!)}
+                              data-testid={`search-action-${i}`}
+                            >
+                              <Search className="w-3 h-3 mr-1" />
+                              Search for parts
+                              <ExternalLink className="w-3 h-3 ml-1" />
+                            </Button>
+                          )}
+                          
+                          {msg.imageIdentification?.success && msg.imageIdentification.suggestions.length > 1 && (
+                            <div className="mt-2 flex flex-wrap gap-1">
+                              <span className="text-[10px] text-muted-foreground w-full mb-1">Related searches:</span>
+                              {msg.imageIdentification.suggestions.slice(0, 4).map((suggestion, j) => (
+                                <Badge 
+                                  key={j}
+                                  variant="outline"
+                                  className="cursor-pointer hover:bg-primary/20 text-xs"
+                                  onClick={() => handleSearch({ query: suggestion })}
+                                >
+                                  {suggestion}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </motion.div>
+                      ))}
+                      
+                      {(isLoading || isUploading) && (
+                        <div className="flex justify-start">
+                          <div className="bg-muted/80 rounded-xl px-3 py-2">
+                            <div className="flex items-center gap-2">
+                              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                              <span className="text-sm text-muted-foreground">
+                                {isUploading ? "Analyzing..." : "Thinking..."}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+
+                  {rateLimitError && (
+                    <div className="flex items-center gap-2 text-amber-500 mb-2">
+                      <AlertCircle className="w-3 h-3" />
+                      <span className="text-xs">Wait {rateLimitError.retryAfter}s</span>
+                    </div>
+                  )}
+
+                  {messages.length <= 1 && !rateLimitError && (
+                    <div className="mb-2">
+                      <div className="flex flex-wrap gap-1">
+                        {quickActions.map((action, i) => (
                           <Badge 
-                            key={j}
-                            variant="outline"
-                            className="cursor-pointer hover:bg-primary/20 text-xs"
-                            onClick={() => handleSearch({ query: suggestion })}
+                            key={i}
+                            variant="outline" 
+                            className="cursor-pointer hover:bg-primary/10 hover:border-primary transition-colors text-xs"
+                            onClick={() => setInput(action.query)}
+                            data-testid={`quick-action-${i}`}
                           >
-                            {suggestion}
+                            <Lightbulb className="w-3 h-3 mr-1" />
+                            {action.label}
                           </Badge>
                         ))}
                       </div>
-                    )}
-                  </motion.div>
-                ))}
-                
-                {(isLoading || isUploading) && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted/50 border border-border/50 rounded-2xl rounded-bl-sm px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                        <span className="text-sm text-muted-foreground">
-                          {isUploading ? "Analyzing your image..." : "Thinking..."}
-                        </span>
-                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+                  )}
 
-            {/* Rate limit warning */}
-            {rateLimitError && (
-              <div className="px-4 py-2 bg-amber-500/10 border-t border-amber-500/30">
-                <div className="flex items-center gap-2 text-amber-500">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-xs">Please wait {rateLimitError.retryAfter}s before sending more messages</span>
-                </div>
-              </div>
-            )}
-
-            {/* Quick actions for new conversations */}
-            {messages.length <= 1 && !rateLimitError && (
-              <div className="px-4 pb-2">
-                <p className="text-xs text-muted-foreground mb-2">Try asking:</p>
-                <div className="flex flex-wrap gap-2">
-                  {quickActions.map((action, i) => (
-                    <Badge 
-                      key={i}
-                      variant="outline" 
-                      className="cursor-pointer hover:bg-primary/10 hover:border-primary transition-colors text-xs"
-                      onClick={() => setInput(action.query)}
-                      data-testid={`quick-action-${i}`}
+                  <div className="flex gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      data-testid="ai-mascot-file-input"
+                    />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="shrink-0 h-9 w-9"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isLoading || isUploading || !!rateLimitError}
+                      title="Upload image"
+                      data-testid="ai-mascot-camera"
                     >
-                      <Lightbulb className="w-3 h-3 mr-1" />
-                      {action.label}
-                    </Badge>
-                  ))}
-                </div>
+                      <Camera className="w-4 h-4" />
+                    </Button>
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                      placeholder={rateLimitError ? "Please wait..." : "Describe what you need..."}
+                      className="flex-1 text-sm h-9"
+                      disabled={isLoading || isUploading || !!rateLimitError}
+                      data-testid="ai-mascot-input"
+                    />
+                    <Button 
+                      size="icon" 
+                      onClick={sendMessage}
+                      disabled={!input.trim() || isLoading || isUploading || !!rateLimitError}
+                      className="shrink-0 h-9 w-9"
+                      data-testid="ai-mascot-send"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </ComicSpeechBubble>
               </div>
-            )}
-
-            <div className="p-4 border-t border-border/50 bg-background/50">
-              <div className="flex gap-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  data-testid="ai-mascot-file-input"
-                />
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="shrink-0"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading || isUploading || !!rateLimitError}
-                  title="Upload image for identification"
-                  data-testid="ai-mascot-camera"
-                >
-                  <Camera className="w-4 h-4 text-muted-foreground" />
-                </Button>
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-                  placeholder={rateLimitError ? "Please wait..." : "Describe what you need..."}
-                  className="flex-1 text-sm"
-                  disabled={isLoading || isUploading || !!rateLimitError}
-                  data-testid="ai-mascot-input"
-                />
-                <Button 
-                  size="icon" 
-                  onClick={sendMessage}
-                  disabled={!input.trim() || isLoading || isUploading || !!rateLimitError}
-                  className="shrink-0"
-                  data-testid="ai-mascot-send"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-2 text-center">
-                <Camera className="w-3 h-3 inline mr-1" />
-                Upload a photo to identify parts or vehicles
-              </p>
-            </div>
+              
+              <motion.img
+                src={isLoading ? mascotThinking : mascotWaving}
+                alt="Buddy the GarageBot mascot"
+                className="w-36 h-36 md:w-44 md:h-44 object-contain ml-8"
+                style={{ 
+                  filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                }}
+                initial={{ x: -100, rotate: 10 }}
+                animate={{ 
+                  x: 0, 
+                  rotate: 0,
+                  transition: {
+                    type: "spring",
+                    damping: 12,
+                    stiffness: 200,
+                  }
+                }}
+                data-testid="ai-mascot-image"
+              />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -618,7 +672,12 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
               className="rounded-full px-4 py-2 bg-card border border-primary/30 text-foreground hover:bg-primary/10"
               data-testid="ai-mascot-restore"
             >
-              <img src={mascotWaving} alt="Buddy" className="w-6 h-6 mr-2" />
+              <img 
+                src={mascotWaving} 
+                alt="Buddy" 
+                className="w-8 h-8 mr-2"
+                style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 255, 255, 0.3))' }}
+              />
               <span className="font-tech text-sm">{mascotName}</span>
               <Badge className="ml-2 bg-primary/20 text-primary text-xs">
                 {messages.length - 1} msgs
@@ -631,7 +690,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
       <motion.button
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        whileHover={{ scale: 1.15 }}
+        whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => {
           setIsOpen(!isOpen);
@@ -642,17 +701,28 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
         data-testid="ai-mascot-toggle"
       >
         {isOpen ? (
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-            <X className="w-6 h-6" />
-          </div>
+          <motion.div 
+            className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center"
+            style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 255, 255, 0.3))' }}
+          >
+            <X className="w-6 h-6 text-primary" />
+          </motion.div>
         ) : (
           <div className="relative">
-            <img 
+            <motion.img 
               src={mascotWaving} 
               alt="Chat with Buddy" 
               className="w-24 h-24 object-contain"
               style={{ 
                 filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+              }}
+              animate={{
+                y: [0, -5, 0],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
               }}
             />
             <Sparkles className="w-4 h-4 text-yellow-300 absolute top-0 right-0 animate-pulse" />
