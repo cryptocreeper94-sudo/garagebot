@@ -441,7 +441,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
           fill="hsl(var(--card))"
         />
       </svg>
-      <div className="relative z-10 p-6">
+      <div className="relative z-10 p-3 sm:p-6">
         {children}
       </div>
     </div>
@@ -477,11 +477,11 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 }
               }}
               exit={{ x: "120vw", opacity: 0, rotate: -20, scale: 0.8 }}
-              className="fixed bottom-4 left-4 md:left-8 flex flex-col items-start"
+              className="fixed inset-x-2 sm:inset-x-auto sm:left-4 md:left-8 bottom-2 sm:bottom-4 flex flex-col items-center sm:items-start max-w-[96vw] sm:max-w-none"
               onClick={(e) => e.stopPropagation()}
               data-testid="ai-mascot-chat"
             >
-              <div className="relative w-80 md:w-[420px] h-[320px] mb-[-30px]">
+              <div className="relative w-full sm:w-80 md:w-[420px] h-[280px] sm:h-[320px] mb-[-30px]">
                 <ComicSpeechBubble>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -510,7 +510,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                     </div>
                   </div>
 
-                  <ScrollArea className="h-36 mb-2" ref={scrollRef}>
+                  <ScrollArea className="h-28 sm:h-36 mb-2" ref={scrollRef}>
                     <div className="space-y-3 pr-2">
                       {messages.map((msg, i) => (
                         <motion.div
@@ -653,7 +653,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
               <motion.img
                 src={isLoading ? mascotThinking : mascotWaving}
                 alt="Buddy the GarageBot mascot"
-                className="w-36 h-36 md:w-44 md:h-44 object-contain ml-8"
+                className="w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 object-contain ml-4 sm:ml-8"
                 style={{ 
                   filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
                 }}
