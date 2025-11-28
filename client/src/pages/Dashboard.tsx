@@ -333,6 +333,113 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* Jason's Dev Task List */}
+        <div className="mt-8 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
+              <FileText className="w-5 h-5 text-orange-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-tech font-bold uppercase text-white">Dev Task List</h2>
+              <p className="text-xs text-muted-foreground font-mono">Jason's things to do // PIN: 0424</p>
+            </div>
+          </div>
+          
+          <Card className="bg-card/30 border-white/10 backdrop-blur-md p-6">
+            <div className="space-y-4">
+              {/* High Priority */}
+              <div>
+                <h4 className="font-mono text-xs text-red-400 uppercase mb-3 flex items-center gap-2">
+                  <AlertCircle className="w-3 h-3" /> High Priority
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Apply for Retailer API Access</p>
+                      <p className="text-xs text-muted-foreground mt-1">AutoZone, O'Reilly, Advance Auto partnerships for real-time inventory</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Set Up Affiliate Programs</p>
+                      <p className="text-xs text-muted-foreground mt-1">Amazon Associates, CJ Affiliate, Impact Radius accounts</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded bg-red-500/5 border border-red-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-red-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Connect garagebot.io Domain</p>
+                      <p className="text-xs text-muted-foreground mt-1">DNS settings in Namecheap → Replit custom domain</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Medium Priority */}
+              <div>
+                <h4 className="font-mono text-xs text-yellow-400 uppercase mb-3 flex items-center gap-2">
+                  <Zap className="w-3 h-3" /> Medium Priority
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Insurify Partnership</p>
+                      <p className="text-xs text-muted-foreground mt-1">Insurance comparison integration for all vehicle types</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Stripe Pro Subscription Product</p>
+                      <p className="text-xs text-muted-foreground mt-1">Create $2.99/month Pro plan in Stripe dashboard</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded bg-yellow-500/5 border border-yellow-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-yellow-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Coinbase Commerce Integration</p>
+                      <p className="text-xs text-muted-foreground mt-1">Crypto payment option for Genesis Hallmark NFTs</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Future Features */}
+              <div>
+                <h4 className="font-mono text-xs text-blue-400 uppercase mb-3 flex items-center gap-2">
+                  <Star className="w-3 h-3" /> Future Features
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-3 p-3 rounded bg-blue-500/5 border border-blue-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-blue-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Homepage Slideshow</p>
+                      <p className="text-xs text-muted-foreground mt-1">Implement product slideshow with prepared content data</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded bg-blue-500/5 border border-blue-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-blue-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Mobile App (React Native)</p>
+                      <p className="text-xs text-muted-foreground mt-1">Barcode/VIN scanner, voice search with Buddy AI</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded bg-blue-500/5 border border-blue-500/20">
+                    <div className="w-4 h-4 rounded border-2 border-blue-400/50 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Shop Portal Launch</p>
+                      <p className="text-xs text-muted-foreground mt-1">Mechanic shop accounts, bulk ordering, wholesale pricing</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
         {/* Affiliate Tracking Section */}
         <div className="mt-8 mb-8">
           <div className="flex items-center gap-3 mb-6">
