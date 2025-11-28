@@ -718,22 +718,22 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
       >
         {isOpen ? (
           <motion.div 
-            className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center"
+            className="w-12 h-12 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center"
             style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 255, 255, 0.3))' }}
           >
-            <X className="w-6 h-6 text-primary" />
+            <X className="w-5 h-5 text-primary" />
           </motion.div>
         ) : (
           <div className="relative">
             <motion.img 
               src={mascotWaving} 
               alt="Chat with Buddy" 
-              className="w-24 h-24 object-contain"
+              className="w-14 h-14 object-contain"
               style={{ 
-                filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                filter: 'drop-shadow(0 2px 8px rgba(0, 255, 255, 0.4)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3))',
               }}
               animate={{
-                y: [0, -5, 0],
+                y: [0, -3, 0],
               }}
               transition={{
                 duration: 2,
@@ -741,7 +741,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 ease: "easeInOut"
               }}
             />
-            <Sparkles className="w-4 h-4 text-yellow-300 absolute top-0 right-0 animate-pulse" />
+            <Sparkles className="w-3 h-3 text-yellow-300 absolute -top-1 -right-1 animate-pulse" />
           </div>
         )}
       </motion.button>
