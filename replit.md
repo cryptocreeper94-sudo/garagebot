@@ -1,12 +1,22 @@
 # Overview
 
-AutoLedger (also referred to as PartScout in documentation) is a modern auto parts aggregator platform that unifies inventory from multiple retailers into a single searchable interface. The application enables users to search for automotive, motorcycle, ATV, boat, and powersports parts across vendors like AutoZone, O'Reilly, RockAuto, Amazon, and specialty suppliers. It prioritizes both price optimization and fulfillment speed, offering local pickup and shipping options.
+**GarageBot** (formerly AutoLedger/PartScout) is a modern auto parts aggregator platform that unifies inventory from multiple retailers into a single searchable interface. The application enables users to search for automotive, motorcycle, ATV, boat, and powersports parts across vendors like AutoZone, O'Reilly, RockAuto, Amazon, and specialty suppliers. It prioritizes both price optimization and fulfillment speed, offering local pickup and shipping options.
+
+**Brand Identity:**
+- Domain: garagebot.io (primary), garagebot.net (redirect)
+- Tagline: "Right Part. First Time. Every Engine."
+- AI Mascot: "Buddy" - the conversational parts-finding assistant
+- Target: All vehicles with engines - cars, trucks, motorcycles, ATVs, boats, RVs, small engines, Chinese imports
 
 The platform features vehicle fleet management ("My Garage"), real-time deal tracking, shopping cart functionality with Stripe payments, and a developer dashboard for system monitoring. The business model includes affiliate commissions, premium subscriptions, and planned direct sales with crypto payment support.
 
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+# Session Reminders
+
+- **DOMAIN REDIRECT TODO**: Help user set up redirect from darkwavestudios.net → darkwavestudios.io (at end of session)
 
 # System Architecture
 
