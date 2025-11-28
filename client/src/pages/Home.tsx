@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
-import alLogo from "@assets/generated_images/al_gear_logo_emblem.png";
+import gbEmblem from "@assets/generated_images/chrome_holographic_gb_emblem.png";
 import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
 import MarketTicker from "@/components/MarketTicker";
 
@@ -92,9 +92,9 @@ export default function Home() {
             className="mb-4"
           >
             <img 
-              src={alLogo} 
+              src={gbEmblem} 
               alt="GarageBot Emblem" 
-              className="w-20 h-20 md:w-28 md:h-28 mx-auto rounded-xl border border-primary/30 shadow-[0_0_30px_rgba(6,182,212,0.3)]"
+              className="w-24 h-24 md:w-32 md:h-32 mx-auto drop-shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:drop-shadow-[0_0_40px_rgba(6,182,212,0.7)] transition-all duration-500 hover:scale-105"
               data-testid="img-garagebot-logo"
             />
           </motion.div>
