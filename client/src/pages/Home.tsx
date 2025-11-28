@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { 
   Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink,
-  ScanLine, Camera, Mic, Wrench, Car, Sparkles
+  ScanLine, Camera, Mic, Wrench, Car, Sparkles, MessageCircle, Bot
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
@@ -13,6 +13,8 @@ import WeatherWidget from "@/components/WeatherWidget";
 import VinScanner from "@/components/VinScanner";
 import PhotoSearch from "@/components/PhotoSearch";
 import VoiceSearch from "@/components/VoiceSearch";
+import AIMascot from "@/components/AIMascot";
+import BuddyHideSeek from "@/components/BuddyHideSeek";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,8 +23,8 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
-import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
 import MarketTicker from "@/components/MarketTicker";
+import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -42,7 +44,6 @@ export default function Home() {
     
     setIsSearching(true);
     
-    // Build query params
     const params = new URLSearchParams();
     params.set('q', searchQuery.trim());
     if (selectedYear) params.set('year', selectedYear);
@@ -80,304 +81,362 @@ export default function Home() {
       <Nav />
       <MarketTicker />
       
-      {/* Layout Wrapper */}
-      <div className="pt-28 min-h-screen container mx-auto px-4 pb-20">
+      {/* Buddy Hide & Seek - Random pop-ups */}
+      <BuddyHideSeek />
+      
+      {/* Main Content */}
+      <div className="pt-28 min-h-screen pb-8">
         
-        {/* Hero Title Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-[10px] font-mono mb-4 tracking-wider">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--color-primary)]" />
-            SYSTEM ONLINE // WEB3 VERIFIED
-          </div>
-          
-          {/* GarageBot Logo Emblem - Featured Large */}
+        {/* Hero Section - Full Width */}
+        <div className="w-full px-4 lg:px-8 xl:px-16 mb-6">
           <motion.div 
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-4"
           >
-            <img 
-              src={gbEmblem} 
-              alt="GarageBot Emblem" 
-              className="w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto drop-shadow-[0_0_40px_rgba(6,182,212,0.6)] hover:drop-shadow-[0_0_60px_rgba(6,182,212,0.8)] transition-all duration-500 hover:scale-105"
-              data-testid="img-garagebot-logo"
-            />
-          </motion.div>
-          
-          <h1 className="text-xl md:text-2xl font-tech font-medium uppercase tracking-widest text-muted-foreground -mt-8 md:-mt-12 lg:-mt-14">
-            Garage<span className="text-primary">Bot</span>
-          </h1>
-          <p className="text-sm md:text-base font-light text-muted-foreground/70 mt-0">
-            Right Part. First Time. Every Engine.
-          </p>
-        </motion.div>
-
-        {/* Mission Statement */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="mb-8"
-        >
-          <Card className="bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 border-primary/20 p-6 md:p-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="font-tech text-lg md:text-xl uppercase text-primary mb-3">Our Mission</h2>
-              <p className="text-muted-foreground leading-relaxed md:text-lg">
-                GarageBot is the only parts platform built for <span className="text-foreground font-medium">every vehicle with an engine</span>. 
-                Whether you're fixing a family sedan, building a custom motorcycle, maintaining your fishing boat, 
-                or restoring a vintage ATV — we search <span className="text-primary font-medium">20+ retailers</span> to 
-                find the right part at the best price, with local pickup when you need it now.
-              </p>
-              <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 mt-4">
-                {["Cars", "Classics", "Exotics", "Kit Cars", "Motorcycles", "ATVs", "Boats", "RVs", "Diesel"].map((type) => (
-                  <span key={type} className="px-2 md:px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] md:text-xs font-mono border border-primary/20 hover:bg-primary/20 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all cursor-default whitespace-nowrap">
-                    {type}
-                  </span>
-                ))}
-              </div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-[10px] font-mono tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--color-primary)]" />
+              SYSTEM ONLINE // WEB3 VERIFIED
             </div>
-          </Card>
-        </motion.div>
+            
+            {/* GarageBot Logo - Smaller on desktop */}
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="mt-3"
+            >
+              <img 
+                src={gbEmblem} 
+                alt="GarageBot Emblem" 
+                className="w-28 h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 mx-auto drop-shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:drop-shadow-[0_0_50px_rgba(6,182,212,0.7)] transition-all duration-500 hover:scale-105"
+                data-testid="img-garagebot-logo"
+              />
+            </motion.div>
+            
+            <h1 className="text-lg md:text-xl font-tech font-medium uppercase tracking-widest text-muted-foreground -mt-4">
+              Garage<span className="text-primary">Bot</span>
+            </h1>
+            <p className="text-xs md:text-sm font-light text-muted-foreground/70">
+              Right Part. First Time. Every Engine.
+            </p>
+          </motion.div>
+        </div>
 
-        {/* Vehicle Type Selector - Full Width at Top */}
+        {/* Vehicle Type Selector - True Full Width Edge-to-Edge */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8"
+          className="w-screen relative left-1/2 right-1/2 -mx-[50vw] mb-6 bg-black/20 py-4 border-y border-white/5"
         >
-          <VehicleTypeSelector />
+          <div className="px-4 lg:px-8 xl:px-16">
+            <VehicleTypeSelector />
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12">
-        
-          {/* Left Column: Search Interface */}
-          <div className="flex flex-col justify-start py-4 lg:py-6">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="space-y-6 md:space-y-8 max-w-xl mx-auto lg:mx-0 w-full"
-            >
-              {/* Mobile Carousel Insertion (Visible only on mobile) */}
-              <div className="lg:hidden">
-                <FeaturedCarousel />
-              </div>
-
-              <Card className="glass-panel border-0 p-1">
-                <Tabs defaultValue="standard" className="w-full">
-                  <TabsList className="w-full grid grid-cols-2 bg-black/40 h-12 p-1 rounded-lg">
-                    <TabsTrigger value="standard" className="font-mono text-xs uppercase rounded-md data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Parts Search</TabsTrigger>
-                    <TabsTrigger value="web3" className="font-mono text-xs uppercase rounded-md data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary flex items-center gap-2">
-                      <Globe className="w-3 h-3" /> Web Portal
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="standard" className="p-3 md:p-5 space-y-4">
-                    <form onSubmit={handleSearch}>
-                      <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
-                        <Select value={selectedYear} onValueChange={setSelectedYear}>
-                          <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-year"><SelectValue placeholder="Year" /></SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 35 }, (_, i) => 2025 - i).map(year => (
-                              <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select value={selectedMake} onValueChange={setSelectedMake}>
-                          <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-make"><SelectValue placeholder="Make" /></SelectTrigger>
-                          <SelectContent>
-                            {["Acura", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge", "Ford", "GMC", "Honda", "Hyundai", "Infiniti", "Jeep", "Kia", "Lexus", "Lincoln", "Mazda", "Mercedes-Benz", "Nissan", "Ram", "Subaru", "Tesla", "Toyota", "Volkswagen", "Volvo"].map(make => (
-                              <SelectItem key={make} value={make.toLowerCase()}>{make}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select value={selectedModel} onValueChange={setSelectedModel}>
-                          <SelectTrigger className="h-12 bg-black/20 border-white/5 font-mono text-xs focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-model"><SelectValue placeholder="Model" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Models</SelectItem>
-                            <SelectItem value="sedan">Sedan</SelectItem>
-                            <SelectItem value="suv">SUV</SelectItem>
-                            <SelectItem value="truck">Truck</SelectItem>
-                            <SelectItem value="coupe">Coupe</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="flex gap-2 md:gap-3">
-                        <Input 
-                          className="h-14 bg-black/20 border-white/5 font-tech text-base md:text-lg placeholder:text-muted-foreground/50 focus:border-primary/50 hover:bg-black/30 transition-colors" 
-                          placeholder="SEARCH PARTS, PART NUMBER, OR KEYWORD..." 
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          data-testid="input-part-search"
-                        />
-                        <Button 
-                          type="submit"
-                          className="h-14 w-14 shrink-0 bg-primary text-black hover:bg-primary/90 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.3)]" 
-                          disabled={isSearching || !searchQuery.trim()}
-                          data-testid="button-search"
-                        >
-                          {isSearching ? (
-                            <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                          ) : (
-                            <ChevronRight className="w-6 h-6" />
-                          )}
-                        </Button>
-                      </div>
-                    </form>
-                  </TabsContent>
-
-                  <TabsContent value="web3" className="p-3 md:p-5 space-y-4">
-                    {/* Web Address Bar */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                        <Globe className="w-3 h-3 text-secondary" />
-                        <span>DIRECT WEB NAVIGATION</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="relative flex-1">
+        {/* Main 3-Column Layout for Desktop */}
+        <div className="w-full px-4 lg:px-8 xl:px-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+            
+            {/* Left Column - Search & Tools */}
+            <div className="lg:col-span-5 xl:col-span-4 space-y-4">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                {/* Search Card */}
+                <Card className="glass-panel border-0 p-1">
+                  <Tabs defaultValue="standard" className="w-full">
+                    <TabsList className="w-full grid grid-cols-2 bg-black/40 h-10 p-1 rounded-lg">
+                      <TabsTrigger value="standard" className="font-mono text-[10px] uppercase rounded-md data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Parts Search</TabsTrigger>
+                      <TabsTrigger value="web3" className="font-mono text-[10px] uppercase rounded-md data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary flex items-center gap-1">
+                        <Globe className="w-3 h-3" /> Web Portal
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="standard" className="p-3 space-y-3">
+                      <form onSubmit={handleSearch}>
+                        <div className="grid grid-cols-3 gap-2 mb-3">
+                          <Select value={selectedYear} onValueChange={setSelectedYear}>
+                            <SelectTrigger className="h-10 bg-black/20 border-white/5 font-mono text-[10px] focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-year"><SelectValue placeholder="Year" /></SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 35 }, (_, i) => 2025 - i).map(year => (
+                                <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select value={selectedMake} onValueChange={setSelectedMake}>
+                            <SelectTrigger className="h-10 bg-black/20 border-white/5 font-mono text-[10px] focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-make"><SelectValue placeholder="Make" /></SelectTrigger>
+                            <SelectContent>
+                              {["Acura", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge", "Ford", "GMC", "Honda", "Hyundai", "Infiniti", "Jeep", "Kia", "Lexus", "Lincoln", "Mazda", "Mercedes-Benz", "Nissan", "Ram", "Subaru", "Tesla", "Toyota", "Volkswagen", "Volvo"].map(make => (
+                                <SelectItem key={make} value={make.toLowerCase()}>{make}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select value={selectedModel} onValueChange={setSelectedModel}>
+                            <SelectTrigger className="h-10 bg-black/20 border-white/5 font-mono text-[10px] focus:border-primary/50 hover:bg-black/30 transition-colors" data-testid="select-model"><SelectValue placeholder="Model" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Models</SelectItem>
+                              <SelectItem value="sedan">Sedan</SelectItem>
+                              <SelectItem value="suv">SUV</SelectItem>
+                              <SelectItem value="truck">Truck</SelectItem>
+                              <SelectItem value="coupe">Coupe</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex gap-2">
                           <Input 
-                            className="h-14 bg-black/20 border-white/5 font-mono text-sm pl-4 pr-10 focus:border-secondary/50 hover:bg-black/30 transition-colors" 
-                            placeholder="Enter URL (e.g., darkwavestudios.io)"
+                            className="h-12 bg-black/20 border-white/5 font-tech text-sm placeholder:text-muted-foreground/50 focus:border-primary/50 hover:bg-black/30 transition-colors" 
+                            placeholder="SEARCH PARTS..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            data-testid="input-part-search"
+                          />
+                          <Button 
+                            type="submit"
+                            className="h-12 w-12 shrink-0 bg-primary text-black hover:bg-primary/90 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.3)]" 
+                            disabled={isSearching || !searchQuery.trim()}
+                            data-testid="button-search"
+                          >
+                            {isSearching ? (
+                              <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                            ) : (
+                              <ChevronRight className="w-5 h-5" />
+                            )}
+                          </Button>
+                        </div>
+                      </form>
+                    </TabsContent>
+
+                    <TabsContent value="web3" className="p-3 space-y-3">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono">
+                          <Globe className="w-3 h-3 text-secondary" />
+                          <span>DIRECT WEB NAVIGATION</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <Input 
+                            className="h-10 bg-black/20 border-white/5 font-mono text-xs pl-3 focus:border-secondary/50 hover:bg-black/30 transition-colors" 
+                            placeholder="Enter URL..."
                             value={webUrl}
                             onChange={(e) => setWebUrl(e.target.value)}
                             onKeyPress={handleWebKeyPress}
                             data-testid="input-web-url"
                           />
+                          <Button 
+                            className="h-10 px-4 shrink-0 bg-secondary text-black hover:bg-secondary/90 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.3)] font-tech uppercase text-xs"
+                            onClick={handleWebNavigate}
+                            data-testid="button-navigate"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
                         </div>
-                        <Button 
-                          className="h-14 px-6 shrink-0 bg-secondary text-black hover:bg-secondary/90 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.3)] font-tech uppercase"
-                          onClick={handleWebNavigate}
-                          data-testid="button-navigate"
-                        >
-                          <ExternalLink className="w-5 h-5 mr-2" />
-                          Go
-                        </Button>
                       </div>
-                      <p className="text-[10px] text-muted-foreground/60 font-mono">Opens in new tab • Secure navigation</p>
-                    </div>
-                    
-                    <div className="border-t border-white/5 pt-4">
-                      <div className="p-4 border border-dashed border-secondary/30 rounded-lg bg-secondary/5 text-center group hover:bg-secondary/10 transition-colors cursor-pointer">
-                        <p className="font-mono text-xs text-secondary mb-3">CONNECT WALLET FOR NFT PARTS</p>
-                        <Button size="sm" variant="outline" className="font-tech uppercase border-secondary text-secondary hover:bg-secondary hover:text-black" data-testid="button-connect-wallet">
-                          <Hexagon className="w-3 h-3 mr-2" />
+                      
+                      <div className="p-3 border border-dashed border-secondary/30 rounded-lg bg-secondary/5 text-center">
+                        <p className="font-mono text-[10px] text-secondary mb-2">CONNECT WALLET FOR NFT PARTS</p>
+                        <Button size="sm" variant="outline" className="font-tech uppercase text-xs border-secondary text-secondary hover:bg-secondary hover:text-black h-8" data-testid="button-connect-wallet">
+                          <Hexagon className="w-3 h-3 mr-1" />
                           Connect Wallet
                         </Button>
                       </div>
+                    </TabsContent>
+                  </Tabs>
+                </Card>
+
+                {/* Quick Tools */}
+                <Card className="bg-card/50 border-primary/20 p-3 mt-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-3 h-3 text-primary" />
+                    <span className="font-tech text-[10px] uppercase text-primary">Quick Tools</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <Dialog open={showVinScanner} onOpenChange={setShowVinScanner}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="h-auto py-2 flex flex-col gap-1 border-primary/20 hover:bg-primary/10 hover:border-primary/40"
+                          data-testid="button-vin-scanner"
+                        >
+                          <ScanLine className="w-4 h-4 text-primary" />
+                          <span className="text-[8px] font-tech uppercase">VIN</span>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-lg">
+                        <VinScanner />
+                      </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={showPhotoSearch} onOpenChange={setShowPhotoSearch}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="h-auto py-2 flex flex-col gap-1 border-purple-500/20 hover:bg-purple-500/10 hover:border-purple-500/40"
+                          data-testid="button-photo-search"
+                        >
+                          <Camera className="w-4 h-4 text-purple-400" />
+                          <span className="text-[8px] font-tech uppercase">Photo</span>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-lg">
+                        <PhotoSearch />
+                      </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={showVoiceSearch} onOpenChange={setShowVoiceSearch}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="h-auto py-2 flex flex-col gap-1 border-green-500/20 hover:bg-green-500/10 hover:border-green-500/40"
+                          data-testid="button-voice-search"
+                        >
+                          <Mic className="w-4 h-4 text-green-400" />
+                          <span className="text-[8px] font-tech uppercase">Voice</span>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-lg">
+                        <VoiceSearch />
+                      </DialogContent>
+                    </Dialog>
+
+                    <Button
+                      variant="outline"
+                      className="h-auto py-2 flex flex-col gap-1 border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/40"
+                      onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
+                      data-testid="button-buddy-chat"
+                    >
+                      <Bot className="w-4 h-4 text-cyan-400" />
+                      <span className="text-[8px] font-tech uppercase">Buddy</span>
+                    </Button>
+                  </div>
+                </Card>
+
+                {/* Stats */}
+                <div className="flex flex-wrap gap-3 text-[9px] font-mono text-muted-foreground/60 mt-3 justify-center lg:justify-start">
+                  <span className="flex items-center gap-1"><Database className="w-3 h-3 text-primary/50" /> 15M+ PARTS</span>
+                  <span className="flex items-center gap-1"><Cpu className="w-3 h-3 text-secondary/50" /> AI ACTIVE</span>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Center Column - Buddy AI + Mission */}
+            <div className="lg:col-span-4 xl:col-span-5 space-y-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+              >
+                {/* Buddy AI Card - Main Feature */}
+                <Card className="bg-gradient-to-br from-primary/10 via-card/80 to-secondary/10 border-primary/30 p-4 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.5)]">
+                        <Bot className="w-6 h-6 text-black" />
+                      </div>
+                      <div>
+                        <h3 className="font-tech text-sm uppercase text-primary flex items-center gap-2">
+                          Meet Buddy
+                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        </h3>
+                        <p className="text-[10px] text-muted-foreground">Your AI Parts Expert</p>
+                      </div>
                     </div>
-                  </TabsContent>
-                </Tabs>
-              </Card>
+                    <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                      Tell Buddy what you need in plain English, snap a photo of a part, or describe your problem. 
+                      He'll find the right part across 20+ retailers.
+                    </p>
+                    <Button 
+                      onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
+                      className="w-full bg-primary text-black hover:bg-primary/90 font-tech uppercase text-xs h-9 shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                      data-testid="button-chat-buddy"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      Chat with Buddy
+                    </Button>
+                  </div>
+                </Card>
 
-              <div className="flex flex-wrap gap-4 md:gap-6 text-[10px] font-mono text-muted-foreground/60 pt-2 justify-center lg:justify-start">
-                <span className="flex items-center gap-1.5"><Database className="w-3 h-3 text-primary/50" /> 15M+ PARTS INDEXED</span>
-                <span className="flex items-center gap-1.5"><Cpu className="w-3 h-3 text-secondary/50" /> AI MATCHING ACTIVE</span>
-              </div>
+                {/* Mission Statement - Compact */}
+                <Card className="bg-card/50 border-white/10 p-4">
+                  <h2 className="font-tech text-xs uppercase text-primary mb-2">Our Mission</h2>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    GarageBot is the only parts platform built for <span className="text-foreground font-medium">every vehicle with an engine</span>. 
+                    Cars, motorcycles, boats, ATVs, RVs, classics, exotics — we search <span className="text-primary">20+ retailers</span> to 
+                    find the right part at the best price.
+                  </p>
+                  <div className="flex flex-wrap gap-1 mt-3">
+                    {["Cars", "Trucks", "Motorcycles", "ATVs", "Boats", "RVs", "Diesel", "Classics", "Exotics"].map((type) => (
+                      <span key={type} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[8px] font-mono border border-primary/20">
+                        {type}
+                      </span>
+                    ))}
+                  </div>
+                </Card>
 
-              {/* Quick Tools Section */}
-              <Card className="bg-card/50 border-primary/20 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="font-tech text-xs uppercase text-primary">Quick Tools</span>
+                {/* Weather Widget */}
+                <div className="hidden lg:block">
+                  <WeatherWidget />
                 </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <Dialog open={showVinScanner} onOpenChange={setShowVinScanner}>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="h-auto py-3 flex flex-col gap-1.5 border-primary/20 hover:bg-primary/10 hover:border-primary/40"
-                        data-testid="button-vin-scanner"
-                      >
-                        <ScanLine className="w-5 h-5 text-primary" />
-                        <span className="text-[10px] font-tech uppercase">VIN Scan</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-lg">
-                      <VinScanner />
-                    </DialogContent>
-                  </Dialog>
+              </motion.div>
+            </div>
 
-                  <Dialog open={showPhotoSearch} onOpenChange={setShowPhotoSearch}>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="h-auto py-3 flex flex-col gap-1.5 border-purple-500/20 hover:bg-purple-500/10 hover:border-purple-500/40"
-                        data-testid="button-photo-search"
-                      >
-                        <Camera className="w-5 h-5 text-purple-400" />
-                        <span className="text-[10px] font-tech uppercase">Photo ID</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-lg">
-                      <PhotoSearch />
-                    </DialogContent>
-                  </Dialog>
-
-                  <Dialog open={showVoiceSearch} onOpenChange={setShowVoiceSearch}>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="h-auto py-3 flex flex-col gap-1.5 border-green-500/20 hover:bg-green-500/10 hover:border-green-500/40"
-                        data-testid="button-voice-search"
-                      >
-                        <Mic className="w-5 h-5 text-green-400" />
-                        <span className="text-[10px] font-tech uppercase">Voice</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-lg">
-                      <VoiceSearch />
-                    </DialogContent>
-                  </Dialog>
-                </div>
-                <p className="text-[10px] text-muted-foreground text-center mt-2">
-                  Scan VIN • Snap Photo • "Hey Buddy" Voice
-                </p>
-              </Card>
-
-              {/* Mobile Category Grid Insertion */}
-              <div className="lg:hidden pt-6">
+            {/* Right Column - Categories & Deals */}
+            <div className="lg:col-span-3 space-y-4">
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25 }}
+              >
                 <CategoryGrid />
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Right Column: Featured / Visuals (Desktop Only) */}
-          <div className="hidden lg:flex flex-col justify-start h-full py-6 pl-12 border-l border-white/5 space-y-6">
-            <WeatherWidget />
-            <CategoryGrid />
-            <FeaturedCarousel />
+              </motion.div>
+            </div>
           </div>
         </div>
+
+        {/* Featured Carousel - Full Width */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="w-full px-4 lg:px-8 xl:px-16 mt-6"
+        >
+          <FeaturedCarousel />
+        </motion.div>
       </div>
       
-      <footer className="py-12 border-t border-primary/20 mt-0 bg-gradient-to-t from-[#0a0f1e] to-transparent relative overflow-hidden">
-        <div className="absolute inset-0 w-full h-full opacity-100 pointer-events-none">
-           <img 
-             src={footerWave} 
-             alt="DarkWave Signature" 
-             className="w-full h-full object-cover mix-blend-screen"
-           />
+      {/* Footer with Wave Background */}
+      <footer className="py-10 border-t border-primary/20 bg-gradient-to-t from-[#0a0f1e] to-transparent relative overflow-hidden">
+        {/* Wave Background - Fixed aspect ratio */}
+        <div className="absolute inset-0 w-full pointer-events-none overflow-hidden">
+          <div className="absolute bottom-0 left-0 right-0 h-32 max-h-full">
+            <img 
+              src={footerWave} 
+              alt="" 
+              className="w-full h-full object-cover object-top opacity-40 mix-blend-screen"
+            />
+          </div>
         </div>
-        <div className="container mx-auto px-4 text-center relative z-10 space-y-3">
-          <p className="font-mono text-xs text-blue-200/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+        <div className="container mx-auto px-4 text-center relative z-10 space-y-2">
+          <p className="font-mono text-[10px] text-muted-foreground/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
             © 2025 DARKWAVE STUDIOS LLC. ALL RIGHTS RESERVED.
           </p>
           <a 
             href="https://darkwave-studios.io" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-block font-mono text-xs text-primary/80 hover:text-primary transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+            className="inline-block font-mono text-[10px] text-primary/80 hover:text-primary transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
             data-testid="link-darkwave-studios"
           >
             darkwave-studios.io
           </a>
         </div>
       </footer>
+
+      {/* Buddy AI Chat - Always available */}
+      <AIMascot />
     </div>
   );
 }
