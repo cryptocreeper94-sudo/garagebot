@@ -2,10 +2,11 @@ import useEmblaCarousel from "embla-carousel-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Star, ChevronRight, Zap } from "lucide-react";
+import { Timer, Star, ShoppingCart, Zap } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
+import { useCart } from "@/hooks/useCart";
 
 type Deal = {
   id: string;
@@ -79,11 +80,23 @@ async function fetchDeals(): Promise<Deal[]> {
 
 export default function FeaturedCarousel() {
   const [emblaRef] = useEmblaCarousel({ align: "start", loop: true });
+  const { addToCart } = useCart();
   
   const { data: deals = FALLBACK_DEALS } = useQuery({
     queryKey: ["deals"],
     queryFn: fetchDeals,
   });
+
+  const handleAddToCart = (deal: Deal) => {
+    addToCart({
+      productId: deal.id,
+      priceId: `price_${deal.id}`,
+      productName: deal.title,
+      productImage: deal.imageUrl || undefined,
+      quantity: 1,
+      unitPrice: parseFloat(deal.price),
+    });
+  };
 
   return (
     <section className="w-full py-6">
@@ -140,8 +153,13 @@ export default function FeaturedCarousel() {
                         </div>
                         <p className="text-[10px] text-muted-foreground uppercase font-mono">Sold by {deal.vendor}</p>
                       </div>
-                      <Button size="sm" className="h-8 w-8 p-0 rounded-full bg-primary text-black hover:bg-white transition-colors">
-                        <ChevronRight className="w-4 h-4" />
+                      <Button 
+                        size="sm" 
+                        className="h-8 w-8 p-0 rounded-full bg-primary text-black hover:bg-white transition-colors"
+                        onClick={() => handleAddToCart(deal)}
+                        data-testid={`button-add-to-cart-${deal.id}`}
+                      >
+                        <ShoppingCart className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>

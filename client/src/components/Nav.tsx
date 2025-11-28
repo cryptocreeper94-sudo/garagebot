@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { CartButton, MobileCartButton } from "@/components/CartDrawer";
+import { useCart } from "@/hooks/useCart";
 
 export default function Nav() {
   const [location] = useLocation();
@@ -80,10 +82,9 @@ export default function Nav() {
             </a>
           )}
           
-          <Button variant="outline" className="hidden md:flex gap-2 border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary">
-            <ShoppingCart className="w-4 h-4" />
-            <span className="font-tech">Cart (0)</span>
-          </Button>
+          <div className="hidden md:block">
+            <CartButton />
+          </div>
           
           {/* Mobile Hamburger Menu */}
           <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -134,9 +135,7 @@ export default function Nav() {
                      <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block">Track Order</span>
                   </Link>
                   <div className="pt-4 flex flex-col gap-3">
-                    <Button className="w-full gap-2 font-tech uppercase">
-                      <ShoppingCart className="w-4 h-4" /> Cart (0)
-                    </Button>
+                    <MobileCartButton />
                     {isAuthenticated ? (
                       <a href="/api/logout" className="w-full">
                         <Button variant="outline" className="w-full gap-2 font-tech uppercase border-red-500/50 text-red-400 hover:bg-red-500/10">
