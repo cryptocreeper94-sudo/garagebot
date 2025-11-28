@@ -6,6 +6,7 @@ import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVend
 import { fromZodError } from "zod-validation-error";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { nhtsaService } from "./services/nhtsa";
+import { weatherService } from "./services/weather";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -299,6 +300,74 @@ export async function registerRoutes(
       res.json({ synced: stored.length, total: recalls.length });
     } catch (error) {
       res.status(500).json({ error: "Failed to sync recalls" });
+    }
+  });
+
+  // Weather API (public - uses free Open-Meteo)
+  app.get("/api/weather/zip/:zipCode", async (req, res) => {
+    try {
+      const { zipCode } = req.params;
+      const weather = await weatherService.getWeatherByZip(zipCode);
+      if (!weather) {
+        return res.status(404).json({ error: "Location not found" });
+      }
+      res.json(weather);
+    } catch (error) {
+      console.error("Weather API error:", error);
+      res.status(500).json({ error: "Failed to fetch weather" });
+    }
+  });
+
+  app.get("/api/weather/city/:city", async (req, res) => {
+    try {
+      const { city } = req.params;
+      const { state } = req.query;
+      const weather = await weatherService.getWeatherByCity(city, state as string);
+      if (!weather) {
+        return res.status(404).json({ error: "Location not found" });
+      }
+      res.json(weather);
+    } catch (error) {
+      console.error("Weather API error:", error);
+      res.status(500).json({ error: "Failed to fetch weather" });
+    }
+  });
+
+  app.get("/api/weather/coords", async (req, res) => {
+    try {
+      const { lat, lon } = req.query;
+      if (!lat || !lon) {
+        return res.status(400).json({ error: "Latitude and longitude required" });
+      }
+      const weather = await weatherService.getWeather(parseFloat(lat as string), parseFloat(lon as string));
+      if (!weather) {
+        return res.status(500).json({ error: "Failed to fetch weather" });
+      }
+      res.json(weather);
+    } catch (error) {
+      console.error("Weather API error:", error);
+      res.status(500).json({ error: "Failed to fetch weather" });
+    }
+  });
+
+  // User preferences for weather (stored ZIP, etc.)
+  app.get("/api/user/preferences", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const prefs = await storage.getUserPreferences(userId);
+      res.json(prefs || {});
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch preferences" });
+    }
+  });
+
+  app.post("/api/user/preferences", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const prefs = await storage.upsertUserPreferences({ userId, ...req.body });
+      res.json(prefs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save preferences" });
     }
   });
 
@@ -636,6 +705,216 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Search error:", error);
       res.status(500).json({ error: "Failed to search" });
+    }
+  });
+
+  // Shop Portal API
+  app.get("/api/shops", async (req, res) => {
+    try {
+      const { city, state, zipCode } = req.query;
+      const shops = await storage.getShops({ 
+        city: city as string, 
+        state: state as string, 
+        zipCode: zipCode as string 
+      });
+      res.json(shops);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch shops" });
+    }
+  });
+
+  app.get("/api/shops/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const shop = await storage.getShopBySlug(slug);
+      if (!shop) {
+        return res.status(404).json({ error: "Shop not found" });
+      }
+      res.json(shop);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch shop" });
+    }
+  });
+
+  app.get("/api/shops/:shopId/reviews", async (req, res) => {
+    try {
+      const { shopId } = req.params;
+      const reviews = await storage.getShopReviews(shopId);
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reviews" });
+    }
+  });
+
+  app.post("/api/shops/:shopId/reviews", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      const review = await storage.createShopReview({ ...req.body, shopId, userId });
+      res.json(review);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create review" });
+    }
+  });
+
+  // Shop owner routes
+  app.get("/api/my-shops", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const shops = await storage.getShopsByOwner(userId);
+      res.json(shops);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch your shops" });
+    }
+  });
+
+  app.post("/api/shops", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const slug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const shop = await storage.createShop({ ...req.body, ownerId: userId, slug });
+      res.json(shop);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create shop" });
+    }
+  });
+
+  app.patch("/api/shops/:shopId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const updated = await storage.updateShop(shopId, req.body);
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update shop" });
+    }
+  });
+
+  // Shop customers
+  app.get("/api/shops/:shopId/customers", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const customers = await storage.getShopCustomers(shopId);
+      res.json(customers);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch customers" });
+    }
+  });
+
+  app.post("/api/shops/:shopId/customers", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const customer = await storage.linkCustomerToShop({ shopId, ...req.body });
+      res.json(customer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add customer" });
+    }
+  });
+
+  // Shop staff
+  app.get("/api/shops/:shopId/staff", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const staff = await storage.getShopStaff(shopId);
+      res.json(staff);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch staff" });
+    }
+  });
+
+  app.post("/api/shops/:shopId/staff", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const staff = await storage.addShopStaff({ shopId, ...req.body });
+      res.json(staff);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add staff" });
+    }
+  });
+
+  // Message templates
+  app.get("/api/message-templates", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.query;
+      const templates = await storage.getMessageTemplates(shopId as string);
+      res.json(templates);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch templates" });
+    }
+  });
+
+  app.post("/api/message-templates", isAuthenticated, async (req: any, res) => {
+    try {
+      const template = await storage.createMessageTemplate(req.body);
+      res.json(template);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create template" });
+    }
+  });
+
+  // Message log
+  app.post("/api/messages/send", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { shopId, recipient, content, messageType } = req.body;
+      
+      // Log the message (actual sending would be via Twilio)
+      const message = await storage.logMessage({
+        shopId,
+        userId,
+        recipient,
+        messageType: messageType || 'sms',
+        content,
+        status: 'pending',
+      });
+      
+      // TODO: Integrate with Twilio when approved
+      // For now, just mark as sent (simulated)
+      
+      res.json({ ...message, note: 'SMS integration pending Twilio approval' });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  app.get("/api/messages/history", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.query;
+      const userId = req.user.claims.sub;
+      const messages = await storage.getMessageHistory({ 
+        shopId: shopId as string, 
+        userId: !shopId ? userId : undefined 
+      });
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch message history" });
     }
   });
 

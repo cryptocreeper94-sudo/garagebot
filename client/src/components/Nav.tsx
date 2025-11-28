@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
@@ -45,6 +45,9 @@ export default function Nav() {
           </Link>
           <Link href="/dashboard">
             <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/dashboard' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-dashboard">Dashboard</span>
+          </Link>
+          <Link href="/shop-portal">
+            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/shop-portal' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-shop-portal">Shop Portal</span>
           </Link>
           <span className="text-sm font-medium text-muted-foreground/50 cursor-not-allowed flex items-center gap-1" data-testid="nav-services">
             Services
@@ -132,6 +135,11 @@ export default function Nav() {
                   </Link>
                   <Link href="/dashboard" onClick={() => setIsOpen(false)}>
                     <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block" data-testid="mobile-nav-dashboard">Dashboard</span>
+                  </Link>
+                  <Link href="/shop-portal" onClick={() => setIsOpen(false)}>
+                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 flex items-center gap-2" data-testid="mobile-nav-shop-portal">
+                      <Store className="w-4 h-4" /> Shop Portal
+                    </span>
                   </Link>
                   <Link href="/account" onClick={() => setIsOpen(false)}>
                     <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block" data-testid="mobile-nav-account">Account</span>

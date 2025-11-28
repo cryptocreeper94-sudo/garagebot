@@ -6,6 +6,7 @@ import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import VehicleTypeSelector from "@/components/VehicleTypeSelector";
+import WeatherWidget from "@/components/WeatherWidget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -250,7 +251,8 @@ export default function Home() {
           </div>
 
           {/* Right Column: Featured / Visuals (Desktop Only) */}
-          <div className="hidden lg:flex flex-col justify-start h-full py-6 pl-12 border-l border-white/5 space-y-10">
+          <div className="hidden lg:flex flex-col justify-start h-full py-6 pl-12 border-l border-white/5 space-y-6">
+            <WeatherWidget />
             <CategoryGrid />
             <FeaturedCarousel />
           </div>
