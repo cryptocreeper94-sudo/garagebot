@@ -1,5 +1,447 @@
 import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge, Crown, Hammer, Sparkles } from "lucide-react";
 
+// Vendor search URL templates - {query}, {year}, {make}, {model}, {zip} are placeholders
+export interface VendorInfo {
+  id: string;
+  name: string;
+  slug: string;
+  searchTemplate: string;
+  storeLocatorUrl?: string;
+  hasLocalPickup: boolean;
+  categories: string[]; // Which vehicle types this vendor serves
+  priority: number; // Higher = show first
+  supportsOEM: boolean;
+  supportsAftermarket: boolean;
+  affiliateNetwork?: string;
+  logoColor: string; // For UI display
+}
+
+export const VENDORS: VendorInfo[] = [
+  // Major Auto Parts Retailers - LOCAL PICKUP AVAILABLE
+  {
+    id: "autozone",
+    name: "AutoZone",
+    slug: "autozone",
+    searchTemplate: "https://www.autozone.com/searchresult?searchText={query}",
+    storeLocatorUrl: "https://www.autozone.com/locations",
+    hasLocalPickup: true,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 100,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Impact",
+    logoColor: "#FF6600"
+  },
+  {
+    id: "oreilly",
+    name: "O'Reilly Auto Parts",
+    slug: "oreilly",
+    searchTemplate: "https://www.oreillyauto.com/shop/b/{query}",
+    storeLocatorUrl: "https://www.oreillyauto.com/store-finder",
+    hasLocalPickup: true,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 99,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#00843D"
+  },
+  {
+    id: "advanceauto",
+    name: "Advance Auto Parts",
+    slug: "advance",
+    searchTemplate: "https://shop.advanceautoparts.com/web/SearchResults?searchTerm={query}",
+    storeLocatorUrl: "https://stores.advanceautoparts.com",
+    hasLocalPickup: true,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 98,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#CC0000"
+  },
+  {
+    id: "napa",
+    name: "NAPA Auto Parts",
+    slug: "napa",
+    searchTemplate: "https://www.napaonline.com/en/search?q={query}",
+    storeLocatorUrl: "https://www.napaonline.com/en/auto-parts-stores-near-me",
+    hasLocalPickup: true,
+    categories: ["cars", "classics", "diesel", "rv", "boats"],
+    priority: 97,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#003DA5"
+  },
+  // Online-Only Major Retailers
+  {
+    id: "rockauto",
+    name: "RockAuto",
+    slug: "rockauto",
+    searchTemplate: "https://www.rockauto.com/en/catalog/?a={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 95,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#336699"
+  },
+  {
+    id: "amazon",
+    name: "Amazon Automotive",
+    slug: "amazon",
+    searchTemplate: "https://www.amazon.com/s?k={query}&i=automotive",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "powersports"],
+    priority: 90,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Amazon Associates",
+    logoColor: "#FF9900"
+  },
+  {
+    id: "ebay",
+    name: "eBay Motors",
+    slug: "ebay",
+    searchTemplate: "https://www.ebay.com/sch/i.html?_nkw={query}&_sacat=6000",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "exotics", "kitcars", "powersports"],
+    priority: 85,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "eBay Partner Network",
+    logoColor: "#E53238"
+  },
+  {
+    id: "carparts",
+    name: "CarParts.com",
+    slug: "carparts",
+    searchTemplate: "https://www.carparts.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics"],
+    priority: 80,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#1E90FF"
+  },
+  // Powersports Specialists
+  {
+    id: "rockymountain",
+    name: "Rocky Mountain ATV/MC",
+    slug: "rockymountain",
+    searchTemplate: "https://www.rockymountainatvmc.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["motorcycles", "atvs", "powersports"],
+    priority: 95,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AvantLink",
+    logoColor: "#FF4500"
+  },
+  {
+    id: "denniskirk",
+    name: "Dennis Kirk",
+    slug: "denniskirk",
+    searchTemplate: "https://www.denniskirk.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["motorcycles", "atvs", "powersports"],
+    priority: 94,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AvantLink",
+    logoColor: "#003366"
+  },
+  {
+    id: "partzilla",
+    name: "Partzilla",
+    slug: "partzilla",
+    searchTemplate: "https://www.partzilla.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["motorcycles", "atvs", "boats", "powersports"],
+    priority: 93,
+    supportsOEM: true,
+    supportsAftermarket: false,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#00AA00"
+  },
+  {
+    id: "revzilla",
+    name: "RevZilla",
+    slug: "revzilla",
+    searchTemplate: "https://www.revzilla.com/search?query={query}",
+    hasLocalPickup: false,
+    categories: ["motorcycles"],
+    priority: 92,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "AvantLink",
+    logoColor: "#FF0000"
+  },
+  {
+    id: "vmcchineseparts",
+    name: "VMC Chinese Parts",
+    slug: "vmc",
+    searchTemplate: "https://www.vmcchineseparts.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["atvs", "powersports"],
+    priority: 85,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#CC0000"
+  },
+  // Marine / Boat
+  {
+    id: "westmarine",
+    name: "West Marine",
+    slug: "westmarine",
+    searchTemplate: "https://www.westmarine.com/search?q={query}",
+    storeLocatorUrl: "https://www.westmarine.com/stores",
+    hasLocalPickup: true,
+    categories: ["boats"],
+    priority: 95,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#003399"
+  },
+  {
+    id: "iboats",
+    name: "iBoats",
+    slug: "iboats",
+    searchTemplate: "https://www.iboats.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["boats"],
+    priority: 90,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#0066CC"
+  },
+  {
+    id: "boatsnet",
+    name: "Boats.net",
+    slug: "boatsnet",
+    searchTemplate: "https://www.boats.net/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["boats"],
+    priority: 88,
+    supportsOEM: true,
+    supportsAftermarket: false,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#006699"
+  },
+  // Performance / Racing
+  {
+    id: "summit",
+    name: "Summit Racing",
+    slug: "summit",
+    searchTemplate: "https://www.summitracing.com/search?keyword={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "exotics", "kitcars"],
+    priority: 95,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#FF0000"
+  },
+  {
+    id: "jegs",
+    name: "JEGS",
+    slug: "jegs",
+    searchTemplate: "https://www.jegs.com/v/Search/{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "exotics", "kitcars"],
+    priority: 94,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#FFCC00"
+  },
+  // Diesel / Commercial
+  {
+    id: "fleetpride",
+    name: "FleetPride",
+    slug: "fleetpride",
+    searchTemplate: "https://www.fleetpride.com/search?q={query}",
+    storeLocatorUrl: "https://www.fleetpride.com/branch-locator",
+    hasLocalPickup: true,
+    categories: ["diesel"],
+    priority: 95,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#003366"
+  },
+  {
+    id: "findParts",
+    name: "FinditParts",
+    slug: "finditparts",
+    searchTemplate: "https://www.finditparts.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["diesel"],
+    priority: 90,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#FF6600"
+  },
+  // RV / Trailer
+  {
+    id: "campingworld",
+    name: "Camping World",
+    slug: "campingworld",
+    searchTemplate: "https://www.campingworld.com/search?q={query}",
+    storeLocatorUrl: "https://www.campingworld.com/store-locator",
+    hasLocalPickup: true,
+    categories: ["rv"],
+    priority: 95,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#00AA00"
+  },
+  {
+    id: "etrailer",
+    name: "etrailer",
+    slug: "etrailer",
+    searchTemplate: "https://www.etrailer.com/search.aspx?SearchTerm={query}",
+    hasLocalPickup: false,
+    categories: ["rv", "cars"],
+    priority: 90,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#0066CC"
+  },
+  // Classic / Vintage
+  {
+    id: "classicindustries",
+    name: "Classic Industries",
+    slug: "classicindustries",
+    searchTemplate: "https://www.classicindustries.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["classics"],
+    priority: 95,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#CC0000"
+  },
+  {
+    id: "lmctruck",
+    name: "LMC Truck",
+    slug: "lmctruck",
+    searchTemplate: "https://www.lmctruck.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["classics"],
+    priority: 92,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#336699"
+  },
+  // Small Engine / Outdoor
+  {
+    id: "jackssmallengines",
+    name: "Jack's Small Engines",
+    slug: "jacks",
+    searchTemplate: "https://www.jackssmallengines.com/jacks-parts-lookup/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["powersports"],
+    priority: 90,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#009933"
+  },
+  {
+    id: "tractorsupply",
+    name: "Tractor Supply",
+    slug: "tractorsupply",
+    searchTemplate: "https://www.tractorsupply.com/tsc/search/{query}",
+    storeLocatorUrl: "https://www.tractorsupply.com/wcs/store/finder",
+    hasLocalPickup: true,
+    categories: ["powersports", "diesel"],
+    priority: 85,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#CC0000"
+  },
+  // Off-Road / 4x4
+  {
+    id: "4wheelparts",
+    name: "4 Wheel Parts",
+    slug: "4wheelparts",
+    searchTemplate: "https://www.4wheelparts.com/search?q={query}",
+    storeLocatorUrl: "https://www.4wheelparts.com/store-locator",
+    hasLocalPickup: true,
+    categories: ["cars", "atvs"],
+    priority: 90,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#FF6600"
+  },
+  {
+    id: "extremeterrain",
+    name: "ExtremeTerrain",
+    slug: "extremeterrain",
+    searchTemplate: "https://www.extremeterrain.com/search/?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars"],
+    priority: 85,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#FF0000"
+  },
+];
+
+// Helper function to generate search URL for a vendor
+export function generateVendorSearchUrl(
+  vendor: VendorInfo,
+  query: string,
+  options?: { year?: string; make?: string; model?: string; zip?: string }
+): string {
+  let url = vendor.searchTemplate;
+  
+  // Build the full query with vehicle info if available
+  let fullQuery = query;
+  if (options?.year && options?.make && options?.model) {
+    fullQuery = `${options.year} ${options.make} ${options.model} ${query}`;
+  } else if (options?.make && options?.model) {
+    fullQuery = `${options.make} ${options.model} ${query}`;
+  }
+  
+  // Replace placeholders
+  url = url.replace('{query}', encodeURIComponent(fullQuery));
+  if (options?.year) url = url.replace('{year}', encodeURIComponent(options.year));
+  if (options?.make) url = url.replace('{make}', encodeURIComponent(options.make));
+  if (options?.model) url = url.replace('{model}', encodeURIComponent(options.model));
+  if (options?.zip) url = url.replace('{zip}', encodeURIComponent(options.zip));
+  
+  return url;
+}
+
+// Get vendors for a specific vehicle type
+export function getVendorsForVehicleType(vehicleType: string): VendorInfo[] {
+  return VENDORS
+    .filter(v => v.categories.includes(vehicleType) || v.categories.includes('cars')) // cars is default
+    .sort((a, b) => b.priority - a.priority);
+}
+
+// Get vendors with local pickup
+export function getLocalPickupVendors(): VendorInfo[] {
+  return VENDORS
+    .filter(v => v.hasLocalPickup)
+    .sort((a, b) => b.priority - a.priority);
+}
+
 export const VEHICLE_TYPES = [
   { id: "cars", name: "Cars & Trucks", icon: Car, description: "Sedans, SUVs, Pickups" },
   { id: "classics", name: "Classic & Hot Rod", icon: Sparkles, description: "Muscle, Vintage, Resto" },
