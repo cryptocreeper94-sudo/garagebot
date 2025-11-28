@@ -15,6 +15,14 @@ import PhotoSearch from "@/components/PhotoSearch";
 import VoiceSearch from "@/components/VoiceSearch";
 import AIMascot from "@/components/AIMascot";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
+import { 
+  AnimatedStats, 
+  RetailerLogos, 
+  HowItWorks, 
+  Testimonials, 
+  CTABanner,
+  TrustBadges
+} from "@/components/LandingPageSections";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -402,10 +410,40 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="w-full px-4 lg:px-8 xl:px-16 mt-6"
+          className="w-full px-4 lg:px-8 xl:px-16 mt-4"
         >
           <FeaturedCarousel />
         </motion.div>
+
+        {/* Animated Stats */}
+        <div className="w-full px-4 lg:px-8 xl:px-16">
+          <AnimatedStats />
+        </div>
+
+        {/* Retailer Logo Parade */}
+        <div className="w-full px-4 lg:px-8 xl:px-16">
+          <RetailerLogos />
+        </div>
+
+        {/* How It Works */}
+        <div className="w-full px-4 lg:px-8 xl:px-16">
+          <HowItWorks />
+        </div>
+
+        {/* CTA Banner */}
+        <div className="w-full px-4 lg:px-8 xl:px-16">
+          <CTABanner />
+        </div>
+
+        {/* Testimonials */}
+        <div className="w-full px-4 lg:px-8 xl:px-16">
+          <Testimonials />
+        </div>
+
+        {/* Trust Badges */}
+        <div className="w-full px-4 lg:px-8 xl:px-16 mb-6">
+          <TrustBadges />
+        </div>
       </div>
       
       {/* Footer with Wave Background */}
