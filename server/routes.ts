@@ -2,9 +2,10 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
+import { nhtsaService } from "./services/nhtsa";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -85,6 +86,219 @@ export async function registerRoutes(
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to set primary vehicle" });
+    }
+  });
+
+  // VIN Decoding API (public - no auth required for lookup)
+  app.get("/api/vin/decode/:vin", async (req, res) => {
+    try {
+      const { vin } = req.params;
+      const decoded = await nhtsaService.decodeVin(vin);
+      res.json(decoded);
+    } catch (error) {
+      console.error("VIN decode error:", error);
+      res.status(500).json({ error: "Failed to decode VIN" });
+    }
+  });
+
+  app.get("/api/vin/recalls/:vin", async (req, res) => {
+    try {
+      const { vin } = req.params;
+      const recalls = await nhtsaService.getRecallsByVin(vin);
+      res.json({ vin, recalls, count: recalls.length });
+    } catch (error) {
+      console.error("Recalls lookup error:", error);
+      res.status(500).json({ error: "Failed to lookup recalls" });
+    }
+  });
+
+  app.get("/api/vin/safety/:vin", async (req, res) => {
+    try {
+      const { vin } = req.params;
+      const decoded = await nhtsaService.decodeVin(vin);
+      
+      if (!decoded.year || !decoded.make || !decoded.model) {
+        return res.status(400).json({ error: "Could not decode VIN for safety ratings" });
+      }
+      
+      const safety = await nhtsaService.getSafetyRating(decoded.year, decoded.make, decoded.model);
+      res.json({ vin, decoded: { year: decoded.year, make: decoded.make, model: decoded.model }, safety });
+    } catch (error) {
+      console.error("Safety rating error:", error);
+      res.status(500).json({ error: "Failed to get safety ratings" });
+    }
+  });
+
+  // Vehicle lookups by year/make/model
+  app.get("/api/vehicle-data/makes", async (req, res) => {
+    try {
+      const makes = await nhtsaService.getMakes();
+      res.json(makes);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get makes" });
+    }
+  });
+
+  app.get("/api/vehicle-data/models/:make", async (req, res) => {
+    try {
+      const { make } = req.params;
+      const { year } = req.query;
+      const models = await nhtsaService.getModels(make, year as string);
+      res.json(models);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get models" });
+    }
+  });
+
+  app.get("/api/recalls/:year/:make/:model", async (req, res) => {
+    try {
+      const { year, make, model } = req.params;
+      const recalls = await nhtsaService.getRecalls(year, make, model);
+      res.json({ year, make, model, recalls, count: recalls.length });
+    } catch (error) {
+      console.error("Recalls lookup error:", error);
+      res.status(500).json({ error: "Failed to lookup recalls" });
+    }
+  });
+
+  // Service Records API (Vehicle Passport)
+  app.get("/api/vehicles/:vehicleId/service-records", isAuthenticated, async (req: any, res) => {
+    try {
+      const { vehicleId } = req.params;
+      const records = await storage.getServiceRecordsByVehicle(vehicleId);
+      res.json(records);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch service records" });
+    }
+  });
+
+  app.post("/api/vehicles/:vehicleId/service-records", isAuthenticated, async (req: any, res) => {
+    try {
+      const { vehicleId } = req.params;
+      const userId = req.user.claims.sub;
+      const result = insertServiceRecordSchema.safeParse({ ...req.body, vehicleId, userId });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const record = await storage.createServiceRecord(result.data);
+      res.json(record);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create service record" });
+    }
+  });
+
+  // Service Reminders API
+  app.get("/api/reminders", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const reminders = await storage.getServiceRemindersByUser(userId);
+      res.json(reminders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reminders" });
+    }
+  });
+
+  app.post("/api/reminders", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const result = insertServiceReminderSchema.safeParse({ ...req.body, userId });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const reminder = await storage.createServiceReminder(result.data);
+      res.json(reminder);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create reminder" });
+    }
+  });
+
+  app.patch("/api/reminders/:id/complete", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.markReminderCompleted(id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to complete reminder" });
+    }
+  });
+
+  // Vehicle Recalls API (stored recalls from user vehicles)
+  app.get("/api/vehicles/:vehicleId/recalls", isAuthenticated, async (req: any, res) => {
+    try {
+      const { vehicleId } = req.params;
+      const vehicle = await storage.getVehicle(vehicleId);
+      
+      if (!vehicle) {
+        return res.status(404).json({ error: "Vehicle not found" });
+      }
+      
+      // Get stored recalls
+      const storedRecalls = await storage.getRecallsByVehicle(vehicleId);
+      
+      // Also fetch fresh recalls if we have vehicle info
+      let freshRecalls: any[] = [];
+      if (vehicle.vin) {
+        freshRecalls = await nhtsaService.getRecallsByVin(vehicle.vin);
+      } else if (vehicle.year && vehicle.make && vehicle.model) {
+        freshRecalls = await nhtsaService.getRecalls(String(vehicle.year), vehicle.make, vehicle.model);
+      }
+      
+      res.json({
+        storedRecalls,
+        freshRecalls,
+        totalCount: storedRecalls.length + freshRecalls.length
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch recalls" });
+    }
+  });
+
+  // Sync recalls to database
+  app.post("/api/vehicles/:vehicleId/sync-recalls", isAuthenticated, async (req: any, res) => {
+    try {
+      const { vehicleId } = req.params;
+      const vehicle = await storage.getVehicle(vehicleId);
+      
+      if (!vehicle) {
+        return res.status(404).json({ error: "Vehicle not found" });
+      }
+      
+      let recalls: any[] = [];
+      if (vehicle.vin) {
+        recalls = await nhtsaService.getRecallsByVin(vehicle.vin);
+      } else if (vehicle.year && vehicle.make && vehicle.model) {
+        recalls = await nhtsaService.getRecalls(String(vehicle.year), vehicle.make, vehicle.model);
+      }
+      
+      // Store each recall
+      const stored = [];
+      for (const recall of recalls) {
+        try {
+          const existingRecalls = await storage.getRecallsByVehicle(vehicleId);
+          const alreadyExists = existingRecalls.some(r => r.campaignNumber === recall.campaignNumber);
+          
+          if (!alreadyExists) {
+            const storedRecall = await storage.createRecall({
+              vehicleId,
+              vin: vehicle.vin || null,
+              campaignNumber: recall.nhtsaCampaignNumber || recall.campaignNumber,
+              component: recall.component,
+              summary: recall.summary,
+              consequence: recall.consequence,
+              remedy: recall.remedy,
+              manufacturer: recall.manufacturer,
+              recallDate: recall.reportReceivedDate ? new Date(recall.reportReceivedDate) : null,
+            });
+            stored.push(storedRecall);
+          }
+        } catch (err) {
+          console.error("Error storing recall:", err);
+        }
+      }
+      
+      res.json({ synced: stored.length, total: recalls.length });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to sync recalls" });
     }
   });
 
