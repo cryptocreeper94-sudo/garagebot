@@ -1298,11 +1298,11 @@ export async function registerRoutes(
     }
   });
 
-  // Vendor redirect with affiliate tracking
+  // Vendor redirect with affiliate tracking - includes vehicle info
   app.get("/api/vendors/:slug/redirect", async (req: any, res) => {
     try {
       const { slug } = req.params;
-      const { query, partNumber } = req.query;
+      const { query, partNumber, year, make, model } = req.query;
       
       const vendor = await storage.getVendor(slug);
       if (!vendor) {
@@ -1315,9 +1315,12 @@ export async function registerRoutes(
         sessionId: req.sessionID,
         query: (query as string) || (partNumber as string) || '',
         clickedVendor: vendor.name,
+        vehicleYear: year ? parseInt(year as string) : undefined,
+        vehicleMake: make as string,
+        vehicleModel: model as string,
       });
       
-      // Build the redirect URL
+      // Build the redirect URL with vehicle info where supported
       let redirectUrl = vendor.websiteUrl;
       
       // If vendor has affiliate link template, use it
@@ -1327,8 +1330,15 @@ export async function registerRoutes(
           .replace('{query}', encodeURIComponent((query as string) || ''))
           .replace('{partNumber}', encodeURIComponent((partNumber as string) || ''));
       } else {
-        // Fallback: just append search query to website
-        const searchPath = getVendorSearchPath(slug, query as string, partNumber as string);
+        // Use vendor-specific search paths with vehicle support
+        const searchPath = getVendorSearchPathWithVehicle(
+          slug, 
+          query as string, 
+          partNumber as string,
+          year as string,
+          make as string,
+          model as string
+        );
         redirectUrl = vendor.websiteUrl + searchPath;
       }
       
@@ -1383,8 +1393,8 @@ export async function registerRoutes(
           hasLocalPickup: vendor.hasLocalPickup,
           hasAffiliateProgram: vendor.hasAffiliateProgram,
         },
-        searchUrl: `/api/vendors/${vendor.slug}/redirect?query=${encodeURIComponent(query || partNumber || '')}&partNumber=${encodeURIComponent(partNumber || '')}`,
-        directUrl: buildVendorSearchUrl(vendor.websiteUrl, vendor.slug, query, partNumber),
+        searchUrl: `/api/vendors/${vendor.slug}/redirect?query=${encodeURIComponent(query || partNumber || '')}&partNumber=${encodeURIComponent(partNumber || '')}&year=${year || ''}&make=${encodeURIComponent(make || '')}&model=${encodeURIComponent(model || '')}`,
+        directUrl: buildVendorSearchUrlWithVehicle(vendor.websiteUrl, vendor.slug, query, partNumber, year, make, model),
       }));
       
       res.json({
@@ -2684,4 +2694,107 @@ function getVendorSearchPath(slug: string, query?: string, partNumber?: string):
     default:
       return `/search?q=${encodeURIComponent(searchTerm)}`;
   }
+}
+
+// Helper function for vendor search paths WITH vehicle info
+function getVendorSearchPathWithVehicle(
+  slug: string, 
+  query?: string, 
+  partNumber?: string,
+  year?: string,
+  make?: string,
+  model?: string
+): string {
+  const searchTerm = partNumber || query || '';
+  const hasVehicle = year && make && model;
+  
+  switch (slug) {
+    case 'autozone':
+      // AutoZone supports year/make/model in URL
+      if (hasVehicle) {
+        return `/parts/${year}/${encodeURIComponent(make!.toLowerCase())}/${encodeURIComponent(model!.toLowerCase().replace(/\s+/g, '-'))}?searchText=${encodeURIComponent(searchTerm)}`;
+      }
+      return `/searchresult?searchText=${encodeURIComponent(searchTerm)}`;
+      
+    case 'oreilly':
+      // O'Reilly uses query params for vehicle
+      if (hasVehicle) {
+        return `/shop/b/search-results?q=${encodeURIComponent(searchTerm)}&year=${year}&make=${encodeURIComponent(make!)}&model=${encodeURIComponent(model!)}`;
+      }
+      return `/shop/b/search-results?q=${encodeURIComponent(searchTerm)}`;
+      
+    case 'advance-auto':
+      // Advance Auto supports vehicle in URL
+      if (hasVehicle) {
+        return `/web/c3/search?q=${encodeURIComponent(searchTerm)}&year=${year}&make=${encodeURIComponent(make!)}&model=${encodeURIComponent(model!)}`;
+      }
+      return `/web/c3/search?q=${encodeURIComponent(searchTerm)}`;
+      
+    case 'rockauto':
+      // RockAuto uses catalog path structure: /catalog/make,model,year
+      if (hasVehicle) {
+        return `/catalog/${encodeURIComponent(make!.toLowerCase())},${encodeURIComponent(model!.toLowerCase().replace(/\s+/g, '+'))},${year}?q=${encodeURIComponent(searchTerm)}`;
+      }
+      return `/catalog/moreinfo.php?pk=${encodeURIComponent(searchTerm)}`;
+      
+    case 'amazon':
+      // Amazon uses keywords including vehicle
+      if (hasVehicle) {
+        return `/s?k=${encodeURIComponent(`${year} ${make} ${model} ${searchTerm}`)}&i=automotive`;
+      }
+      return `/s?k=${encodeURIComponent(searchTerm)}&i=automotive`;
+      
+    case 'napa':
+      // NAPA supports vehicle params
+      if (hasVehicle) {
+        return `/search?text=${encodeURIComponent(searchTerm)}&year=${year}&make=${encodeURIComponent(make!)}&model=${encodeURIComponent(model!)}`;
+      }
+      return `/search?text=${encodeURIComponent(searchTerm)}`;
+      
+    case 'ebay':
+      // eBay Motors with vehicle in search
+      if (hasVehicle) {
+        return `/sch/i.html?_nkw=${encodeURIComponent(`${year} ${make} ${model} ${searchTerm}`)}&_sacat=6000`;
+      }
+      return `/sch/i.html?_nkw=${encodeURIComponent(searchTerm)}&_sacat=6000`;
+      
+    case 'vmc':
+      return `/search.php?search_query=${encodeURIComponent(searchTerm)}`;
+      
+    case 'west-marine':
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
+      
+    case 'dennis-kirk':
+      return `/search?term=${encodeURIComponent(searchTerm)}`;
+      
+    case 'rocky-mountain':
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
+      
+    case 'summit-racing':
+      if (hasVehicle) {
+        return `/search/parts?keyword=${encodeURIComponent(searchTerm)}&year=${year}&make=${encodeURIComponent(make!)}&model=${encodeURIComponent(model!)}`;
+      }
+      return `/search/parts?keyword=${encodeURIComponent(searchTerm)}`;
+      
+    default:
+      if (hasVehicle && searchTerm) {
+        return `/search?q=${encodeURIComponent(`${year} ${make} ${model} ${searchTerm}`)}`;
+      }
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
+  }
+}
+
+// Helper function to build vendor-specific search URLs WITH vehicle info
+function buildVendorSearchUrlWithVehicle(
+  baseUrl: string, 
+  slug: string, 
+  query?: string, 
+  partNumber?: string,
+  year?: number,
+  make?: string,
+  model?: string
+): string {
+  const yearStr = year ? year.toString() : undefined;
+  const path = getVendorSearchPathWithVehicle(slug, query, partNumber, yearStr, make, model);
+  return baseUrl + path;
 }
