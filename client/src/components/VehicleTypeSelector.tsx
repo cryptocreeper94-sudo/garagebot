@@ -19,7 +19,7 @@ export default function VehicleTypeSelector() {
       
       {/* Full-width scrollable container */}
       <div className="overflow-x-auto scrollbar-hide pb-2">
-        <div className="flex gap-2 lg:gap-3 lg:flex-wrap lg:justify-center xl:justify-start" style={{ minWidth: "max-content" }}>
+        <div className="flex gap-4 lg:gap-3 lg:flex-wrap lg:justify-center xl:justify-start" style={{ minWidth: "max-content" }}>
           {VEHICLE_TYPES.map((type, index) => (
             <Link key={type.id} href={`/results?type=${type.id}`}>
               <motion.div
@@ -28,7 +28,7 @@ export default function VehicleTypeSelector() {
                 transition={{ delay: index * 0.03 }}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative flex flex-col items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-[72px] lg:h-[72px] rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm cursor-pointer hover:border-primary/60 hover:bg-primary/10 transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                className="group relative flex flex-col items-center justify-center w-[70px] h-[70px] md:w-20 md:h-20 lg:w-[72px] lg:h-[72px] rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm cursor-pointer hover:border-primary/60 hover:bg-primary/10 transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
                 data-testid={`vehicle-type-${type.id}`}
               >
                 <motion.div 
@@ -38,7 +38,7 @@ export default function VehicleTypeSelector() {
                 >
                   <type.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
                 </motion.div>
-                <span className="font-tech text-[8px] md:text-[9px] uppercase tracking-wide text-foreground text-center px-1 leading-tight whitespace-nowrap">
+                <span className="font-tech text-[7px] md:text-[9px] uppercase tracking-wide text-foreground text-center leading-tight w-full px-0.5 line-clamp-2">
                   {type.name}
                 </span>
               </motion.div>
