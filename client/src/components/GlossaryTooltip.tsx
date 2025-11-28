@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,97 +30,137 @@ interface GlossaryTooltipProps {
   userName?: string;
   onClose: () => void;
   slideFrom?: 'left' | 'right';
+  autoCloseDelay?: number;
 }
 
-export default function GlossaryTooltip({ term, userName, onClose, slideFrom = 'right' }: GlossaryTooltipProps) {
+export default function GlossaryTooltip({ 
+  term, 
+  userName, 
+  onClose, 
+  slideFrom = 'right',
+  autoCloseDelay = 8000
+}: GlossaryTooltipProps) {
+  const [isExiting, setIsExiting] = useState(false);
+  const [exitDirection, setExitDirection] = useState<'left' | 'right'>('left');
+  
   const mascotImage = mascotImages[term.image || 'general'] || mascotImages.thinking;
   const greeting = userName ? `Hey ${userName}!` : "Hey there!";
   
-  const slideDirection = slideFrom === 'right' ? 1 : -1;
+  const enterDirection = slideFrom === 'right' ? 1 : -1;
+  
+  const handleClose = useCallback((direction: 'left' | 'right' = slideFrom === 'right' ? 'left' : 'right') => {
+    setExitDirection(direction);
+    setIsExiting(true);
+    setTimeout(() => {
+      onClose();
+    }, 400);
+  }, [onClose, slideFrom]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleClose(slideFrom === 'right' ? 'left' : 'right');
+    }, autoCloseDelay);
+    
+    return () => clearTimeout(timer);
+  }, [autoCloseDelay, handleClose, slideFrom]);
+
+  const getExitX = () => {
+    return exitDirection === 'left' ? -500 : 500;
+  };
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 backdrop-blur-sm p-4 pb-8"
-        onClick={onClose}
-        data-testid="glossary-tooltip-overlay"
-      >
+      {!isExiting ? (
         <motion.div
-          initial={{ x: slideDirection * 400, opacity: 0 }}
-          animate={{ 
-            x: 0, 
-            opacity: 1,
-            transition: {
-              type: "spring",
-              damping: 20,
-              stiffness: 300,
-              mass: 0.8
-            }
-          }}
-          exit={{ x: slideDirection * 400, opacity: 0 }}
-          className="relative flex items-end gap-0"
-          onClick={(e) => e.stopPropagation()}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 backdrop-blur-sm p-4 pb-8"
+          onClick={() => handleClose()}
+          data-testid="glossary-tooltip-overlay"
         >
-          <div className="relative flex flex-col items-center">
+          <motion.div
+            initial={{ x: enterDirection * 500, opacity: 0, rotate: enterDirection * -15 }}
+            animate={{ 
+              x: 0, 
+              opacity: 1,
+              rotate: 0,
+              transition: {
+                type: "spring",
+                damping: 18,
+                stiffness: 350,
+                mass: 0.6
+              }
+            }}
+            exit={{ 
+              x: getExitX(), 
+              opacity: 0,
+              rotate: exitDirection === 'left' ? 15 : -15,
+              transition: {
+                type: "spring",
+                damping: 25,
+                stiffness: 400
+              }
+            }}
+            className="relative flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <motion.div
-              initial={{ scale: 0, y: 20 }}
+              initial={{ scale: 0.8, y: 30 }}
               animate={{ 
                 scale: 1, 
                 y: 0,
-                transition: { delay: 0.2, type: "spring", damping: 15 }
+                transition: { delay: 0.1, type: "spring", damping: 15 }
               }}
-              className="relative mb-[-20px] z-10"
+              className="relative mb-[-25px] z-10"
             >
               <svg 
-                viewBox="0 0 320 180" 
-                className="w-80 h-44 drop-shadow-lg"
-                style={{ filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.3))' }}
+                viewBox="0 0 360 200" 
+                className="w-[340px] h-[190px]"
+                style={{ filter: 'drop-shadow(0 4px 16px rgba(0, 255, 255, 0.35))' }}
               >
                 <ellipse 
-                  cx="160" 
-                  cy="80" 
-                  rx="155" 
-                  ry="75" 
+                  cx="180" 
+                  cy="90" 
+                  rx="175" 
+                  ry="85" 
                   fill="white" 
                   stroke="hsl(var(--primary))" 
                   strokeWidth="3"
                 />
                 <path 
-                  d="M 200 145 Q 180 160 160 175 Q 175 155 185 145" 
+                  d="M 220 165 Q 200 185 175 195 Q 195 175 205 160" 
                   fill="white" 
                   stroke="hsl(var(--primary))" 
                   strokeWidth="3"
                 />
                 <ellipse 
-                  cx="160" 
-                  cy="80" 
-                  rx="150" 
-                  ry="70" 
+                  cx="180" 
+                  cy="90" 
+                  rx="170" 
+                  ry="80" 
                   fill="white"
                 />
               </svg>
               
-              <div className="absolute inset-0 flex flex-col items-center justify-center px-10 py-6">
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-12 py-6">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute top-2 right-6 h-6 w-6 rounded-full bg-muted/50 hover:bg-muted"
-                  onClick={onClose}
+                  className="absolute top-3 right-8 h-7 w-7 rounded-full bg-gray-100 hover:bg-gray-200"
+                  onClick={() => handleClose()}
                   data-testid="glossary-tooltip-close"
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-4 h-4 text-gray-600" />
                 </Button>
                 
                 <p className="text-primary font-bold text-sm mb-1 text-center">
                   {greeting}
                 </p>
-                <h3 className="text-lg font-bold capitalize mb-1 text-gray-900 text-center">
+                <h3 className="text-xl font-bold capitalize mb-2 text-gray-900 text-center">
                   {term.term}
                 </h3>
-                <p className="text-sm text-gray-700 leading-snug text-center max-w-[250px]">
+                <p className="text-sm text-gray-700 leading-relaxed text-center max-w-[280px]">
                   {term.definition}
                 </p>
               </div>
@@ -129,25 +169,80 @@ export default function GlossaryTooltip({ term, userName, onClose, slideFrom = '
             <motion.img
               src={mascotImage}
               alt="Buddy the GarageBot mascot"
-              className="w-40 h-40 object-contain"
+              className="w-44 h-44 object-contain"
               style={{ 
-                filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                filter: 'drop-shadow(0 4px 16px rgba(0, 255, 255, 0.5)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4))',
               }}
-              initial={{ x: slideDirection * 100, rotate: slideDirection * -10 }}
+              initial={{ x: enterDirection * 80, rotate: enterDirection * -20, scale: 0.9 }}
               animate={{ 
                 x: 0, 
                 rotate: 0,
+                scale: 1,
                 transition: {
                   type: "spring",
-                  damping: 12,
-                  stiffness: 200,
+                  damping: 10,
+                  stiffness: 180,
+                  delay: 0.05
                 }
               }}
               data-testid="glossary-mascot-image"
             />
-          </div>
+            
+            <motion.div 
+              className="absolute bottom-0 left-1/2 -translate-x-1/2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transition: { delay: 0.5 } }}
+            >
+              <p className="text-xs text-white/60 mt-2">Tap anywhere to close</p>
+            </motion.div>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
+        >
+          <motion.div
+            initial={{ x: 0, opacity: 1, rotate: 0 }}
+            animate={{ 
+              x: getExitX(), 
+              opacity: 0,
+              rotate: exitDirection === 'left' ? 15 : -15,
+              transition: {
+                type: "spring",
+                damping: 20,
+                stiffness: 300
+              }
+            }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
+          >
+            <div className="relative mb-[-25px] z-10">
+              <svg 
+                viewBox="0 0 360 200" 
+                className="w-[340px] h-[190px]"
+                style={{ filter: 'drop-shadow(0 4px 16px rgba(0, 255, 255, 0.35))' }}
+              >
+                <ellipse cx="180" cy="90" rx="175" ry="85" fill="white" stroke="hsl(var(--primary))" strokeWidth="3"/>
+                <path d="M 220 165 Q 200 185 175 195 Q 195 175 205 160" fill="white" stroke="hsl(var(--primary))" strokeWidth="3"/>
+                <ellipse cx="180" cy="90" rx="170" ry="80" fill="white"/>
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-12 py-6">
+                <p className="text-primary font-bold text-sm mb-1">{greeting}</p>
+                <h3 className="text-xl font-bold capitalize mb-2 text-gray-900">{term.term}</h3>
+                <p className="text-sm text-gray-700 text-center max-w-[280px]">{term.definition}</p>
+              </div>
+            </div>
+            <img
+              src={mascotImage}
+              alt="Buddy"
+              className="w-44 h-44 object-contain"
+              style={{ filter: 'drop-shadow(0 4px 16px rgba(0, 255, 255, 0.5))' }}
+            />
+          </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 }
@@ -160,11 +255,19 @@ interface HighlightedTermProps {
 
 export function HighlightedTerm({ children, term, userName }: HighlightedTermProps) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [slideFrom, setSlideFrom] = useState<'left' | 'right'>('right');
+
+  const handleClick = (e: React.MouseEvent) => {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const screenMiddle = window.innerWidth / 2;
+    setSlideFrom(rect.left < screenMiddle ? 'right' : 'left');
+    setShowTooltip(true);
+  };
 
   return (
     <>
       <button
-        onClick={() => setShowTooltip(true)}
+        onClick={handleClick}
         className="inline-flex items-center gap-0.5 text-primary underline decoration-dotted underline-offset-2 hover:text-primary/80 cursor-help transition-colors"
         data-testid={`glossary-term-${term.term.replace(/\s+/g, '-')}`}
       >
@@ -177,7 +280,7 @@ export function HighlightedTerm({ children, term, userName }: HighlightedTermPro
           term={term}
           userName={userName}
           onClose={() => setShowTooltip(false)}
-          slideFrom="right"
+          slideFrom={slideFrom}
         />
       )}
     </>

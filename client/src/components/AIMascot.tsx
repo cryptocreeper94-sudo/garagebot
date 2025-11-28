@@ -68,6 +68,7 @@ const searchContext = {
 export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
   const [, navigate] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -76,6 +77,14 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
   const [rateLimitError, setRateLimitError] = useState<{ message: string; retryAfter: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClose = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setIsOpen(false);
+      setIsExiting(false);
+    }, 400);
+  };
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -444,25 +453,27 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
         {isOpen && !isMinimized && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: isExiting ? 0 : 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
             data-testid="ai-mascot-overlay"
           >
             <motion.div
-              initial={{ x: -400, opacity: 0 }}
+              initial={{ x: -500, opacity: 0, rotate: 15 }}
               animate={{ 
-                x: 0, 
-                opacity: 1,
+                x: isExiting ? 600 : 0, 
+                opacity: isExiting ? 0 : 1,
+                rotate: isExiting ? -15 : 0,
                 transition: {
                   type: "spring",
-                  damping: 20,
-                  stiffness: 300,
+                  damping: isExiting ? 25 : 20,
+                  stiffness: isExiting ? 400 : 300,
                   mass: 0.8
                 }
               }}
-              exit={{ x: -400, opacity: 0 }}
+              exit={{ x: 600, opacity: 0, rotate: -15 }}
               className="fixed bottom-4 left-4 md:left-8 flex flex-col items-start"
               onClick={(e) => e.stopPropagation()}
               data-testid="ai-mascot-chat"
@@ -488,7 +499,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                         variant="ghost" 
                         size="icon" 
                         className="h-6 w-6"
-                        onClick={() => setIsOpen(false)}
+                        onClick={handleClose}
                         data-testid="ai-mascot-close"
                       >
                         <X className="w-3 h-3" />
@@ -642,10 +653,11 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 style={{ 
                   filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
                 }}
-                initial={{ x: -100, rotate: 10 }}
+                initial={{ x: -100, rotate: 15, scale: 0.9 }}
                 animate={{ 
-                  x: 0, 
-                  rotate: 0,
+                  x: isExiting ? 100 : 0, 
+                  rotate: isExiting ? -20 : 0,
+                  scale: isExiting ? 0.9 : 1,
                   transition: {
                     type: "spring",
                     damping: 12,
@@ -693,8 +705,12 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => {
-          setIsOpen(!isOpen);
-          setIsMinimized(false);
+          if (isOpen) {
+            handleClose();
+          } else {
+            setIsOpen(true);
+            setIsMinimized(false);
+          }
         }}
         className="fixed bottom-4 right-4 z-50 p-0 bg-transparent border-0 cursor-pointer"
         style={{ background: 'none' }}
