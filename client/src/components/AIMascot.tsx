@@ -631,27 +631,32 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
       <motion.button
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.15 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => {
           setIsOpen(!isOpen);
           setIsMinimized(false);
         }}
-        className={`fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-colors overflow-hidden ${
-          isOpen ? "bg-muted" : "bg-gradient-to-br from-primary/20 to-secondary/20 border-2 border-primary/50"
-        }`}
+        className="fixed bottom-4 right-4 z-50 p-0 bg-transparent border-0 cursor-pointer"
+        style={{ background: 'none' }}
         data-testid="ai-mascot-toggle"
       >
         {isOpen ? (
-          <X className="w-6 h-6" />
+          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+            <X className="w-6 h-6" />
+          </div>
         ) : (
           <div className="relative">
             <img 
               src={mascotWaving} 
               alt="Chat with Buddy" 
-              className="w-14 h-14 object-contain"
+              className="w-24 h-24 object-contain rounded-lg"
+              style={{ 
+                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))',
+                mixBlendMode: 'multiply',
+              }}
             />
-            <Sparkles className="w-3 h-3 text-yellow-300 absolute -top-1 -right-1" />
+            <Sparkles className="w-4 h-4 text-yellow-300 absolute top-1 right-1 animate-pulse" />
           </div>
         )}
       </motion.button>
