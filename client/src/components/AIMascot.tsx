@@ -8,9 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { 
   MessageCircle, X, Send, Loader2, Sparkles, 
-  Wrench, Lightbulb, ChevronDown, Camera, Search,
+  Lightbulb, ChevronDown, Camera, Search,
   ExternalLink, Car, AlertCircle, CheckCircle2
 } from "lucide-react";
+
+import mascotWaving from "@assets/generated_images/robot_mascot_waving_hello.png";
+import mascotThinking from "@assets/generated_images/robot_mascot_thinking_pose.png";
 
 interface VehicleInfo {
   type?: string;
@@ -412,9 +415,11 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-4 border-b border-primary/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
-                    <Wrench className="w-5 h-5 text-primary" />
-                  </div>
+                  <img 
+                    src={isLoading ? mascotThinking : mascotWaving} 
+                    alt="Buddy the GarageBot mascot"
+                    className="w-12 h-12 object-contain"
+                  />
                   <div>
                     <h3 className="font-tech font-bold text-sm uppercase">{mascotName}</h3>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -613,7 +618,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
               className="rounded-full px-4 py-2 bg-card border border-primary/30 text-foreground hover:bg-primary/10"
               data-testid="ai-mascot-restore"
             >
-              <Wrench className="w-4 h-4 mr-2 text-primary" />
+              <img src={mascotWaving} alt="Buddy" className="w-6 h-6 mr-2" />
               <span className="font-tech text-sm">{mascotName}</span>
               <Badge className="ml-2 bg-primary/20 text-primary text-xs">
                 {messages.length - 1} msgs
@@ -632,8 +637,8 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
           setIsOpen(!isOpen);
           setIsMinimized(false);
         }}
-        className={`fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-colors ${
-          isOpen ? "bg-muted" : "bg-gradient-to-br from-primary to-secondary"
+        className={`fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-colors overflow-hidden ${
+          isOpen ? "bg-muted" : "bg-gradient-to-br from-primary/20 to-secondary/20 border-2 border-primary/50"
         }`}
         data-testid="ai-mascot-toggle"
       >
@@ -641,7 +646,11 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
           <X className="w-6 h-6" />
         ) : (
           <div className="relative">
-            <MessageCircle className="w-6 h-6 text-primary-foreground" />
+            <img 
+              src={mascotWaving} 
+              alt="Chat with Buddy" 
+              className="w-14 h-14 object-contain"
+            />
             <Sparkles className="w-3 h-3 text-yellow-300 absolute -top-1 -right-1" />
           </div>
         )}
