@@ -24,7 +24,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import MarketTicker from "@/components/MarketTicker";
-import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
+import footerWave from "@assets/darkwave_footer_transparent.png";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -419,12 +419,12 @@ export default function Home() {
             <img 
               src={footerWave} 
               alt="" 
-              className="w-1/2 h-[150px] object-cover object-center opacity-70 mix-blend-screen flex-shrink-0"
+              className="w-1/2 h-[150px] object-contain object-center flex-shrink-0"
             />
             <img 
               src={footerWave} 
               alt="" 
-              className="w-1/2 h-[150px] object-cover object-center opacity-70 mix-blend-screen flex-shrink-0"
+              className="w-1/2 h-[150px] object-contain object-center flex-shrink-0"
               style={{ transform: 'scaleX(-1)' }}
             />
           </div>
