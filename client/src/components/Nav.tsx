@@ -28,13 +28,13 @@ export default function Nav() {
           )}
           
           <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer group">
+            <div className="flex items-center gap-1 cursor-pointer group">
               <img 
                 src={gbEmblem} 
                 alt="GB" 
-                className="w-9 h-9 md:w-10 md:h-10 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.5)] group-hover:drop-shadow-[0_0_12px_rgba(6,182,212,0.8)] transition-all duration-300 group-hover:scale-110"
+                className="w-14 h-14 md:w-16 md:h-16 lg:w-[72px] lg:h-[72px] object-contain drop-shadow-[0_0_12px_rgba(6,182,212,0.6)] group-hover:drop-shadow-[0_0_20px_rgba(6,182,212,0.9)] transition-all duration-300 group-hover:scale-105 -my-2"
               />
-              <span className="font-tech font-bold text-xl md:text-2xl tracking-wide uppercase text-foreground">
+              <span className="font-tech font-bold text-lg md:text-xl lg:text-2xl tracking-wide uppercase text-foreground">
                 Garage<span className="text-primary">Bot</span>
               </span>
             </div>
