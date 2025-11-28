@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
-import gbEmblem from "@assets/generated_images/transparent_chrome_gb_emblem.png";
+import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import footerWave from "@assets/copilot_image_1764282859449_1764282878495.jpeg";
 import MarketTicker from "@/components/MarketTicker";
 
