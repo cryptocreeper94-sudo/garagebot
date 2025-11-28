@@ -49,12 +49,11 @@ export default function Nav() {
           <Link href="/shop-portal">
             <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/shop-portal' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-shop-portal">Shop Portal</span>
           </Link>
+          <Link href="/insurance">
+            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/insurance' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-insurance">Insurance</span>
+          </Link>
           <span className="text-sm font-medium text-muted-foreground/50 cursor-not-allowed flex items-center gap-1" data-testid="nav-services">
             Services
-            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] px-1 py-0 font-mono">SOON</Badge>
-          </span>
-          <span className="text-sm font-medium text-muted-foreground/50 cursor-not-allowed flex items-center gap-1" data-testid="nav-insurance">
-            Insurance
             <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] px-1 py-0 font-mono">SOON</Badge>
           </span>
         </div>
@@ -153,10 +152,11 @@ export default function Nav() {
                     <span className="flex items-center gap-2"><Wrench className="w-4 h-4" /> Services</span>
                     <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">SOON</Badge>
                   </span>
-                  <span className="text-lg font-medium text-muted-foreground/50 py-2 border-b border-white/5 flex items-center justify-between" data-testid="mobile-nav-insurance">
-                    <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Insurance</span>
-                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">SOON</Badge>
-                  </span>
+                  <Link href="/insurance" onClick={() => setIsOpen(false)}>
+                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 flex items-center gap-2" data-testid="mobile-nav-insurance">
+                      <Shield className="w-4 h-4" /> Insurance
+                    </span>
+                  </Link>
                   <span className="text-lg font-medium text-muted-foreground/50 py-2 border-b border-white/5 flex items-center justify-between" data-testid="mobile-nav-ratings">
                     <span className="flex items-center gap-2"><Star className="w-4 h-4" /> Ratings</span>
                     <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">SOON</Badge>
