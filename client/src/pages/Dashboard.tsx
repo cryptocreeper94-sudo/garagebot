@@ -2,6 +2,7 @@ import Nav from "@/components/Nav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ComingSoonCard } from "@/components/ComingSoonBadge";
 import { 
   Activity, 
   Server, 
@@ -12,7 +13,11 @@ import {
   Shield, 
   Cpu,
   Terminal,
-  AlertCircle
+  AlertCircle,
+  Wrench,
+  Star,
+  FileText,
+  Package
 } from "lucide-react";
 import { 
   LineChart, 
@@ -227,6 +232,103 @@ export default function Dashboard() {
               </div>
             </Card>
           </div>
+        </div>
+
+        {/* Coming Soon Features Section */}
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-2xl font-tech font-bold uppercase tracking-wide">
+              Upcoming <span className="text-yellow-400">Features</span>
+            </h2>
+            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[10px] font-mono">
+              ROADMAP
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <ComingSoonCard
+              title="Order Tracking"
+              description="Track all your orders from every retailer in one unified dashboard."
+              icon={<Package className="w-6 h-6 text-yellow-400" />}
+              features={[
+                "Real-time shipping updates",
+                "Multi-vendor order history",
+                "Delivery notifications"
+              ]}
+              expectedDate="Q1 2026"
+            />
+
+            <ComingSoonCard
+              title="Service Scheduling"
+              description="Book mechanics and service appointments directly through AutoLedger."
+              icon={<Wrench className="w-6 h-6 text-yellow-400" />}
+              features={[
+                "Local shop finder by zip",
+                "Online appointment booking",
+                "Service history tracking"
+              ]}
+              expectedDate="Q2 2026"
+            />
+
+            <ComingSoonCard
+              title="Ratings & Reviews"
+              description="Community-driven ratings for shops, vendors, and service providers."
+              icon={<Star className="w-6 h-6 text-yellow-400" />}
+              features={[
+                "Verified purchase reviews",
+                "Shop response system",
+                "AI-powered dispute resolution"
+              ]}
+              expectedDate="Q2 2026"
+            />
+
+            <ComingSoonCard
+              title="Insurance Hub"
+              description="Compare auto, boat, RV, and commercial vehicle insurance rates."
+              icon={<FileText className="w-6 h-6 text-yellow-400" />}
+              features={[
+                "Multi-carrier comparison",
+                "Quote aggregation",
+                "Policy management"
+              ]}
+              expectedDate="Q3 2026"
+            />
+          </div>
+        </div>
+
+        {/* Genesis Hallmark Section */}
+        <div className="mt-12 mb-8">
+          <Card className="relative overflow-hidden bg-gradient-to-r from-secondary/10 via-primary/5 to-secondary/10 border-secondary/30 p-8">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
+            
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8">
+              <div className="w-24 h-24 rounded-2xl bg-secondary/20 border border-secondary/40 flex items-center justify-center shrink-0">
+                <Shield className="w-12 h-12 text-secondary" />
+              </div>
+              
+              <div className="flex-1 text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
+                  <h3 className="text-2xl font-tech font-bold uppercase">Genesis Hallmark</h3>
+                  <Badge className="bg-secondary/20 text-secondary border-secondary/30 text-[10px] font-mono">
+                    BLOCKCHAIN
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground mb-4 max-w-2xl">
+                  Your on-chain vehicle identity. The Genesis Hallmark NFT system creates an immutable record of your vehicle's complete history - 
+                  from parts purchases to service records. Asset #0 is the protocol. Be among the first to mint your unique vehicle identifier.
+                </p>
+                <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                  <Button variant="outline" className="font-tech uppercase border-secondary/50 text-secondary hover:bg-secondary/10" disabled>
+                    <Shield className="w-4 h-4 mr-2" />
+                    Mint Coming Soon
+                  </Button>
+                  <Button variant="ghost" className="font-mono text-xs text-muted-foreground hover:text-secondary">
+                    Learn More →
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
     </div>

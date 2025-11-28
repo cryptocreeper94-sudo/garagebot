@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,17 +39,21 @@ export default function Nav() {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4">
           <Link href="/garage">
-            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/garage' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>My Garage</span>
+            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/garage' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-garage">My Garage</span>
           </Link>
           <Link href="/dashboard">
-            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/dashboard' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>Dashboard</span>
+            <span className={`text-sm font-medium transition-colors cursor-pointer ${location === '/dashboard' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-dashboard">Dashboard</span>
           </Link>
-          <Link href="/dashboard">
-            <span className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer">Track Order</span>
-          </Link>
-          <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Support</a>
+          <span className="text-sm font-medium text-muted-foreground/50 cursor-not-allowed flex items-center gap-1" data-testid="nav-services">
+            Services
+            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] px-1 py-0 font-mono">SOON</Badge>
+          </span>
+          <span className="text-sm font-medium text-muted-foreground/50 cursor-not-allowed flex items-center gap-1" data-testid="nav-insurance">
+            Insurance
+            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] px-1 py-0 font-mono">SOON</Badge>
+          </span>
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">
@@ -120,20 +125,38 @@ export default function Nav() {
                 
                 <div className="space-y-4 flex flex-col">
                   <Link href="/" onClick={() => setIsOpen(false)}>
-                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block">Home</span>
+                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block" data-testid="mobile-nav-home">Home</span>
                   </Link>
                   <Link href="/garage" onClick={() => setIsOpen(false)}>
-                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block">My Garage</span>
+                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block" data-testid="mobile-nav-garage">My Garage</span>
                   </Link>
                   <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block">Dashboard</span>
+                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block" data-testid="mobile-nav-dashboard">Dashboard</span>
                   </Link>
                   <Link href="/account" onClick={() => setIsOpen(false)}>
-                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block">Account</span>
+                    <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block" data-testid="mobile-nav-account">Account</span>
                   </Link>
-                  <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                     <span className="text-lg font-medium text-foreground py-2 border-b border-white/5 block">Track Order</span>
-                  </Link>
+                  
+                  {/* Coming Soon Features */}
+                  <div className="pt-2 pb-2">
+                    <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider">Coming Soon</span>
+                  </div>
+                  <span className="text-lg font-medium text-muted-foreground/50 py-2 border-b border-white/5 flex items-center justify-between" data-testid="mobile-nav-services">
+                    <span className="flex items-center gap-2"><Wrench className="w-4 h-4" /> Services</span>
+                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">SOON</Badge>
+                  </span>
+                  <span className="text-lg font-medium text-muted-foreground/50 py-2 border-b border-white/5 flex items-center justify-between" data-testid="mobile-nav-insurance">
+                    <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Insurance</span>
+                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">SOON</Badge>
+                  </span>
+                  <span className="text-lg font-medium text-muted-foreground/50 py-2 border-b border-white/5 flex items-center justify-between" data-testid="mobile-nav-ratings">
+                    <span className="flex items-center gap-2"><Star className="w-4 h-4" /> Ratings</span>
+                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">SOON</Badge>
+                  </span>
+                  <span className="text-lg font-medium text-muted-foreground/50 py-2 border-b border-white/5 flex items-center justify-between" data-testid="mobile-nav-hallmark">
+                    <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Genesis Hallmark</span>
+                    <Badge className="bg-secondary/20 text-secondary border-secondary/30 text-[9px] font-mono">NFT</Badge>
+                  </span>
                   <div className="pt-4 flex flex-col gap-3">
                     <MobileCartButton />
                     {isAuthenticated ? (

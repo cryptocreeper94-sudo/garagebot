@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/hooks/useCart";
+import OnboardingModal from "@/components/OnboardingModal";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Results from "@/pages/Results";
@@ -36,6 +37,7 @@ function App() {
       <CartProvider>
         <TooltipProvider>
           <Toaster />
+          <OnboardingModal />
           <Router />
         </TooltipProvider>
       </CartProvider>
