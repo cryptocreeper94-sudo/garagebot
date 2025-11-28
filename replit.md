@@ -48,6 +48,27 @@ Preferred communication style: Simple, everyday language.
 
 **Authentication**: OpenID Connect (OIDC) integration with Replit's authentication service using Passport.js strategy. User claims are stored in session with access/refresh token rotation.
 
+## AI Features (Buddy AI)
+
+**Service**: Unified AI assistant service in `server/services/aiAssistant.ts` powered by OpenAI.
+
+**Core Capabilities**:
+- **Chat with Memory**: Persistent conversation history with vehicle context awareness (`/api/ai/buddy/chat-with-memory`)
+- **Smart Recommendations**: Predictive part suggestions based on mileage, age, and common failures (`/api/ai/recommendations`, `/api/ai/buddy/smart-recommendations`)
+- **DIY Repair Guides**: AI-generated step-by-step instructions for specific vehicles (`/api/ai/diy-guide`, `/api/ai/buddy/diy-guide`)
+- **Mechanic Estimates**: Labor and parts cost estimates for repairs (`/api/ai/mechanic-estimate`, `/api/ai/buddy/mechanic-estimate`)
+- **Proactive Alerts**: Maintenance reminders and seasonal suggestions (`/api/ai/buddy/alerts`)
+
+**Frontend Components**:
+- `SmartRecommendations.tsx`: Displays AI recommendations with DIY guides and mechanic estimates
+- `ProactiveAlerts.tsx`: Shows maintenance alerts and reminders
+- `BuddyChat.tsx`: Conversational interface with Buddy AI
+
+**Integration Points**:
+- Garage page "AI Insights" tab for vehicle-specific recommendations
+- Home page Buddy chat for natural language parts search
+- Vehicle context automatically included in all AI requests
+
 ## Data Storage
 
 **Database**: PostgreSQL accessed via Neon serverless driver with WebSocket support.
