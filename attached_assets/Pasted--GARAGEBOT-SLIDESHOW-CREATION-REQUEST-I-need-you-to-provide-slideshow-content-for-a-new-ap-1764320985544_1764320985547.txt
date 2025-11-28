@@ -1,0 +1,56 @@
+=== GARAGEBOT SLIDESHOW CREATION REQUEST ===
+
+I need you to provide slideshow content for a new app called "GarageBot" to be added to the DarkWave Studios product gallery. Please provide content in TWO formats:
+
+=== FORMAT 1: SLIDE CONTENT (for ProductSlideshow) ===
+Provide 15-25 slides in this TypeScript format:
+{
+  title: string,
+  subtitle?: string,  // optional, mainly for intro slide
+  content: string,    // 1-2 sentence description
+  category: string    // e.g., "INTRODUCTION", "CORE FEATURE", "AUTOMATION", "ANALYTICS", etc.
+}
+
+Categories should include: INTRODUCTION, VISION, CORE FEATURE, AUTOMATION, INTEGRATION, ANALYTICS, MOBILE, SECURITY, ENTERPRISE, PRICING
+
+=== FORMAT 2: SLIDES DATA (for HomeSlideshow) ===
+Provide 10-15 slides in this TypeScript format:
+{
+  id: number,
+  title: string,
+  section: string,      // e.g., "Opening & Hook", "Problem Statement", "Solution Overview", "Core Features"
+  duration: number,     // seconds per slide (usually 8)
+  content: {
+    type: 'hero' | 'problem' | 'solution' | 'feature' | 'comparison' | 'cta' | 'closing',
+    headline: string,
+    subheadline?: string,
+    description?: string,
+    bullets?: string[]  // 3-5 bullet points
+  }
+}
+
+=== REQUIRED INFORMATION ABOUT GARAGEBOT ===
+Please provide:
+1. App Name & Tagline (e.g., "GarageBot - [tagline here]")
+2. One-paragraph description (2-3 sentences)
+3. Primary color gradient (e.g., "from-green-500 to-emerald-600")
+4. Core problem it solves (3-5 pain points)
+5. Key features (6-10 main capabilities)
+6. Target audience/industry
+7. Unique value proposition vs competitors
+8. Any integrations or automation it provides
+9. Mobile/desktop capabilities
+10. Pricing tiers (if applicable)
+
+=== EXISTING APPS FOR REFERENCE ===
+Current DarkWave Studios apps follow this pattern:
+- ORBIT Staffing OS: Cyan/Blue gradient, staffing automation, 35+ slides
+- DarkWave Pulse: Purple/Pink gradient, safety & compliance, 15+ slides  
+- Lot Ops Pro: Amber/Orange gradient, fleet & inventory, 20+ slides
+
+GarageBot should have a distinct color (suggest: Green/Emerald or Teal) and comprehensive feature coverage matching the depth of the existing apps.
+
+=== OUTPUT NEEDED ===
+1. Complete slideContent array for GarageBot
+2. Complete slidesData array for GarageBot slideshow
+3. Product card metadata (name, tagline, description, color gradient)
