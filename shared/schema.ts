@@ -17,12 +17,18 @@ export const sessions = pgTable(
 // Users with password auth support
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: text("email").unique(),
-  username: text("username").unique(),
+  email: text("email"),
+  username: text("username").unique().notNull(),
   passwordHash: text("password_hash"),
+  quickPin: text("quick_pin"),
+  recoveryCodesHash: text("recovery_codes_hash"),
+  phoneVerified: boolean("phone_verified").default(false),
   firstName: text("first_name"),
   lastName: text("last_name"),
   phone: text("phone"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
   profileImageUrl: text("profile_image_url"),
   walletAddress: text("wallet_address"),
   hasGenesisBadge: boolean("has_genesis_badge").default(false),
@@ -31,7 +37,13 @@ export const users = pgTable("users", {
   preferredUnits: text("preferred_units").default("imperial"),
   notificationsEnabled: boolean("notifications_enabled").default(true),
   smsRemindersEnabled: boolean("sms_reminders_enabled").default(false),
+  subscriptionTier: text("subscription_tier").default("free"),
+  subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
   role: text("role").default("user"),
+  persistenceEnabled: boolean("persistence_enabled").default(false),
+  persistenceExpiresAt: timestamp("persistence_expires_at"),
   lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -270,24 +282,31 @@ export const deals = pgTable("deals", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Hallmarks (Genesis NFT system)
+// Hallmarks (Genesis NFT system) - Per Vehicle
 export const hallmarks = pgTable("hallmarks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
   assetNumber: integer("asset_number").unique(),
   tokenId: text("token_id"),
   transactionHash: text("transaction_hash"),
   walletAddress: text("wallet_address"),
   displayName: text("display_name"),
-  assetType: text("asset_type").default("user"),
+  assetType: text("asset_type").default("vehicle"),
+  customImageUrl: text("custom_image_url"),
+  generatedArtUrl: text("generated_art_url"),
+  qrCodeData: text("qr_code_data"),
   metadata: jsonb("metadata"),
-  isGenesis: boolean("is_genesis").default(false),
+  isGenesis: boolean("is_genesis").default(true),
+  stripePaymentId: text("stripe_payment_id"),
+  mintPrice: decimal("mint_price", { precision: 10, scale: 2 }).default("2.00"),
   mintedAt: timestamp("minted_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("IDX_hallmark_asset").on(table.assetNumber),
   index("IDX_hallmark_wallet").on(table.walletAddress),
   index("IDX_hallmark_name").on(table.displayName),
+  index("IDX_hallmark_vehicle").on(table.vehicleId),
 ]);
 
 // Vendors (parts retailers)
