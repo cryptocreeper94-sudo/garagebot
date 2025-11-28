@@ -83,7 +83,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
     setTimeout(() => {
       setIsOpen(false);
       setIsExiting(false);
-    }, 400);
+    }, 800);
   };
 
   useEffect(() => {
@@ -460,20 +460,23 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             onClick={handleClose}
             data-testid="ai-mascot-overlay"
           >
+            {/* Buddy runs in from left and out to right */}
             <motion.div
-              initial={{ x: -500, opacity: 0, rotate: 15 }}
+              initial={{ x: "-120vw", opacity: 0, rotate: 20, scale: 0.8 }}
               animate={{ 
-                x: isExiting ? 600 : 0, 
+                x: isExiting ? "120vw" : 0, 
                 opacity: isExiting ? 0 : 1,
-                rotate: isExiting ? -15 : 0,
+                rotate: isExiting ? -20 : 0,
+                scale: isExiting ? 0.8 : 1,
                 transition: {
                   type: "spring",
-                  damping: isExiting ? 25 : 20,
-                  stiffness: isExiting ? 400 : 300,
-                  mass: 0.8
+                  damping: isExiting ? 15 : 12,
+                  stiffness: isExiting ? 120 : 100,
+                  mass: 1.2,
+                  velocity: isExiting ? 5 : 3
                 }
               }}
-              exit={{ x: 600, opacity: 0, rotate: -15 }}
+              exit={{ x: "120vw", opacity: 0, rotate: -20, scale: 0.8 }}
               className="fixed bottom-4 left-4 md:left-8 flex flex-col items-start"
               onClick={(e) => e.stopPropagation()}
               data-testid="ai-mascot-chat"
@@ -646,6 +649,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 </ComicSpeechBubble>
               </div>
               
+              {/* Buddy mascot with running animation */}
               <motion.img
                 src={isLoading ? mascotThinking : mascotWaving}
                 alt="Buddy the GarageBot mascot"
@@ -653,15 +657,27 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 style={{ 
                   filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
                 }}
-                initial={{ x: -100, rotate: 15, scale: 0.9 }}
-                animate={{ 
-                  x: isExiting ? 100 : 0, 
-                  rotate: isExiting ? -20 : 0,
-                  scale: isExiting ? 0.9 : 1,
+                initial={{ x: -300, rotate: 25, scale: 0.6 }}
+                animate={isExiting ? {
+                  x: 300,
+                  rotate: -25,
+                  scale: 0.6,
                   transition: {
                     type: "spring",
-                    damping: 12,
-                    stiffness: 200,
+                    damping: 10,
+                    stiffness: 80,
+                    mass: 1.5
+                  }
+                } : {
+                  x: 0,
+                  rotate: [0, 2, -2, 0],
+                  scale: 1,
+                  y: [0, -4, 0],
+                  transition: {
+                    x: { type: "spring", damping: 12, stiffness: 100 },
+                    rotate: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                    y: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+                    scale: { type: "spring", damping: 15, stiffness: 200 }
                   }
                 }}
                 data-testid="ai-mascot-image"
