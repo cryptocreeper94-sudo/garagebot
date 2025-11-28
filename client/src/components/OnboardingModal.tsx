@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Car, ShoppingCart, Wrench, Shield, Star, Clock, FileText, Zap } from "lucide-react";
+import { X, Car, ShoppingCart, Wrench, Shield, Star, Clock, FileText, Zap, Brain, Sparkles, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
@@ -13,9 +13,27 @@ const FEATURES = [
     status: "live" 
   },
   { 
+    name: "Buddy AI Assistant", 
+    description: "Conversational parts finder with memory", 
+    icon: Brain, 
+    status: "live" 
+  },
+  { 
     name: "My Garage", 
     description: "Save your vehicles for quick part matching", 
     icon: Car, 
+    status: "live" 
+  },
+  { 
+    name: "AI Smart Recommendations", 
+    description: "Proactive maintenance & part suggestions", 
+    icon: Sparkles, 
+    status: "live" 
+  },
+  { 
+    name: "DIY Repair Guides", 
+    description: "AI-generated step-by-step instructions", 
+    icon: BookOpen, 
     status: "live" 
   },
   { 
@@ -28,25 +46,25 @@ const FEATURES = [
     name: "Order Tracking", 
     description: "Track all orders in one place", 
     icon: Clock, 
-    status: "coming" 
+    status: "live" 
   },
   { 
     name: "Genesis Hallmark", 
     description: "On-chain vehicle identity & history", 
     icon: Shield, 
-    status: "coming" 
+    status: "live" 
   },
   { 
-    name: "Service Scheduling", 
-    description: "Book mechanics & service appointments", 
+    name: "Mechanic Estimates", 
+    description: "Compare shop costs vs DIY pricing", 
     icon: Wrench, 
-    status: "coming" 
+    status: "live" 
   },
   { 
     name: "Ratings & Reviews", 
     description: "Community ratings for shops & vendors", 
     icon: Star, 
-    status: "coming" 
+    status: "live" 
   },
   { 
     name: "Insurance Comparison", 
