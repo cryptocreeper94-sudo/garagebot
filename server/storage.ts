@@ -3,7 +3,8 @@ import {
   users, vehicles, deals, hallmarks, carts, cartItems, orders, orderItems, 
   vendors, searchHistory, waitlist, shops, shopStaff, shopCustomers, shopReviews,
   serviceRecords, serviceReminders, messageTemplates, messageLog,
-  userPreferences, auditLog, vehicleRecalls, scanHistory, devTasks, vehicleShares
+  userPreferences, auditLog, vehicleRecalls, scanHistory, devTasks, vehicleShares,
+  affiliateNetworks, affiliatePartners, affiliateClicks, affiliateCommissions, affiliatePayouts
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -14,7 +15,10 @@ import type {
   MessageTemplate, InsertMessageTemplate, MessageLog, InsertMessageLog,
   UserPreferences, InsertUserPreferences, AuditLog, InsertAuditLog,
   VehicleRecall, InsertVehicleRecall, ScanHistory, InsertScanHistory,
-  DevTask, InsertDevTask, VehicleShare, InsertVehicleShare
+  DevTask, InsertDevTask, VehicleShare, InsertVehicleShare,
+  AffiliateNetwork, InsertAffiliateNetwork, AffiliatePartner, InsertAffiliatePartner,
+  AffiliateClick, InsertAffiliateClick, AffiliateCommission, InsertAffiliateCommission,
+  AffiliatePayout, InsertAffiliatePayout
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte } from "drizzle-orm";
 
@@ -157,6 +161,35 @@ export interface IStorage {
   createVehicleShare(share: InsertVehicleShare): Promise<VehicleShare>;
   acceptVehicleShare(inviteCode: string, userId: string): Promise<VehicleShare | undefined>;
   deleteVehicleShare(id: string, userId: string): Promise<boolean>;
+
+  // Affiliate Networks
+  getAffiliateNetworks(): Promise<AffiliateNetwork[]>;
+  getAffiliateNetwork(id: string): Promise<AffiliateNetwork | undefined>;
+  getAffiliateNetworkBySlug(slug: string): Promise<AffiliateNetwork | undefined>;
+  createAffiliateNetwork(network: InsertAffiliateNetwork): Promise<AffiliateNetwork>;
+  updateAffiliateNetwork(id: string, updates: Partial<AffiliateNetwork>): Promise<AffiliateNetwork | undefined>;
+
+  // Affiliate Partners
+  getAffiliatePartners(filters?: { category?: string; isActive?: boolean }): Promise<AffiliatePartner[]>;
+  getAffiliatePartner(id: string): Promise<AffiliatePartner | undefined>;
+  getAffiliatePartnerBySlug(slug: string): Promise<AffiliatePartner | undefined>;
+  createAffiliatePartner(partner: InsertAffiliatePartner): Promise<AffiliatePartner>;
+  updateAffiliatePartner(id: string, updates: Partial<AffiliatePartner>): Promise<AffiliatePartner | undefined>;
+
+  // Affiliate Click Tracking
+  trackAffiliateClick(click: InsertAffiliateClick): Promise<AffiliateClick>;
+  getAffiliateClicks(filters: { partnerId?: string; startDate?: Date; endDate?: Date }): Promise<AffiliateClick[]>;
+  getAffiliateClickStats(partnerId?: string): Promise<{ totalClicks: number; uniqueUsers: number }>;
+
+  // Affiliate Commissions
+  createAffiliateCommission(commission: InsertAffiliateCommission): Promise<AffiliateCommission>;
+  getAffiliateCommissions(filters: { partnerId?: string; status?: string }): Promise<AffiliateCommission[]>;
+  updateCommissionStatus(id: string, status: string): Promise<AffiliateCommission | undefined>;
+  getCommissionSummary(): Promise<{ pending: string; approved: string; paid: string }>;
+
+  // Affiliate Payouts
+  createAffiliatePayout(payout: InsertAffiliatePayout): Promise<AffiliatePayout>;
+  getAffiliatePayouts(): Promise<AffiliatePayout[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -725,6 +758,187 @@ export class DatabaseStorage implements IStorage {
         eq(vehicleShares.ownerId, userId)
       ));
     return true;
+  }
+
+  // ============================================
+  // AFFILIATE TRACKING SYSTEM
+  // ============================================
+
+  // Affiliate Networks
+  async getAffiliateNetworks(): Promise<AffiliateNetwork[]> {
+    return await db.select().from(affiliateNetworks).orderBy(asc(affiliateNetworks.name));
+  }
+
+  async getAffiliateNetwork(id: string): Promise<AffiliateNetwork | undefined> {
+    const [network] = await db.select().from(affiliateNetworks).where(eq(affiliateNetworks.id, id));
+    return network;
+  }
+
+  async getAffiliateNetworkBySlug(slug: string): Promise<AffiliateNetwork | undefined> {
+    const [network] = await db.select().from(affiliateNetworks).where(eq(affiliateNetworks.slug, slug));
+    return network;
+  }
+
+  async createAffiliateNetwork(network: InsertAffiliateNetwork): Promise<AffiliateNetwork> {
+    const [newNetwork] = await db.insert(affiliateNetworks).values(network).returning();
+    return newNetwork;
+  }
+
+  async updateAffiliateNetwork(id: string, updates: Partial<AffiliateNetwork>): Promise<AffiliateNetwork | undefined> {
+    const [network] = await db.update(affiliateNetworks)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(affiliateNetworks.id, id))
+      .returning();
+    return network;
+  }
+
+  // Affiliate Partners
+  async getAffiliatePartners(filters?: { category?: string; isActive?: boolean }): Promise<AffiliatePartner[]> {
+    let query = db.select().from(affiliatePartners);
+    
+    if (filters?.category) {
+      query = query.where(eq(affiliatePartners.category, filters.category)) as any;
+    }
+    if (filters?.isActive !== undefined) {
+      query = query.where(eq(affiliatePartners.isActive, filters.isActive)) as any;
+    }
+    
+    return await query.orderBy(desc(affiliatePartners.priority), asc(affiliatePartners.name));
+  }
+
+  async getAffiliatePartner(id: string): Promise<AffiliatePartner | undefined> {
+    const [partner] = await db.select().from(affiliatePartners).where(eq(affiliatePartners.id, id));
+    return partner;
+  }
+
+  async getAffiliatePartnerBySlug(slug: string): Promise<AffiliatePartner | undefined> {
+    const [partner] = await db.select().from(affiliatePartners).where(eq(affiliatePartners.slug, slug));
+    return partner;
+  }
+
+  async createAffiliatePartner(partner: InsertAffiliatePartner): Promise<AffiliatePartner> {
+    const [newPartner] = await db.insert(affiliatePartners).values(partner).returning();
+    return newPartner;
+  }
+
+  async updateAffiliatePartner(id: string, updates: Partial<AffiliatePartner>): Promise<AffiliatePartner | undefined> {
+    const [partner] = await db.update(affiliatePartners)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(affiliatePartners.id, id))
+      .returning();
+    return partner;
+  }
+
+  // Affiliate Click Tracking
+  async trackAffiliateClick(click: InsertAffiliateClick): Promise<AffiliateClick> {
+    const [newClick] = await db.insert(affiliateClicks).values(click).returning();
+    return newClick;
+  }
+
+  async getAffiliateClicks(filters: { partnerId?: string; startDate?: Date; endDate?: Date }): Promise<AffiliateClick[]> {
+    let conditions = [];
+    
+    if (filters.partnerId) {
+      conditions.push(eq(affiliateClicks.partnerId, filters.partnerId));
+    }
+    if (filters.startDate) {
+      conditions.push(gte(affiliateClicks.createdAt, filters.startDate));
+    }
+    if (filters.endDate) {
+      conditions.push(lte(affiliateClicks.createdAt, filters.endDate));
+    }
+
+    if (conditions.length === 0) {
+      return await db.select().from(affiliateClicks).orderBy(desc(affiliateClicks.createdAt)).limit(1000);
+    }
+
+    return await db.select().from(affiliateClicks)
+      .where(and(...conditions))
+      .orderBy(desc(affiliateClicks.createdAt))
+      .limit(1000);
+  }
+
+  async getAffiliateClickStats(partnerId?: string): Promise<{ totalClicks: number; uniqueUsers: number }> {
+    const baseQuery = partnerId 
+      ? db.select().from(affiliateClicks).where(eq(affiliateClicks.partnerId, partnerId))
+      : db.select().from(affiliateClicks);
+    
+    const clicks = await baseQuery;
+    const uniqueUserIds = new Set(clicks.filter(c => c.userId).map(c => c.userId));
+    
+    return {
+      totalClicks: clicks.length,
+      uniqueUsers: uniqueUserIds.size
+    };
+  }
+
+  // Affiliate Commissions
+  async createAffiliateCommission(commission: InsertAffiliateCommission): Promise<AffiliateCommission> {
+    const [newCommission] = await db.insert(affiliateCommissions).values(commission).returning();
+    return newCommission;
+  }
+
+  async getAffiliateCommissions(filters: { partnerId?: string; status?: string }): Promise<AffiliateCommission[]> {
+    let conditions = [];
+    
+    if (filters.partnerId) {
+      conditions.push(eq(affiliateCommissions.partnerId, filters.partnerId));
+    }
+    if (filters.status) {
+      conditions.push(eq(affiliateCommissions.status, filters.status));
+    }
+
+    if (conditions.length === 0) {
+      return await db.select().from(affiliateCommissions).orderBy(desc(affiliateCommissions.createdAt));
+    }
+
+    return await db.select().from(affiliateCommissions)
+      .where(and(...conditions))
+      .orderBy(desc(affiliateCommissions.createdAt));
+  }
+
+  async updateCommissionStatus(id: string, status: string): Promise<AffiliateCommission | undefined> {
+    const updates: any = { status, updatedAt: new Date() };
+    if (status === 'approved') updates.approvedAt = new Date();
+    if (status === 'paid') updates.paidAt = new Date();
+    
+    const [commission] = await db.update(affiliateCommissions)
+      .set(updates)
+      .where(eq(affiliateCommissions.id, id))
+      .returning();
+    return commission;
+  }
+
+  async getCommissionSummary(): Promise<{ pending: string; approved: string; paid: string }> {
+    const allCommissions = await db.select().from(affiliateCommissions);
+    
+    const pending = allCommissions
+      .filter(c => c.status === 'pending')
+      .reduce((sum, c) => sum + parseFloat(c.commissionAmount || '0'), 0);
+    
+    const approved = allCommissions
+      .filter(c => c.status === 'approved')
+      .reduce((sum, c) => sum + parseFloat(c.commissionAmount || '0'), 0);
+    
+    const paid = allCommissions
+      .filter(c => c.status === 'paid')
+      .reduce((sum, c) => sum + parseFloat(c.commissionAmount || '0'), 0);
+    
+    return {
+      pending: pending.toFixed(2),
+      approved: approved.toFixed(2),
+      paid: paid.toFixed(2)
+    };
+  }
+
+  // Affiliate Payouts
+  async createAffiliatePayout(payout: InsertAffiliatePayout): Promise<AffiliatePayout> {
+    const [newPayout] = await db.insert(affiliatePayouts).values(payout).returning();
+    return newPayout;
+  }
+
+  async getAffiliatePayouts(): Promise<AffiliatePayout[]> {
+    return await db.select().from(affiliatePayouts).orderBy(desc(affiliatePayouts.periodEnd));
   }
 }
 

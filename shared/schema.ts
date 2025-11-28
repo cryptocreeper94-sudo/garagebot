@@ -574,3 +574,147 @@ export const partReviews = pgTable("part_reviews", {
 export const insertPartReviewSchema = createInsertSchema(partReviews).omit({ id: true, createdAt: true });
 export type InsertPartReview = z.infer<typeof insertPartReviewSchema>;
 export type PartReview = typeof partReviews.$inferSelect;
+
+// ============================================
+// AFFILIATE TRACKING SYSTEM
+// ============================================
+
+// Affiliate Networks (CJ, Impact, Rakuten, Amazon Associates, etc.)
+export const affiliateNetworks = pgTable("affiliate_networks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  websiteUrl: text("website_url"),
+  apiEndpoint: text("api_endpoint"),
+  apiKeyName: text("api_key_name"),
+  trackingParamName: text("tracking_param_name").default("ref"),
+  commissionType: text("commission_type").default("percentage"),
+  defaultCommissionRate: decimal("default_commission_rate", { precision: 5, scale: 2 }),
+  paymentThreshold: decimal("payment_threshold", { precision: 10, scale: 2 }),
+  paymentFrequency: text("payment_frequency"),
+  contactEmail: text("contact_email"),
+  notes: text("notes"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAffiliateNetworkSchema = createInsertSchema(affiliateNetworks).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertAffiliateNetwork = z.infer<typeof insertAffiliateNetworkSchema>;
+export type AffiliateNetwork = typeof affiliateNetworks.$inferSelect;
+
+// Affiliate Partners (individual retailers/brands)
+export const affiliatePartners = pgTable("affiliate_partners", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  networkId: varchar("network_id").references(() => affiliateNetworks.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  category: text("category").notNull(),
+  subcategory: text("subcategory"),
+  logoUrl: text("logo_url"),
+  websiteUrl: text("website_url").notNull(),
+  affiliateUrl: text("affiliate_url"),
+  affiliateId: text("affiliate_id"),
+  trackingTemplate: text("tracking_template"),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }),
+  commissionType: text("commission_type").default("percentage"),
+  cookieDuration: integer("cookie_duration"),
+  avgOrderValue: decimal("avg_order_value", { precision: 10, scale: 2 }),
+  conversionRate: decimal("conversion_rate", { precision: 5, scale: 2 }),
+  vehicleTypes: text("vehicle_types").array(),
+  partCategories: text("part_categories").array(),
+  hasLocalPickup: boolean("has_local_pickup").default(false),
+  hasApi: boolean("has_api").default(false),
+  apiStatus: text("api_status").default("none"),
+  priority: integer("priority").default(50),
+  isActive: boolean("is_active").default(true),
+  isFeatured: boolean("is_featured").default(false),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAffiliatePartnerSchema = createInsertSchema(affiliatePartners).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertAffiliatePartner = z.infer<typeof insertAffiliatePartnerSchema>;
+export type AffiliatePartner = typeof affiliatePartners.$inferSelect;
+
+// Affiliate Click Tracking
+export const affiliateClicks = pgTable("affiliate_clicks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  partnerId: varchar("partner_id").notNull().references(() => affiliatePartners.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  sessionId: text("session_id"),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  productName: text("product_name"),
+  productSku: text("product_sku"),
+  searchQuery: text("search_query"),
+  sourceUrl: text("source_url"),
+  destinationUrl: text("destination_url"),
+  clickContext: text("click_context"),
+  utmSource: text("utm_source"),
+  utmMedium: text("utm_medium"),
+  utmCampaign: text("utm_campaign"),
+  utmContent: text("utm_content"),
+  userAgent: text("user_agent"),
+  ipAddress: text("ip_address"),
+  referrer: text("referrer"),
+  deviceType: text("device_type"),
+  country: text("country"),
+  region: text("region"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAffiliateClickSchema = createInsertSchema(affiliateClicks).omit({ id: true, createdAt: true });
+export type InsertAffiliateClick = z.infer<typeof insertAffiliateClickSchema>;
+export type AffiliateClick = typeof affiliateClicks.$inferSelect;
+
+// Affiliate Commissions/Conversions
+export const affiliateCommissions = pgTable("affiliate_commissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  clickId: varchar("click_id").references(() => affiliateClicks.id, { onDelete: "set null" }),
+  partnerId: varchar("partner_id").notNull().references(() => affiliatePartners.id, { onDelete: "cascade" }),
+  networkId: varchar("network_id").references(() => affiliateNetworks.id, { onDelete: "set null" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  transactionId: text("transaction_id"),
+  orderAmount: decimal("order_amount", { precision: 10, scale: 2 }),
+  commissionAmount: decimal("commission_amount", { precision: 10, scale: 2 }),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }),
+  currency: text("currency").default("USD"),
+  status: text("status").default("pending"),
+  productCategory: text("product_category"),
+  productName: text("product_name"),
+  transactionDate: timestamp("transaction_date"),
+  approvedAt: timestamp("approved_at"),
+  paidAt: timestamp("paid_at"),
+  payoutBatchId: text("payout_batch_id"),
+  networkReferenceId: text("network_reference_id"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAffiliateCommissionSchema = createInsertSchema(affiliateCommissions).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertAffiliateCommission = z.infer<typeof insertAffiliateCommissionSchema>;
+export type AffiliateCommission = typeof affiliateCommissions.$inferSelect;
+
+// Affiliate Payouts (monthly summaries)
+export const affiliatePayouts = pgTable("affiliate_payouts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  networkId: varchar("network_id").references(() => affiliateNetworks.id, { onDelete: "set null" }),
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  totalClicks: integer("total_clicks").default(0),
+  totalConversions: integer("total_conversions").default(0),
+  totalOrderValue: decimal("total_order_value", { precision: 12, scale: 2 }).default("0"),
+  totalCommission: decimal("total_commission", { precision: 12, scale: 2 }).default("0"),
+  status: text("status").default("pending"),
+  paymentMethod: text("payment_method"),
+  paymentReference: text("payment_reference"),
+  paidAt: timestamp("paid_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAffiliatePayoutSchema = createInsertSchema(affiliatePayouts).omit({ id: true, createdAt: true });
+export type InsertAffiliatePayout = z.infer<typeof insertAffiliatePayoutSchema>;
+export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
