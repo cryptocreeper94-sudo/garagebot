@@ -168,3 +168,166 @@ export async function getMascotGreeting(context?: string): Promise<string> {
     return greetings[0];
   }
 }
+
+export interface ImageIdentificationResult {
+  success: boolean;
+  vehicleInfo?: {
+    type?: string;
+    year?: string;
+    make?: string;
+    model?: string;
+    engine?: string;
+  };
+  partInfo?: {
+    name?: string;
+    partNumber?: string;
+    description?: string;
+    condition?: string;
+  };
+  confidence: number;
+  suggestions: string[];
+  message: string;
+}
+
+function extractJsonFromResponse(content: string): any {
+  // Try parsing as-is first
+  try {
+    return JSON.parse(content);
+  } catch {}
+  
+  // Try removing markdown code blocks
+  const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlockMatch) {
+    try {
+      return JSON.parse(codeBlockMatch[1].trim());
+    } catch {}
+  }
+  
+  // Try finding JSON object in the text
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch {}
+  }
+  
+  return null;
+}
+
+export async function identifyFromImage(imageData: string, context?: string): Promise<ImageIdentificationResult> {
+  try {
+    const isUrl = imageData.startsWith('http');
+    const imageContent = isUrl 
+      ? { type: "image_url" as const, image_url: { url: imageData } }
+      : { type: "image_url" as const, image_url: { url: `data:image/jpeg;base64,${imageData}` } };
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert automotive parts identifier. Analyze images of vehicles or parts and extract information.
+
+For vehicles, identify: type (car, truck, motorcycle, ATV, boat, etc.), year range, make, model, engine if visible.
+For parts, identify: part name, possible part numbers, description, condition (new/used/damaged).
+
+IMPORTANT: Return ONLY a valid JSON object with this exact structure (no other text):
+{
+  "success": true,
+  "vehicleInfo": { "type": "car", "year": "2020", "make": "Toyota", "model": "Camry", "engine": "2.5L" },
+  "partInfo": null,
+  "confidence": 85,
+  "suggestions": ["brake pads Toyota Camry 2020", "Toyota Camry parts"],
+  "message": "I can see a 2020 Toyota Camry. What parts do you need for it?"
+}
+
+Set vehicleInfo or partInfo to null if not applicable. If you cannot identify the image, set success to false.`
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: context || "What vehicle or part is this? Help me identify it so I can find the right replacement parts." },
+            imageContent
+          ]
+        }
+      ],
+      max_tokens: 600,
+      temperature: 0.2,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+    const parsed = extractJsonFromResponse(content);
+    
+    if (!parsed) {
+      // Could not parse JSON - extract what we can from the text
+      console.error("Failed to parse image ID response:", content);
+      return {
+        success: false,
+        confidence: 0,
+        suggestions: [],
+        message: content.length > 200 
+          ? "I analyzed the image but couldn't format my response. Could you describe what you're looking for?"
+          : content || "I couldn't identify this image. Can you provide more details or describe what you need?"
+      };
+    }
+    
+    // Validate and normalize the response
+    const result: ImageIdentificationResult = {
+      success: Boolean(parsed.success),
+      confidence: typeof parsed.confidence === 'number' ? Math.min(100, Math.max(0, parsed.confidence)) : 0,
+      suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.filter((s: any) => typeof s === 'string') : [],
+      message: typeof parsed.message === 'string' ? parsed.message : "Image analyzed. What parts do you need?"
+    };
+    
+    // Validate vehicleInfo if present
+    if (parsed.vehicleInfo && typeof parsed.vehicleInfo === 'object') {
+      result.vehicleInfo = {
+        type: parsed.vehicleInfo.type || undefined,
+        year: parsed.vehicleInfo.year || undefined,
+        make: parsed.vehicleInfo.make || undefined,
+        model: parsed.vehicleInfo.model || undefined,
+        engine: parsed.vehicleInfo.engine || undefined
+      };
+    }
+    
+    // Validate partInfo if present
+    if (parsed.partInfo && typeof parsed.partInfo === 'object') {
+      result.partInfo = {
+        name: parsed.partInfo.name || undefined,
+        partNumber: parsed.partInfo.partNumber || undefined,
+        description: parsed.partInfo.description || undefined,
+        condition: parsed.partInfo.condition || undefined
+      };
+    }
+    
+    return result;
+  } catch (error: any) {
+    console.error("Image identification error:", error);
+    const errorMessage = error?.message || '';
+    
+    if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
+      return {
+        success: false,
+        confidence: 0,
+        suggestions: [],
+        message: "I'm getting a lot of requests right now. Please try again in a minute."
+      };
+    }
+    
+    if (errorMessage.includes('invalid_image') || errorMessage.includes('image')) {
+      return {
+        success: false,
+        confidence: 0,
+        suggestions: [],
+        message: "I couldn't process that image. Please try a different photo - JPG or PNG works best, under 20MB."
+      };
+    }
+    
+    return {
+      success: false,
+      confidence: 0,
+      suggestions: [],
+      message: "Something went wrong analyzing your image. Try uploading a clearer photo, or describe what you're looking for instead."
+    };
+  }
+}
