@@ -1,12 +1,16 @@
-import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge } from "lucide-react";
+import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge, Crown, Hammer, Sparkles } from "lucide-react";
 
 export const VEHICLE_TYPES = [
-  { id: "cars", name: "Cars & Trucks", icon: Car, description: "Sedans, SUVs, Trucks, Vans" },
-  { id: "motorcycles", name: "Motorcycles", icon: Bike, description: "Street, Sport, Cruiser, Touring" },
-  { id: "atvs", name: "ATVs & UTVs", icon: Mountain, description: "Quads, Side-by-Sides, Can-Am" },
-  { id: "boats", name: "Boats & Marine", icon: Ship, description: "Outboard, Inboard, PWC, Pontoon" },
-  { id: "powersports", name: "Powersports", icon: Gauge, description: "Dirt Bikes, Snowmobiles, Go-Karts" },
-  { id: "rv", name: "RV & Trailer", icon: Truck, description: "Motorhomes, Campers, Utility" },
+  { id: "cars", name: "Cars & Trucks", icon: Car, description: "Sedans, SUVs, Pickups" },
+  { id: "classics", name: "Classic & Hot Rod", icon: Sparkles, description: "Muscle, Vintage, Resto" },
+  { id: "exotics", name: "Exotics", icon: Crown, description: "Ferrari, Lambo, Porsche" },
+  { id: "kitcars", name: "Kit & Custom", icon: Hammer, description: "Replicas, Builds, DIY" },
+  { id: "motorcycles", name: "Motorcycles", icon: Bike, description: "Street, Sport, Cruiser" },
+  { id: "atvs", name: "ATVs & UTVs", icon: Mountain, description: "Quads, Side-by-Sides" },
+  { id: "boats", name: "Marine", icon: Ship, description: "Boats, PWC, Outboard" },
+  { id: "powersports", name: "Powersports", icon: Gauge, description: "Dirt, Snow, Go-Karts" },
+  { id: "rv", name: "RV & Trailer", icon: Truck, description: "Motorhomes, Campers" },
+  { id: "diesel", name: "Diesel & Commercial", icon: Cog, description: "Semi, Fleet, Heavy" },
 ];
 
 export const CATEGORIES = [
@@ -21,6 +25,35 @@ export const CATEGORIES = [
   { id: "powersports", name: "Powersports", icon: Bike },
   { id: "marine", name: "Marine", icon: Waves },
 ];
+
+export const SPECIALTY_RETAILERS = {
+  classics: [
+    { name: "Summit Racing", url: "https://www.summitracing.com", specialty: "Performance & Restoration" },
+    { name: "Classic Industries", url: "https://www.classicindustries.com", specialty: "Restoration Parts" },
+    { name: "Year One", url: "https://www.yearone.com", specialty: "Muscle Car Parts" },
+    { name: "OPGI", url: "https://www.opgi.com", specialty: "GM Restoration" },
+    { name: "Holley", url: "https://www.holley.com", specialty: "Carburetors & EFI" },
+    { name: "Speedway Motors", url: "https://www.speedwaymotors.com", specialty: "Hot Rod Parts" },
+    { name: "Eckler's", url: "https://www.ecklers.com", specialty: "Corvette & Chevy" },
+    { name: "Danchuk", url: "https://www.danchuk.com", specialty: "55-57 Chevy" },
+  ],
+  exotics: [
+    { name: "Scuderia Car Parts", url: "https://www.scuderiacarparts.com", specialty: "Ferrari & Maserati" },
+    { name: "Suncoast Parts", url: "https://www.suncoastparts.com", specialty: "Porsche Specialist" },
+    { name: "Eurospares", url: "https://www.eurospares.com", specialty: "European Exotics" },
+    { name: "Ricambi America", url: "https://www.ricambiamerica.com", specialty: "Italian Supercars" },
+    { name: "Vivid Racing", url: "https://www.vividracing.com", specialty: "Performance Upgrades" },
+    { name: "Fabspeed", url: "https://www.fabspeed.com", specialty: "Exotic Exhaust" },
+  ],
+  kitcars: [
+    { name: "Factory Five Racing", url: "https://www.factoryfive.com", specialty: "Cobra & GT40 Kits" },
+    { name: "Superformance", url: "https://www.superformance.com", specialty: "Licensed Replicas" },
+    { name: "Backdraft Racing", url: "https://www.backdraftracing.com", specialty: "Cobra Replicas" },
+    { name: "Detroit Speed", url: "https://www.detroitspeed.com", specialty: "Pro-Touring Suspension" },
+    { name: "Speedmaster", url: "https://www.speedmaster1.com", specialty: "Engine Components" },
+    { name: "Superlite Cars", url: "https://www.superlitecars.com", specialty: "SL-C & Aero Kits" },
+  ],
+};
 
 export const MOCK_RESULTS = [
   {
