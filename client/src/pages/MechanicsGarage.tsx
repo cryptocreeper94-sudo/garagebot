@@ -24,7 +24,8 @@ import {
   Car, Ship, Bike, Truck, Cog, Anchor, Zap, Tractor, Mountain,
   Play, Pause, Receipt, CreditCard, Search, Filter, ArrowUpDown,
   ChevronDown, MoreHorizontal, Edit, Trash2, ExternalLink, 
-  CalendarDays, UserCheck, AlertTriangle, CircleDot, X
+  CalendarDays, UserCheck, AlertTriangle, CircleDot, X, Link2,
+  RefreshCw, ArrowRight, Sparkles, Database, Shield, Globe
 } from "lucide-react";
 
 const VEHICLE_TYPES = [
@@ -690,7 +691,7 @@ export default function MechanicsGarage() {
 
                     {/* Tabs */}
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="p-6">
-                      <TabsList className="grid grid-cols-6 mb-6 h-auto">
+                      <TabsList className="grid grid-cols-7 mb-6 h-auto">
                         <TabsTrigger value="dashboard" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-dashboard">
                           <BarChart3 className="w-4 h-4" />
                           Dashboard
@@ -715,10 +716,39 @@ export default function MechanicsGarage() {
                           <Users className="w-4 h-4" />
                           Team
                         </TabsTrigger>
+                        <TabsTrigger value="integrations" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto relative" data-testid="tab-integrations">
+                          <Link2 className="w-4 h-4" />
+                          Integrations
+                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                        </TabsTrigger>
                       </TabsList>
 
                       {/* Dashboard Tab */}
                       <TabsContent value="dashboard">
+                        {/* Integration Highlight Banner */}
+                        <Card 
+                          className="p-4 mb-6 bg-gradient-to-r from-purple-500/10 via-primary/10 to-blue-500/10 border-primary/30 cursor-pointer hover:border-primary/50 transition-colors"
+                          onClick={() => setActiveTab("integrations")}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-primary/20">
+                                <Link2 className="w-5 h-5 text-primary" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-tech font-bold text-sm">Connect Your Business Tools</span>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[8px] font-mono">
+                                    NEW
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground">QuickBooks • UKG Pro • ADP • Google Calendar & more</p>
+                              </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                        </Card>
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                           <Card className="p-4 bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
                             <div className="flex items-center gap-3">
@@ -1008,6 +1038,288 @@ export default function MechanicsGarage() {
                             <Button variant="outline" className="w-full font-tech text-xs">
                               <BarChart3 className="w-3 h-3 mr-2" /> View Reports
                             </Button>
+                          </Card>
+                        </div>
+                      </TabsContent>
+
+                      {/* Integrations Tab */}
+                      <TabsContent value="integrations">
+                        {/* Hero Banner */}
+                        <Card className="p-6 mb-6 bg-gradient-to-r from-primary/20 via-purple-500/10 to-blue-500/20 border-primary/30 relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                          <div className="relative">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="p-3 rounded-xl bg-primary/20">
+                                <Link2 className="w-8 h-8 text-primary" />
+                              </div>
+                              <div>
+                                <h3 className="text-2xl font-tech font-bold uppercase">Unified Business Hub</h3>
+                                <p className="text-muted-foreground">Connect your existing tools or use our built-in solutions</p>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4 mt-4">
+                              <div className="flex items-center gap-2 text-sm">
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                                <span>Coexist with current systems</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm">
+                                <RefreshCw className="w-4 h-4 text-blue-500" />
+                                <span>Gradually migrate at your pace</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm">
+                                <Sparkles className="w-4 h-4 text-purple-500" />
+                                <span>Full replacement available</span>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+
+                        {/* Integration Categories */}
+                        <div className="space-y-6">
+                          {/* Accounting & Invoicing */}
+                          <div>
+                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
+                              <DollarSign className="w-4 h-4" /> Accounting & Invoicing
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <Card className="p-4 bg-gradient-to-br from-green-500/5 to-transparent border-green-500/20 hover:border-green-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-green-500/10">
+                                    <Database className="w-6 h-6 text-green-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">QuickBooks</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Sync invoices, payments, and financial reports automatically</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+
+                              <Card className="p-4 bg-gradient-to-br from-blue-500/5 to-transparent border-blue-500/20 hover:border-blue-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-blue-500/10">
+                                    <FileText className="w-6 h-6 text-blue-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">FreshBooks</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Time tracking, invoicing, and expense management</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+
+                              <Card className="p-4 bg-gradient-to-br from-purple-500/5 to-transparent border-purple-500/20 hover:border-purple-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-purple-500/10">
+                                    <Receipt className="w-6 h-6 text-purple-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">Xero</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Cloud accounting with powerful reporting</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+                            </div>
+                          </div>
+
+                          {/* Workforce & Payroll */}
+                          <div>
+                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
+                              <Users className="w-4 h-4" /> Workforce & Payroll
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <Card className="p-4 bg-gradient-to-br from-orange-500/5 to-transparent border-orange-500/20 hover:border-orange-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-orange-500/10">
+                                    <UserCheck className="w-6 h-6 text-orange-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">UKG Pro</h5>
+                                <p className="text-xs text-muted-foreground mb-3">HR, payroll, talent management in one platform</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+
+                              <Card className="p-4 bg-gradient-to-br from-cyan-500/5 to-transparent border-cyan-500/20 hover:border-cyan-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-cyan-500/10">
+                                    <Timer className="w-6 h-6 text-cyan-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">ADP</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Payroll, HR, and workforce management</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+
+                              <Card className="p-4 bg-gradient-to-br from-pink-500/5 to-transparent border-pink-500/20 hover:border-pink-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-pink-500/10">
+                                    <Clock className="w-6 h-6 text-pink-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">Gusto</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Modern payroll and benefits for small business</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+                            </div>
+                          </div>
+
+                          {/* Scheduling & CRM */}
+                          <div>
+                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
+                              <Calendar className="w-4 h-4" /> Scheduling & Customer Management
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <Card className="p-4 bg-gradient-to-br from-indigo-500/5 to-transparent border-indigo-500/20 hover:border-indigo-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-indigo-500/10">
+                                    <CalendarDays className="w-6 h-6 text-indigo-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">Google Calendar</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Sync appointments with your Google account</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+
+                              <Card className="p-4 bg-gradient-to-br from-red-500/5 to-transparent border-red-500/20 hover:border-red-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-red-500/10">
+                                    <MessageSquare className="w-6 h-6 text-red-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">Twilio</h5>
+                                <p className="text-xs text-muted-foreground mb-3">SMS notifications and customer messaging</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+
+                              <Card className="p-4 bg-gradient-to-br from-teal-500/5 to-transparent border-teal-500/20 hover:border-teal-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-teal-500/10">
+                                    <Mail className="w-6 h-6 text-teal-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">Mailchimp</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Email marketing and customer outreach</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+                            </div>
+                          </div>
+
+                          {/* Parts & Inventory */}
+                          <div>
+                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
+                              <Package className="w-4 h-4" /> Parts & Inventory
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <Card className="p-4 bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/20 hover:border-amber-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-amber-500/10">
+                                    <Wrench className="w-6 h-6 text-amber-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">PartsTech</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Search and order from 20+ suppliers</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+
+                              <Card className="p-4 bg-gradient-to-br from-lime-500/5 to-transparent border-lime-500/20 hover:border-lime-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-lime-500/10">
+                                    <Globe className="w-6 h-6 text-lime-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">Nexpart</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Catalog data and electronic ordering</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+
+                              <Card className="p-4 bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/20 hover:border-emerald-500/40 transition-colors group cursor-pointer">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="p-2 rounded-lg bg-emerald-500/10">
+                                    <Shield className="w-6 h-6 text-emerald-500" />
+                                  </div>
+                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
+                                    COMING SOON
+                                  </Badge>
+                                </div>
+                                <h5 className="font-tech font-bold text-lg mb-1">AutoZone Pro</h5>
+                                <p className="text-xs text-muted-foreground mb-3">Commercial account integration</p>
+                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Connect <ArrowRight className="w-3 h-3" />
+                                </div>
+                              </Card>
+                            </div>
+                          </div>
+
+                          {/* Built-in Features Notice */}
+                          <Card className="p-6 bg-gradient-to-r from-primary/5 to-transparent border-primary/20">
+                            <div className="flex items-start gap-4">
+                              <div className="p-3 rounded-xl bg-primary/10">
+                                <Sparkles className="w-8 h-8 text-primary" />
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-tech font-bold text-lg mb-2">Don't Have These Systems?</h4>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                  Mechanics Garage includes built-in versions of all these capabilities. Use our integrated tools for invoicing, scheduling, time tracking, and inventory - no additional subscriptions required.
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Invoicing</Badge>
+                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Time Clock</Badge>
+                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Scheduling</Badge>
+                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Inventory</Badge>
+                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in CRM</Badge>
+                                </div>
+                              </div>
+                            </div>
                           </Card>
                         </div>
                       </TabsContent>
