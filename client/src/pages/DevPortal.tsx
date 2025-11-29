@@ -37,6 +37,7 @@ const CATEGORIES = [
   { id: "shop_integrations", name: "Shop Software OAuth", icon: Link2, color: "text-orange-400" },
   { id: "parts_ordering", name: "Parts & Tool Ordering", icon: Settings, color: "text-amber-400" },
   { id: "features", name: "Feature Development", icon: Zap, color: "text-yellow-400" },
+  { id: "marketing", name: "Marketing & Monetization", icon: DollarSign, color: "text-pink-400" },
   { id: "partnerships", name: "Partnerships", icon: Users, color: "text-purple-400" },
   { id: "legal", name: "Legal & Compliance", icon: Shield, color: "text-red-400" },
   { id: "infrastructure", name: "Infrastructure", icon: Settings, color: "text-cyan-400" },
@@ -131,6 +132,15 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   
   // FORTELLIS MARKETPLACE
   { category: "parts_ordering", title: "Fortellis Marketplace", description: "CDK Global automotive API marketplace", priority: "medium", status: "pending", dueDate: null, link: "https://fortellis.io", notes: "Automotive API ecosystem", sortOrder: 14 },
+  
+  // MARKETING & MONETIZATION
+  { category: "marketing", title: "Google AdSense Setup", description: "Sign up for Google AdSense to monetize informational pages (NOT search results). Get your publisher ID (ca-pub-XXXXX)", priority: "high", status: "pending", dueDate: null, link: "https://adsense.google.com/start/", notes: "Only on informational pages (DIY guides, about, blog). Avoid on search results to keep UX clean", sortOrder: 1 },
+  { category: "marketing", title: "Buffer Account Setup", description: "Create Buffer account for social media scheduling. Connect Twitter/X, Facebook, Instagram, LinkedIn", priority: "medium", status: "pending", dueDate: null, link: "https://buffer.com", notes: "Free tier: 3 channels, 10 posts/channel. Pro $6/mo for more", sortOrder: 2 },
+  { category: "marketing", title: "Hypefury Account Setup", description: "Twitter/X automation and thread scheduling. Great for automotive tips content", priority: "medium", status: "pending", dueDate: null, link: "https://hypefury.com", notes: "Auto-retweet best content, engagement features", sortOrder: 3 },
+  { category: "marketing", title: "Content Calendar Creation", description: "Build 30-day social content calendar: DIY tips, part deals, seasonal maintenance, Buddy AI highlights", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Mix: 40% educational, 30% deals, 20% engagement, 10% promotional", sortOrder: 4 },
+  { category: "marketing", title: "TikTok/Reels Strategy", description: "Short-form video content: quick repair tips, tool reviews, before/after fixes", priority: "low", status: "pending", dueDate: null, link: null, notes: "Repurpose DIY guide content into 60-sec videos", sortOrder: 5 },
+  { category: "marketing", title: "Email Marketing Setup", description: "Set up email list for price drop alerts, weekly deals digest, maintenance reminders", priority: "medium", status: "pending", dueDate: null, link: "https://www.mailerlite.com", notes: "Free up to 1000 subscribers", sortOrder: 6 },
+  { category: "marketing", title: "Google Analytics 4", description: "Set up GA4 for traffic and conversion tracking", priority: "high", status: "pending", dueDate: null, link: "https://analytics.google.com", notes: "Track: searches, affiliate clicks, conversions, Buddy usage", sortOrder: 7 },
 ];
 
 export default function DevPortal() {

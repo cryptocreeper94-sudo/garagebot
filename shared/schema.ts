@@ -1363,3 +1363,52 @@ export type GuideRating = typeof guideRatings.$inferSelect;
 export const insertGuideProgressSchema = createInsertSchema(guideProgress).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertGuideProgress = z.infer<typeof insertGuideProgressSchema>;
 export type GuideProgress = typeof guideProgress.$inferSelect;
+
+// ============================================
+// PRICE DROP ALERTS (Pro Feature)
+// ============================================
+
+export const priceAlerts = pgTable("price_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  
+  // Part identification
+  partName: text("part_name").notNull(),
+  partNumber: text("part_number"),
+  searchQuery: text("search_query").notNull(),
+  
+  // Target price
+  currentPrice: decimal("current_price", { precision: 10, scale: 2 }),
+  targetPrice: decimal("target_price", { precision: 10, scale: 2 }).notNull(),
+  lastCheckedPrice: decimal("last_checked_price", { precision: 10, scale: 2 }),
+  
+  // Vendor preferences
+  preferredVendors: text("preferred_vendors").array(),
+  excludedVendors: text("excluded_vendors").array(),
+  
+  // Alert settings
+  alertMethod: text("alert_method").default("email"),
+  isActive: boolean("is_active").default(true),
+  alertFrequency: text("alert_frequency").default("daily"),
+  
+  // Tracking
+  lastCheckedAt: timestamp("last_checked_at"),
+  lastAlertSentAt: timestamp("last_alert_sent_at"),
+  alertCount: integer("alert_count").default(0),
+  
+  // When price dropped
+  priceDroppedAt: timestamp("price_dropped_at"),
+  droppedToPrice: decimal("dropped_to_price", { precision: 10, scale: 2 }),
+  droppedAtVendor: text("dropped_at_vendor"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_price_alerts_user").on(table.userId),
+  index("IDX_price_alerts_active").on(table.isActive),
+]);
+
+export const insertPriceAlertSchema = createInsertSchema(priceAlerts).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertPriceAlert = z.infer<typeof insertPriceAlertSchema>;
+export type PriceAlert = typeof priceAlerts.$inferSelect;
