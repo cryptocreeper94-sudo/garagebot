@@ -1071,3 +1071,294 @@ export type InspectionItem = typeof inspectionItems.$inferSelect;
 export const insertShopSettingsSchema = createInsertSchema(shopSettings).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertShopSettings = z.infer<typeof insertShopSettingsSchema>;
 export type ShopSettings = typeof shopSettings.$inferSelect;
+
+// ============================================
+// DIY REPAIR GUIDES SYSTEM - Comprehensive Vehicle Coverage
+// ============================================
+
+// Vehicle Categories - All 12+ types supported
+export const vehicleCategories = pgTable("vehicle_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description"),
+  icon: text("icon"),
+  parentCategoryId: varchar("parent_category_id").references((): any => vehicleCategories.id, { onDelete: "set null" }),
+  yearRangeStart: integer("year_range_start"),
+  yearRangeEnd: integer("year_range_end"),
+  commonSystems: text("common_systems").array(),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Repair Guides - Main guide information
+export const repairGuides = pgTable("repair_guides", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  summary: text("summary"),
+  
+  // Categorization
+  difficulty: text("difficulty").notNull().default("beginner"),
+  category: text("category").notNull(),
+  systemType: text("system_type"),
+  repairType: text("repair_type"),
+  
+  // Time and cost
+  estimatedTime: text("estimated_time"),
+  estimatedTimeMinutes: integer("estimated_time_minutes"),
+  estimatedCostMin: decimal("estimated_cost_min", { precision: 10, scale: 2 }),
+  estimatedCostMax: decimal("estimated_cost_max", { precision: 10, scale: 2 }),
+  laborDifficulty: integer("labor_difficulty").default(1),
+  
+  // Tools and parts
+  toolsRequired: text("tools_required").array(),
+  partsRequired: text("parts_required").array(),
+  specialToolsRequired: text("special_tools_required").array(),
+  consumables: text("consumables").array(),
+  
+  // Safety and prerequisites
+  safetyWarnings: text("safety_warnings").array(),
+  prerequisites: text("prerequisites").array(),
+  skillsNeeded: text("skills_needed").array(),
+  
+  // Media
+  thumbnailUrl: text("thumbnail_url"),
+  headerImageUrl: text("header_image_url"),
+  youtubeSearchTerm: text("youtube_search_term"),
+  youtubeVideoId: text("youtube_video_id"),
+  youtubePlaylistId: text("youtube_playlist_id"),
+  
+  // Content metadata
+  contentSource: text("content_source").default("manual"),
+  aiGenerated: boolean("ai_generated").default(false),
+  aiPromptUsed: text("ai_prompt_used"),
+  isVerified: boolean("is_verified").default(false),
+  verifiedBy: varchar("verified_by").references(() => users.id, { onDelete: "set null" }),
+  verifiedAt: timestamp("verified_at"),
+  
+  // Stats
+  viewCount: integer("view_count").default(0),
+  helpfulCount: integer("helpful_count").default(0),
+  notHelpfulCount: integer("not_helpful_count").default(0),
+  completionCount: integer("completion_count").default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }),
+  
+  // Publishing
+  status: text("status").default("draft"),
+  publishedAt: timestamp("published_at"),
+  lastReviewedAt: timestamp("last_reviewed_at"),
+  
+  // Metadata
+  tags: text("tags").array(),
+  searchKeywords: text("search_keywords").array(),
+  relatedGuideIds: text("related_guide_ids").array(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_guide_difficulty").on(table.difficulty),
+  index("IDX_guide_category").on(table.category),
+  index("IDX_guide_status").on(table.status),
+  index("IDX_guide_system").on(table.systemType),
+]);
+
+// Guide Steps - Individual step-by-step instructions
+export const guideSteps = pgTable("guide_steps", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  guideId: varchar("guide_id").notNull().references(() => repairGuides.id, { onDelete: "cascade" }),
+  stepNumber: integer("step_number").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  detailedInstructions: text("detailed_instructions"),
+  
+  // Media for this step
+  imageUrls: text("image_urls").array(),
+  videoUrl: text("video_url"),
+  youtubeTimestamp: text("youtube_timestamp"),
+  diagramUrl: text("diagram_url"),
+  
+  // Tips and warnings
+  proTips: text("pro_tips").array(),
+  warnings: text("warnings").array(),
+  commonMistakes: text("common_mistakes").array(),
+  
+  // Technical specs for this step
+  torqueSpecs: jsonb("torque_specs"),
+  measurements: jsonb("measurements"),
+  toolsForStep: text("tools_for_step").array(),
+  partsForStep: text("parts_for_step").array(),
+  
+  // Time estimate for this specific step
+  estimatedMinutes: integer("estimated_minutes"),
+  
+  // Conditional content
+  vehicleSpecificNotes: jsonb("vehicle_specific_notes"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_step_guide").on(table.guideId),
+  index("IDX_step_order").on(table.guideId, table.stepNumber),
+]);
+
+// Guide Fitment - Links guides to compatible vehicles
+export const guideFitment = pgTable("guide_fitment", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  guideId: varchar("guide_id").notNull().references(() => repairGuides.id, { onDelete: "cascade" }),
+  
+  // Vehicle category level
+  vehicleCategoryId: varchar("vehicle_category_id").references(() => vehicleCategories.id, { onDelete: "set null" }),
+  vehicleCategorySlug: text("vehicle_category_slug"),
+  
+  // Year range
+  yearStart: integer("year_start"),
+  yearEnd: integer("year_end"),
+  
+  // Make/Model specifics (optional - for more targeted guides)
+  make: text("make"),
+  model: text("model"),
+  trim: text("trim"),
+  submodel: text("submodel"),
+  
+  // Engine/powertrain specifics
+  engineType: text("engine_type"),
+  engineSize: text("engine_size"),
+  fuelType: text("fuel_type"),
+  transmission: text("transmission"),
+  drivetrain: text("drivetrain"),
+  
+  // System tags for cross-compatibility
+  systemTags: text("system_tags").array(),
+  
+  // Fitment notes
+  fitmentNotes: text("fitment_notes"),
+  excludedModels: text("excluded_models").array(),
+  
+  // Priority for search results
+  relevanceScore: integer("relevance_score").default(50),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_fitment_guide").on(table.guideId),
+  index("IDX_fitment_category").on(table.vehicleCategorySlug),
+  index("IDX_fitment_make_model").on(table.make, table.model),
+  index("IDX_fitment_years").on(table.yearStart, table.yearEnd),
+]);
+
+// Part Terminology - Maps equivalent part names across industries
+export const partTerminology = pgTable("part_terminology", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  canonicalName: text("canonical_name").notNull(),
+  displayName: text("display_name").notNull(),
+  description: text("description"),
+  
+  // Alternative names by industry
+  autoTerms: text("auto_terms").array(),
+  marineTerms: text("marine_terms").array(),
+  motorcycleTerms: text("motorcycle_terms").array(),
+  smallEngineTerms: text("small_engine_terms").array(),
+  dieselTerms: text("diesel_terms").array(),
+  atvTerms: text("atv_terms").array(),
+  rvTerms: text("rv_terms").array(),
+  
+  // All searchable terms
+  allTerms: text("all_terms").array(),
+  
+  // Part category
+  partCategory: text("part_category"),
+  systemType: text("system_type"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_terminology_canonical").on(table.canonicalName),
+  index("IDX_terminology_category").on(table.partCategory),
+]);
+
+// Guide Ratings - User feedback on guides
+export const guideRatings = pgTable("guide_ratings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  guideId: varchar("guide_id").notNull().references(() => repairGuides.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  
+  rating: integer("rating"),
+  isHelpful: boolean("is_helpful"),
+  completedRepair: boolean("completed_repair").default(false),
+  
+  // Feedback details
+  difficultyRating: integer("difficulty_rating"),
+  timeAccuracyRating: integer("time_accuracy_rating"),
+  clarityRating: integer("clarity_rating"),
+  
+  comment: text("comment"),
+  suggestions: text("suggestions"),
+  
+  // Which vehicle they used the guide for
+  vehicleYear: integer("vehicle_year"),
+  vehicleMake: text("vehicle_make"),
+  vehicleModel: text("vehicle_model"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_rating_guide").on(table.guideId),
+  index("IDX_rating_user").on(table.userId),
+]);
+
+// Guide Completion Tracking - Track user progress
+export const guideProgress = pgTable("guide_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  guideId: varchar("guide_id").notNull().references(() => repairGuides.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  
+  currentStep: integer("current_step").default(1),
+  completedSteps: integer("completed_steps").array(),
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  
+  startedAt: timestamp("started_at").defaultNow(),
+  lastAccessedAt: timestamp("last_accessed_at").defaultNow(),
+  
+  // Notes they took during the repair
+  userNotes: text("user_notes"),
+  photosUrls: text("photos_urls").array(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_progress_guide_user").on(table.guideId, table.userId),
+  index("IDX_progress_user").on(table.userId),
+]);
+
+// Schema exports for DIY Guides
+export const insertVehicleCategorySchema = createInsertSchema(vehicleCategories).omit({ id: true, createdAt: true });
+export type InsertVehicleCategory = z.infer<typeof insertVehicleCategorySchema>;
+export type VehicleCategory = typeof vehicleCategories.$inferSelect;
+
+export const insertRepairGuideSchema = createInsertSchema(repairGuides).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertRepairGuide = z.infer<typeof insertRepairGuideSchema>;
+export type RepairGuide = typeof repairGuides.$inferSelect;
+
+export const insertGuideStepSchema = createInsertSchema(guideSteps).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertGuideStep = z.infer<typeof insertGuideStepSchema>;
+export type GuideStep = typeof guideSteps.$inferSelect;
+
+export const insertGuideFitmentSchema = createInsertSchema(guideFitment).omit({ id: true, createdAt: true });
+export type InsertGuideFitment = z.infer<typeof insertGuideFitmentSchema>;
+export type GuideFitment = typeof guideFitment.$inferSelect;
+
+export const insertPartTerminologySchema = createInsertSchema(partTerminology).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertPartTerminology = z.infer<typeof insertPartTerminologySchema>;
+export type PartTerminology = typeof partTerminology.$inferSelect;
+
+export const insertGuideRatingSchema = createInsertSchema(guideRatings).omit({ id: true, createdAt: true });
+export type InsertGuideRating = z.infer<typeof insertGuideRatingSchema>;
+export type GuideRating = typeof guideRatings.$inferSelect;
+
+export const insertGuideProgressSchema = createInsertSchema(guideProgress).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertGuideProgress = z.infer<typeof insertGuideProgressSchema>;
+export type GuideProgress = typeof guideProgress.$inferSelect;
