@@ -18,8 +18,49 @@
 - Vehicle-aware affiliate search links with guaranteed fitment
 - Shopping cart with Stripe payments
 - Developer dashboard with partner outreach info (PIN: 0424)
-- Genesis Hallmark NFT system planned ($2/vehicle)
-- Pro subscription planned ($2.99/month)
+- Genesis Hallmark NFT system with tiered pricing
+- Pro "Founders Circle" subscription ($4.99/month Launch Edition)
+
+# Pricing Structure (Launch Edition)
+
+**Editions:**
+- **Launch Edition** (current): Lower prices locked in for early adopters
+- **Standard Edition** (post-V2 launch): Higher prices for new subscribers
+
+**Pro Subscription - Founders Circle:**
+- Monthly: $4.99/month (Standard: $9.99)
+- Annual: $39.99/year (Standard: $79.99)
+- Founders get grandfathered rate forever
+
+**Genesis Hallmark Pricing:**
+- Free users: $9.99/vehicle (Standard: $14.99)
+- Pro members: $1.99/vehicle (Standard: $2.99)
+- 80% savings for Pro members
+
+**Free Tier (generous core value):**
+- Full parts search across 40+ retailers
+- Price comparison
+- All deals
+- 1 vehicle in garage
+- VIN decoding
+- All DIY guides with YouTube
+- Basic Buddy chat
+- Full checkout
+
+**Pro Tier (power features):**
+- Everything in Free
+- Unlimited vehicles
+- Genesis Hallmark at 80% off ($1.99 vs $9.99)
+- Saved DIY progress
+- Price drop alerts
+- Advanced Buddy AI
+- Extended recall monitoring
+- Family sharing (10 people)
+- Exclusive deals
+
+**Mechanics Garage (coming soon):**
+- Monthly: $29.99 (Standard: $49.99)
+- Annual: $249.99 (Standard: $399.99)
 
 # DIY Repair Guides System
 
