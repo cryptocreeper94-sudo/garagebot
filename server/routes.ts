@@ -1620,6 +1620,249 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // MECHANICS GARAGE - REPAIR ORDERS
+  // ============================================
+  
+  app.get("/api/shops/:shopId/repair-orders", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const orders = await storage.getRepairOrders(shopId);
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch repair orders" });
+    }
+  });
+
+  app.post("/api/shops/:shopId/repair-orders", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      // Generate order number
+      const orderCount = await storage.getRepairOrderCount(shopId);
+      const orderNumber = `RO-${String(orderCount + 1).padStart(5, '0')}`;
+      
+      const order = await storage.createRepairOrder({
+        shopId,
+        orderNumber,
+        ...req.body,
+        status: 'pending',
+        paymentStatus: 'unpaid'
+      });
+      
+      res.json(order);
+    } catch (error) {
+      console.error("Error creating repair order:", error);
+      res.status(500).json({ error: "Failed to create repair order" });
+    }
+  });
+
+  app.get("/api/shops/:shopId/repair-orders/:orderId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, orderId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      // Authorization check - verify user owns the shop
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const order = await storage.getRepairOrder(orderId);
+      if (!order || order.shopId !== shopId) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      res.json(order);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch repair order" });
+    }
+  });
+
+  app.patch("/api/shops/:shopId/repair-orders/:orderId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, orderId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const order = await storage.updateRepairOrder(orderId, req.body);
+      res.json(order);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update repair order" });
+    }
+  });
+
+  // ============================================
+  // MECHANICS GARAGE - ESTIMATES
+  // ============================================
+  
+  app.get("/api/shops/:shopId/estimates", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const estimates = await storage.getEstimates(shopId);
+      res.json(estimates);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch estimates" });
+    }
+  });
+
+  app.post("/api/shops/:shopId/estimates", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      // Generate estimate number
+      const estCount = await storage.getEstimateCount(shopId);
+      const estimateNumber = `EST-${String(estCount + 1).padStart(5, '0')}`;
+      
+      const estimate = await storage.createEstimate({
+        shopId,
+        estimateNumber,
+        ...req.body,
+        status: 'draft'
+      });
+      
+      res.json(estimate);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create estimate" });
+    }
+  });
+
+  // ============================================
+  // MECHANICS GARAGE - APPOINTMENTS
+  // ============================================
+  
+  app.get("/api/shops/:shopId/appointments", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const appointments = await storage.getAppointments(shopId);
+      res.json(appointments);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch appointments" });
+    }
+  });
+
+  app.post("/api/shops/:shopId/appointments", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      // Generate appointment number
+      const aptCount = await storage.getAppointmentCount(shopId);
+      const appointmentNumber = `APT-${String(aptCount + 1).padStart(5, '0')}`;
+      
+      const appointment = await storage.createAppointment({
+        shopId,
+        appointmentNumber,
+        ...req.body,
+        status: 'scheduled'
+      });
+      
+      res.json(appointment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create appointment" });
+    }
+  });
+
+  app.patch("/api/shops/:shopId/appointments/:appointmentId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, appointmentId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const appointment = await storage.updateAppointment(appointmentId, req.body);
+      res.json(appointment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update appointment" });
+    }
+  });
+
+  // ============================================
+  // MECHANICS GARAGE - INVENTORY
+  // ============================================
+  
+  app.get("/api/shops/:shopId/inventory", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const inventory = await storage.getShopInventory(shopId);
+      res.json(inventory);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch inventory" });
+    }
+  });
+
+  // ============================================
+  // MECHANICS GARAGE - DIGITAL INSPECTIONS
+  // ============================================
+  
+  app.get("/api/shops/:shopId/inspections", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const inspections = await storage.getDigitalInspections(shopId);
+      res.json(inspections);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch inspections" });
+    }
+  });
+
   // Seed vendors endpoint (for initial setup) - COMPREHENSIVE LIST
   app.post("/api/admin/seed-vendors", async (req, res) => {
     try {

@@ -718,3 +718,325 @@ export const affiliatePayouts = pgTable("affiliate_payouts", {
 export const insertAffiliatePayoutSchema = createInsertSchema(affiliatePayouts).omit({ id: true, createdAt: true });
 export type InsertAffiliatePayout = z.infer<typeof insertAffiliatePayoutSchema>;
 export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
+
+// ============================================
+// MECHANICS GARAGE - SHOP MANAGEMENT SYSTEM
+// ============================================
+
+// Repair Orders (Work Orders)
+export const repairOrders = pgTable("repair_orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  customerId: varchar("customer_id").references(() => users.id, { onDelete: "set null" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  technicianId: varchar("technician_id").references(() => users.id, { onDelete: "set null" }),
+  estimateId: varchar("estimate_id"),
+  orderNumber: text("order_number").notNull(),
+  vehicleType: text("vehicle_type").default("car"),
+  customerName: text("customer_name"),
+  customerPhone: text("customer_phone"),
+  customerEmail: text("customer_email"),
+  vehicleInfo: text("vehicle_info"),
+  vin: text("vin"),
+  mileageIn: integer("mileage_in"),
+  mileageOut: integer("mileage_out"),
+  status: text("status").default("pending"),
+  priority: text("priority").default("normal"),
+  promisedDate: timestamp("promised_date"),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  pickedUpAt: timestamp("picked_up_at"),
+  laborTotal: decimal("labor_total", { precision: 10, scale: 2 }).default("0"),
+  partsTotal: decimal("parts_total", { precision: 10, scale: 2 }).default("0"),
+  taxTotal: decimal("tax_total", { precision: 10, scale: 2 }).default("0"),
+  discountTotal: decimal("discount_total", { precision: 10, scale: 2 }).default("0"),
+  grandTotal: decimal("grand_total", { precision: 10, scale: 2 }).default("0"),
+  paymentStatus: text("payment_status").default("unpaid"),
+  paymentMethod: text("payment_method"),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  notes: text("notes"),
+  internalNotes: text("internal_notes"),
+  tags: text("tags").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_repair_order_shop").on(table.shopId),
+  index("IDX_repair_order_status").on(table.status),
+  index("IDX_repair_order_number").on(table.orderNumber),
+]);
+
+// Repair Order Line Items (Labor and Parts)
+export const repairOrderItems = pgTable("repair_order_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  repairOrderId: varchar("repair_order_id").notNull().references(() => repairOrders.id, { onDelete: "cascade" }),
+  itemType: text("item_type").notNull(),
+  description: text("description").notNull(),
+  partNumber: text("part_number"),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).default("1"),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  laborHours: decimal("labor_hours", { precision: 5, scale: 2 }),
+  laborRate: decimal("labor_rate", { precision: 10, scale: 2 }),
+  taxable: boolean("taxable").default(true),
+  discount: decimal("discount", { precision: 10, scale: 2 }).default("0"),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  status: text("status").default("pending"),
+  technicianId: varchar("technician_id").references(() => users.id, { onDelete: "set null" }),
+  completedAt: timestamp("completed_at"),
+  notes: text("notes"),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Estimates / Quotes
+export const estimates = pgTable("estimates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  customerId: varchar("customer_id").references(() => users.id, { onDelete: "set null" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  inspectionId: varchar("inspection_id"),
+  estimateNumber: text("estimate_number").notNull(),
+  vehicleType: text("vehicle_type").default("car"),
+  customerName: text("customer_name"),
+  customerPhone: text("customer_phone"),
+  customerEmail: text("customer_email"),
+  vehicleInfo: text("vehicle_info"),
+  vin: text("vin"),
+  mileage: integer("mileage"),
+  status: text("status").default("draft"),
+  validUntil: timestamp("valid_until"),
+  laborTotal: decimal("labor_total", { precision: 10, scale: 2 }).default("0"),
+  partsTotal: decimal("parts_total", { precision: 10, scale: 2 }).default("0"),
+  taxTotal: decimal("tax_total", { precision: 10, scale: 2 }).default("0"),
+  discountTotal: decimal("discount_total", { precision: 10, scale: 2 }).default("0"),
+  grandTotal: decimal("grand_total", { precision: 10, scale: 2 }).default("0"),
+  sentAt: timestamp("sent_at"),
+  viewedAt: timestamp("viewed_at"),
+  approvedAt: timestamp("approved_at"),
+  declinedAt: timestamp("declined_at"),
+  convertedToOrderId: varchar("converted_to_order_id"),
+  notes: text("notes"),
+  termsAndConditions: text("terms_and_conditions"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Estimate Line Items
+export const estimateItems = pgTable("estimate_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  estimateId: varchar("estimate_id").notNull().references(() => estimates.id, { onDelete: "cascade" }),
+  itemType: text("item_type").notNull(),
+  description: text("description").notNull(),
+  partNumber: text("part_number"),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).default("1"),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  laborHours: decimal("labor_hours", { precision: 5, scale: 2 }),
+  laborRate: decimal("labor_rate", { precision: 10, scale: 2 }),
+  taxable: boolean("taxable").default(true),
+  discount: decimal("discount", { precision: 10, scale: 2 }).default("0"),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  isApproved: boolean("is_approved").default(false),
+  isRequired: boolean("is_required").default(false),
+  urgency: text("urgency").default("normal"),
+  notes: text("notes"),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Appointments / Scheduling
+export const appointments = pgTable("appointments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  customerId: varchar("customer_id").references(() => users.id, { onDelete: "set null" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  technicianId: varchar("technician_id").references(() => users.id, { onDelete: "set null" }),
+  repairOrderId: varchar("repair_order_id"),
+  appointmentNumber: text("appointment_number"),
+  vehicleType: text("vehicle_type").default("car"),
+  customerName: text("customer_name"),
+  customerPhone: text("customer_phone"),
+  customerEmail: text("customer_email"),
+  vehicleInfo: text("vehicle_info"),
+  serviceType: text("service_type"),
+  description: text("description"),
+  scheduledStart: timestamp("scheduled_start").notNull(),
+  scheduledEnd: timestamp("scheduled_end"),
+  estimatedDuration: integer("estimated_duration"),
+  status: text("status").default("scheduled"),
+  isDropOff: boolean("is_drop_off").default(false),
+  isWaiting: boolean("is_waiting").default(false),
+  needsLoaner: boolean("needs_loaner").default(false),
+  confirmedAt: timestamp("confirmed_at"),
+  checkedInAt: timestamp("checked_in_at"),
+  noShowAt: timestamp("no_show_at"),
+  cancelledAt: timestamp("cancelled_at"),
+  cancelReason: text("cancel_reason"),
+  reminderSentAt: timestamp("reminder_sent_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_appointment_shop_date").on(table.shopId, table.scheduledStart),
+]);
+
+// Shop Parts Inventory
+export const shopInventory = pgTable("shop_inventory", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  partNumber: text("part_number").notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category"),
+  manufacturer: text("manufacturer"),
+  location: text("location"),
+  quantityOnHand: integer("quantity_on_hand").default(0),
+  quantityReserved: integer("quantity_reserved").default(0),
+  reorderLevel: integer("reorder_level").default(5),
+  reorderQuantity: integer("reorder_quantity").default(10),
+  costPrice: decimal("cost_price", { precision: 10, scale: 2 }),
+  sellPrice: decimal("sell_price", { precision: 10, scale: 2 }),
+  markup: decimal("markup", { precision: 5, scale: 2 }),
+  vendorId: varchar("vendor_id").references(() => vendors.id, { onDelete: "set null" }),
+  vendorPartNumber: text("vendor_part_number"),
+  vehicleTypes: text("vehicle_types").array(),
+  imageUrl: text("image_url"),
+  isActive: boolean("is_active").default(true),
+  lastOrderedAt: timestamp("last_ordered_at"),
+  lastReceivedAt: timestamp("last_received_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_inventory_shop_part").on(table.shopId, table.partNumber),
+]);
+
+// Technician Time Clock Entries
+export const technicianTimeEntries = pgTable("technician_time_entries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  repairOrderId: varchar("repair_order_id").references(() => repairOrders.id, { onDelete: "set null" }),
+  repairOrderItemId: varchar("repair_order_item_id").references(() => repairOrderItems.id, { onDelete: "set null" }),
+  entryType: text("entry_type").notNull(),
+  clockIn: timestamp("clock_in"),
+  clockOut: timestamp("clock_out"),
+  breakMinutes: integer("break_minutes").default(0),
+  totalHours: decimal("total_hours", { precision: 5, scale: 2 }),
+  hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }),
+  totalPay: decimal("total_pay", { precision: 10, scale: 2 }),
+  status: text("status").default("active"),
+  notes: text("notes"),
+  approvedBy: varchar("approved_by").references(() => users.id, { onDelete: "set null" }),
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Digital Vehicle Inspections (DVI)
+export const digitalInspections = pgTable("digital_inspections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  repairOrderId: varchar("repair_order_id").references(() => repairOrders.id, { onDelete: "set null" }),
+  customerId: varchar("customer_id").references(() => users.id, { onDelete: "set null" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  technicianId: varchar("technician_id").references(() => users.id, { onDelete: "set null" }),
+  inspectionNumber: text("inspection_number").notNull(),
+  vehicleType: text("vehicle_type").default("car"),
+  templateName: text("template_name"),
+  customerName: text("customer_name"),
+  vehicleInfo: text("vehicle_info"),
+  vin: text("vin"),
+  mileage: integer("mileage"),
+  status: text("status").default("in_progress"),
+  overallCondition: text("overall_condition"),
+  sentAt: timestamp("sent_at"),
+  viewedAt: timestamp("viewed_at"),
+  approvedItemsCount: integer("approved_items_count").default(0),
+  totalItemsCount: integer("total_items_count").default(0),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Inspection Items (Individual checkpoints)
+export const inspectionItems = pgTable("inspection_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  inspectionId: varchar("inspection_id").notNull().references(() => digitalInspections.id, { onDelete: "cascade" }),
+  category: text("category").notNull(),
+  itemName: text("item_name").notNull(),
+  condition: text("condition").default("good"),
+  urgency: text("urgency").default("none"),
+  measurement: text("measurement"),
+  notes: text("notes"),
+  technicianNotes: text("technician_notes"),
+  imageUrls: text("image_urls").array(),
+  videoUrl: text("video_url"),
+  recommendedService: text("recommended_service"),
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  isApproved: boolean("is_approved").default(false),
+  customerResponse: text("customer_response"),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Shop Settings
+export const shopSettings = pgTable("shop_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }).unique(),
+  defaultLaborRate: decimal("default_labor_rate", { precision: 10, scale: 2 }).default("100"),
+  defaultPartsMarkup: decimal("default_parts_markup", { precision: 5, scale: 2 }).default("40"),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).default("0"),
+  orderNumberPrefix: text("order_number_prefix").default("RO"),
+  estimateNumberPrefix: text("estimate_number_prefix").default("EST"),
+  appointmentNumberPrefix: text("appointment_number_prefix").default("APT"),
+  inspectionNumberPrefix: text("inspection_number_prefix").default("DVI"),
+  defaultPaymentTerms: text("default_payment_terms"),
+  autoSendReminders: boolean("auto_send_reminders").default(true),
+  reminderHoursBefore: integer("reminder_hours_before").default(24),
+  stripeAccountId: text("stripe_account_id"),
+  stripeEnabled: boolean("stripe_enabled").default(false),
+  vehicleTypesServed: text("vehicle_types_served").array(),
+  workingHours: jsonb("working_hours"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Schema exports for Mechanics Garage
+export const insertRepairOrderSchema = createInsertSchema(repairOrders).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertRepairOrder = z.infer<typeof insertRepairOrderSchema>;
+export type RepairOrder = typeof repairOrders.$inferSelect;
+
+export const insertRepairOrderItemSchema = createInsertSchema(repairOrderItems).omit({ id: true, createdAt: true });
+export type InsertRepairOrderItem = z.infer<typeof insertRepairOrderItemSchema>;
+export type RepairOrderItem = typeof repairOrderItems.$inferSelect;
+
+export const insertEstimateSchema = createInsertSchema(estimates).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertEstimate = z.infer<typeof insertEstimateSchema>;
+export type Estimate = typeof estimates.$inferSelect;
+
+export const insertEstimateItemSchema = createInsertSchema(estimateItems).omit({ id: true, createdAt: true });
+export type InsertEstimateItem = z.infer<typeof insertEstimateItemSchema>;
+export type EstimateItem = typeof estimateItems.$inferSelect;
+
+export const insertAppointmentSchema = createInsertSchema(appointments).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
+export type Appointment = typeof appointments.$inferSelect;
+
+export const insertShopInventorySchema = createInsertSchema(shopInventory).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertShopInventory = z.infer<typeof insertShopInventorySchema>;
+export type ShopInventory = typeof shopInventory.$inferSelect;
+
+export const insertTechnicianTimeEntrySchema = createInsertSchema(technicianTimeEntries).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertTechnicianTimeEntry = z.infer<typeof insertTechnicianTimeEntrySchema>;
+export type TechnicianTimeEntry = typeof technicianTimeEntries.$inferSelect;
+
+export const insertDigitalInspectionSchema = createInsertSchema(digitalInspections).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertDigitalInspection = z.infer<typeof insertDigitalInspectionSchema>;
+export type DigitalInspection = typeof digitalInspections.$inferSelect;
+
+export const insertInspectionItemSchema = createInsertSchema(inspectionItems).omit({ id: true, createdAt: true });
+export type InsertInspectionItem = z.infer<typeof insertInspectionItemSchema>;
+export type InspectionItem = typeof inspectionItems.$inferSelect;
+
+export const insertShopSettingsSchema = createInsertSchema(shopSettings).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertShopSettings = z.infer<typeof insertShopSettingsSchema>;
+export type ShopSettings = typeof shopSettings.$inferSelect;
