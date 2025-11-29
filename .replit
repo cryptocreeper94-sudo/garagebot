@@ -40,6 +40,10 @@ localPort = 37949
 externalPort = 3002
 
 [[ports]]
+localPort = 39557
+externalPort = 9000
+
+[[ports]]
 localPort = 39643
 externalPort = 5000
 
@@ -98,3 +102,11 @@ waitForPort = 5000
 [agent]
 mockupState = "FULLSTACK"
 integrations = ["stripe:1.0.0", "javascript_openai_ai_integrations:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+STRIPE_PRO_MONTHLY_PRICE_ID = "price_1SYxctDrf5skKAbGZf8RHaQL"
+STRIPE_PRO_ANNUAL_PRICE_ID = "price_1SYxctDrf5skKAbG13YpAuld"
+STRIPE_HALLMARK_FREE_PRICE_ID = "price_1SYxcuDrf5skKAbGDFadkYTd"
+STRIPE_HALLMARK_PRO_PRICE_ID = "price_1SYxcuDrf5skKAbGnJrAmQzP"
