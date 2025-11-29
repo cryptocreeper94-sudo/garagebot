@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { 
   Crown, Check, Zap, Shield, Bell, Search, Car, Users, 
-  MessageSquare, TrendingUp, Gift, Star, Lock, ArrowRight, Loader2
+  MessageSquare, TrendingUp, Gift, Star, Lock, ArrowRight, Loader2,
+  Sparkles, Award, Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,10 +22,16 @@ interface ProFeature {
 
 const PRO_FEATURES: ProFeature[] = [
   {
-    icon: <Search className="w-5 h-5" />,
-    title: "Priority Part Search",
-    description: "Your searches run first - no waiting in queue",
-    badge: "Fast"
+    icon: <Car className="w-5 h-5" />,
+    title: "Unlimited Vehicles",
+    description: "Save all your cars, trucks, boats, ATVs - no limits",
+    badge: "Popular"
+  },
+  {
+    icon: <Award className="w-5 h-5" />,
+    title: "Genesis Hallmark - $1.99",
+    description: "Mint your vehicle's digital passport (Free users pay $9.99)",
+    badge: "80% Off"
   },
   {
     icon: <Bell className="w-5 h-5" />,
@@ -32,15 +39,15 @@ const PRO_FEATURES: ProFeature[] = [
     description: "Get notified instantly when parts go on sale",
   },
   {
-    icon: <Car className="w-5 h-5" />,
-    title: "Unlimited Vehicles",
-    description: "Save all your vehicles - no 3-vehicle limit",
-    badge: "Popular"
+    icon: <MessageSquare className="w-5 h-5" />,
+    title: "Advanced Buddy AI",
+    description: "Proactive maintenance alerts & diagnostic insights",
+    badge: "AI"
   },
   {
-    icon: <Users className="w-5 h-5" />,
-    title: "Family Sharing",
-    description: "Share vehicles with up to 10 family members",
+    icon: <TrendingUp className="w-5 h-5" />,
+    title: "Saved DIY Progress",
+    description: "Pick up where you left off on any repair guide",
   },
   {
     icon: <Shield className="w-5 h-5" />,
@@ -48,20 +55,14 @@ const PRO_FEATURES: ProFeature[] = [
     description: "90-day recall history and alerts for saved vehicles",
   },
   {
-    icon: <TrendingUp className="w-5 h-5" />,
-    title: "Price History Charts",
-    description: "See if now is a good time to buy",
-  },
-  {
-    icon: <MessageSquare className="w-5 h-5" />,
-    title: "Priority Buddy Support",
-    description: "Ask Buddy anything - faster, smarter responses",
-    badge: "AI"
-  },
-  {
     icon: <Gift className="w-5 h-5" />,
     title: "Exclusive Deals",
     description: "Pro-only discounts from partner retailers",
+  },
+  {
+    icon: <Users className="w-5 h-5" />,
+    title: "Family Sharing",
+    description: "Share vehicles with up to 10 family members",
   },
 ];
 
@@ -71,8 +72,8 @@ export default function ProSubscription() {
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
 
-  const monthlyPrice = 2.99;
-  const annualPrice = 24.99;
+  const monthlyPrice = 4.99;
+  const annualPrice = 39.99;
   const annualSavings = Math.round((monthlyPrice * 12 - annualPrice) / (monthlyPrice * 12) * 100);
 
   const { data: subscription } = useQuery({
@@ -121,9 +122,42 @@ export default function ProSubscription() {
   };
 
   const isPro = subscription?.status === 'active';
+  const isFounder = subscription?.isFounder === true;
 
   return (
     <div className="space-y-8">
+      {/* Founders Circle Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-2xl mx-auto"
+      >
+        <Card className="p-4 bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-yellow-500/30">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-yellow-500" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-tech text-yellow-500 uppercase text-sm">Founders Circle</span>
+                  <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[10px]">
+                    Launch Edition
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Lock in $4.99/mo forever. Price goes to $9.99 after V2 launch.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock className="w-4 h-4" />
+              Limited time offer
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+
       {/* Header */}
       <div className="text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 mb-4">
@@ -131,10 +165,10 @@ export default function ProSubscription() {
           <span className="font-tech text-sm uppercase text-yellow-500">GarageBot Pro</span>
         </div>
         <h1 className="text-3xl md:text-4xl font-tech font-bold uppercase mb-3">
-          Upgrade to <span className="text-gradient">Pro</span>
+          Join the <span className="text-gradient">Founders Circle</span>
         </h1>
         <p className="text-muted-foreground max-w-lg mx-auto">
-          Get priority access, unlimited vehicles, and exclusive deals for less than a coffee per month.
+          Early supporters get locked-in pricing forever. Unlimited vehicles, Genesis Hallmarks at 80% off, and exclusive features.
         </p>
       </div>
 
@@ -179,9 +213,16 @@ export default function ProSubscription() {
             
             {isAnnual && (
               <p className="text-sm text-muted-foreground mt-2">
-                Just ${(annualPrice / 12).toFixed(2)}/month
+                Just ${(annualPrice / 12).toFixed(2)}/month - locked in forever
               </p>
             )}
+
+            <div className="mt-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <p className="text-xs text-yellow-400">
+                <Sparkles className="w-3 h-3 inline mr-1" />
+                Founders Circle members keep this rate even when V2 launches at $9.99/mo
+              </p>
+            </div>
 
             <Button
               onClick={handleSubscribe}
@@ -192,9 +233,9 @@ export default function ProSubscription() {
               {subscribeMutation.isPending ? (
                 <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...</>
               ) : isPro ? (
-                <><Check className="w-5 h-5 mr-2" /> Already Pro</>
+                <><Check className="w-5 h-5 mr-2" /> {isFounder ? 'Founders Circle Member' : 'Already Pro'}</>
               ) : (
-                <><Zap className="w-5 h-5 mr-2" /> Subscribe Now</>
+                <><Zap className="w-5 h-5 mr-2" /> Join Founders Circle</>
               )}
             </Button>
 
@@ -257,19 +298,39 @@ export default function ProSubscription() {
             </thead>
             <tbody>
               <tr className="border-b border-border/20">
-                <td className="py-2">Saved Vehicles</td>
-                <td className="text-center">3</td>
-                <td className="text-center text-primary">Unlimited</td>
+                <td className="py-2">Parts Search & Comparison</td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
               </tr>
               <tr className="border-b border-border/20">
-                <td className="py-2">Part Search</td>
-                <td className="text-center">Standard</td>
-                <td className="text-center text-primary">Priority</td>
+                <td className="py-2">Deals & Checkout</td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
               </tr>
               <tr className="border-b border-border/20">
-                <td className="py-2">Family Sharing</td>
-                <td className="text-center">1 person</td>
-                <td className="text-center text-primary">10 people</td>
+                <td className="py-2">DIY Guides + YouTube</td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
+              </tr>
+              <tr className="border-b border-border/20">
+                <td className="py-2">Basic Buddy Chat</td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
+              </tr>
+              <tr className="border-b border-border/20 bg-primary/5">
+                <td className="py-2 font-medium">Saved Vehicles</td>
+                <td className="text-center">1</td>
+                <td className="text-center text-primary font-bold">Unlimited</td>
+              </tr>
+              <tr className="border-b border-border/20 bg-yellow-500/5">
+                <td className="py-2 font-medium">Genesis Hallmark</td>
+                <td className="text-center">$9.99/vehicle</td>
+                <td className="text-center text-yellow-500 font-bold">$1.99/vehicle</td>
+              </tr>
+              <tr className="border-b border-border/20">
+                <td className="py-2">Saved DIY Progress</td>
+                <td className="text-center"><Lock className="w-4 h-4 mx-auto text-muted-foreground" /></td>
+                <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
               </tr>
               <tr className="border-b border-border/20">
                 <td className="py-2">Price Alerts</td>
@@ -277,7 +338,7 @@ export default function ProSubscription() {
                 <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
               </tr>
               <tr className="border-b border-border/20">
-                <td className="py-2">Price History</td>
+                <td className="py-2">Advanced Buddy AI</td>
                 <td className="text-center"><Lock className="w-4 h-4 mx-auto text-muted-foreground" /></td>
                 <td className="text-center"><Check className="w-4 h-4 mx-auto text-green-400" /></td>
               </tr>
@@ -297,7 +358,7 @@ export default function ProSubscription() {
           {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
         </div>
         <p className="text-sm text-muted-foreground">
-          Trusted by 1,000+ automotive enthusiasts
+          Join the Founders Circle - be part of GarageBot's story
         </p>
       </div>
 
@@ -306,16 +367,20 @@ export default function ProSubscription() {
         <h4 className="font-tech uppercase text-primary mb-4">Common Questions</h4>
         <div className="space-y-4 text-sm">
           <div>
+            <p className="font-medium">What happens when V2 launches?</p>
+            <p className="text-muted-foreground mt-1">Founders Circle members keep their $4.99/mo rate forever, even when the price goes to $9.99.</p>
+          </div>
+          <div>
             <p className="font-medium">Can I cancel anytime?</p>
             <p className="text-muted-foreground mt-1">Yes! Cancel with one click in your account settings. No questions asked.</p>
           </div>
           <div>
-            <p className="font-medium">Do I keep my saved vehicles if I cancel?</p>
-            <p className="text-muted-foreground mt-1">Yes, you keep all your data. You just lose access to Pro features.</p>
+            <p className="font-medium">What's a Genesis Hallmark?</p>
+            <p className="text-muted-foreground mt-1">A digital passport for your vehicle that stores its complete history - VIN, service records, mods, and more.</p>
           </div>
           <div>
-            <p className="font-medium">Is there a free trial?</p>
-            <p className="text-muted-foreground mt-1">The free tier gives you a great GarageBot experience. Pro is for power users who want more.</p>
+            <p className="font-medium">Is free good enough?</p>
+            <p className="text-muted-foreground mt-1">Absolutely! Free gives you full parts search, comparison, DIY guides, and more. Pro is for power users who want the extras.</p>
           </div>
         </div>
       </Card>
