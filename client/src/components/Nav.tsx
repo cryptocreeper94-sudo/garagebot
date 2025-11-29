@@ -1,19 +1,39 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
 import { CartButton, MobileCartButton } from "@/components/CartDrawer";
 import { useCart } from "@/hooks/useCart";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
+
+interface Subscription {
+  status: 'active' | 'inactive' | 'canceled';
+  tier?: string;
+  isFounder?: boolean;
+}
 
 export default function Nav() {
   const [location] = useLocation();
   const isHome = location === "/";
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, isLoading, logout } = useAuth();
+
+  const { data: subscription } = useQuery<Subscription | null>({
+    queryKey: ['subscription'],
+    queryFn: async () => {
+      const res = await fetch('/api/subscription/status');
+      if (!res.ok) return null;
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  const isPro = subscription?.status === 'active';
+  const isFounder = subscription?.isFounder === true || (user as any)?.isFounder === true;
 
   return (
     <nav className="w-full h-16 border-b border-border/40 bg-background/80 backdrop-blur-md fixed top-0 z-50">
@@ -56,12 +76,23 @@ export default function Nav() {
           <Link href="/insurance">
             <span className={`text-[11px] lg:text-xs xl:text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${location === '/insurance' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} data-testid="nav-insurance">Insurance</span>
           </Link>
-          <Link href="/pro">
-            <Button size="sm" className="bg-gradient-to-r from-primary to-yellow-500 text-black hover:from-primary/90 hover:to-yellow-500/90 font-tech uppercase gap-1 h-6 lg:h-7 text-[10px] lg:text-xs px-2 lg:px-3">
-              <Crown className="w-3 h-3" />
-              Pro
-            </Button>
-          </Link>
+          
+          {isPro ? (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30">
+              <Crown className="w-3 h-3 text-yellow-500" />
+              <span className="text-[10px] lg:text-xs font-tech uppercase text-yellow-500">
+                {isFounder ? 'Founder' : 'Pro'}
+              </span>
+              {isFounder && <Sparkles className="w-3 h-3 text-yellow-400" />}
+            </div>
+          ) : (
+            <Link href="/pro">
+              <Button size="sm" className="bg-gradient-to-r from-primary to-yellow-500 text-black hover:from-primary/90 hover:to-yellow-500/90 font-tech uppercase gap-1 h-6 lg:h-7 text-[10px] lg:text-xs px-2 lg:px-3">
+                <Crown className="w-3 h-3" />
+                Pro
+              </Button>
+            </Link>
+          )}
         </div>
 
         <div className="flex items-center gap-2 lg:gap-3">
@@ -122,8 +153,15 @@ export default function Nav() {
                         <User className="w-5 h-5 text-primary" />
                       </div>
                     )}
-                    <div>
-                      <p className="font-medium text-foreground">{user.firstName || 'User'}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-foreground">{user.firstName || 'User'}</p>
+                        {isPro && (
+                          <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-tech">
+                            {isFounder ? 'FOUNDER' : 'PRO'}
+                          </Badge>
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
@@ -172,15 +210,25 @@ export default function Nav() {
                     </span>
                   </Link>
                   
-                  {/* Pro Upgrade Button */}
-                  <Link href="/pro" onClick={() => setIsOpen(false)}>
-                    <div className="py-3 px-4 mt-2 rounded-lg bg-gradient-to-r from-primary/20 to-yellow-500/20 border border-primary/30 flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-lg font-medium">
-                        <Crown className="w-5 h-5 text-yellow-500" /> Upgrade to Pro
+                  {/* Pro Upgrade Button or Founders Circle Badge */}
+                  {isPro ? (
+                    <div className="py-3 px-4 mt-2 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 flex items-center justify-center gap-2">
+                      <Crown className="w-5 h-5 text-yellow-500" />
+                      <span className="text-lg font-tech uppercase text-yellow-500">
+                        {isFounder ? 'Founders Circle' : 'Pro Member'}
                       </span>
-                      <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30 text-[9px] font-mono">$2.99/mo</Badge>
+                      {isFounder && <Sparkles className="w-4 h-4 text-yellow-400" />}
                     </div>
-                  </Link>
+                  ) : (
+                    <Link href="/pro" onClick={() => setIsOpen(false)}>
+                      <div className="py-3 px-4 mt-2 rounded-lg bg-gradient-to-r from-primary/20 to-yellow-500/20 border border-primary/30 flex items-center justify-between">
+                        <span className="flex items-center gap-2 text-lg font-medium">
+                          <Crown className="w-5 h-5 text-yellow-500" /> Join Founders Circle
+                        </span>
+                        <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30 text-[9px] font-mono">$4.99/mo</Badge>
+                      </div>
+                    </Link>
+                  )}
                   
                   <div className="pt-4 flex flex-col gap-3">
                     <MobileCartButton />

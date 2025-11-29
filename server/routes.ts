@@ -2587,6 +2587,7 @@ export async function registerRoutes(
         tier: user?.subscriptionTier || 'free',
         status: isPro ? 'active' : 'inactive',
         expiresAt: user?.subscriptionExpiresAt || null,
+        isFounder: user?.isFounder || false,
       });
     } catch (error) {
       console.error("Subscription status error:", error);

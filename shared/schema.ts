@@ -39,6 +39,7 @@ export const users = pgTable("users", {
   smsRemindersEnabled: boolean("sms_reminders_enabled").default(false),
   subscriptionTier: text("subscription_tier").default("free"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  isFounder: boolean("is_founder").default(false),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   role: text("role").default("user"),
