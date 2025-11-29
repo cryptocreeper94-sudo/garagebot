@@ -3,7 +3,8 @@ import { useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
 import { 
   Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink,
-  ScanLine, Camera, Mic, Wrench, Car, Sparkles, MessageCircle, Bot, TrendingUp, Terminal
+  ScanLine, Camera, Mic, Wrench, Car, Sparkles, MessageCircle, Bot, TrendingUp, Terminal,
+  BookOpen, PlayCircle, CheckCircle2, Images
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
@@ -172,18 +173,74 @@ export default function Home() {
                 <Car className="w-4 h-4 text-green-400" />
                 <span className="text-xs md:text-sm font-medium text-foreground">All Vehicle Types</span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm">
-                <Sparkles className="w-4 h-4 text-yellow-400" />
-                <span className="text-xs md:text-sm font-medium text-foreground">Genesis NFT</span>
-              </div>
+            </motion.div>
+            
+            {/* DIY Repair Guides - Hero Feature Callout */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mt-8"
+            >
+              <Link href="/diy-guides" data-testid="link-diy-guides">
+                <div className="relative mx-auto max-w-2xl group cursor-pointer" data-testid="card-diy-guides-hero">
+                  {/* Glowing border effect */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-green-400 to-primary rounded-xl opacity-50 group-hover:opacity-100 blur transition-all duration-500 animate-pulse" />
+                  
+                  <div className="relative bg-black/80 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-primary/30">
+                    <div className="flex items-center justify-center gap-3 mb-3">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-primary to-green-400 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.5)]">
+                        <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-black" />
+                      </div>
+                      <div className="text-left">
+                        <h3 className="text-lg md:text-xl font-tech font-bold text-foreground uppercase tracking-wide">
+                          DIY Repair Guides
+                        </h3>
+                        <p className="text-xs md:text-sm text-primary font-medium">Better Than Video Tutorials</p>
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm md:text-base text-muted-foreground text-center mb-4">
+                      Step-by-step slideshows for YOUR exact vehicle. No more pausing and rewinding YouTube videos!
+                    </p>
+                    
+                    <div className="flex flex-wrap justify-center gap-2 md:gap-4 text-xs">
+                      <div className="flex items-center gap-1 text-green-400">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Go At Your Pace</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-green-400">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Vehicle-Specific</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-green-400">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Plain English</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-green-400">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Parts Links Included</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 flex justify-center">
+                      <Button className="bg-gradient-to-r from-primary to-green-500 hover:from-primary/90 hover:to-green-500/90 text-black font-tech uppercase text-xs md:text-sm gap-2 shadow-[0_0_15px_rgba(6,182,212,0.4)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] transition-all" data-testid="button-explore-guides">
+                        <Images className="w-4 h-4" />
+                        Explore Guides
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Link>
             </motion.div>
             
             {/* Trusted Retailers Ticker */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.45 }}
-              className="mt-6 overflow-hidden"
+              transition={{ delay: 0.5 }}
+              className="mt-8 overflow-hidden"
             >
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-2">Trusted Retail Partners</p>
               <div className="relative">
