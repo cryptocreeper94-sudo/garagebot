@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { 
   Hexagon, Shield, Award, CheckCircle, Car, Calendar, FileText,
-  Hash, MapPin, Wrench, Clock, Loader2, ArrowRight, Copy, Check
+  Hash, MapPin, Wrench, Clock, Loader2, ArrowRight, Copy, Check,
+  Crown, Sparkles
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "wouter";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
 
 interface Hallmark {
@@ -44,6 +46,17 @@ interface Vehicle {
   vin?: string;
 }
 
+interface Subscription {
+  status: 'active' | 'inactive' | 'canceled';
+  tier?: string;
+  isFounder?: boolean;
+}
+
+const HALLMARK_PRICING = {
+  free: 9.99,
+  pro: 1.99,
+};
+
 export default function GenesisHallmark() {
   const [selectedVehicle, setSelectedVehicle] = useState("");
   const [copiedAsset, setCopiedAsset] = useState<number | null>(null);
@@ -55,6 +68,16 @@ export default function GenesisHallmark() {
     queryFn: async () => {
       const res = await fetch('/api/vehicles');
       if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  const { data: subscription } = useQuery<Subscription | null>({
+    queryKey: ['subscription'],
+    queryFn: async () => {
+      const res = await fetch('/api/subscription/status');
+      if (!res.ok) return null;
       return res.json();
     },
     enabled: isAuthenticated,
@@ -110,7 +133,10 @@ export default function GenesisHallmark() {
     setTimeout(() => setCopiedAsset(null), 2000);
   };
 
-  const MINT_PRICE = 2.00;
+  const isPro = subscription?.status === 'active';
+  const currentPrice = isPro ? HALLMARK_PRICING.pro : HALLMARK_PRICING.free;
+  const savings = HALLMARK_PRICING.free - HALLMARK_PRICING.pro;
+  const savingsPercent = Math.round((savings / HALLMARK_PRICING.free) * 100);
 
   return (
     <div className="min-h-screen text-foreground font-sans relative">
@@ -182,6 +208,7 @@ export default function GenesisHallmark() {
                         <button 
                           onClick={() => copyAssetNumber(hallmark.assetNumber)}
                           className="text-muted-foreground hover:text-primary"
+                          data-testid="button-copy-asset"
                         >
                           {copiedAsset === hallmark.assetNumber ? (
                             <Check className="w-4 h-4 text-green-400" />
@@ -210,12 +237,12 @@ export default function GenesisHallmark() {
                   <div>
                     <Label>Select Vehicle</Label>
                     <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-                      <SelectTrigger className="mt-2">
+                      <SelectTrigger className="mt-2" data-testid="select-vehicle">
                         <SelectValue placeholder="Choose a vehicle to certify" />
                       </SelectTrigger>
                       <SelectContent>
                         {vehicles.map((v) => (
-                          <SelectItem key={v.id} value={v.id}>
+                          <SelectItem key={v.id} value={v.id} data-testid={`option-vehicle-${v.id}`}>
                             {v.year} {v.make} {v.model}
                           </SelectItem>
                         ))}
@@ -223,25 +250,72 @@ export default function GenesisHallmark() {
                     </Select>
                   </div>
 
-                  <div className="p-4 bg-muted/30 rounded-lg space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Hallmark Price</span>
-                      <span className="font-bold text-lg">${MINT_PRICE.toFixed(2)}</span>
+                  {/* Pricing Section with Pro/Free differentiation */}
+                  <div className="space-y-3">
+                    <div className={`p-4 rounded-lg space-y-2 ${isPro ? 'bg-yellow-500/10 border border-yellow-500/30' : 'bg-muted/30'}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">Hallmark Price</span>
+                          {isPro && (
+                            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[10px]">
+                              <Crown className="w-3 h-3 mr-1" /> Pro Rate
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          {isPro && (
+                            <span className="text-sm text-muted-foreground line-through">${HALLMARK_PRICING.free.toFixed(2)}</span>
+                          )}
+                          <span className={`font-bold text-lg ${isPro ? 'text-yellow-400' : ''}`}>
+                            ${currentPrice.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                      {isPro && (
+                        <p className="text-[11px] text-yellow-400 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" />
+                          You're saving ${savings.toFixed(2)} ({savingsPercent}% off) as a Pro member!
+                        </p>
+                      )}
+                      <p className="text-[10px] text-muted-foreground">
+                        One-time payment. Valid for vehicle lifetime.
+                      </p>
                     </div>
-                    <p className="text-[10px] text-muted-foreground">
-                      One-time payment. Valid for vehicle lifetime.
-                    </p>
+
+                    {/* Upgrade prompt for free users */}
+                    {!isPro && isAuthenticated && (
+                      <Link href="/pro">
+                        <Card className="p-3 bg-gradient-to-r from-yellow-500/5 to-amber-500/5 border-yellow-500/20 hover:border-yellow-500/40 transition-colors cursor-pointer">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Crown className="w-4 h-4 text-yellow-500" />
+                              <div>
+                                <p className="text-sm font-medium">Save {savingsPercent}% with Pro</p>
+                                <p className="text-[10px] text-muted-foreground">
+                                  Hallmarks just ${HALLMARK_PRICING.pro.toFixed(2)} for Pro members
+                                </p>
+                              </div>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-yellow-500" />
+                          </div>
+                        </Card>
+                      </Link>
+                    )}
                   </div>
 
                   <Button
                     onClick={() => mintMutation.mutate(selectedVehicle)}
                     disabled={!selectedVehicle || mintMutation.isPending || !isAuthenticated}
-                    className="w-full h-12 font-tech uppercase bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-500/90 hover:to-pink-500/90 text-white"
+                    className={`w-full h-12 font-tech uppercase ${isPro 
+                      ? 'bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-500/90 hover:to-amber-500/90 text-black' 
+                      : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-500/90 hover:to-pink-500/90 text-white'
+                    }`}
+                    data-testid="button-mint-hallmark"
                   >
                     {mintMutation.isPending ? (
                       <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Minting...</>
                     ) : (
-                      <><Award className="w-5 h-5 mr-2" /> Mint Hallmark - ${MINT_PRICE}</>
+                      <><Award className="w-5 h-5 mr-2" /> Mint Hallmark - ${currentPrice.toFixed(2)}</>
                     )}
                   </Button>
 
@@ -298,6 +372,7 @@ export default function GenesisHallmark() {
                     <div 
                       key={h.id}
                       className="p-4 hover:bg-muted/20 transition-colors"
+                      data-testid={`hallmark-entry-${h.assetNumber}`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 font-mono">
@@ -330,12 +405,14 @@ export default function GenesisHallmark() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3 mt-6">
               <Card className="p-4 text-center bg-card border-border/40">
-                <p className="text-2xl font-bold text-primary">{allHallmarks.length || 0}</p>
+                <p className="text-2xl font-bold text-primary" data-testid="text-total-minted">{allHallmarks.length || 0}</p>
                 <p className="text-xs text-muted-foreground">Total Minted</p>
               </Card>
               <Card className="p-4 text-center bg-card border-border/40">
-                <p className="text-2xl font-bold text-green-400">$2</p>
-                <p className="text-xs text-muted-foreground">Per Hallmark</p>
+                <div className="flex flex-col">
+                  <p className="text-2xl font-bold text-green-400">${HALLMARK_PRICING.pro}</p>
+                  <p className="text-xs text-muted-foreground">Pro Price</p>
+                </div>
               </Card>
               <Card className="p-4 text-center bg-card border-border/40">
                 <p className="text-2xl font-bold text-purple-400">∞</p>
@@ -343,13 +420,37 @@ export default function GenesisHallmark() {
               </Card>
             </div>
 
+            {/* Pricing Comparison */}
+            <Card className="mt-6 p-4 bg-gradient-to-r from-yellow-500/5 to-amber-500/5 border-yellow-500/20">
+              <h3 className="font-tech uppercase text-sm text-yellow-500 mb-3 flex items-center gap-2">
+                <Crown className="w-4 h-4" /> Hallmark Pricing
+              </h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Free users</span>
+                  <span className="font-medium">${HALLMARK_PRICING.free.toFixed(2)}/vehicle</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-yellow-500 font-medium flex items-center gap-1">
+                    <Crown className="w-3 h-3" /> Pro members
+                  </span>
+                  <span className="font-bold text-yellow-400">${HALLMARK_PRICING.pro.toFixed(2)}/vehicle</span>
+                </div>
+                <div className="pt-2 mt-2 border-t border-yellow-500/20">
+                  <p className="text-xs text-muted-foreground text-center">
+                    Pro members save <span className="text-yellow-400 font-medium">${savings.toFixed(2)}</span> ({savingsPercent}% off) per vehicle
+                  </p>
+                </div>
+              </div>
+            </Card>
+
             {/* How it Works */}
             <Card className="mt-6 p-6 bg-muted/20 border-border/40">
               <h3 className="font-tech uppercase text-sm text-muted-foreground mb-4">How It Works</h3>
               <div className="space-y-4">
                 {[
                   { step: 1, text: "Add your vehicle to My Garage" },
-                  { step: 2, text: "Select vehicle and pay $2 minting fee" },
+                  { step: 2, text: `Select vehicle and pay minting fee` },
                   { step: 3, text: "Receive unique asset number (GB-XXXXXX)" },
                   { step: 4, text: "Share hallmark when selling to prove history" },
                 ].map(({ step, text }) => (
