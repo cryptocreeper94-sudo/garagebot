@@ -533,6 +533,37 @@ export const insertDevTaskSchema = createInsertSchema(devTasks).omit({ id: true,
 export type InsertDevTask = z.infer<typeof insertDevTaskSchema>;
 export type DevTask = typeof devTasks.$inferSelect;
 
+// Integration Credentials Vault - Secure storage for OAuth/API keys
+export const integrationCredentials = pgTable("integration_credentials", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  integrationKey: text("integration_key").notNull().unique(), // e.g., "quickbooks", "ukg_pro", "partstech"
+  displayName: text("display_name").notNull(),
+  category: text("category").notNull(), // "accounting", "payroll", "parts", "communication", etc.
+  clientId: text("client_id"),
+  clientSecretEncrypted: text("client_secret_encrypted"), // Server-side encrypted
+  apiKeyEncrypted: text("api_key_encrypted"), // Server-side encrypted
+  refreshTokenEncrypted: text("refresh_token_encrypted"),
+  accessToken: text("access_token"), // Short-lived, can store temporarily
+  tokenExpiresAt: timestamp("token_expires_at"),
+  webhookSecret: text("webhook_secret"),
+  additionalConfig: jsonb("additional_config"), // For extra settings like scopes, endpoints
+  status: text("status").default("pending"), // "pending", "configured", "active", "error", "expired"
+  lastValidatedAt: timestamp("last_validated_at"),
+  lastError: text("last_error"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertIntegrationCredentialSchema = createInsertSchema(integrationCredentials).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true,
+  lastValidatedAt: true,
+  lastError: true
+});
+export type InsertIntegrationCredential = z.infer<typeof insertIntegrationCredentialSchema>;
+export type IntegrationCredential = typeof integrationCredentials.$inferSelect;
+
 // Family/Trust sharing for vehicles
 export const vehicleShares = pgTable("vehicle_shares", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

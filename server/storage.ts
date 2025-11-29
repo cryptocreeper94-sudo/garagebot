@@ -6,7 +6,7 @@ import {
   userPreferences, auditLog, vehicleRecalls, scanHistory, devTasks, vehicleShares,
   affiliateNetworks, affiliatePartners, affiliateClicks, affiliateCommissions, affiliatePayouts,
   repairOrders, repairOrderItems, estimates, estimateItems, appointments, shopInventory,
-  technicianTimeEntries, digitalInspections, inspectionItems, shopSettings
+  technicianTimeEntries, digitalInspections, inspectionItems, shopSettings, integrationCredentials
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -22,7 +22,8 @@ import type {
   AffiliateClick, InsertAffiliateClick, AffiliateCommission, InsertAffiliateCommission,
   AffiliatePayout, InsertAffiliatePayout,
   RepairOrder, InsertRepairOrder, Estimate, InsertEstimate, Appointment, InsertAppointment,
-  ShopInventory, InsertShopInventory, DigitalInspection, InsertDigitalInspection
+  ShopInventory, InsertShopInventory, DigitalInspection, InsertDigitalInspection,
+  IntegrationCredential, InsertIntegrationCredential
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte } from "drizzle-orm";
 
@@ -158,6 +159,13 @@ export interface IStorage {
   createDevTask(task: InsertDevTask): Promise<DevTask>;
   updateDevTask(id: string, updates: Partial<DevTask>): Promise<DevTask | undefined>;
   deleteDevTask(id: string): Promise<boolean>;
+
+  // Integration Credentials Vault
+  getIntegrationCredentials(): Promise<IntegrationCredential[]>;
+  getIntegrationCredential(integrationKey: string): Promise<IntegrationCredential | undefined>;
+  upsertIntegrationCredential(credential: InsertIntegrationCredential): Promise<IntegrationCredential>;
+  updateIntegrationCredential(integrationKey: string, updates: Partial<IntegrationCredential>): Promise<IntegrationCredential | undefined>;
+  deleteIntegrationCredential(integrationKey: string): Promise<boolean>;
 
   // Vehicle Sharing (Family Garage)
   getVehicleSharesByOwner(ownerId: string): Promise<VehicleShare[]>;
@@ -741,6 +749,42 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDevTask(id: string): Promise<boolean> {
     const result = await db.delete(devTasks).where(eq(devTasks.id, id));
+    return true;
+  }
+
+  // Integration Credentials Vault
+  async getIntegrationCredentials(): Promise<IntegrationCredential[]> {
+    return await db.select().from(integrationCredentials).orderBy(asc(integrationCredentials.category), asc(integrationCredentials.integrationKey));
+  }
+
+  async getIntegrationCredential(integrationKey: string): Promise<IntegrationCredential | undefined> {
+    const [credential] = await db.select().from(integrationCredentials).where(eq(integrationCredentials.integrationKey, integrationKey));
+    return credential;
+  }
+
+  async upsertIntegrationCredential(credential: InsertIntegrationCredential): Promise<IntegrationCredential> {
+    const existing = await this.getIntegrationCredential(credential.integrationKey);
+    if (existing) {
+      const [updated] = await db.update(integrationCredentials)
+        .set({ ...credential, updatedAt: new Date() })
+        .where(eq(integrationCredentials.integrationKey, credential.integrationKey))
+        .returning();
+      return updated;
+    }
+    const [newCred] = await db.insert(integrationCredentials).values(credential).returning();
+    return newCred;
+  }
+
+  async updateIntegrationCredential(integrationKey: string, updates: Partial<IntegrationCredential>): Promise<IntegrationCredential | undefined> {
+    const [credential] = await db.update(integrationCredentials)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(integrationCredentials.integrationKey, integrationKey))
+      .returning();
+    return credential;
+  }
+
+  async deleteIntegrationCredential(integrationKey: string): Promise<boolean> {
+    await db.delete(integrationCredentials).where(eq(integrationCredentials.integrationKey, integrationKey));
     return true;
   }
 
