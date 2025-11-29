@@ -72,11 +72,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen text-foreground font-sans selection:bg-primary selection:text-black overflow-x-hidden relative">
-      {/* Global Watermark Background */}
-      <div 
-        className="fixed inset-0 z-[-1] bg-cover bg-center opacity-30 pointer-events-none"
-        style={{ backgroundImage: `url(${bgImage})` }}
-      />
+      {/* Fixed GB Watermark Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03]">
+          <span className="text-[40vw] font-tech font-black tracking-tighter select-none text-primary">
+            GB
+          </span>
+        </div>
+      </div>
       
       <Nav />
       <MarketTicker />
@@ -85,41 +89,115 @@ export default function Home() {
       <BuddyHideSeek />
       
       {/* Main Content */}
-      <div className="pt-28 min-h-screen pb-8">
+      <div className="pt-20 min-h-screen pb-8">
         
-        {/* Hero Section - Full Width */}
-        <div className="w-full px-4 lg:px-8 xl:px-16 mb-6">
+        {/* Hero Section - Full Width with Premium Feel */}
+        <div className="w-full px-4 lg:px-8 xl:px-16 mb-4">
+          {/* Hero Container with Gradient Border */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-4"
+            className="relative text-center py-6 md:py-8 lg:py-10"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-[10px] font-mono tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--color-primary)]" />
-              SYSTEM ONLINE // WEB3 VERIFIED
-            </div>
+            {/* Animated glow lines */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 md:w-64 lg:w-96 h-px bg-gradient-to-r from-transparent via-primary to-transparent animate-pulse" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 md:w-48 lg:w-64 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
             
-            {/* GarageBot Logo with Welcome Text */}
+            {/* Status Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] md:text-xs font-mono tracking-wider mb-4 shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+            >
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_12px_var(--color-primary)]" />
+              SYSTEM ONLINE // 40+ RETAILERS CONNECTED
+            </motion.div>
+            
+            {/* GarageBot Logo */}
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="mt-2"
+              transition={{ delay: 0.15, type: "spring", stiffness: 200 }}
+              className="relative"
             >
               <img 
                 src={gbEmblem} 
                 alt="GarageBot Emblem" 
-                className="w-28 h-28 md:w-36 md:h-36 lg:w-44 lg:h-44 xl:w-52 xl:h-52 mx-auto drop-shadow-[0_0_40px_rgba(6,182,212,0.6)] hover:drop-shadow-[0_0_60px_rgba(6,182,212,0.8)] transition-all duration-500 hover:scale-105"
+                className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 mx-auto drop-shadow-[0_0_50px_rgba(6,182,212,0.7)] hover:drop-shadow-[0_0_70px_rgba(6,182,212,0.9)] transition-all duration-500 hover:scale-110"
                 data-testid="img-garagebot-logo"
               />
+              {/* Orbital ring effect */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 border border-primary/20 rounded-full animate-[spin_20s_linear_infinite]" />
+              </div>
             </motion.div>
             
-            <h1 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-tech font-medium uppercase tracking-widest text-muted-foreground -mt-4 lg:-mt-6">
-              Welcome to <span className="text-primary">G</span>arage<span className="text-primary">B</span>ot<span className="text-foreground">.io</span>
-            </h1>
-            <p className="text-sm md:text-base lg:text-lg font-light text-muted-foreground/70 mt-1">
-              Right Part. First Time. Every Engine.
-            </p>
+            {/* Main Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="mt-4"
+            >
+              <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-tech font-bold uppercase tracking-wide">
+                <span className="text-muted-foreground">Welcome to </span>
+                <span className="text-primary drop-shadow-[0_0_20px_rgba(6,182,212,0.8)]">G</span>
+                <span className="text-foreground">arage</span>
+                <span className="text-primary drop-shadow-[0_0_20px_rgba(6,182,212,0.8)]">B</span>
+                <span className="text-foreground">ot</span>
+                <span className="text-primary/80">.io</span>
+              </h1>
+              <p className="text-base md:text-lg lg:text-xl font-light text-muted-foreground/80 mt-2 tracking-wide">
+                Right Part. First Time. <span className="text-primary">Every Engine.</span>
+              </p>
+            </motion.div>
+            
+            {/* Stats Badges Row */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="flex flex-wrap justify-center gap-3 md:gap-4 mt-6"
+            >
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm">
+                <Database className="w-4 h-4 text-primary" />
+                <span className="text-xs md:text-sm font-medium text-foreground">40+ Retailers</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm">
+                <Cpu className="w-4 h-4 text-secondary" />
+                <span className="text-xs md:text-sm font-medium text-foreground">AI-Powered</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm">
+                <Car className="w-4 h-4 text-green-400" />
+                <span className="text-xs md:text-sm font-medium text-foreground">All Vehicle Types</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+                <span className="text-xs md:text-sm font-medium text-foreground">Genesis NFT</span>
+              </div>
+            </motion.div>
+            
+            {/* Trusted Retailers Ticker */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.45 }}
+              className="mt-6 overflow-hidden"
+            >
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-2">Trusted Retail Partners</p>
+              <div className="relative">
+                <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent z-10" />
+                <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10" />
+                <div className="flex animate-[scroll_30s_linear_infinite] whitespace-nowrap">
+                  {["AutoZone", "O'Reilly", "RockAuto", "Advance Auto", "NAPA", "Summit Racing", "JEGS", "Amazon", "eBay Motors", "CarParts.com", "AutoZone", "O'Reilly", "RockAuto", "Advance Auto", "NAPA", "Summit Racing"].map((name, i) => (
+                    <span key={i} className="mx-4 md:mx-6 text-xs md:text-sm text-muted-foreground/60 font-medium">
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
 
