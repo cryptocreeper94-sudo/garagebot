@@ -3480,6 +3480,516 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // DIY REPAIR GUIDES API ROUTES
+  // ============================================
+  
+  // Get all vehicle categories
+  app.get("/api/diy-guides/categories", async (req, res) => {
+    try {
+      const categories = await storage.getVehicleCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching vehicle categories:", error);
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+  
+  // Get all repair guides with optional filters
+  app.get("/api/diy-guides", async (req, res) => {
+    try {
+      const { category, difficulty, vehicleCategory, systemType, search } = req.query;
+      const guides = await storage.getRepairGuides({
+        category: category as string,
+        difficulty: difficulty as string,
+        vehicleCategorySlug: vehicleCategory as string,
+        systemType: systemType as string,
+        search: search as string,
+      });
+      res.json(guides);
+    } catch (error) {
+      console.error("Error fetching repair guides:", error);
+      res.status(500).json({ error: "Failed to fetch guides" });
+    }
+  });
+  
+  // Get single repair guide by slug
+  app.get("/api/diy-guides/:slug", async (req, res) => {
+    try {
+      const guide = await storage.getRepairGuideBySlug(req.params.slug);
+      if (!guide) {
+        return res.status(404).json({ error: "Guide not found" });
+      }
+      
+      // Increment view count
+      await storage.incrementGuideViewCount(guide.id);
+      
+      // Get steps
+      const steps = await storage.getGuideSteps(guide.id);
+      
+      // Get fitment info
+      const fitment = await storage.getGuideFitment(guide.id);
+      
+      res.json({ ...guide, steps, fitment });
+    } catch (error) {
+      console.error("Error fetching repair guide:", error);
+      res.status(500).json({ error: "Failed to fetch guide" });
+    }
+  });
+  
+  // Get guides for a specific vehicle in user's garage
+  app.get("/api/diy-guides/vehicle/:vehicleId", isAuthenticated, async (req: any, res) => {
+    try {
+      const guides = await storage.getRepairGuidesForVehicle(req.params.vehicleId);
+      res.json(guides);
+    } catch (error) {
+      console.error("Error fetching guides for vehicle:", error);
+      res.status(500).json({ error: "Failed to fetch guides" });
+    }
+  });
+  
+  // Rate a guide
+  app.post("/api/diy-guides/:guideId/rate", async (req, res) => {
+    try {
+      const { isHelpful, rating, comment, vehicleYear, vehicleMake, vehicleModel } = req.body;
+      const userId = (req as any).user?.claims?.sub;
+      
+      const guideRating = await storage.createGuideRating({
+        guideId: req.params.guideId,
+        userId,
+        isHelpful,
+        rating,
+        comment,
+        vehicleYear,
+        vehicleMake,
+        vehicleModel,
+      });
+      
+      res.json(guideRating);
+    } catch (error) {
+      console.error("Error rating guide:", error);
+      res.status(500).json({ error: "Failed to rate guide" });
+    }
+  });
+  
+  // Track guide progress
+  app.post("/api/diy-guides/:guideId/progress", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { currentStep, completedSteps, isCompleted, vehicleId, userNotes } = req.body;
+      
+      const progress = await storage.upsertGuideProgress({
+        guideId: req.params.guideId,
+        userId,
+        vehicleId,
+        currentStep,
+        completedSteps,
+        isCompleted,
+        userNotes,
+        completedAt: isCompleted ? new Date() : undefined,
+      });
+      
+      res.json(progress);
+    } catch (error) {
+      console.error("Error updating guide progress:", error);
+      res.status(500).json({ error: "Failed to update progress" });
+    }
+  });
+  
+  // Get user's guide history
+  app.get("/api/diy-guides/user/history", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const history = await storage.getUserGuideHistory(userId);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching guide history:", error);
+      res.status(500).json({ error: "Failed to fetch history" });
+    }
+  });
+  
+  // Search terminology
+  app.get("/api/diy-guides/terminology/search", async (req, res) => {
+    try {
+      const { term } = req.query;
+      if (!term) {
+        return res.status(400).json({ error: "Search term required" });
+      }
+      const results = await storage.searchTerminology(term as string);
+      res.json(results);
+    } catch (error) {
+      console.error("Error searching terminology:", error);
+      res.status(500).json({ error: "Failed to search terminology" });
+    }
+  });
+
+  // ============================================
+  // ADMIN: SEED VEHICLE CATEGORIES
+  // ============================================
+  
+  app.post("/api/admin/seed-vehicle-categories", async (req, res) => {
+    try {
+      const categories = [
+        {
+          slug: "car",
+          name: "Cars & Sedans",
+          description: "Passenger vehicles including sedans, coupes, hatchbacks, and station wagons from all eras",
+          icon: "Car",
+          yearRangeStart: 1900,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "transmission", "brakes", "suspension", "electrical", "cooling", "fuel", "exhaust", "steering", "hvac"],
+          sortOrder: 1,
+        },
+        {
+          slug: "truck",
+          name: "Trucks & Pickups",
+          description: "Light and medium duty trucks, pickups, and work vehicles",
+          icon: "Truck",
+          yearRangeStart: 1900,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "transmission", "brakes", "suspension", "electrical", "cooling", "fuel", "exhaust", "4wd", "towing"],
+          sortOrder: 2,
+        },
+        {
+          slug: "diesel",
+          name: "Diesel & Commercial",
+          description: "Heavy duty diesel trucks, semi trucks, buses, and commercial vehicles",
+          icon: "Truck",
+          yearRangeStart: 1950,
+          yearRangeEnd: 2025,
+          commonSystems: ["diesel_engine", "turbo", "def_system", "air_brakes", "transmission", "cooling", "fuel", "exhaust", "electrical"],
+          sortOrder: 3,
+        },
+        {
+          slug: "suv",
+          name: "SUVs & Crossovers",
+          description: "Sport utility vehicles, crossovers, and 4x4 vehicles",
+          icon: "Car",
+          yearRangeStart: 1970,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "transmission", "brakes", "suspension", "electrical", "cooling", "fuel", "4wd", "awd"],
+          sortOrder: 4,
+        },
+        {
+          slug: "motorcycle",
+          name: "Motorcycles",
+          description: "Street bikes, cruisers, sport bikes, touring, and dual-sport motorcycles",
+          icon: "Bike",
+          yearRangeStart: 1900,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "transmission", "brakes", "chain_drive", "belt_drive", "electrical", "fuel", "suspension", "exhaust"],
+          sortOrder: 5,
+        },
+        {
+          slug: "atv",
+          name: "ATVs & Quads",
+          description: "All-terrain vehicles, four-wheelers, and recreational quads",
+          icon: "Bike",
+          yearRangeStart: 1970,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "cvt", "brakes", "suspension", "electrical", "fuel", "4wd", "exhaust"],
+          sortOrder: 6,
+        },
+        {
+          slug: "utv",
+          name: "UTVs & Side-by-Sides",
+          description: "Utility task vehicles, side-by-sides, and recreational off-road vehicles",
+          icon: "Truck",
+          yearRangeStart: 2000,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "cvt", "brakes", "suspension", "electrical", "fuel", "4wd", "steering", "roll_cage"],
+          sortOrder: 7,
+        },
+        {
+          slug: "boat",
+          name: "Boats & Marine",
+          description: "Outboard motors, inboard engines, sterndrives, and personal watercraft",
+          icon: "Anchor",
+          yearRangeStart: 1950,
+          yearRangeEnd: 2025,
+          commonSystems: ["outboard", "inboard", "sterndrive", "fuel", "electrical", "cooling", "lower_unit", "propeller", "trailer"],
+          sortOrder: 8,
+        },
+        {
+          slug: "rv",
+          name: "RVs & Motorhomes",
+          description: "Recreational vehicles, motorhomes, travel trailers, and campers",
+          icon: "Truck",
+          yearRangeStart: 1960,
+          yearRangeEnd: 2025,
+          commonSystems: ["chassis", "generator", "plumbing", "electrical", "hvac", "propane", "slideout", "leveling", "awning"],
+          sortOrder: 9,
+        },
+        {
+          slug: "small-engine",
+          name: "Small Engines",
+          description: "Lawn mowers, chainsaws, generators, pressure washers, and outdoor power equipment",
+          icon: "Wrench",
+          yearRangeStart: 1950,
+          yearRangeEnd: 2025,
+          commonSystems: ["2stroke", "4stroke", "carburetor", "ignition", "fuel", "starter", "blade", "chain"],
+          sortOrder: 10,
+        },
+        {
+          slug: "classic",
+          name: "Classics & Vintage",
+          description: "Antique, classic, and vintage vehicles from the pre-1980s era",
+          icon: "Car",
+          yearRangeStart: 1900,
+          yearRangeEnd: 1989,
+          commonSystems: ["carburetor", "points_ignition", "drum_brakes", "manual_steering", "generator", "fuel", "electrical"],
+          sortOrder: 11,
+        },
+        {
+          slug: "hotrod",
+          name: "Hot Rods & Customs",
+          description: "Custom builds, hot rods, engine swaps, and performance modifications",
+          icon: "Zap",
+          yearRangeStart: 1920,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine_swap", "custom_exhaust", "suspension", "brakes", "electrical", "fuel", "transmission"],
+          sortOrder: 12,
+        },
+        {
+          slug: "exotic",
+          name: "Exotics & Supercars",
+          description: "High-performance sports cars, supercars, and exotic vehicles",
+          icon: "Zap",
+          yearRangeStart: 1960,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "transmission", "brakes", "suspension", "electrical", "cooling", "aero", "electronics"],
+          sortOrder: 13,
+        },
+        {
+          slug: "chinese-import",
+          name: "Chinese Imports",
+          description: "Budget ATVs, scooters, mini bikes, and pit bikes from Chinese manufacturers",
+          icon: "Bike",
+          yearRangeStart: 2000,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "carburetor", "cdi", "electrical", "fuel", "brakes", "suspension"],
+          sortOrder: 14,
+        },
+        {
+          slug: "scooter",
+          name: "Scooters & Mopeds",
+          description: "Motor scooters, mopeds, and electric scooters",
+          icon: "Bike",
+          yearRangeStart: 1950,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "cvt", "brakes", "electrical", "fuel", "carburetor", "starter"],
+          sortOrder: 15,
+        },
+        {
+          slug: "snowmobile",
+          name: "Snowmobiles",
+          description: "Snowmobiles and snow machines for winter recreation",
+          icon: "Bike",
+          yearRangeStart: 1960,
+          yearRangeEnd: 2025,
+          commonSystems: ["engine", "track", "suspension", "fuel", "electrical", "cooling", "exhaust"],
+          sortOrder: 16,
+        },
+        {
+          slug: "jet-ski",
+          name: "Jet Skis & PWC",
+          description: "Personal watercraft, jet skis, and wave runners",
+          icon: "Anchor",
+          yearRangeStart: 1970,
+          yearRangeEnd: 2025,
+          commonSystems: ["jet_pump", "engine", "fuel", "electrical", "hull", "steering", "cooling"],
+          sortOrder: 17,
+        },
+        {
+          slug: "golf-cart",
+          name: "Golf Carts & LSVs",
+          description: "Golf carts, low-speed vehicles, and neighborhood electric vehicles",
+          icon: "Car",
+          yearRangeStart: 1960,
+          yearRangeEnd: 2025,
+          commonSystems: ["electric_motor", "batteries", "charger", "controller", "brakes", "steering", "gas_engine"],
+          sortOrder: 18,
+        },
+      ];
+
+      const createdCategories = [];
+      for (const category of categories) {
+        try {
+          const created = await storage.createVehicleCategory(category);
+          createdCategories.push(created);
+        } catch (e: any) {
+          // Skip duplicates
+          if (!e.message?.includes('duplicate')) {
+            console.error("Error creating category:", category.slug, e);
+          }
+        }
+      }
+
+      res.json({ 
+        message: "Vehicle categories seeded successfully",
+        count: createdCategories.length
+      });
+    } catch (error) {
+      console.error("Seed vehicle categories error:", error);
+      res.status(500).json({ error: "Failed to seed vehicle categories" });
+    }
+  });
+
+  // ============================================
+  // ADMIN: SEED PART TERMINOLOGY
+  // ============================================
+  
+  app.post("/api/admin/seed-terminology", async (req, res) => {
+    try {
+      const terminology = [
+        {
+          canonicalName: "differential_fluid",
+          displayName: "Differential Fluid / Gear Oil",
+          description: "Lubricant for differential gears and bearings",
+          autoTerms: ["differential fluid", "diff fluid", "gear oil", "rear end fluid", "pumpkin fluid"],
+          marineTerms: ["lower unit oil", "gear lube", "gear case oil", "outboard gear oil"],
+          motorcycleTerms: ["final drive oil", "shaft drive fluid", "bevel gear oil"],
+          atvTerms: ["differential oil", "front diff fluid", "rear diff fluid"],
+          dieselTerms: ["differential lubricant", "axle fluid"],
+          allTerms: ["differential fluid", "diff fluid", "gear oil", "lower unit oil", "gear lube", "final drive oil"],
+          partCategory: "fluids",
+          systemType: "drivetrain",
+        },
+        {
+          canonicalName: "spark_plug",
+          displayName: "Spark Plug",
+          description: "Ignition component that creates spark to ignite fuel",
+          autoTerms: ["spark plug", "sparking plug", "ignition plug"],
+          marineTerms: ["marine spark plug", "outboard spark plug", "boat spark plug"],
+          motorcycleTerms: ["motorcycle spark plug", "bike plug"],
+          smallEngineTerms: ["small engine plug", "lawn mower plug", "chainsaw plug"],
+          atvTerms: ["atv spark plug", "quad plug"],
+          allTerms: ["spark plug", "sparking plug", "ignition plug", "plug"],
+          partCategory: "ignition",
+          systemType: "ignition",
+        },
+        {
+          canonicalName: "oil_filter",
+          displayName: "Oil Filter",
+          description: "Filters contaminants from engine oil",
+          autoTerms: ["oil filter", "engine oil filter", "motor oil filter"],
+          marineTerms: ["marine oil filter", "boat oil filter", "outboard oil filter"],
+          motorcycleTerms: ["motorcycle oil filter", "bike oil filter"],
+          smallEngineTerms: ["small engine oil filter"],
+          dieselTerms: ["diesel oil filter", "heavy duty oil filter"],
+          allTerms: ["oil filter", "engine oil filter", "lube filter"],
+          partCategory: "filters",
+          systemType: "lubrication",
+        },
+        {
+          canonicalName: "fuel_filter",
+          displayName: "Fuel Filter",
+          description: "Filters contaminants from fuel before reaching engine",
+          autoTerms: ["fuel filter", "gas filter", "inline fuel filter"],
+          marineTerms: ["marine fuel filter", "fuel water separator", "boat fuel filter", "racor filter"],
+          motorcycleTerms: ["motorcycle fuel filter", "inline fuel filter"],
+          smallEngineTerms: ["small engine fuel filter", "carburetor fuel filter"],
+          dieselTerms: ["diesel fuel filter", "fuel water separator", "primary fuel filter", "secondary fuel filter"],
+          allTerms: ["fuel filter", "gas filter", "fuel water separator", "inline filter"],
+          partCategory: "filters",
+          systemType: "fuel",
+        },
+        {
+          canonicalName: "belt",
+          displayName: "Drive Belt / Serpentine Belt",
+          description: "Belt that drives accessories from engine crankshaft",
+          autoTerms: ["serpentine belt", "drive belt", "accessory belt", "v-belt", "fan belt"],
+          marineTerms: ["raw water pump belt", "alternator belt", "marine drive belt"],
+          motorcycleTerms: ["drive belt", "final drive belt"],
+          smallEngineTerms: ["deck belt", "drive belt", "mower belt", "auger belt"],
+          atvTerms: ["cvt belt", "drive belt", "clutch belt"],
+          allTerms: ["serpentine belt", "drive belt", "v-belt", "fan belt", "cvt belt", "deck belt"],
+          partCategory: "belts",
+          systemType: "accessory_drive",
+        },
+        {
+          canonicalName: "coolant",
+          displayName: "Coolant / Antifreeze",
+          description: "Liquid that regulates engine temperature",
+          autoTerms: ["coolant", "antifreeze", "engine coolant", "radiator fluid"],
+          marineTerms: ["marine coolant", "boat antifreeze", "closed cooling fluid"],
+          motorcycleTerms: ["motorcycle coolant", "bike coolant"],
+          dieselTerms: ["heavy duty coolant", "extended life coolant", "eld coolant"],
+          rvTerms: ["rv antifreeze", "non-toxic antifreeze", "potable antifreeze"],
+          allTerms: ["coolant", "antifreeze", "radiator fluid", "engine coolant"],
+          partCategory: "fluids",
+          systemType: "cooling",
+        },
+        {
+          canonicalName: "brake_pads",
+          displayName: "Brake Pads",
+          description: "Friction material that presses against rotor to slow vehicle",
+          autoTerms: ["brake pads", "disc brake pads", "front brake pads", "rear brake pads"],
+          motorcycleTerms: ["motorcycle brake pads", "sintered pads", "organic pads"],
+          atvTerms: ["atv brake pads", "quad brake pads"],
+          dieselTerms: ["heavy duty brake pads", "air disc brake pads"],
+          allTerms: ["brake pads", "disc brake pads", "friction pads"],
+          partCategory: "brakes",
+          systemType: "brakes",
+        },
+        {
+          canonicalName: "air_filter",
+          displayName: "Air Filter",
+          description: "Filters air entering engine intake",
+          autoTerms: ["air filter", "engine air filter", "intake filter"],
+          marineTerms: ["marine air filter", "flame arrestor"],
+          motorcycleTerms: ["motorcycle air filter", "pod filter", "k&n filter"],
+          smallEngineTerms: ["small engine air filter", "foam filter", "pre-filter"],
+          dieselTerms: ["diesel air filter", "heavy duty air filter", "intake filter"],
+          allTerms: ["air filter", "engine air filter", "intake filter", "foam filter"],
+          partCategory: "filters",
+          systemType: "intake",
+        },
+        {
+          canonicalName: "impeller",
+          displayName: "Impeller / Water Pump Impeller",
+          description: "Rotating component that moves water for cooling",
+          autoTerms: ["water pump impeller", "coolant pump"],
+          marineTerms: ["impeller", "raw water impeller", "outboard impeller", "water pump impeller", "cooling impeller"],
+          jetSkiTerms: ["jet pump impeller", "wear ring"],
+          dieselTerms: ["water pump impeller", "coolant pump impeller"],
+          allTerms: ["impeller", "water pump impeller", "raw water impeller", "cooling impeller"],
+          partCategory: "cooling",
+          systemType: "cooling",
+        },
+        {
+          canonicalName: "propeller",
+          displayName: "Propeller / Prop",
+          description: "Rotating blades that propel boat through water",
+          marineTerms: ["propeller", "prop", "boat prop", "outboard prop", "stainless prop", "aluminum prop"],
+          allTerms: ["propeller", "prop", "boat propeller"],
+          partCategory: "propulsion",
+          systemType: "drivetrain",
+        },
+      ];
+
+      const createdTerms = [];
+      for (const term of terminology) {
+        try {
+          const created = await storage.createPartTerminology(term as any);
+          createdTerms.push(created);
+        } catch (e: any) {
+          if (!e.message?.includes('duplicate')) {
+            console.error("Error creating terminology:", term.canonicalName, e);
+          }
+        }
+      }
+
+      res.json({ 
+        message: "Part terminology seeded successfully",
+        count: createdTerms.length
+      });
+    } catch (error) {
+      console.error("Seed terminology error:", error);
+      res.status(500).json({ error: "Failed to seed terminology" });
+    }
+  });
+
   return httpServer;
 }
 
