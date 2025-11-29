@@ -1,4 +1,4 @@
-import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge, Crown, Hammer, Sparkles } from "lucide-react";
+import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge, Crown, Hammer, Sparkles, Lightbulb, Droplets, Navigation, Settings, PaintBucket, Sofa, CircleDot, Flame, Cable, Drill, Fan, Leaf } from "lucide-react";
 
 // Vendor search URL templates - {query}, {year}, {make}, {model}, {zip} are placeholders
 export interface VendorInfo {
@@ -453,6 +453,8 @@ export const VEHICLE_TYPES = [
   { id: "powersports", name: "Powersports", icon: Gauge, description: "Dirt, Snow, Go-Karts" },
   { id: "rv", name: "RV & Trailer", icon: Truck, description: "Motorhomes, Campers" },
   { id: "diesel", name: "Diesel & Commercial", icon: Cog, description: "Semi, Fleet, Heavy" },
+  { id: "generators", name: "Generators", icon: Fan, description: "Portable, Standby, Inverter" },
+  { id: "smallengines", name: "Small Engines", icon: Leaf, description: "Mowers, Chainsaws, Trimmers" },
 ];
 
 export const CATEGORIES = [
@@ -466,6 +468,16 @@ export const CATEGORIES = [
   { id: "batteries", name: "Batteries", icon: Battery },
   { id: "powersports", name: "Powersports", icon: Bike },
   { id: "marine", name: "Marine", icon: Waves },
+  { id: "lighting", name: "Lighting", icon: Lightbulb },
+  { id: "oilfluids", name: "Oil & Fluids", icon: Droplets },
+  { id: "steering", name: "Steering", icon: Navigation },
+  { id: "transmission", name: "Transmission", icon: Settings },
+  { id: "body", name: "Body & Exterior", icon: PaintBucket },
+  { id: "interior", name: "Interior", icon: Sofa },
+  { id: "tireswheels", name: "Tires & Wheels", icon: CircleDot },
+  { id: "ignition", name: "Ignition", icon: Flame },
+  { id: "beltshoses", name: "Belts & Hoses", icon: Cable },
+  { id: "tools", name: "Tools", icon: Drill },
 ];
 
 export const SPECIALTY_RETAILERS = {
