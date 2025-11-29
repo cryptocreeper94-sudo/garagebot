@@ -7,7 +7,8 @@ import {
   affiliateNetworks, affiliatePartners, affiliateClicks, affiliateCommissions, affiliatePayouts,
   repairOrders, repairOrderItems, estimates, estimateItems, appointments, shopInventory,
   technicianTimeEntries, digitalInspections, inspectionItems, shopSettings, integrationCredentials,
-  vehicleCategories, repairGuides, guideSteps, guideFitment, partTerminology, guideRatings, guideProgress
+  vehicleCategories, repairGuides, guideSteps, guideFitment, partTerminology, guideRatings, guideProgress,
+  priceAlerts
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -28,7 +29,8 @@ import type {
   VehicleCategory, InsertVehicleCategory, RepairGuide, InsertRepairGuide,
   GuideStep, InsertGuideStep, GuideFitment, InsertGuideFitment,
   PartTerminology, InsertPartTerminology, GuideRating, InsertGuideRating,
-  GuideProgress, InsertGuideProgress
+  GuideProgress, InsertGuideProgress,
+  PriceAlert, InsertPriceAlert
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte } from "drizzle-orm";
 
@@ -279,6 +281,14 @@ export interface IStorage {
   getGuideProgress(userId: string, guideId: string): Promise<GuideProgress | undefined>;
   upsertGuideProgress(progress: InsertGuideProgress): Promise<GuideProgress>;
   getUserGuideHistory(userId: string): Promise<GuideProgress[]>;
+  
+  // Price Alerts (Pro Feature)
+  getPriceAlertsByUser(userId: string): Promise<PriceAlert[]>;
+  getPriceAlert(id: string): Promise<PriceAlert | undefined>;
+  getActivePriceAlerts(): Promise<PriceAlert[]>;
+  createPriceAlert(alert: InsertPriceAlert): Promise<PriceAlert>;
+  updatePriceAlert(id: string, updates: Partial<PriceAlert>): Promise<PriceAlert | undefined>;
+  deletePriceAlert(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1445,6 +1455,42 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(guideProgress)
       .where(eq(guideProgress.userId, userId))
       .orderBy(desc(guideProgress.lastAccessedAt));
+  }
+  
+  // Price Alerts (Pro Feature)
+  async getPriceAlertsByUser(userId: string): Promise<PriceAlert[]> {
+    return await db.select().from(priceAlerts)
+      .where(eq(priceAlerts.userId, userId))
+      .orderBy(desc(priceAlerts.createdAt));
+  }
+  
+  async getPriceAlert(id: string): Promise<PriceAlert | undefined> {
+    const [alert] = await db.select().from(priceAlerts).where(eq(priceAlerts.id, id));
+    return alert;
+  }
+  
+  async getActivePriceAlerts(): Promise<PriceAlert[]> {
+    return await db.select().from(priceAlerts)
+      .where(eq(priceAlerts.isActive, true))
+      .orderBy(desc(priceAlerts.createdAt));
+  }
+  
+  async createPriceAlert(alert: InsertPriceAlert): Promise<PriceAlert> {
+    const [newAlert] = await db.insert(priceAlerts).values(alert).returning();
+    return newAlert;
+  }
+  
+  async updatePriceAlert(id: string, updates: Partial<PriceAlert>): Promise<PriceAlert | undefined> {
+    const [alert] = await db.update(priceAlerts)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(priceAlerts.id, id))
+      .returning();
+    return alert;
+  }
+  
+  async deletePriceAlert(id: string): Promise<boolean> {
+    await db.delete(priceAlerts).where(eq(priceAlerts.id, id));
+    return true;
   }
 }
 
