@@ -2949,6 +2949,80 @@ export async function registerRoutes(
   });
 
   // ============================================
+  // INTEGRATION CREDENTIALS VAULT (Admin Only)
+  // ============================================
+
+  // Get all integration credentials (masks sensitive data)
+  app.get('/api/dev/credentials', async (req, res) => {
+    try {
+      const credentials = await storage.getIntegrationCredentials();
+      // Mask actual credentials for display
+      const masked = credentials.map(cred => ({
+        ...cred,
+        clientSecretEncrypted: cred.clientSecretEncrypted ? '********' : null,
+        apiKeyEncrypted: cred.apiKeyEncrypted ? '********' : null,
+        refreshTokenEncrypted: cred.refreshTokenEncrypted ? '********' : null,
+        accessToken: cred.accessToken ? '********' : null,
+        webhookSecret: cred.webhookSecret ? '********' : null,
+      }));
+      res.json(masked);
+    } catch (error) {
+      console.error("Get integration credentials error:", error);
+      res.status(500).json({ error: "Failed to fetch credentials" });
+    }
+  });
+
+  // Get single credential (unmasks data for admin use)
+  app.get('/api/dev/credentials/:key', async (req, res) => {
+    try {
+      const credential = await storage.getIntegrationCredential(req.params.key);
+      if (!credential) {
+        return res.status(404).json({ error: "Credential not found" });
+      }
+      res.json(credential);
+    } catch (error) {
+      console.error("Get integration credential error:", error);
+      res.status(500).json({ error: "Failed to fetch credential" });
+    }
+  });
+
+  // Upsert integration credential
+  app.post('/api/dev/credentials', async (req, res) => {
+    try {
+      const credential = await storage.upsertIntegrationCredential(req.body);
+      res.json(credential);
+    } catch (error) {
+      console.error("Upsert integration credential error:", error);
+      res.status(500).json({ error: "Failed to save credential" });
+    }
+  });
+
+  // Update integration credential
+  app.patch('/api/dev/credentials/:key', async (req, res) => {
+    try {
+      const credential = await storage.updateIntegrationCredential(req.params.key, req.body);
+      if (!credential) {
+        return res.status(404).json({ error: "Credential not found" });
+      }
+      res.json(credential);
+    } catch (error) {
+      console.error("Update integration credential error:", error);
+      res.status(500).json({ error: "Failed to update credential" });
+    }
+  });
+
+  // Delete integration credential
+  app.delete('/api/dev/credentials/:key', async (req, res) => {
+    try {
+      await storage.deleteIntegrationCredential(req.params.key);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete integration credential error:", error);
+      res.status(500).json({ error: "Failed to delete credential" });
+    }
+  });
+
+  // ============================================
   // AFFILIATE TRACKING ROUTES
   // ============================================
 
