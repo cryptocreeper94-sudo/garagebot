@@ -6,7 +6,8 @@ import {
   userPreferences, auditLog, vehicleRecalls, scanHistory, devTasks, vehicleShares,
   affiliateNetworks, affiliatePartners, affiliateClicks, affiliateCommissions, affiliatePayouts,
   repairOrders, repairOrderItems, estimates, estimateItems, appointments, shopInventory,
-  technicianTimeEntries, digitalInspections, inspectionItems, shopSettings, integrationCredentials
+  technicianTimeEntries, digitalInspections, inspectionItems, shopSettings, integrationCredentials,
+  vehicleCategories, repairGuides, guideSteps, guideFitment, partTerminology, guideRatings, guideProgress
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -23,7 +24,11 @@ import type {
   AffiliatePayout, InsertAffiliatePayout,
   RepairOrder, InsertRepairOrder, Estimate, InsertEstimate, Appointment, InsertAppointment,
   ShopInventory, InsertShopInventory, DigitalInspection, InsertDigitalInspection,
-  IntegrationCredential, InsertIntegrationCredential
+  IntegrationCredential, InsertIntegrationCredential,
+  VehicleCategory, InsertVehicleCategory, RepairGuide, InsertRepairGuide,
+  GuideStep, InsertGuideStep, GuideFitment, InsertGuideFitment,
+  PartTerminology, InsertPartTerminology, GuideRating, InsertGuideRating,
+  GuideProgress, InsertGuideProgress
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte } from "drizzle-orm";
 
@@ -229,6 +234,51 @@ export interface IStorage {
 
   // Mechanics Garage - Digital Inspections
   getDigitalInspections(shopId: string): Promise<DigitalInspection[]>;
+
+  // DIY Repair Guides - Vehicle Categories
+  getVehicleCategories(): Promise<VehicleCategory[]>;
+  getVehicleCategory(id: string): Promise<VehicleCategory | undefined>;
+  getVehicleCategoryBySlug(slug: string): Promise<VehicleCategory | undefined>;
+  createVehicleCategory(category: InsertVehicleCategory): Promise<VehicleCategory>;
+  
+  // DIY Repair Guides - Guides
+  getRepairGuides(filters?: { 
+    category?: string; 
+    difficulty?: string; 
+    vehicleCategorySlug?: string;
+    systemType?: string;
+    status?: string;
+    search?: string;
+  }): Promise<RepairGuide[]>;
+  getRepairGuide(id: string): Promise<RepairGuide | undefined>;
+  getRepairGuideBySlug(slug: string): Promise<RepairGuide | undefined>;
+  getRepairGuidesForVehicle(vehicleId: string): Promise<RepairGuide[]>;
+  createRepairGuide(guide: InsertRepairGuide): Promise<RepairGuide>;
+  updateRepairGuide(id: string, updates: Partial<RepairGuide>): Promise<RepairGuide | undefined>;
+  incrementGuideViewCount(id: string): Promise<void>;
+  
+  // DIY Repair Guides - Steps
+  getGuideSteps(guideId: string): Promise<GuideStep[]>;
+  createGuideStep(step: InsertGuideStep): Promise<GuideStep>;
+  updateGuideStep(id: string, updates: Partial<GuideStep>): Promise<GuideStep | undefined>;
+  
+  // DIY Repair Guides - Fitment
+  getGuideFitment(guideId: string): Promise<GuideFitment[]>;
+  createGuideFitment(fitment: InsertGuideFitment): Promise<GuideFitment>;
+  
+  // DIY Repair Guides - Terminology
+  getPartTerminology(): Promise<PartTerminology[]>;
+  searchTerminology(term: string): Promise<PartTerminology[]>;
+  createPartTerminology(term: InsertPartTerminology): Promise<PartTerminology>;
+  
+  // DIY Repair Guides - Ratings
+  createGuideRating(rating: InsertGuideRating): Promise<GuideRating>;
+  getGuideRatings(guideId: string): Promise<GuideRating[]>;
+  
+  // DIY Repair Guides - Progress
+  getGuideProgress(userId: string, guideId: string): Promise<GuideProgress | undefined>;
+  upsertGuideProgress(progress: InsertGuideProgress): Promise<GuideProgress>;
+  getUserGuideHistory(userId: string): Promise<GuideProgress[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1133,6 +1183,268 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(digitalInspections)
       .where(eq(digitalInspections.shopId, shopId))
       .orderBy(desc(digitalInspections.createdAt));
+  }
+
+  // ============================================
+  // DIY REPAIR GUIDES - VEHICLE CATEGORIES
+  // ============================================
+  
+  async getVehicleCategories(): Promise<VehicleCategory[]> {
+    return await db.select().from(vehicleCategories)
+      .where(eq(vehicleCategories.isActive, true))
+      .orderBy(asc(vehicleCategories.sortOrder));
+  }
+  
+  async getVehicleCategory(id: string): Promise<VehicleCategory | undefined> {
+    const [category] = await db.select().from(vehicleCategories).where(eq(vehicleCategories.id, id));
+    return category;
+  }
+  
+  async getVehicleCategoryBySlug(slug: string): Promise<VehicleCategory | undefined> {
+    const [category] = await db.select().from(vehicleCategories).where(eq(vehicleCategories.slug, slug));
+    return category;
+  }
+  
+  async createVehicleCategory(category: InsertVehicleCategory): Promise<VehicleCategory> {
+    const [newCategory] = await db.insert(vehicleCategories).values(category).returning();
+    return newCategory;
+  }
+
+  // ============================================
+  // DIY REPAIR GUIDES - GUIDES
+  // ============================================
+  
+  async getRepairGuides(filters?: { 
+    category?: string; 
+    difficulty?: string; 
+    vehicleCategorySlug?: string;
+    systemType?: string;
+    status?: string;
+    search?: string;
+  }): Promise<RepairGuide[]> {
+    let query = db.select().from(repairGuides);
+    
+    const conditions = [];
+    
+    if (filters?.category) {
+      conditions.push(eq(repairGuides.category, filters.category));
+    }
+    if (filters?.difficulty) {
+      conditions.push(eq(repairGuides.difficulty, filters.difficulty));
+    }
+    if (filters?.systemType) {
+      conditions.push(eq(repairGuides.systemType, filters.systemType));
+    }
+    if (filters?.status) {
+      conditions.push(eq(repairGuides.status, filters.status));
+    } else {
+      conditions.push(eq(repairGuides.status, 'published'));
+    }
+    if (filters?.search) {
+      conditions.push(
+        or(
+          ilike(repairGuides.title, `%${filters.search}%`),
+          ilike(repairGuides.description, `%${filters.search}%`)
+        )
+      );
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+    
+    return await query.orderBy(desc(repairGuides.viewCount));
+  }
+  
+  async getRepairGuide(id: string): Promise<RepairGuide | undefined> {
+    const [guide] = await db.select().from(repairGuides).where(eq(repairGuides.id, id));
+    return guide;
+  }
+  
+  async getRepairGuideBySlug(slug: string): Promise<RepairGuide | undefined> {
+    const [guide] = await db.select().from(repairGuides).where(eq(repairGuides.slug, slug));
+    return guide;
+  }
+  
+  async getRepairGuidesForVehicle(vehicleId: string): Promise<RepairGuide[]> {
+    const vehicle = await this.getVehicle(vehicleId);
+    if (!vehicle) return [];
+    
+    const fitments = await db.select().from(guideFitment)
+      .where(
+        and(
+          or(
+            eq(guideFitment.vehicleCategorySlug, vehicle.vehicleType || 'car'),
+            sql`${guideFitment.make} IS NULL`
+          ),
+          or(
+            and(
+              lte(guideFitment.yearStart, vehicle.year),
+              gte(guideFitment.yearEnd, vehicle.year)
+            ),
+            sql`${guideFitment.yearStart} IS NULL`
+          )
+        )
+      );
+    
+    const guideIds = [...new Set(fitments.map(f => f.guideId))];
+    if (guideIds.length === 0) return [];
+    
+    return await db.select().from(repairGuides)
+      .where(
+        and(
+          sql`${repairGuides.id} = ANY(${guideIds})`,
+          eq(repairGuides.status, 'published')
+        )
+      )
+      .orderBy(desc(repairGuides.viewCount));
+  }
+  
+  async createRepairGuide(guide: InsertRepairGuide): Promise<RepairGuide> {
+    const [newGuide] = await db.insert(repairGuides).values(guide).returning();
+    return newGuide;
+  }
+  
+  async updateRepairGuide(id: string, updates: Partial<RepairGuide>): Promise<RepairGuide | undefined> {
+    const [guide] = await db.update(repairGuides)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(repairGuides.id, id))
+      .returning();
+    return guide;
+  }
+  
+  async incrementGuideViewCount(id: string): Promise<void> {
+    await db.update(repairGuides)
+      .set({ viewCount: sql`${repairGuides.viewCount} + 1` })
+      .where(eq(repairGuides.id, id));
+  }
+
+  // ============================================
+  // DIY REPAIR GUIDES - STEPS
+  // ============================================
+  
+  async getGuideSteps(guideId: string): Promise<GuideStep[]> {
+    return await db.select().from(guideSteps)
+      .where(eq(guideSteps.guideId, guideId))
+      .orderBy(asc(guideSteps.stepNumber));
+  }
+  
+  async createGuideStep(step: InsertGuideStep): Promise<GuideStep> {
+    const [newStep] = await db.insert(guideSteps).values(step).returning();
+    return newStep;
+  }
+  
+  async updateGuideStep(id: string, updates: Partial<GuideStep>): Promise<GuideStep | undefined> {
+    const [step] = await db.update(guideSteps)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(guideSteps.id, id))
+      .returning();
+    return step;
+  }
+
+  // ============================================
+  // DIY REPAIR GUIDES - FITMENT
+  // ============================================
+  
+  async getGuideFitment(guideId: string): Promise<GuideFitment[]> {
+    return await db.select().from(guideFitment)
+      .where(eq(guideFitment.guideId, guideId));
+  }
+  
+  async createGuideFitment(fitment: InsertGuideFitment): Promise<GuideFitment> {
+    const [newFitment] = await db.insert(guideFitment).values(fitment).returning();
+    return newFitment;
+  }
+
+  // ============================================
+  // DIY REPAIR GUIDES - TERMINOLOGY
+  // ============================================
+  
+  async getPartTerminology(): Promise<PartTerminology[]> {
+    return await db.select().from(partTerminology)
+      .orderBy(asc(partTerminology.displayName));
+  }
+  
+  async searchTerminology(term: string): Promise<PartTerminology[]> {
+    return await db.select().from(partTerminology)
+      .where(
+        or(
+          ilike(partTerminology.canonicalName, `%${term}%`),
+          ilike(partTerminology.displayName, `%${term}%`),
+          sql`${term} = ANY(${partTerminology.allTerms})`
+        )
+      );
+  }
+  
+  async createPartTerminology(term: InsertPartTerminology): Promise<PartTerminology> {
+    const [newTerm] = await db.insert(partTerminology).values(term).returning();
+    return newTerm;
+  }
+
+  // ============================================
+  // DIY REPAIR GUIDES - RATINGS
+  // ============================================
+  
+  async createGuideRating(rating: InsertGuideRating): Promise<GuideRating> {
+    const [newRating] = await db.insert(guideRatings).values(rating).returning();
+    
+    if (rating.isHelpful !== undefined) {
+      if (rating.isHelpful) {
+        await db.update(repairGuides)
+          .set({ helpfulCount: sql`${repairGuides.helpfulCount} + 1` })
+          .where(eq(repairGuides.id, rating.guideId));
+      } else {
+        await db.update(repairGuides)
+          .set({ notHelpfulCount: sql`${repairGuides.notHelpfulCount} + 1` })
+          .where(eq(repairGuides.id, rating.guideId));
+      }
+    }
+    
+    return newRating;
+  }
+  
+  async getGuideRatings(guideId: string): Promise<GuideRating[]> {
+    return await db.select().from(guideRatings)
+      .where(eq(guideRatings.guideId, guideId))
+      .orderBy(desc(guideRatings.createdAt));
+  }
+
+  // ============================================
+  // DIY REPAIR GUIDES - PROGRESS
+  // ============================================
+  
+  async getGuideProgress(userId: string, guideId: string): Promise<GuideProgress | undefined> {
+    const [progress] = await db.select().from(guideProgress)
+      .where(and(
+        eq(guideProgress.userId, userId),
+        eq(guideProgress.guideId, guideId)
+      ));
+    return progress;
+  }
+  
+  async upsertGuideProgress(progress: InsertGuideProgress): Promise<GuideProgress> {
+    const existing = await this.getGuideProgress(progress.userId, progress.guideId);
+    
+    if (existing) {
+      const [updated] = await db.update(guideProgress)
+        .set({ 
+          ...progress, 
+          lastAccessedAt: new Date(),
+          updatedAt: new Date() 
+        })
+        .where(eq(guideProgress.id, existing.id))
+        .returning();
+      return updated;
+    }
+    
+    const [newProgress] = await db.insert(guideProgress).values(progress).returning();
+    return newProgress;
+  }
+  
+  async getUserGuideHistory(userId: string): Promise<GuideProgress[]> {
+    return await db.select().from(guideProgress)
+      .where(eq(guideProgress.userId, userId))
+      .orderBy(desc(guideProgress.lastAccessedAt));
   }
 }
 
