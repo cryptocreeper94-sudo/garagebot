@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { nhtsaService } from "./services/nhtsa";
@@ -4025,6 +4025,112 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Seed terminology error:", error);
       res.status(500).json({ error: "Failed to seed terminology" });
+    }
+  });
+
+  // ============================================
+  // PRICE ALERTS (Pro Feature)
+  // ============================================
+  
+  // Get user's price alerts
+  app.get('/api/price-alerts', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      const alerts = await storage.getPriceAlertsByUser(userId);
+      res.json(alerts);
+    } catch (error) {
+      console.error("Get price alerts error:", error);
+      res.status(500).json({ error: "Failed to fetch price alerts" });
+    }
+  });
+  
+  // Get single price alert
+  app.get('/api/price-alerts/:id', isAuthenticated, async (req, res) => {
+    try {
+      const alert = await storage.getPriceAlert(req.params.id);
+      if (!alert) {
+        return res.status(404).json({ error: "Alert not found" });
+      }
+      const userId = (req.user as any)?.id;
+      if (alert.userId !== userId) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+      res.json(alert);
+    } catch (error) {
+      console.error("Get price alert error:", error);
+      res.status(500).json({ error: "Failed to fetch price alert" });
+    }
+  });
+  
+  // Create price alert (Pro only)
+  app.post('/api/price-alerts', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.subscriptionTier !== 'pro') {
+        return res.status(403).json({ error: "Price alerts require a Pro subscription" });
+      }
+      
+      const result = insertPriceAlertSchema.safeParse({
+        ...req.body,
+        userId
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      
+      const alert = await storage.createPriceAlert(result.data);
+      res.json(alert);
+    } catch (error) {
+      console.error("Create price alert error:", error);
+      res.status(500).json({ error: "Failed to create price alert" });
+    }
+  });
+  
+  // Update price alert
+  app.patch('/api/price-alerts/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const existingAlert = await storage.getPriceAlert(req.params.id);
+      
+      if (!existingAlert) {
+        return res.status(404).json({ error: "Alert not found" });
+      }
+      if (existingAlert.userId !== userId) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+      
+      const alert = await storage.updatePriceAlert(req.params.id, req.body);
+      res.json(alert);
+    } catch (error) {
+      console.error("Update price alert error:", error);
+      res.status(500).json({ error: "Failed to update price alert" });
+    }
+  });
+  
+  // Delete price alert
+  app.delete('/api/price-alerts/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const existingAlert = await storage.getPriceAlert(req.params.id);
+      
+      if (!existingAlert) {
+        return res.status(404).json({ error: "Alert not found" });
+      }
+      if (existingAlert.userId !== userId) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+      
+      await storage.deletePriceAlert(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete price alert error:", error);
+      res.status(500).json({ error: "Failed to delete price alert" });
     }
   });
 
