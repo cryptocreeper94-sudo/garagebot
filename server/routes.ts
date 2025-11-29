@@ -2599,19 +2599,56 @@ export async function registerRoutes(
     try {
       const userId = req.user?.claims?.sub || (req.session as any).userId;
       const { billingPeriod } = req.body;
+      const user = await storage.getUser(userId);
       
-      // In production, create a Stripe checkout session
-      // For now, return a placeholder
+      if (!user) {
+        return res.status(400).json({ error: "User not found" });
+      }
+      
       const priceId = billingPeriod === 'annual' 
-        ? process.env.STRIPE_ANNUAL_PRICE_ID 
-        : process.env.STRIPE_MONTHLY_PRICE_ID;
+        ? process.env.STRIPE_PRO_ANNUAL_PRICE_ID 
+        : process.env.STRIPE_PRO_MONTHLY_PRICE_ID;
       
-      // Placeholder - in production, create actual Stripe checkout
-      res.json({
-        message: "Subscription checkout initiated",
-        checkoutUrl: `/pro?demo=true`,
-        billingPeriod,
+      if (!priceId) {
+        return res.status(500).json({ error: "Stripe price not configured" });
+      }
+      
+      const stripe = await getUncachableStripeClient();
+      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      
+      // Get or create Stripe customer
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          metadata: { userId, username: user.username }
+        });
+        customerId = customer.id;
+        await storage.updateUser(userId, { stripeCustomerId: customerId });
+      }
+      
+      // Create checkout session for subscription
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: 'subscription',
+        success_url: `${baseUrl}/pro?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/pro?canceled=true`,
+        metadata: {
+          userId,
+          billingPeriod,
+          isFounder: 'true', // Mark as founder during Launch Edition
+        },
+        subscription_data: {
+          metadata: {
+            userId,
+            isFounder: 'true',
+          }
+        }
       });
+      
+      res.json({ checkoutUrl: session.url });
     } catch (error) {
       console.error("Subscription checkout error:", error);
       res.status(500).json({ error: "Failed to create checkout session" });
