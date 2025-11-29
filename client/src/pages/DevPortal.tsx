@@ -34,6 +34,8 @@ interface DevTask {
 const CATEGORIES = [
   { id: "affiliates", name: "Affiliate Programs", icon: DollarSign, color: "text-green-400" },
   { id: "apis", name: "API Integrations", icon: Link2, color: "text-blue-400" },
+  { id: "shop_integrations", name: "Shop Software OAuth", icon: Link2, color: "text-orange-400" },
+  { id: "parts_ordering", name: "Parts & Tool Ordering", icon: Settings, color: "text-amber-400" },
   { id: "features", name: "Feature Development", icon: Zap, color: "text-yellow-400" },
   { id: "partnerships", name: "Partnerships", icon: Users, color: "text-purple-400" },
   { id: "legal", name: "Legal & Compliance", icon: Shield, color: "text-red-400" },
@@ -75,6 +77,60 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "infrastructure", title: "Domain: garagebot.net", description: "Set up redirect domain", priority: "medium", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 2 },
   { category: "infrastructure", title: "SSL Certificates", description: "Ensure SSL on all domains", priority: "high", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 3 },
   { category: "infrastructure", title: "CDN Setup", description: "Configure CDN for assets", priority: "low", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 4 },
+  
+  // SHOP SOFTWARE OAUTH INTEGRATIONS - Accounting
+  { category: "shop_integrations", title: "QuickBooks Online OAuth", description: "OAuth 2.0 - Sync invoices, payments, financial reports. Apply at developer.intuit.com", priority: "high", status: "pending", dueDate: null, link: "https://developer.intuit.com", notes: "OAuth 2.0, access token expires 1hr, refresh 100 days", sortOrder: 1 },
+  { category: "shop_integrations", title: "FreshBooks OAuth", description: "OAuth 2.0 - Time tracking, invoicing, expense management", priority: "medium", status: "pending", dueDate: null, link: "https://www.freshbooks.com/api", notes: "OAuth 2.0 Authorization Code flow", sortOrder: 2 },
+  { category: "shop_integrations", title: "Xero OAuth", description: "OAuth 2.0 - Cloud accounting with powerful reporting", priority: "medium", status: "pending", dueDate: null, link: "https://developer.xero.com", notes: "OAuth 2.0, PKCE flow recommended", sortOrder: 3 },
+  { category: "shop_integrations", title: "Wave Accounting API", description: "Free accounting software API integration", priority: "low", status: "pending", dueDate: null, link: "https://developer.waveapps.com", notes: "GraphQL API", sortOrder: 4 },
+  
+  // SHOP SOFTWARE OAUTH - Workforce & Payroll
+  { category: "shop_integrations", title: "UKG Pro OAuth", description: "OAuth 2.0 - HR, payroll, talent management. Apply at developer.ukg.com", priority: "high", status: "pending", dueDate: null, link: "https://developer.ukg.com", notes: "OAuth 2.0 client credentials, token ~30min", sortOrder: 5 },
+  { category: "shop_integrations", title: "ADP OAuth", description: "OAuth 2.0 - Payroll, HR, workforce management", priority: "high", status: "pending", dueDate: null, link: "https://developers.adp.com", notes: "OAuth 2.0, requires partner approval", sortOrder: 6 },
+  { category: "shop_integrations", title: "Gusto OAuth", description: "OAuth 2.0 - Modern payroll and benefits for small business", priority: "medium", status: "pending", dueDate: null, link: "https://dev.gusto.com", notes: "OAuth 2.0, REST API", sortOrder: 7 },
+  { category: "shop_integrations", title: "Paychex API", description: "Payroll and HR services integration", priority: "medium", status: "pending", dueDate: null, link: "https://developer.paychex.com", notes: "REST API with OAuth", sortOrder: 8 },
+  
+  // SHOP SOFTWARE - Scheduling & Communication
+  { category: "shop_integrations", title: "Google Calendar OAuth", description: "OAuth 2.0 - Sync appointments with Google accounts", priority: "high", status: "pending", dueDate: null, link: "https://console.cloud.google.com", notes: "OAuth 2.0, calendar.events scope", sortOrder: 9 },
+  { category: "shop_integrations", title: "Google Workspace OAuth", description: "OAuth 2.0 - Gmail, Drive, Sheets integration", priority: "medium", status: "pending", dueDate: null, link: "https://console.cloud.google.com", notes: "OAuth 2.0, multiple scopes available", sortOrder: 10 },
+  { category: "shop_integrations", title: "Microsoft 365 OAuth", description: "OAuth 2.0 - Outlook calendar and email sync", priority: "medium", status: "pending", dueDate: null, link: "https://portal.azure.com", notes: "Azure AD OAuth 2.0", sortOrder: 11 },
+  { category: "shop_integrations", title: "Twilio API", description: "API Key - SMS notifications and customer messaging", priority: "high", status: "pending", dueDate: null, link: "https://www.twilio.com/console", notes: "API Key auth, no OAuth", sortOrder: 12 },
+  { category: "shop_integrations", title: "SendGrid API", description: "API Key - Email notifications and invoices", priority: "medium", status: "pending", dueDate: null, link: "https://app.sendgrid.com", notes: "API Key auth, 69 char keys", sortOrder: 13 },
+  { category: "shop_integrations", title: "Mailchimp OAuth", description: "OAuth 2.0 - Email marketing and customer outreach", priority: "low", status: "pending", dueDate: null, link: "https://mailchimp.com/developer", notes: "OAuth 2.0, tokens never expire", sortOrder: 14 },
+  
+  // SHOP SOFTWARE - Vehicle Data
+  { category: "shop_integrations", title: "CARFAX API", description: "Vehicle history report integration", priority: "high", status: "pending", dueDate: null, link: "https://www.carfaxforlife.com", notes: "Contact for partnership", sortOrder: 15 },
+  { category: "shop_integrations", title: "AutoCheck API", description: "Vehicle history from Experian", priority: "medium", status: "pending", dueDate: null, link: "https://www.autocheck.com", notes: "Contact for API access", sortOrder: 16 },
+  { category: "shop_integrations", title: "Smartcar OAuth", description: "OAuth 2.0 - Connected vehicle data from 30+ brands", priority: "medium", status: "pending", dueDate: null, link: "https://smartcar.com/developers", notes: "OAuth 2.0, real-time vehicle data", sortOrder: 17 },
+  
+  // SHOP SOFTWARE - Payment
+  { category: "shop_integrations", title: "Square OAuth", description: "OAuth 2.0 - Payment processing and POS", priority: "medium", status: "pending", dueDate: null, link: "https://developer.squareup.com", notes: "OAuth 2.0 for Connect API", sortOrder: 18 },
+  { category: "shop_integrations", title: "PayPal OAuth", description: "OAuth 2.0 - Alternative payment option", priority: "low", status: "pending", dueDate: null, link: "https://developer.paypal.com", notes: "OAuth 2.0 REST API", sortOrder: 19 },
+  
+  // SHOP SOFTWARE - Competitor Data Import
+  { category: "shop_integrations", title: "Shopmonkey API", description: "API/OAuth - Import customer data from Shopmonkey shops", priority: "medium", status: "pending", dueDate: null, link: "https://shopmonkey.dev", notes: "REST API, Bearer token auth", sortOrder: 20 },
+  { category: "shop_integrations", title: "Tekmetric API", description: "REST API - Import from Tekmetric shops", priority: "medium", status: "pending", dueDate: null, link: "https://api.tekmetric.com", notes: "REST API with OAuth", sortOrder: 21 },
+  { category: "shop_integrations", title: "Mitchell 1 API", description: "Shop management data import", priority: "low", status: "pending", dueDate: null, link: "https://mitchell1.com", notes: "Contact for API access", sortOrder: 22 },
+  
+  // PARTS ORDERING INTEGRATIONS
+  { category: "parts_ordering", title: "PartsTech API (FREE)", description: "FREE API - Search 20,000+ suppliers, 7M+ parts, VIN lookup", priority: "high", status: "pending", dueDate: null, link: "https://partstech.com", notes: "FREE - Username + API key auth", sortOrder: 1 },
+  { category: "parts_ordering", title: "Nexpart/WHI Solutions API", description: "43,000+ seller locations, multi-seller stock check", priority: "high", status: "pending", dueDate: null, link: "https://whisolutions.com/products/nexpart-ecommerce-solution", notes: "SDK + REST API, contact WHI", sortOrder: 2 },
+  { category: "parts_ordering", title: "WorldPac SpeedDIAL API", description: "OEM and import parts distributor", priority: "medium", status: "pending", dueDate: null, link: "https://worldpac.com", notes: "Contact for API access", sortOrder: 3 },
+  { category: "parts_ordering", title: "RepairLink API", description: "OEM parts ordering integration", priority: "medium", status: "pending", dueDate: null, link: "https://repairlink.com", notes: "OEM parts network", sortOrder: 4 },
+  { category: "parts_ordering", title: "AutoZone Pro Commercial", description: "Commercial account integration for shops", priority: "high", status: "pending", dueDate: null, link: "https://www.autozonepro.com", notes: "Contact for commercial API", sortOrder: 5 },
+  { category: "parts_ordering", title: "O'Reilly Pro Commercial", description: "Commercial/shop account ordering", priority: "high", status: "pending", dueDate: null, link: "https://www.oreillyauto.com", notes: "Contact for commercial partnership", sortOrder: 6 },
+  { category: "parts_ordering", title: "Advance Pro Commercial", description: "Commercial parts ordering for shops", priority: "medium", status: "pending", dueDate: null, link: "https://shop.advanceautoparts.com", notes: "Contact for pro account API", sortOrder: 7 },
+  { category: "parts_ordering", title: "NAPA TRACS Integration", description: "NAPA commercial shop ordering", priority: "medium", status: "pending", dueDate: null, link: "https://napatracs.com", notes: "NAPA commercial accounts", sortOrder: 8 },
+  
+  // TOOL ORDERING (B2B/EDI)
+  { category: "parts_ordering", title: "Grainger API", description: "Industrial tool and supply ordering", priority: "medium", status: "pending", dueDate: null, link: "https://www.grainger.com", notes: "B2B API available", sortOrder: 9 },
+  { category: "parts_ordering", title: "MSC Industrial API", description: "Industrial tools and metalworking", priority: "medium", status: "pending", dueDate: null, link: "https://www.mscdirect.com", notes: "EDI/API for B2B", sortOrder: 10 },
+  { category: "parts_ordering", title: "Fastenal B2B Integration", description: "Industrial and construction supplies", priority: "low", status: "pending", dueDate: null, link: "https://www.fastenal.com", notes: "B2B integration options", sortOrder: 11 },
+  { category: "parts_ordering", title: "Snap-on B2B Portal", description: "Tool ordering for shops (EDI required)", priority: "low", status: "pending", dueDate: null, link: "https://b2b.snapon.com", notes: "Contact order@snapon.com for B2B", sortOrder: 12 },
+  { category: "parts_ordering", title: "Matco Tools EDI", description: "EDI integration via B2BGateway", priority: "low", status: "pending", dueDate: null, link: "https://www.matcotools.com", notes: "EDI via B2BGateway.net", sortOrder: 13 },
+  
+  // FORTELLIS MARKETPLACE
+  { category: "parts_ordering", title: "Fortellis Marketplace", description: "CDK Global automotive API marketplace", priority: "medium", status: "pending", dueDate: null, link: "https://fortellis.io", notes: "Automotive API ecosystem", sortOrder: 14 },
 ];
 
 export default function DevPortal() {
