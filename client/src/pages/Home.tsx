@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
 import { 
   Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink,
-  ScanLine, Camera, Mic, Wrench, Car, Sparkles, MessageCircle, Bot
+  ScanLine, Camera, Mic, Wrench, Car, Sparkles, MessageCircle, Bot, TrendingUp, Terminal
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
@@ -406,32 +406,65 @@ export default function Home() {
       </div>
       
       {/* Footer with Animated Wave Background */}
-      <footer className="border-t border-primary/20 bg-[#0a0f1e] relative overflow-hidden">
-        {/* Animated Wave Background - Seamless horizontal scroll */}
-        <div className="absolute inset-0 w-full pointer-events-none overflow-hidden">
+      <footer className="border-t border-primary/20 bg-[#0a0f1e] relative overflow-hidden min-h-[250px]">
+        {/* Animated Wave Background - Full width seamless scroll */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
           <div 
-            className="absolute bottom-0 left-0 flex"
+            className="absolute bottom-0 left-0 flex h-full w-[400%]"
             style={{ 
-              animation: 'waveScroll 180s linear infinite',
-              width: '200%'
+              animation: 'waveScroll 120s linear infinite',
             }}
           >
             <img 
               src={footerWave} 
               alt="" 
-              className="w-1/2 h-[150px] object-contain object-center flex-shrink-0"
+              className="h-full w-1/4 object-cover object-bottom flex-shrink-0 opacity-80"
             />
             <img 
               src={footerWave} 
               alt="" 
-              className="w-1/2 h-[150px] object-contain object-center flex-shrink-0"
+              className="h-full w-1/4 object-cover object-bottom flex-shrink-0 opacity-80"
+              style={{ transform: 'scaleX(-1)' }}
+            />
+            <img 
+              src={footerWave} 
+              alt="" 
+              className="h-full w-1/4 object-cover object-bottom flex-shrink-0 opacity-80"
+            />
+            <img 
+              src={footerWave} 
+              alt="" 
+              className="h-full w-1/4 object-cover object-bottom flex-shrink-0 opacity-80"
               style={{ transform: 'scaleX(-1)' }}
             />
           </div>
         </div>
         
         {/* Footer Content - Positioned over wave */}
-        <div className="container mx-auto px-4 text-center relative z-10 py-14 space-y-2">
+        <div className="container mx-auto px-4 text-center relative z-10 py-10 space-y-4">
+          {/* Action Buttons */}
+          <div className="flex flex-wrap justify-center gap-3 mb-4">
+            <Link href="/investors">
+              <Button 
+                className="font-tech uppercase gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 shadow-lg shadow-green-900/30"
+                data-testid="footer-button-investors"
+              >
+                <TrendingUp className="w-4 h-4" />
+                Investors
+              </Button>
+            </Link>
+            <Link href="/dev-portal">
+              <Button 
+                variant="outline"
+                className="font-tech uppercase gap-2 border-primary/50 text-primary hover:bg-primary/10 shadow-lg"
+                data-testid="footer-button-dev"
+              >
+                <Terminal className="w-4 h-4" />
+                Dev Portal
+              </Button>
+            </Link>
+          </div>
+          
           <p className="font-mono text-sm text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
             © 2025 DarkWave Studios LLC. All Rights Reserved.
           </p>
