@@ -14,11 +14,43 @@
 **Key Features:**
 - Vehicle fleet management ("My Garage") with VIN decoding
 - AI-powered part recommendations and DIY repair guides
+- **DIY Repair Guides** with YouTube video integration (18 vehicle categories)
 - Vehicle-aware affiliate search links with guaranteed fitment
 - Shopping cart with Stripe payments
 - Developer dashboard with partner outreach info (PIN: 0424)
 - Genesis Hallmark NFT system planned ($2/vehicle)
 - Pro subscription planned ($2.99/month)
+
+# DIY Repair Guides System
+
+**Comprehensive vehicle taxonomy** covering 18 vehicle categories:
+- Cars & Sedans, Trucks & Pickups, SUVs & Crossovers
+- Motorcycles, ATVs & Quads, UTVs & Side-by-Sides
+- Boats & Marine, Jet Skis & PWC
+- RVs & Motorhomes, Diesel & Commercial
+- Small Engines (lawn mowers, generators, chainsaws)
+- Classics & Vintage, Hot Rods & Customs, Exotics & Supercars
+- Chinese Imports, Scooters & Mopeds, Snowmobiles, Golf Carts & LSVs
+
+**YouTube Integration:**
+- Each guide has a YouTube search query for video alternatives
+- "Watch Videos" button opens YouTube search for the repair topic
+- Per-step YouTube search links for specific step instructions
+- Alternative to slideshows for users who prefer video tutorials
+
+**Cross-Industry Terminology:**
+- Terminology translation table maps part names across industries
+- Example: "lower unit oil" (marine) = "differential fluid" (automotive)
+- Supports: automotive, marine, motorcycle, small engine, ATV, diesel, RV terms
+
+**Database Tables:**
+- `vehicle_categories` - 18 seeded categories with systems, year ranges
+- `repair_guides` - Guides with YouTube links, difficulty, time estimates
+- `guide_steps` - Step-by-step instructions with tips, warnings, images
+- `guide_fitment` - Cross-vehicle compatibility mappings
+- `part_terminology` - Industry-specific term translations
+- `guide_ratings` - User feedback and helpful votes
+- `guide_progress` - Track user progress through guides
 
 # User Preferences
 
