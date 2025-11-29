@@ -9,23 +9,37 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { 
   BookOpen, Search, Car, Wrench, ChevronLeft, ChevronRight, Clock, 
   Gauge, AlertTriangle, CheckCircle2, Filter, X, Play, Pause,
   RotateCcw, Download, Share2, Bookmark, ThumbsUp, ArrowRight,
-  Lightbulb, ShoppingCart, ExternalLink, Zap, Anchor, Bike, Truck
+  Lightbulb, ShoppingCart, ExternalLink, Zap, Anchor, Bike, Truck,
+  Youtube, Ship, Snowflake, Leaf, Settings, Crown, Flame
 } from "lucide-react";
 
 type RepairCategory = "basic" | "intermediate" | "advanced";
-type VehicleType = "car" | "truck" | "motorcycle" | "boat" | "atv" | "small-engine";
+
+interface VehicleCategory {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  icon: string;
+  yearRangeStart: number;
+  yearRangeEnd: number;
+  commonSystems: string[];
+  sortOrder: number;
+  isActive: boolean;
+}
 
 interface RepairGuide {
   id: string;
   title: string;
   description: string;
   category: RepairCategory;
-  vehicleType: VehicleType;
+  vehicleType: string;
   estimatedTime: string;
   difficulty: number;
   toolsNeeded: string[];
@@ -34,6 +48,8 @@ interface RepairGuide {
   compatibleVehicles: string[];
   viewCount: number;
   helpfulCount: number;
+  youtubeSearchQuery?: string;
+  youtubeVideoId?: string;
 }
 
 interface GuideStep {
@@ -43,6 +59,8 @@ interface GuideStep {
   imageUrl?: string;
   tips?: string[];
   warnings?: string[];
+  youtubeVideoId?: string;
+  youtubeTimestamp?: number;
 }
 
 const sampleGuides: RepairGuide[] = [
@@ -59,6 +77,7 @@ const sampleGuides: RepairGuide[] = [
     compatibleVehicles: ["All cars and trucks"],
     viewCount: 15420,
     helpfulCount: 14200,
+    youtubeSearchQuery: "how to change oil DIY",
     steps: [
       { stepNumber: 1, title: "Prepare Your Vehicle", description: "Park on a level surface. If needed, use jack stands to safely raise the front of the vehicle. Never work under a car supported only by a jack.", tips: ["Warm up the engine for 2-3 minutes - warm oil drains faster"], warnings: ["Never get under a vehicle supported only by a jack"] },
       { stepNumber: 2, title: "Locate the Drain Plug", description: "Find the oil drain plug on the bottom of the engine oil pan. It's usually a bolt at the lowest point of the oil pan.", tips: ["Take a photo before removing anything so you remember where parts go"] },
@@ -83,6 +102,7 @@ const sampleGuides: RepairGuide[] = [
     compatibleVehicles: ["Most cars and light trucks 1990-present"],
     viewCount: 8934,
     helpfulCount: 8100,
+    youtubeSearchQuery: "how to replace front brake pads DIY",
     steps: [
       { stepNumber: 1, title: "Safety First", description: "Park on level ground. Loosen lug nuts before jacking. Raise vehicle and secure on jack stands. Remove the wheel.", warnings: ["Always use jack stands - never work under a car on just a jack", "Let brakes cool if vehicle was recently driven"] },
       { stepNumber: 2, title: "Inspect the Brake Assembly", description: "Look at your current brake pads, rotor, and caliper. Check rotor thickness and surface condition. Deep grooves may mean you need new rotors too.", tips: ["Take photos of the assembly before disassembly"] },
@@ -107,6 +127,7 @@ const sampleGuides: RepairGuide[] = [
     compatibleVehicles: ["Most cars and trucks"],
     viewCount: 12100,
     helpfulCount: 11500,
+    youtubeSearchQuery: "how to replace headlight bulb",
     steps: [
       { stepNumber: 1, title: "Identify Your Bulb Type", description: "Check your owner's manual or the existing bulb for the correct replacement type. Common types include H11, 9005, 9006, H7, and H1.", tips: ["Buy bulbs in pairs - if one burned out, the other is likely close behind"] },
       { stepNumber: 2, title: "Access the Headlight", description: "Open your hood and locate the back of the headlight housing. Some vehicles require removing the air filter box or battery for access.", tips: ["Take a photo of the connector before removal"] },
@@ -129,6 +150,7 @@ const sampleGuides: RepairGuide[] = [
     compatibleVehicles: ["All cars and trucks"],
     viewCount: 9870,
     helpfulCount: 9500,
+    youtubeSearchQuery: "how to replace engine air filter",
     steps: [
       { stepNumber: 1, title: "Locate the Air Filter Box", description: "Open your hood and find the air filter housing. It's usually a black plastic box near the front of the engine with a large hose connected to it.", tips: ["The air filter box is usually on the driver's side"] },
       { stepNumber: 2, title: "Open the Housing", description: "Release the clips or screws holding the air filter housing closed. Some vehicles use spring clips, others use screws.", tips: ["Note the orientation of the clips for reassembly"] },
@@ -151,6 +173,7 @@ const sampleGuides: RepairGuide[] = [
     compatibleVehicles: ["All gasoline engines"],
     viewCount: 7650,
     helpfulCount: 7100,
+    youtubeSearchQuery: "how to replace spark plugs DIY",
     steps: [
       { stepNumber: 1, title: "Let the Engine Cool", description: "Never work on spark plugs with a hot engine. Let it cool for at least an hour to avoid burns and to prevent thread damage.", warnings: ["Hot engines can cause severe burns", "Installing plugs in a hot engine can damage threads"] },
       { stepNumber: 2, title: "Access the Spark Plugs", description: "Locate your spark plugs. On most engines, they're under the ignition coils. You may need to remove an engine cover first.", tips: ["Work on one cylinder at a time to avoid mixing up wires"] },
@@ -161,6 +184,98 @@ const sampleGuides: RepairGuide[] = [
       { stepNumber: 7, title: "Reinstall the Coil", description: "Apply a thin layer of dielectric grease to the inside of the coil boot. Push the coil firmly onto the plug. Reinstall the bolt and reconnect the electrical connector.", tips: ["You should feel/hear the coil click onto the plug"] },
       { stepNumber: 8, title: "Repeat and Test", description: "Repeat for remaining cylinders. Start the engine and check for smooth idle. Listen for any misfires or unusual sounds.", tips: ["A rough idle after installation usually means a plug isn't seated correctly"] }
     ]
+  },
+  {
+    id: "outboard-impeller",
+    title: "Outboard Water Pump Impeller",
+    description: "Essential maintenance for outboard motors. Replace the water pump impeller to prevent overheating.",
+    category: "intermediate",
+    vehicleType: "boat",
+    estimatedTime: "1-2 hours",
+    difficulty: 3,
+    toolsNeeded: ["Socket wrench set", "Screwdrivers", "Impeller puller", "Gasket scraper", "Marine grease"],
+    partsNeeded: ["Water pump impeller kit", "Lower unit gaskets"],
+    compatibleVehicles: ["All outboard motors"],
+    viewCount: 4250,
+    helpfulCount: 3900,
+    youtubeSearchQuery: "how to replace outboard impeller water pump",
+    steps: [
+      { stepNumber: 1, title: "Gather Materials", description: "Get the correct impeller kit for your motor. Kits usually include the impeller, gaskets, and wear plate.", tips: ["Always replace impeller every 2-3 years or 300 hours"] },
+      { stepNumber: 2, title: "Remove Lower Unit", description: "Drain the gear oil. Remove the lower unit bolts. Carefully slide the lower unit down and off the driveshaft.", warnings: ["Support the lower unit - it's heavy and can fall"] },
+      { stepNumber: 3, title: "Access Water Pump", description: "Remove the water pump housing bolts. Lift off the pump housing to expose the impeller.", tips: ["Note the orientation of all parts as you remove them"] },
+      { stepNumber: 4, title: "Remove Old Impeller", description: "Use an impeller puller or carefully pry out the old impeller. Inspect the impeller for wear, cracks, or missing fins.", warnings: ["A damaged impeller can cause overheating and engine damage"] },
+      { stepNumber: 5, title: "Install New Impeller", description: "Apply marine grease to the new impeller. Twist vanes in direction of rotation. Slide onto driveshaft and seat firmly.", tips: ["Grease helps with installation and initial startup"] },
+      { stepNumber: 6, title: "Reassemble and Test", description: "Reinstall housing with new gasket. Reassemble lower unit with fresh gear oil. Test water flow from tell-tale when running.", tips: ["Check for strong water stream from tell-tale"] }
+    ]
+  },
+  {
+    id: "atv-cvt-belt",
+    title: "CVT Belt Replacement",
+    description: "Replace the CVT drive belt on your ATV or UTV for restored power and acceleration.",
+    category: "intermediate",
+    vehicleType: "atv",
+    estimatedTime: "1-2 hours",
+    difficulty: 2,
+    toolsNeeded: ["Socket wrench set", "Clutch tools", "CVT cover tool", "Torque wrench"],
+    partsNeeded: ["CVT belt (correct size for your machine)"],
+    compatibleVehicles: ["ATVs and UTVs with CVT transmission"],
+    viewCount: 3100,
+    helpfulCount: 2850,
+    youtubeSearchQuery: "how to replace ATV CVT belt",
+    steps: [
+      { stepNumber: 1, title: "Access CVT Cover", description: "Park on level ground. Remove the CVT cover bolts and carefully remove the cover. Inspect for debris.", tips: ["Take a photo before removal for reference"] },
+      { stepNumber: 2, title: "Inspect Old Belt", description: "Check the belt for cracks, glazing, or wear. Measure belt width and compare to spec.", warnings: ["A worn belt causes poor acceleration and slipping"] },
+      { stepNumber: 3, title: "Release Belt Tension", description: "Compress the secondary clutch to release belt tension. Slide the old belt off both clutches.", tips: ["Some machines have a belt release tool slot"] },
+      { stepNumber: 4, title: "Install New Belt", description: "Route the new belt around the secondary clutch first, then the primary. Make sure it sits in the grooves properly.", tips: ["The belt should sit centered in both clutches"] },
+      { stepNumber: 5, title: "Clean and Inspect", description: "Clean clutch faces with brake cleaner. Inspect clutch weights and springs for wear.", warnings: ["Never use petroleum-based cleaners on clutch faces"] },
+      { stepNumber: 6, title: "Reassemble", description: "Replace the CVT cover with a new gasket if needed. Torque bolts to spec. Test ride and check for proper operation.", tips: ["Break in new belt gently for first 10 miles"] }
+    ]
+  },
+  {
+    id: "small-engine-carb",
+    title: "Small Engine Carburetor Cleaning",
+    description: "Restore power to your lawn mower, generator, or small engine by cleaning the carburetor.",
+    category: "intermediate",
+    vehicleType: "small-engine",
+    estimatedTime: "1-2 hours",
+    difficulty: 2,
+    toolsNeeded: ["Screwdriver set", "Socket set", "Carburetor cleaner", "Compressed air", "Small wire or needle"],
+    partsNeeded: ["Carburetor rebuild kit (gaskets, needle, float)"],
+    compatibleVehicles: ["Lawn mowers, generators, pressure washers, chainsaws"],
+    viewCount: 6800,
+    helpfulCount: 6200,
+    youtubeSearchQuery: "how to clean small engine carburetor",
+    steps: [
+      { stepNumber: 1, title: "Disconnect Fuel", description: "Turn off fuel valve or clamp fuel line. Remove air filter and housing.", warnings: ["Work in ventilated area away from sparks"] },
+      { stepNumber: 2, title: "Remove Carburetor", description: "Disconnect throttle linkage and fuel line. Remove mounting bolts. Carefully remove carburetor.", tips: ["Take photos of all linkage connections"] },
+      { stepNumber: 3, title: "Disassemble Carburetor", description: "Remove bowl, float, needle valve, and jets. Lay parts out in order.", tips: ["A magnetic tray helps keep small parts organized"] },
+      { stepNumber: 4, title: "Clean All Passages", description: "Spray carb cleaner through all passages. Use compressed air to clear. Clean jets with fine wire if clogged.", warnings: ["Never use wire larger than the jet hole"] },
+      { stepNumber: 5, title: "Replace Worn Parts", description: "Install new gaskets, needle valve, and float if worn. Check float height against specification.", tips: ["Rebuild kits are cheap insurance"] },
+      { stepNumber: 6, title: "Reassemble and Test", description: "Reinstall carb with new gaskets. Reconnect linkage and fuel. Start engine and adjust idle if needed.", tips: ["Let engine warm up before final adjustments"] }
+    ]
+  },
+  {
+    id: "motorcycle-chain",
+    title: "Motorcycle Chain Maintenance",
+    description: "Clean, lubricate, and adjust your motorcycle chain for smooth power delivery and extended life.",
+    category: "basic",
+    vehicleType: "motorcycle",
+    estimatedTime: "30-45 min",
+    difficulty: 1,
+    toolsNeeded: ["Rear stand or paddock stand", "Chain brush", "Chain cleaner", "Chain lube", "Wrenches for axle adjusters"],
+    partsNeeded: ["Chain cleaner", "Chain lubricant (O-ring safe)"],
+    compatibleVehicles: ["All chain-drive motorcycles"],
+    viewCount: 5400,
+    helpfulCount: 5100,
+    youtubeSearchQuery: "motorcycle chain maintenance how to",
+    steps: [
+      { stepNumber: 1, title: "Raise the Rear Wheel", description: "Put motorcycle on rear stand so wheel spins freely. If no stand, work in sections.", tips: ["A center stand or rear paddock stand makes this much easier"] },
+      { stepNumber: 2, title: "Inspect the Chain", description: "Check for tight spots, kinks, rust, or damaged O-rings. Look for stretched links.", warnings: ["Replace chain if any links are stiff or damaged"] },
+      { stepNumber: 3, title: "Clean the Chain", description: "Spray chain cleaner on all sides of the chain while rotating wheel. Scrub with chain brush.", tips: ["Use only O-ring safe cleaners"] },
+      { stepNumber: 4, title: "Wipe and Dry", description: "Wipe excess cleaner with clean rag. Let chain dry completely before lubricating.", warnings: ["Don't let cleaner sit too long - it can damage O-rings"] },
+      { stepNumber: 5, title: "Apply Lubricant", description: "Apply chain lube to inside of chain while rotating wheel. Focus on rollers and pins.", tips: ["Apply lube after riding when chain is warm for better penetration"] },
+      { stepNumber: 6, title: "Check Tension", description: "Measure chain slack at midpoint between sprockets. Adjust axle adjusters if needed. Typical spec is 1-1.5 inches.", tips: ["Check owner's manual for exact specification"] }
+    ]
   }
 ];
 
@@ -170,22 +285,66 @@ const categoryInfo = {
   advanced: { label: "Advanced", color: "bg-red-500", description: "Experienced DIYers" }
 };
 
-const vehicleTypeIcons: Record<VehicleType, typeof Car> = {
-  car: Car,
-  truck: Truck,
-  motorcycle: Bike,
-  boat: Anchor,
-  atv: Zap,
-  "small-engine": Wrench
+const iconMap: Record<string, typeof Car> = {
+  Car: Car,
+  Truck: Truck,
+  Bike: Bike,
+  Anchor: Anchor,
+  Zap: Zap,
+  Wrench: Wrench,
+  Ship: Ship,
+  Snowflake: Snowflake,
+  Leaf: Leaf,
+  Settings: Settings,
+  Crown: Crown,
+  Flame: Flame,
 };
+
+function getVehicleIcon(iconName: string, slug: string): typeof Car {
+  if (iconMap[iconName]) return iconMap[iconName];
+  const defaultIcons: Record<string, typeof Car> = {
+    car: Car,
+    truck: Truck,
+    motorcycle: Bike,
+    boat: Anchor,
+    atv: Zap,
+    utv: Truck,
+    "small-engine": Wrench,
+    rv: Truck,
+    diesel: Truck,
+    suv: Car,
+    classic: Car,
+    hotrod: Flame,
+    exotic: Crown,
+    "chinese-import": Bike,
+    scooter: Bike,
+    snowmobile: Snowflake,
+    "jet-ski": Anchor,
+    "golf-cart": Car,
+  };
+  return defaultIcons[slug] || Wrench;
+}
+
+function generateYoutubeSearchUrl(query: string, vehicleMake?: string, vehicleModel?: string): string {
+  let searchQuery = query;
+  if (vehicleMake && vehicleModel) {
+    searchQuery = `${vehicleMake} ${vehicleModel} ${query}`;
+  }
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+}
 
 export default function DIYGuides() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<RepairCategory | "all">("all");
-  const [selectedVehicleType, setSelectedVehicleType] = useState<VehicleType | "all">("all");
+  const [selectedVehicleType, setSelectedVehicleType] = useState<string>("all");
   const [selectedGuide, setSelectedGuide] = useState<RepairGuide | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(false);
+
+  const { data: vehicleCategories = [] } = useQuery<VehicleCategory[]>({
+    queryKey: ["/api/diy-guides/categories"],
+    staleTime: 1000 * 60 * 60,
+  });
 
   const filteredGuides = sampleGuides.filter(guide => {
     const matchesSearch = guide.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -205,6 +364,11 @@ export default function DIYGuides() {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     }
+  };
+
+  const getVehicleTypeDisplay = (slug: string): string => {
+    const category = vehicleCategories.find(c => c.slug === slug);
+    return category?.name || slug.charAt(0).toUpperCase() + slug.slice(1);
   };
 
   return (
@@ -260,21 +424,82 @@ export default function DIYGuides() {
             </SelectContent>
           </Select>
           
-          <Select value={selectedVehicleType} onValueChange={(v) => setSelectedVehicleType(v as VehicleType | "all")}>
-            <SelectTrigger className="w-40" data-testid="select-vehicle-type">
+          <Select value={selectedVehicleType} onValueChange={(v) => setSelectedVehicleType(v)}>
+            <SelectTrigger className="w-48" data-testid="select-vehicle-type">
               <SelectValue placeholder="Vehicle Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="car">Cars</SelectItem>
-              <SelectItem value="truck">Trucks</SelectItem>
-              <SelectItem value="motorcycle">Motorcycles</SelectItem>
-              <SelectItem value="boat">Boats</SelectItem>
-              <SelectItem value="atv">ATVs/UTVs</SelectItem>
-              <SelectItem value="small-engine">Small Engines</SelectItem>
+              <SelectItem value="all">All Vehicle Types</SelectItem>
+              {vehicleCategories.length > 0 ? (
+                vehicleCategories.map((category) => (
+                  <SelectItem key={category.slug} value={category.slug}>
+                    {category.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <>
+                  <SelectItem value="car">Cars & Sedans</SelectItem>
+                  <SelectItem value="truck">Trucks & Pickups</SelectItem>
+                  <SelectItem value="suv">SUVs & Crossovers</SelectItem>
+                  <SelectItem value="motorcycle">Motorcycles</SelectItem>
+                  <SelectItem value="boat">Boats & Marine</SelectItem>
+                  <SelectItem value="atv">ATVs & Quads</SelectItem>
+                  <SelectItem value="utv">UTVs & Side-by-Sides</SelectItem>
+                  <SelectItem value="rv">RVs & Motorhomes</SelectItem>
+                  <SelectItem value="small-engine">Small Engines</SelectItem>
+                  <SelectItem value="diesel">Diesel & Commercial</SelectItem>
+                  <SelectItem value="classic">Classics & Vintage</SelectItem>
+                  <SelectItem value="hotrod">Hot Rods & Customs</SelectItem>
+                  <SelectItem value="exotic">Exotics & Supercars</SelectItem>
+                  <SelectItem value="chinese-import">Chinese Imports</SelectItem>
+                  <SelectItem value="scooter">Scooters & Mopeds</SelectItem>
+                  <SelectItem value="snowmobile">Snowmobiles</SelectItem>
+                  <SelectItem value="jet-ski">Jet Skis & PWC</SelectItem>
+                  <SelectItem value="golf-cart">Golf Carts & LSVs</SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
         </motion.div>
+
+        {vehicleCategories.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="mb-8"
+          >
+            <ScrollArea className="w-full">
+              <div className="flex gap-2 pb-4 justify-center flex-wrap">
+                <Button
+                  variant={selectedVehicleType === "all" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedVehicleType("all")}
+                  className="flex-shrink-0"
+                  data-testid="button-all-types"
+                >
+                  All Types
+                </Button>
+                {vehicleCategories.slice(0, 12).map((category) => {
+                  const IconComponent = getVehicleIcon(category.icon, category.slug);
+                  return (
+                    <Button
+                      key={category.slug}
+                      variant={selectedVehicleType === category.slug ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedVehicleType(category.slug)}
+                      className="flex-shrink-0 gap-1"
+                      data-testid={`button-category-${category.slug}`}
+                    >
+                      <IconComponent className="w-3 h-3" />
+                      {category.name.split(' ')[0]}
+                    </Button>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </motion.div>
+        )}
 
         <Tabs defaultValue="basic" className="w-full">
           <TabsList className="grid grid-cols-3 max-w-md mx-auto mb-6">
@@ -295,7 +520,7 @@ export default function DIYGuides() {
                 {filteredGuides
                   .filter(g => g.category === cat)
                   .map((guide, idx) => {
-                    const VehicleIcon = vehicleTypeIcons[guide.vehicleType];
+                    const VehicleIcon = getVehicleIcon("", guide.vehicleType);
                     return (
                       <motion.div
                         key={guide.id}
@@ -317,7 +542,9 @@ export default function DIYGuides() {
                                 <h3 className="font-tech font-bold text-foreground group-hover:text-primary transition-colors">
                                   {guide.title}
                                 </h3>
-                                <p className="text-xs text-muted-foreground">{guide.steps.length} steps</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {guide.steps.length} steps • {getVehicleTypeDisplay(guide.vehicleType)}
+                                </p>
                               </div>
                             </div>
                             <Badge className={`${categoryInfo[guide.category].color} text-black text-[10px]`}>
@@ -330,13 +557,21 @@ export default function DIYGuides() {
                           </p>
                           
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {guide.estimatedTime}
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {guide.estimatedTime}
+                              </div>
+                              {guide.youtubeSearchQuery && (
+                                <div className="flex items-center gap-1 text-red-400">
+                                  <Youtube className="w-3 h-3" />
+                                  Videos
+                                </div>
+                              )}
                             </div>
                             <div className="flex items-center gap-1">
                               <ThumbsUp className="w-3 h-3" />
-                              {guide.helpfulCount.toLocaleString()} helpful
+                              {guide.helpfulCount.toLocaleString()}
                             </div>
                           </div>
                         </Card>
@@ -366,12 +601,26 @@ export default function DIYGuides() {
                         {selectedGuide.title}
                       </DialogTitle>
                       <DialogDescription className="text-muted-foreground">
-                        Step {currentStep + 1} of {selectedGuide.steps.length}
+                        Step {currentStep + 1} of {selectedGuide.steps.length} • {getVehicleTypeDisplay(selectedGuide.vehicleType)}
                       </DialogDescription>
                     </div>
-                    <Badge className={`${categoryInfo[selectedGuide.category].color} text-black`}>
-                      {categoryInfo[selectedGuide.category].label}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {selectedGuide.youtubeSearchQuery && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1 text-red-400 border-red-400/30 hover:bg-red-400/10"
+                          onClick={() => window.open(generateYoutubeSearchUrl(selectedGuide.youtubeSearchQuery!), '_blank')}
+                          data-testid="button-youtube-search"
+                        >
+                          <Youtube className="w-4 h-4" />
+                          Watch Videos
+                        </Button>
+                      )}
+                      <Badge className={`${categoryInfo[selectedGuide.category].color} text-black`}>
+                        {categoryInfo[selectedGuide.category].label}
+                      </Badge>
+                    </div>
                   </div>
                   
                   <div className="w-full bg-black/30 rounded-full h-2 mt-4">
@@ -433,6 +682,31 @@ export default function DIYGuides() {
                           </ul>
                         </div>
                       )}
+
+                      {selectedGuide.youtubeSearchQuery && (
+                        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Youtube className="w-5 h-5 text-red-400" />
+                              <span className="font-medium text-red-400">Prefer watching a video?</span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-400 hover:bg-red-400/20"
+                              onClick={() => window.open(
+                                generateYoutubeSearchUrl(
+                                  `${selectedGuide.title} step ${currentStep + 1} ${selectedGuide.steps[currentStep].title}`
+                                ), 
+                                '_blank'
+                              )}
+                              data-testid="button-youtube-step"
+                            >
+                              Search This Step <ExternalLink className="w-3 h-3 ml-1" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </motion.div>
                   </AnimatePresence>
                   
@@ -479,7 +753,12 @@ export default function DIYGuides() {
                   </Button>
                   
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" title="Restart">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      title="Restart"
+                      onClick={() => setCurrentStep(0)}
+                    >
                       <RotateCcw className="w-4 h-4" />
                     </Button>
                     <Button variant="ghost" size="icon" title="Save Guide">
@@ -488,6 +767,17 @@ export default function DIYGuides() {
                     <Button variant="ghost" size="icon" title="Share">
                       <Share2 className="w-4 h-4" />
                     </Button>
+                    {selectedGuide.youtubeSearchQuery && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        title="Watch on YouTube"
+                        className="text-red-400"
+                        onClick={() => window.open(generateYoutubeSearchUrl(selectedGuide.youtubeSearchQuery!), '_blank')}
+                      >
+                        <Youtube className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                   
                   {currentStep === selectedGuide.steps.length - 1 ? (
