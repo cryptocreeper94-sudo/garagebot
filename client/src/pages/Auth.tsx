@@ -108,7 +108,7 @@ export default function Auth() {
       }
       
       toast({ title: "Welcome back!", description: `Logged in as ${data.user.username}` });
-      setLocation("/");
+      setLocation("/dashboard");
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
@@ -203,7 +203,7 @@ export default function Auth() {
 
   const finishSignup = () => {
     setShowRecoveryDialog(false);
-    setLocation("/");
+    setLocation("/dashboard");
   };
 
   return (
