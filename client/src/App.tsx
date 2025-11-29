@@ -8,6 +8,7 @@ import OnboardingModal from "@/components/OnboardingModal";
 import AIMascot from "@/components/AIMascot";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
+import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Results from "@/pages/Results";
@@ -57,6 +58,18 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <TooltipProvider>
+          {/* Site-wide GB Watermark Background */}
+          <div 
+            className="fixed inset-0 z-[-2] pointer-events-none flex items-center justify-center"
+            aria-hidden="true"
+          >
+            <img 
+              src={gbEmblem} 
+              alt="" 
+              className="w-[60vmin] h-[60vmin] max-w-[500px] max-h-[500px] opacity-[0.04] select-none"
+              style={{ filter: 'grayscale(30%)' }}
+            />
+          </div>
           <Toaster />
           <OnboardingModal />
           <AddToHomeScreen />

@@ -99,7 +99,7 @@ export default function Home() {
               SYSTEM ONLINE // WEB3 VERIFIED
             </div>
             
-            {/* GarageBot Logo - Larger on desktop */}
+            {/* GarageBot Logo with Welcome Text */}
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -109,13 +109,13 @@ export default function Home() {
               <img 
                 src={gbEmblem} 
                 alt="GarageBot Emblem" 
-                className="w-32 h-32 md:w-40 md:h-40 lg:w-52 lg:h-52 xl:w-60 xl:h-60 mx-auto drop-shadow-[0_0_40px_rgba(6,182,212,0.6)] hover:drop-shadow-[0_0_60px_rgba(6,182,212,0.8)] transition-all duration-500 hover:scale-105"
+                className="w-28 h-28 md:w-36 md:h-36 lg:w-44 lg:h-44 xl:w-52 xl:h-52 mx-auto drop-shadow-[0_0_40px_rgba(6,182,212,0.6)] hover:drop-shadow-[0_0_60px_rgba(6,182,212,0.8)] transition-all duration-500 hover:scale-105"
                 data-testid="img-garagebot-logo"
               />
             </motion.div>
             
-            <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-tech font-medium uppercase tracking-widest text-muted-foreground -mt-6 lg:-mt-8">
-              Garage<span className="text-primary">Bot</span>
+            <h1 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-tech font-medium uppercase tracking-widest text-muted-foreground -mt-4 lg:-mt-6">
+              Welcome to <span className="text-primary">G</span>arage<span className="text-primary">B</span>ot<span className="text-foreground">.io</span>
             </h1>
             <p className="text-sm md:text-base lg:text-lg font-light text-muted-foreground/70 mt-1">
               Right Part. First Time. Every Engine.

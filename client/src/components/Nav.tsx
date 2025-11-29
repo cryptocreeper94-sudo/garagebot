@@ -35,8 +35,8 @@ export default function Nav() {
                 alt="GB" 
                 className="w-14 h-14 md:w-16 md:h-16 lg:w-[72px] lg:h-[72px] object-contain drop-shadow-[0_0_12px_rgba(6,182,212,0.6)] group-hover:drop-shadow-[0_0_20px_rgba(6,182,212,0.9)] transition-all duration-300 group-hover:scale-105 -my-2"
               />
-              <span className="font-tech font-bold text-lg md:text-xl lg:text-2xl tracking-wide uppercase text-foreground">
-                Garage<span className="text-primary">Bot</span>
+              <span className="font-tech font-bold text-sm md:text-base lg:text-lg tracking-wide uppercase text-foreground">
+                <span className="text-primary">G</span>arage<span className="text-primary">B</span>ot<span className="text-muted-foreground">.io</span>
               </span>
             </div>
           </Link>
