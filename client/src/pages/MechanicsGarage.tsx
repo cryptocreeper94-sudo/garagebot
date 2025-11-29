@@ -1,0 +1,1030 @@
+import { useState, useEffect } from "react";
+import { Link } from "wouter";
+import Nav from "@/components/Nav";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Plus, Store, Users, MessageSquare, Settings, Star, MapPin, Phone, 
+  Mail, Clock, Wrench, Send, ChevronRight, Loader2, Building2,
+  UserPlus, Calendar, DollarSign, AlertCircle, CheckCircle, Eye,
+  ClipboardList, FileText, Timer, Package, BarChart3, Camera,
+  Car, Ship, Bike, Truck, Cog, Anchor, Zap, Tractor, Mountain,
+  Play, Pause, Receipt, CreditCard, Search, Filter, ArrowUpDown,
+  ChevronDown, MoreHorizontal, Edit, Trash2, ExternalLink, 
+  CalendarDays, UserCheck, AlertTriangle, CircleDot, X
+} from "lucide-react";
+
+const VEHICLE_TYPES = [
+  { id: "car", name: "Cars", icon: Car },
+  { id: "truck", name: "Trucks", icon: Truck },
+  { id: "motorcycle", name: "Motorcycles", icon: Bike },
+  { id: "atv", name: "ATVs/UTVs", icon: Mountain },
+  { id: "boat", name: "Boats/Marine", icon: Anchor },
+  { id: "rv", name: "RVs", icon: Truck },
+  { id: "diesel", name: "Diesel/Commercial", icon: Truck },
+  { id: "small_engine", name: "Small Engines", icon: Cog },
+  { id: "generator", name: "Generators", icon: Zap },
+  { id: "tractor", name: "Tractors/Farm", icon: Tractor },
+  { id: "classic", name: "Classics", icon: Car },
+  { id: "exotic", name: "Exotics", icon: Car },
+];
+
+const ORDER_STATUSES = [
+  { id: "pending", name: "Pending", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
+  { id: "checked_in", name: "Checked In", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+  { id: "in_progress", name: "In Progress", color: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  { id: "waiting_parts", name: "Waiting Parts", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
+  { id: "waiting_approval", name: "Waiting Approval", color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" },
+  { id: "completed", name: "Completed", color: "bg-green-500/20 text-green-400 border-green-500/30" },
+  { id: "picked_up", name: "Picked Up", color: "bg-gray-500/20 text-gray-400 border-gray-500/30" },
+];
+
+interface Shop {
+  id: string;
+  ownerId: string;
+  name: string;
+  slug: string;
+  description?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  rating?: string;
+  reviewCount?: number;
+  isActive: boolean;
+  vehicleTypes?: string[];
+  createdAt: string;
+}
+
+interface RepairOrder {
+  id: string;
+  shopId: string;
+  orderNumber: string;
+  customerName?: string;
+  customerPhone?: string;
+  vehicleInfo?: string;
+  vehicleType?: string;
+  status: string;
+  priority?: string;
+  grandTotal?: string;
+  paymentStatus?: string;
+  promisedDate?: string;
+  createdAt: string;
+}
+
+interface Appointment {
+  id: string;
+  shopId: string;
+  customerName?: string;
+  customerPhone?: string;
+  vehicleInfo?: string;
+  serviceType?: string;
+  scheduledStart: string;
+  status: string;
+}
+
+interface Estimate {
+  id: string;
+  shopId: string;
+  estimateNumber: string;
+  customerName?: string;
+  vehicleInfo?: string;
+  grandTotal?: string;
+  status: string;
+  createdAt: string;
+}
+
+export default function MechanicsGarage() {
+  const { user, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [createShopOpen, setCreateShopOpen] = useState(false);
+  const [createOrderOpen, setCreateOrderOpen] = useState(false);
+  const [createAppointmentOpen, setCreateAppointmentOpen] = useState(false);
+  const [selectedVehicleTypes, setSelectedVehicleTypes] = useState<string[]>([]);
+  
+  const [newShop, setNewShop] = useState({ 
+    name: "", 
+    description: "", 
+    address: "", 
+    city: "", 
+    state: "", 
+    zipCode: "", 
+    phone: "", 
+    email: "",
+    vehicleTypes: [] as string[]
+  });
+
+  const [newOrder, setNewOrder] = useState({
+    customerName: "",
+    customerPhone: "",
+    customerEmail: "",
+    vehicleInfo: "",
+    vehicleType: "car",
+    notes: "",
+    priority: "normal"
+  });
+
+  const [newAppointment, setNewAppointment] = useState({
+    customerName: "",
+    customerPhone: "",
+    vehicleInfo: "",
+    serviceType: "",
+    scheduledStart: "",
+    notes: ""
+  });
+
+  const { data: myShops = [], isLoading: shopsLoading } = useQuery<Shop[]>({
+    queryKey: ["/api/my-shops"],
+    enabled: !!user,
+  });
+
+  const { data: repairOrders = [], isLoading: ordersLoading } = useQuery<RepairOrder[]>({
+    queryKey: ["/api/shops", selectedShop?.id, "repair-orders"],
+    queryFn: async () => {
+      if (!selectedShop) return [];
+      const res = await fetch(`/api/shops/${selectedShop.id}/repair-orders`);
+      if (!res.ok) return [];
+      return await res.json();
+    },
+    enabled: !!selectedShop,
+  });
+
+  const { data: appointments = [] } = useQuery<Appointment[]>({
+    queryKey: ["/api/shops", selectedShop?.id, "appointments"],
+    queryFn: async () => {
+      if (!selectedShop) return [];
+      const res = await fetch(`/api/shops/${selectedShop.id}/appointments`);
+      if (!res.ok) return [];
+      return await res.json();
+    },
+    enabled: !!selectedShop,
+  });
+
+  const { data: estimates = [] } = useQuery<Estimate[]>({
+    queryKey: ["/api/shops", selectedShop?.id, "estimates"],
+    queryFn: async () => {
+      if (!selectedShop) return [];
+      const res = await fetch(`/api/shops/${selectedShop.id}/estimates`);
+      if (!res.ok) return [];
+      return await res.json();
+    },
+    enabled: !!selectedShop,
+  });
+
+  const createShopMutation = useMutation({
+    mutationFn: async (shop: typeof newShop) => {
+      const res = await fetch("/api/shops", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...shop, vehicleTypes: selectedVehicleTypes })
+      });
+      if (!res.ok) throw new Error("Failed to create shop");
+      return res.json();
+    },
+    onSuccess: (shop) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/my-shops"] });
+      setCreateShopOpen(false);
+      setNewShop({ name: "", description: "", address: "", city: "", state: "", zipCode: "", phone: "", email: "", vehicleTypes: [] });
+      setSelectedVehicleTypes([]);
+      setSelectedShop(shop);
+      toast({ title: "Shop Created", description: `${shop.name} is now registered` });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create shop", variant: "destructive" });
+    }
+  });
+
+  const createOrderMutation = useMutation({
+    mutationFn: async (order: typeof newOrder) => {
+      if (!selectedShop) throw new Error("No shop selected");
+      const res = await fetch(`/api/shops/${selectedShop.id}/repair-orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order)
+      });
+      if (!res.ok) throw new Error("Failed to create order");
+      return res.json();
+    },
+    onSuccess: (order) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/shops", selectedShop?.id, "repair-orders"] });
+      setCreateOrderOpen(false);
+      setNewOrder({ customerName: "", customerPhone: "", customerEmail: "", vehicleInfo: "", vehicleType: "car", notes: "", priority: "normal" });
+      toast({ title: "Repair Order Created", description: `Order #${order.orderNumber} created` });
+    }
+  });
+
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (apt: typeof newAppointment) => {
+      if (!selectedShop) throw new Error("No shop selected");
+      const res = await fetch(`/api/shops/${selectedShop.id}/appointments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(apt)
+      });
+      if (!res.ok) throw new Error("Failed to create appointment");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/shops", selectedShop?.id, "appointments"] });
+      setCreateAppointmentOpen(false);
+      setNewAppointment({ customerName: "", customerPhone: "", vehicleInfo: "", serviceType: "", scheduledStart: "", notes: "" });
+      toast({ title: "Appointment Scheduled" });
+    }
+  });
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = ORDER_STATUSES.find(s => s.id === status) || ORDER_STATUSES[0];
+    return (
+      <Badge variant="outline" className={`${statusConfig.color} text-xs font-mono`}>
+        {statusConfig.name}
+      </Badge>
+    );
+  };
+
+  const getVehicleIcon = (type: string) => {
+    const vehicleType = VEHICLE_TYPES.find(v => v.id === type);
+    const IconComponent = vehicleType?.icon || Car;
+    return <IconComponent className="w-4 h-4" />;
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground font-sans">
+        <Nav />
+        <div className="container mx-auto px-4 pt-24 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background text-foreground font-sans">
+        <Nav />
+        <div className="container mx-auto px-4 pt-24 text-center">
+          <Wrench className="w-24 h-24 mx-auto mb-6 text-primary/30" />
+          <h1 className="text-3xl font-tech font-bold uppercase text-primary mb-4">Mechanics Garage</h1>
+          <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
+            Professional shop management for ALL vehicle types - cars, trucks, boats, ATVs, motorcycles, small engines, and more.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {VEHICLE_TYPES.slice(0, 8).map(vt => (
+              <Badge key={vt.id} variant="outline" className="gap-1 text-xs">
+                <vt.icon className="w-3 h-3" />
+                {vt.name}
+              </Badge>
+            ))}
+          </div>
+          <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/api/login"} data-testid="button-login">
+            Sign In to Get Started
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background text-foreground font-sans">
+      <Nav />
+      <div className="container mx-auto px-4 pt-24 pb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-tech font-bold uppercase text-primary flex items-center gap-3" data-testid="text-page-title">
+              <Wrench className="w-8 h-8" />
+              Mechanics Garage
+            </h1>
+            <p className="text-muted-foreground mt-2 font-mono text-sm">
+              REPAIR ORDERS • ESTIMATES • SCHEDULING • INSPECTIONS • PAYMENTS
+            </p>
+          </div>
+          <Dialog open={createShopOpen} onOpenChange={setCreateShopOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 font-tech uppercase" data-testid="button-register-shop">
+                <Plus className="w-4 h-4" /> Register Shop
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="font-tech text-xl uppercase">Register Your Shop</DialogTitle>
+                <DialogDescription>Add your repair shop to Mechanics Garage</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <Label>Shop Name *</Label>
+                    <Input 
+                      value={newShop.name} 
+                      onChange={(e) => setNewShop({ ...newShop, name: e.target.value })} 
+                      placeholder="Mike's Marine & Auto" 
+                      data-testid="input-shop-name" 
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <Label>Description</Label>
+                    <Textarea 
+                      value={newShop.description} 
+                      onChange={(e) => setNewShop({ ...newShop, description: e.target.value })} 
+                      placeholder="Full-service repair for boats, cars, trucks, and small engines..." 
+                      data-testid="input-shop-description" 
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <Label className="mb-2 block">Vehicle Types Serviced</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {VEHICLE_TYPES.map(vt => (
+                        <div 
+                          key={vt.id}
+                          className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-all ${
+                            selectedVehicleTypes.includes(vt.id) 
+                              ? 'bg-primary/20 border-primary' 
+                              : 'bg-muted/30 border-muted hover:border-primary/50'
+                          }`}
+                          onClick={() => {
+                            if (selectedVehicleTypes.includes(vt.id)) {
+                              setSelectedVehicleTypes(selectedVehicleTypes.filter(v => v !== vt.id));
+                            } else {
+                              setSelectedVehicleTypes([...selectedVehicleTypes, vt.id]);
+                            }
+                          }}
+                        >
+                          <vt.icon className="w-4 h-4 text-primary" />
+                          <span className="text-xs font-mono">{vt.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <Label>Street Address</Label>
+                    <Input 
+                      value={newShop.address} 
+                      onChange={(e) => setNewShop({ ...newShop, address: e.target.value })} 
+                      placeholder="123 Main Street" 
+                      data-testid="input-shop-address" 
+                    />
+                  </div>
+                  <div>
+                    <Label>City</Label>
+                    <Input 
+                      value={newShop.city} 
+                      onChange={(e) => setNewShop({ ...newShop, city: e.target.value })} 
+                      placeholder="Springfield" 
+                      data-testid="input-shop-city" 
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label>State</Label>
+                      <Input 
+                        value={newShop.state} 
+                        onChange={(e) => setNewShop({ ...newShop, state: e.target.value })} 
+                        placeholder="IL" 
+                        maxLength={2} 
+                        data-testid="input-shop-state" 
+                      />
+                    </div>
+                    <div>
+                      <Label>ZIP</Label>
+                      <Input 
+                        value={newShop.zipCode} 
+                        onChange={(e) => setNewShop({ ...newShop, zipCode: e.target.value })} 
+                        placeholder="62701" 
+                        data-testid="input-shop-zip" 
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Phone</Label>
+                    <Input 
+                      value={newShop.phone} 
+                      onChange={(e) => setNewShop({ ...newShop, phone: e.target.value })} 
+                      placeholder="(555) 123-4567" 
+                      data-testid="input-shop-phone" 
+                    />
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <Input 
+                      type="email" 
+                      value={newShop.email} 
+                      onChange={(e) => setNewShop({ ...newShop, email: e.target.value })} 
+                      placeholder="contact@mikesshop.com" 
+                      data-testid="input-shop-email" 
+                    />
+                  </div>
+                </div>
+                <Button 
+                  className="w-full font-tech uppercase"
+                  onClick={() => createShopMutation.mutate(newShop)}
+                  disabled={!newShop.name || createShopMutation.isPending}
+                  data-testid="button-save-shop"
+                >
+                  {createShopMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  Register Shop
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {shopsLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : myShops.length === 0 ? (
+          <Card className="bg-card/50 border-dashed border-2 border-muted p-12 text-center">
+            <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+            <h3 className="text-xl font-tech uppercase text-muted-foreground mb-2">No Shops Registered</h3>
+            <p className="text-sm text-muted-foreground mb-4">Register your shop to start managing repairs, estimates, and appointments</p>
+            <div className="flex flex-wrap justify-center gap-2 mb-6">
+              {VEHICLE_TYPES.map(vt => (
+                <Badge key={vt.id} variant="outline" className="gap-1 text-xs bg-muted/30">
+                  <vt.icon className="w-3 h-3" />
+                  {vt.name}
+                </Badge>
+              ))}
+            </div>
+            <Button onClick={() => setCreateShopOpen(true)} className="font-tech uppercase" data-testid="button-register-first-shop">
+              <Plus className="w-4 h-4 mr-2" /> Register Your First Shop
+            </Button>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Shop Sidebar */}
+            <div className="lg:col-span-1 space-y-4">
+              <h2 className="font-tech uppercase text-sm text-muted-foreground mb-2">Your Shops ({myShops.length})</h2>
+              <AnimatePresence>
+                {myShops.map((shop, index) => (
+                  <motion.div
+                    key={shop.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card 
+                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${selectedShop?.id === shop.id ? 'border-primary bg-primary/5' : 'bg-card'}`}
+                      onClick={() => setSelectedShop(shop)}
+                      data-testid={`card-shop-${shop.id}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-lg bg-primary/20">
+                          <Wrench className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-tech font-bold truncate text-sm">{shop.name}</h3>
+                          {shop.city && <p className="text-xs text-muted-foreground font-mono">{shop.city}, {shop.state}</p>}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant={shop.isActive ? "default" : "secondary"} className="text-[10px]">
+                              {shop.isActive ? "Active" : "Inactive"}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Main Content */}
+            <div className="lg:col-span-4">
+              {selectedShop ? (
+                <motion.div
+                  key={selectedShop.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <Card className="bg-card border-primary/30 overflow-hidden">
+                    {/* Shop Header */}
+                    <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b border-primary/20">
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                          <h2 className="text-2xl font-tech font-bold uppercase">{selectedShop.name}</h2>
+                          {selectedShop.address && (
+                            <p className="text-muted-foreground font-mono text-sm flex items-center gap-1 mt-1">
+                              <MapPin className="w-3 h-3" /> {selectedShop.address}, {selectedShop.city}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Dialog open={createOrderOpen} onOpenChange={setCreateOrderOpen}>
+                            <DialogTrigger asChild>
+                              <Button className="gap-2 font-tech text-xs" data-testid="button-new-order">
+                                <Plus className="w-3 h-3" /> New Order
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-lg">
+                              <DialogHeader>
+                                <DialogTitle className="font-tech uppercase">New Repair Order</DialogTitle>
+                                <DialogDescription>Create a new work order for {selectedShop.name}</DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="col-span-2">
+                                    <Label>Customer Name *</Label>
+                                    <Input 
+                                      value={newOrder.customerName}
+                                      onChange={(e) => setNewOrder({ ...newOrder, customerName: e.target.value })}
+                                      placeholder="John Smith"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label>Phone</Label>
+                                    <Input 
+                                      value={newOrder.customerPhone}
+                                      onChange={(e) => setNewOrder({ ...newOrder, customerPhone: e.target.value })}
+                                      placeholder="(555) 123-4567"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label>Email</Label>
+                                    <Input 
+                                      value={newOrder.customerEmail}
+                                      onChange={(e) => setNewOrder({ ...newOrder, customerEmail: e.target.value })}
+                                      placeholder="john@email.com"
+                                    />
+                                  </div>
+                                  <div className="col-span-2">
+                                    <Label>Vehicle Info *</Label>
+                                    <Input 
+                                      value={newOrder.vehicleInfo}
+                                      onChange={(e) => setNewOrder({ ...newOrder, vehicleInfo: e.target.value })}
+                                      placeholder="2020 Toyota Camry / 15ft Bass Tracker / Honda EU2200i"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label>Vehicle Type</Label>
+                                    <Select value={newOrder.vehicleType} onValueChange={(v) => setNewOrder({ ...newOrder, vehicleType: v })}>
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {VEHICLE_TYPES.map(vt => (
+                                          <SelectItem key={vt.id} value={vt.id}>
+                                            <span className="flex items-center gap-2">
+                                              <vt.icon className="w-4 h-4" />
+                                              {vt.name}
+                                            </span>
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div>
+                                    <Label>Priority</Label>
+                                    <Select value={newOrder.priority} onValueChange={(v) => setNewOrder({ ...newOrder, priority: v })}>
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="low">Low</SelectItem>
+                                        <SelectItem value="normal">Normal</SelectItem>
+                                        <SelectItem value="high">High</SelectItem>
+                                        <SelectItem value="urgent">Urgent</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="col-span-2">
+                                    <Label>Notes</Label>
+                                    <Textarea 
+                                      value={newOrder.notes}
+                                      onChange={(e) => setNewOrder({ ...newOrder, notes: e.target.value })}
+                                      placeholder="Customer concerns, symptoms, etc."
+                                    />
+                                  </div>
+                                </div>
+                                <Button 
+                                  className="w-full font-tech uppercase"
+                                  onClick={() => createOrderMutation.mutate(newOrder)}
+                                  disabled={!newOrder.customerName || !newOrder.vehicleInfo || createOrderMutation.isPending}
+                                >
+                                  {createOrderMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                  Create Repair Order
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                          <Dialog open={createAppointmentOpen} onOpenChange={setCreateAppointmentOpen}>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" className="gap-2 font-tech text-xs" data-testid="button-new-appointment">
+                                <Calendar className="w-3 h-3" /> Schedule
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle className="font-tech uppercase">Schedule Appointment</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <div>
+                                  <Label>Customer Name *</Label>
+                                  <Input 
+                                    value={newAppointment.customerName}
+                                    onChange={(e) => setNewAppointment({ ...newAppointment, customerName: e.target.value })}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Phone</Label>
+                                  <Input 
+                                    value={newAppointment.customerPhone}
+                                    onChange={(e) => setNewAppointment({ ...newAppointment, customerPhone: e.target.value })}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Vehicle</Label>
+                                  <Input 
+                                    value={newAppointment.vehicleInfo}
+                                    onChange={(e) => setNewAppointment({ ...newAppointment, vehicleInfo: e.target.value })}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Service Type</Label>
+                                  <Input 
+                                    value={newAppointment.serviceType}
+                                    onChange={(e) => setNewAppointment({ ...newAppointment, serviceType: e.target.value })}
+                                    placeholder="Oil Change, Tune Up, etc."
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Date & Time *</Label>
+                                  <Input 
+                                    type="datetime-local"
+                                    value={newAppointment.scheduledStart}
+                                    onChange={(e) => setNewAppointment({ ...newAppointment, scheduledStart: e.target.value })}
+                                  />
+                                </div>
+                                <Button 
+                                  className="w-full font-tech uppercase"
+                                  onClick={() => createAppointmentMutation.mutate(newAppointment)}
+                                  disabled={!newAppointment.customerName || !newAppointment.scheduledStart || createAppointmentMutation.isPending}
+                                >
+                                  Schedule Appointment
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                          <Button variant="ghost" size="icon" data-testid="button-shop-settings">
+                            <Settings className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tabs */}
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="p-6">
+                      <TabsList className="grid grid-cols-6 mb-6 h-auto">
+                        <TabsTrigger value="dashboard" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-dashboard">
+                          <BarChart3 className="w-4 h-4" />
+                          Dashboard
+                        </TabsTrigger>
+                        <TabsTrigger value="orders" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-orders">
+                          <ClipboardList className="w-4 h-4" />
+                          Orders
+                        </TabsTrigger>
+                        <TabsTrigger value="estimates" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-estimates">
+                          <FileText className="w-4 h-4" />
+                          Estimates
+                        </TabsTrigger>
+                        <TabsTrigger value="schedule" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-schedule">
+                          <Calendar className="w-4 h-4" />
+                          Schedule
+                        </TabsTrigger>
+                        <TabsTrigger value="inventory" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-inventory">
+                          <Package className="w-4 h-4" />
+                          Inventory
+                        </TabsTrigger>
+                        <TabsTrigger value="team" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-team">
+                          <Users className="w-4 h-4" />
+                          Team
+                        </TabsTrigger>
+                      </TabsList>
+
+                      {/* Dashboard Tab */}
+                      <TabsContent value="dashboard">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                          <Card className="p-4 bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-primary/20">
+                                <ClipboardList className="w-5 h-5 text-primary" />
+                              </div>
+                              <div>
+                                <p className="text-2xl font-bold">{repairOrders.length}</p>
+                                <p className="text-xs text-muted-foreground font-mono">Active Orders</p>
+                              </div>
+                            </div>
+                          </Card>
+                          <Card className="p-4 bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-yellow-500/20">
+                                <FileText className="w-5 h-5 text-yellow-500" />
+                              </div>
+                              <div>
+                                <p className="text-2xl font-bold">{estimates.filter(e => e.status === 'pending').length}</p>
+                                <p className="text-xs text-muted-foreground font-mono">Pending Estimates</p>
+                              </div>
+                            </div>
+                          </Card>
+                          <Card className="p-4 bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-blue-500/20">
+                                <Calendar className="w-5 h-5 text-blue-500" />
+                              </div>
+                              <div>
+                                <p className="text-2xl font-bold">{appointments.length}</p>
+                                <p className="text-xs text-muted-foreground font-mono">Today's Appts</p>
+                              </div>
+                            </div>
+                          </Card>
+                          <Card className="p-4 bg-gradient-to-br from-green-500/10 to-transparent border-green-500/20">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-green-500/20">
+                                <DollarSign className="w-5 h-5 text-green-500" />
+                              </div>
+                              <div>
+                                <p className="text-2xl font-bold">$0</p>
+                                <p className="text-xs text-muted-foreground font-mono">Today's Revenue</p>
+                              </div>
+                            </div>
+                          </Card>
+                        </div>
+
+                        {/* Quick Actions */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                          <Button variant="outline" className="h-auto py-4 flex-col gap-2 font-tech text-xs" onClick={() => setCreateOrderOpen(true)}>
+                            <Plus className="w-5 h-5" />
+                            New Repair Order
+                          </Button>
+                          <Button variant="outline" className="h-auto py-4 flex-col gap-2 font-tech text-xs">
+                            <FileText className="w-5 h-5" />
+                            Create Estimate
+                          </Button>
+                          <Button variant="outline" className="h-auto py-4 flex-col gap-2 font-tech text-xs" onClick={() => setCreateAppointmentOpen(true)}>
+                            <Calendar className="w-5 h-5" />
+                            Schedule Appointment
+                          </Button>
+                          <Button variant="outline" className="h-auto py-4 flex-col gap-2 font-tech text-xs">
+                            <Camera className="w-5 h-5" />
+                            Start Inspection
+                          </Button>
+                        </div>
+
+                        {/* Recent Orders */}
+                        <div>
+                          <h3 className="font-tech uppercase text-sm text-muted-foreground mb-3">Recent Repair Orders</h3>
+                          {ordersLoading ? (
+                            <div className="flex items-center justify-center py-8">
+                              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                            </div>
+                          ) : repairOrders.length === 0 ? (
+                            <Card className="p-8 text-center bg-muted/30 border-dashed">
+                              <ClipboardList className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
+                              <p className="text-muted-foreground font-mono text-sm">No repair orders yet</p>
+                              <Button className="mt-4 font-tech text-xs" onClick={() => setCreateOrderOpen(true)}>
+                                <Plus className="w-3 h-3 mr-1" /> Create First Order
+                              </Button>
+                            </Card>
+                          ) : (
+                            <ScrollArea className="h-[300px]">
+                              <div className="space-y-2">
+                                {repairOrders.slice(0, 10).map(order => (
+                                  <Card key={order.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-primary/10">
+                                          {getVehicleIcon(order.vehicleType || 'car')}
+                                        </div>
+                                        <div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-mono text-sm font-bold">#{order.orderNumber}</span>
+                                            {getStatusBadge(order.status)}
+                                          </div>
+                                          <p className="text-sm">{order.customerName || 'Walk-in'}</p>
+                                          <p className="text-xs text-muted-foreground">{order.vehicleInfo}</p>
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="font-mono font-bold">${order.grandTotal || '0.00'}</p>
+                                        <Badge variant="outline" className={`text-[10px] ${order.paymentStatus === 'paid' ? 'text-green-400' : 'text-yellow-400'}`}>
+                                          {order.paymentStatus || 'unpaid'}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  </Card>
+                                ))}
+                              </div>
+                            </ScrollArea>
+                          )}
+                        </div>
+                      </TabsContent>
+
+                      {/* Orders Tab */}
+                      <TabsContent value="orders">
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="flex items-center gap-2">
+                            <Input placeholder="Search orders..." className="w-64" />
+                            <Button variant="outline" size="icon">
+                              <Filter className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          <Button className="gap-2 font-tech text-xs" onClick={() => setCreateOrderOpen(true)}>
+                            <Plus className="w-3 h-3" /> New Order
+                          </Button>
+                        </div>
+                        
+                        {ordersLoading ? (
+                          <div className="flex items-center justify-center py-12">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                          </div>
+                        ) : repairOrders.length === 0 ? (
+                          <Card className="p-12 text-center bg-muted/30 border-dashed">
+                            <ClipboardList className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                            <h3 className="font-tech uppercase text-lg mb-2">No Repair Orders</h3>
+                            <p className="text-muted-foreground text-sm mb-4">Create your first repair order to get started</p>
+                            <Button onClick={() => setCreateOrderOpen(true)} className="font-tech">
+                              <Plus className="w-4 h-4 mr-2" /> Create Repair Order
+                            </Button>
+                          </Card>
+                        ) : (
+                          <div className="space-y-3">
+                            {repairOrders.map(order => (
+                              <Card key={order.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-primary/10">
+                                      {getVehicleIcon(order.vehicleType || 'car')}
+                                    </div>
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-mono font-bold">#{order.orderNumber}</span>
+                                        {getStatusBadge(order.status)}
+                                        {order.priority === 'high' && <Badge variant="destructive" className="text-[10px]">HIGH</Badge>}
+                                        {order.priority === 'urgent' && <Badge variant="destructive" className="text-[10px] animate-pulse">URGENT</Badge>}
+                                      </div>
+                                      <p className="font-medium">{order.customerName || 'Walk-in Customer'}</p>
+                                      <p className="text-sm text-muted-foreground">{order.vehicleInfo}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <div className="text-right">
+                                      <p className="font-mono font-bold text-lg">${order.grandTotal || '0.00'}</p>
+                                      <Badge variant="outline" className={`text-[10px] ${order.paymentStatus === 'paid' ? 'text-green-400 border-green-400/30' : 'text-yellow-400 border-yellow-400/30'}`}>
+                                        {order.paymentStatus || 'unpaid'}
+                                      </Badge>
+                                    </div>
+                                    <Button variant="ghost" size="icon">
+                                      <MoreHorizontal className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      {/* Estimates Tab */}
+                      <TabsContent value="estimates">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-tech uppercase text-sm">Estimates & Quotes</h3>
+                          <Button className="gap-2 font-tech text-xs">
+                            <Plus className="w-3 h-3" /> New Estimate
+                          </Button>
+                        </div>
+                        <Card className="p-12 text-center bg-muted/30 border-dashed">
+                          <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                          <h3 className="font-tech uppercase text-lg mb-2">No Estimates Yet</h3>
+                          <p className="text-muted-foreground text-sm">Create estimates to send quotes to customers</p>
+                        </Card>
+                      </TabsContent>
+
+                      {/* Schedule Tab */}
+                      <TabsContent value="schedule">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-tech uppercase text-sm">Appointment Calendar</h3>
+                          <Button className="gap-2 font-tech text-xs" onClick={() => setCreateAppointmentOpen(true)}>
+                            <Plus className="w-3 h-3" /> Schedule Appointment
+                          </Button>
+                        </div>
+                        {appointments.length === 0 ? (
+                          <Card className="p-12 text-center bg-muted/30 border-dashed">
+                            <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                            <h3 className="font-tech uppercase text-lg mb-2">No Appointments</h3>
+                            <p className="text-muted-foreground text-sm mb-4">Schedule appointments to manage your workflow</p>
+                            <Button onClick={() => setCreateAppointmentOpen(true)} className="font-tech">
+                              <Plus className="w-4 h-4 mr-2" /> Schedule Appointment
+                            </Button>
+                          </Card>
+                        ) : (
+                          <div className="space-y-3">
+                            {appointments.map(apt => (
+                              <Card key={apt.id} className="p-4 bg-muted/20">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-blue-500/10">
+                                      <CalendarDays className="w-5 h-5 text-blue-500" />
+                                    </div>
+                                    <div>
+                                      <p className="font-medium">{apt.customerName}</p>
+                                      <p className="text-sm text-muted-foreground">{apt.vehicleInfo} - {apt.serviceType}</p>
+                                      <p className="text-xs text-muted-foreground font-mono">
+                                        {new Date(apt.scheduledStart).toLocaleString()}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <Badge variant="outline">{apt.status}</Badge>
+                                </div>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      {/* Inventory Tab */}
+                      <TabsContent value="inventory">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-tech uppercase text-sm">Parts Inventory</h3>
+                          <Button className="gap-2 font-tech text-xs">
+                            <Plus className="w-3 h-3" /> Add Part
+                          </Button>
+                        </div>
+                        <Card className="p-12 text-center bg-muted/30 border-dashed">
+                          <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                          <h3 className="font-tech uppercase text-lg mb-2">Inventory Management</h3>
+                          <p className="text-muted-foreground text-sm">Track parts, stock levels, and vendor orders</p>
+                        </Card>
+                      </TabsContent>
+
+                      {/* Team Tab */}
+                      <TabsContent value="team">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-tech uppercase text-sm">Team & Technicians</h3>
+                          <Button className="gap-2 font-tech text-xs">
+                            <UserPlus className="w-3 h-3" /> Add Technician
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card className="p-6 bg-muted/30 border-dashed">
+                            <div className="flex items-center gap-4 mb-4">
+                              <div className="p-3 rounded-lg bg-primary/10">
+                                <Timer className="w-6 h-6 text-primary" />
+                              </div>
+                              <div>
+                                <h4 className="font-tech uppercase">Time Clock</h4>
+                                <p className="text-sm text-muted-foreground">Track technician hours</p>
+                              </div>
+                            </div>
+                            <Button variant="outline" className="w-full font-tech text-xs">
+                              <Play className="w-3 h-3 mr-2" /> Clock In/Out
+                            </Button>
+                          </Card>
+                          <Card className="p-6 bg-muted/30 border-dashed">
+                            <div className="flex items-center gap-4 mb-4">
+                              <div className="p-3 rounded-lg bg-green-500/10">
+                                <UserCheck className="w-6 h-6 text-green-500" />
+                              </div>
+                              <div>
+                                <h4 className="font-tech uppercase">Productivity</h4>
+                                <p className="text-sm text-muted-foreground">Track tech efficiency</p>
+                              </div>
+                            </div>
+                            <Button variant="outline" className="w-full font-tech text-xs">
+                              <BarChart3 className="w-3 h-3 mr-2" /> View Reports
+                            </Button>
+                          </Card>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </Card>
+                </motion.div>
+              ) : (
+                <Card className="p-12 text-center bg-card/50 border-dashed">
+                  <Store className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                  <h3 className="font-tech uppercase text-xl mb-2">Select a Shop</h3>
+                  <p className="text-muted-foreground">Choose a shop from the sidebar to view its dashboard</p>
+                </Card>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

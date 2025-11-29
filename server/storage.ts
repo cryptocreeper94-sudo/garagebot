@@ -4,7 +4,9 @@ import {
   vendors, searchHistory, waitlist, shops, shopStaff, shopCustomers, shopReviews,
   serviceRecords, serviceReminders, messageTemplates, messageLog,
   userPreferences, auditLog, vehicleRecalls, scanHistory, devTasks, vehicleShares,
-  affiliateNetworks, affiliatePartners, affiliateClicks, affiliateCommissions, affiliatePayouts
+  affiliateNetworks, affiliatePartners, affiliateClicks, affiliateCommissions, affiliatePayouts,
+  repairOrders, repairOrderItems, estimates, estimateItems, appointments, shopInventory,
+  technicianTimeEntries, digitalInspections, inspectionItems, shopSettings
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -18,7 +20,9 @@ import type {
   DevTask, InsertDevTask, VehicleShare, InsertVehicleShare,
   AffiliateNetwork, InsertAffiliateNetwork, AffiliatePartner, InsertAffiliatePartner,
   AffiliateClick, InsertAffiliateClick, AffiliateCommission, InsertAffiliateCommission,
-  AffiliatePayout, InsertAffiliatePayout
+  AffiliatePayout, InsertAffiliatePayout,
+  RepairOrder, InsertRepairOrder, Estimate, InsertEstimate, Appointment, InsertAppointment,
+  ShopInventory, InsertShopInventory, DigitalInspection, InsertDigitalInspection
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte } from "drizzle-orm";
 
@@ -190,6 +194,33 @@ export interface IStorage {
   // Affiliate Payouts
   createAffiliatePayout(payout: InsertAffiliatePayout): Promise<AffiliatePayout>;
   getAffiliatePayouts(): Promise<AffiliatePayout[]>;
+
+  // Mechanics Garage - Repair Orders
+  getRepairOrders(shopId: string): Promise<RepairOrder[]>;
+  getRepairOrder(id: string): Promise<RepairOrder | undefined>;
+  getRepairOrderCount(shopId: string): Promise<number>;
+  createRepairOrder(order: InsertRepairOrder): Promise<RepairOrder>;
+  updateRepairOrder(id: string, updates: Partial<RepairOrder>): Promise<RepairOrder | undefined>;
+
+  // Mechanics Garage - Estimates
+  getEstimates(shopId: string): Promise<Estimate[]>;
+  getEstimate(id: string): Promise<Estimate | undefined>;
+  getEstimateCount(shopId: string): Promise<number>;
+  createEstimate(estimate: InsertEstimate): Promise<Estimate>;
+  updateEstimate(id: string, updates: Partial<Estimate>): Promise<Estimate | undefined>;
+
+  // Mechanics Garage - Appointments
+  getAppointments(shopId: string): Promise<Appointment[]>;
+  getAppointment(id: string): Promise<Appointment | undefined>;
+  getAppointmentCount(shopId: string): Promise<number>;
+  createAppointment(appointment: InsertAppointment): Promise<Appointment>;
+  updateAppointment(id: string, updates: Partial<Appointment>): Promise<Appointment | undefined>;
+
+  // Mechanics Garage - Inventory
+  getShopInventory(shopId: string): Promise<ShopInventory[]>;
+
+  // Mechanics Garage - Digital Inspections
+  getDigitalInspections(shopId: string): Promise<DigitalInspection[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -939,6 +970,125 @@ export class DatabaseStorage implements IStorage {
 
   async getAffiliatePayouts(): Promise<AffiliatePayout[]> {
     return await db.select().from(affiliatePayouts).orderBy(desc(affiliatePayouts.periodEnd));
+  }
+
+  // ============================================
+  // MECHANICS GARAGE - REPAIR ORDERS
+  // ============================================
+  
+  async getRepairOrders(shopId: string): Promise<RepairOrder[]> {
+    return await db.select().from(repairOrders)
+      .where(eq(repairOrders.shopId, shopId))
+      .orderBy(desc(repairOrders.createdAt));
+  }
+
+  async getRepairOrder(id: string): Promise<RepairOrder | undefined> {
+    const [order] = await db.select().from(repairOrders).where(eq(repairOrders.id, id));
+    return order;
+  }
+
+  async getRepairOrderCount(shopId: string): Promise<number> {
+    const orders = await db.select().from(repairOrders).where(eq(repairOrders.shopId, shopId));
+    return orders.length;
+  }
+
+  async createRepairOrder(order: InsertRepairOrder): Promise<RepairOrder> {
+    const [newOrder] = await db.insert(repairOrders).values(order).returning();
+    return newOrder;
+  }
+
+  async updateRepairOrder(id: string, updates: Partial<RepairOrder>): Promise<RepairOrder | undefined> {
+    const [order] = await db.update(repairOrders)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(repairOrders.id, id))
+      .returning();
+    return order;
+  }
+
+  // ============================================
+  // MECHANICS GARAGE - ESTIMATES
+  // ============================================
+  
+  async getEstimates(shopId: string): Promise<Estimate[]> {
+    return await db.select().from(estimates)
+      .where(eq(estimates.shopId, shopId))
+      .orderBy(desc(estimates.createdAt));
+  }
+
+  async getEstimate(id: string): Promise<Estimate | undefined> {
+    const [estimate] = await db.select().from(estimates).where(eq(estimates.id, id));
+    return estimate;
+  }
+
+  async getEstimateCount(shopId: string): Promise<number> {
+    const ests = await db.select().from(estimates).where(eq(estimates.shopId, shopId));
+    return ests.length;
+  }
+
+  async createEstimate(estimate: InsertEstimate): Promise<Estimate> {
+    const [newEstimate] = await db.insert(estimates).values(estimate).returning();
+    return newEstimate;
+  }
+
+  async updateEstimate(id: string, updates: Partial<Estimate>): Promise<Estimate | undefined> {
+    const [estimate] = await db.update(estimates)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(estimates.id, id))
+      .returning();
+    return estimate;
+  }
+
+  // ============================================
+  // MECHANICS GARAGE - APPOINTMENTS
+  // ============================================
+  
+  async getAppointments(shopId: string): Promise<Appointment[]> {
+    return await db.select().from(appointments)
+      .where(eq(appointments.shopId, shopId))
+      .orderBy(asc(appointments.scheduledStart));
+  }
+
+  async getAppointment(id: string): Promise<Appointment | undefined> {
+    const [apt] = await db.select().from(appointments).where(eq(appointments.id, id));
+    return apt;
+  }
+
+  async getAppointmentCount(shopId: string): Promise<number> {
+    const apts = await db.select().from(appointments).where(eq(appointments.shopId, shopId));
+    return apts.length;
+  }
+
+  async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
+    const [newApt] = await db.insert(appointments).values(appointment).returning();
+    return newApt;
+  }
+
+  async updateAppointment(id: string, updates: Partial<Appointment>): Promise<Appointment | undefined> {
+    const [apt] = await db.update(appointments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(appointments.id, id))
+      .returning();
+    return apt;
+  }
+
+  // ============================================
+  // MECHANICS GARAGE - INVENTORY
+  // ============================================
+  
+  async getShopInventory(shopId: string): Promise<ShopInventory[]> {
+    return await db.select().from(shopInventory)
+      .where(eq(shopInventory.shopId, shopId))
+      .orderBy(asc(shopInventory.name));
+  }
+
+  // ============================================
+  // MECHANICS GARAGE - DIGITAL INSPECTIONS
+  // ============================================
+  
+  async getDigitalInspections(shopId: string): Promise<DigitalInspection[]> {
+    return await db.select().from(digitalInspections)
+      .where(eq(digitalInspections.shopId, shopId))
+      .orderBy(desc(digitalInspections.createdAt));
   }
 }
 

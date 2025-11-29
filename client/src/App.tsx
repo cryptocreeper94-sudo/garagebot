@@ -18,6 +18,7 @@ import Checkout from "@/pages/Checkout";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
 import CheckoutCancel from "@/pages/CheckoutCancel";
 import ShopPortal from "@/pages/ShopPortal";
+import MechanicsGarage from "@/pages/MechanicsGarage";
 import Insurance from "@/pages/Insurance";
 import Auth from "@/pages/Auth";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/results" component={Results} />
       <Route path="/garage" component={Garage} />
       <Route path="/shop-portal" component={ShopPortal} />
+      <Route path="/mechanics-garage" component={MechanicsGarage} />
       <Route path="/insurance" component={Insurance} />
       <Route path="/auth" component={Auth} />
       <Route path="/privacy" component={PrivacyPolicy} />

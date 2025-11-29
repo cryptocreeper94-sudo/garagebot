@@ -444,6 +444,15 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center relative z-10 py-10 space-y-4">
           {/* Action Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mb-4">
+            <Link href="/mechanics-garage">
+              <Button 
+                className="font-tech uppercase gap-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 shadow-lg shadow-orange-900/30"
+                data-testid="footer-button-mechanics"
+              >
+                <Wrench className="w-4 h-4" />
+                Mechanics Garage
+              </Button>
+            </Link>
             <Link href="/investors">
               <Button 
                 className="font-tech uppercase gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 shadow-lg shadow-green-900/30"
@@ -453,7 +462,7 @@ export default function Home() {
                 Investors
               </Button>
             </Link>
-            <Link href="/dev-portal">
+            <Link href="/dev">
               <Button 
                 variant="outline"
                 className="font-tech uppercase gap-2 border-primary/50 text-primary hover:bg-primary/10 shadow-lg"
