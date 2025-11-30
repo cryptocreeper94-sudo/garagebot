@@ -145,27 +145,28 @@
   text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.3);
 }
 
-/* Primary Glow Effect for Buttons */
+/* Primary Glow Effect for Buttons - Additive to Button component styling */
 .glow-primary {
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), 0 0 5px rgba(6, 182, 212, 0.3) inset;
   transition: all 0.3s ease;
+  position: relative;
 }
 .glow-primary:hover {
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), 0 0 50px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.6), 0 0 50px rgba(6, 182, 212, 0.25), 0 0 8px rgba(6, 182, 212, 0.4) inset;
   transform: translateY(-1px);
 }
 .glow-primary:active {
   transform: translateY(0);
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
 }
 
-/* Secondary Glow Effect (Purple) */
+/* Secondary Glow Effect (Purple) - Additive to Button component styling */
 .glow-secondary {
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4), 0 0 5px rgba(168, 85, 247, 0.3) inset;
   transition: all 0.3s ease;
 }
 .glow-secondary:hover {
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.5), 0 0 50px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.6), 0 0 50px rgba(168, 85, 247, 0.25), 0 0 8px rgba(168, 85, 247, 0.4) inset;
   transform: translateY(-1px);
 }
 
