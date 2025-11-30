@@ -161,18 +161,24 @@ export default function Home() {
               transition={{ delay: 0.35 }}
               className="flex flex-wrap justify-center gap-3 md:gap-4 mt-6"
             >
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm">
-                <Database className="w-4 h-4 text-primary" />
-                <span className="text-xs md:text-sm font-medium text-foreground">40+ Retailers</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm">
-                <Cpu className="w-4 h-4 text-secondary" />
-                <span className="text-xs md:text-sm font-medium text-foreground">AI-Powered</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm">
-                <Car className="w-4 h-4 text-green-400" />
-                <span className="text-xs md:text-sm font-medium text-foreground">All Vehicle Types</span>
-              </div>
+              <Link href="/results">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group">
+                  <Database className="w-4 h-4 text-primary group-hover:text-primary" />
+                  <span className="text-xs md:text-sm font-medium text-foreground group-hover:text-primary">40+ Retailers</span>
+                </div>
+              </Link>
+              <Link href="/diy-guides">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm cursor-pointer hover:border-secondary/50 hover:bg-secondary/5 transition-all group">
+                  <Cpu className="w-4 h-4 text-secondary group-hover:text-secondary" />
+                  <span className="text-xs md:text-sm font-medium text-foreground group-hover:text-secondary">AI-Powered</span>
+                </div>
+              </Link>
+              <Link href="/garage">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/30 border border-white/10 backdrop-blur-sm cursor-pointer hover:border-green-500/50 hover:bg-green-500/5 transition-all group">
+                  <Car className="w-4 h-4 text-green-400 group-hover:text-green-300" />
+                  <span className="text-xs md:text-sm font-medium text-foreground group-hover:text-green-300">All Vehicle Types</span>
+                </div>
+              </Link>
               <Link href="/hallmark">
                 <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-900/40 to-primary/20 border border-purple-500/30 backdrop-blur-sm cursor-pointer hover:border-purple-400/50 transition-all group">
                   <Shield className="w-4 h-4 text-purple-400 group-hover:text-purple-300" />
