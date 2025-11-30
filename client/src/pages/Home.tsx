@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { 
   Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink,
   ScanLine, Camera, Mic, Wrench, Car, Sparkles, MessageCircle, Bot, TrendingUp, Terminal,
-  BookOpen, PlayCircle, CheckCircle2, Images
+  BookOpen, PlayCircle, CheckCircle2, Images, Shield
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
@@ -173,6 +173,12 @@ export default function Home() {
                 <Car className="w-4 h-4 text-green-400" />
                 <span className="text-xs md:text-sm font-medium text-foreground">All Vehicle Types</span>
               </div>
+              <Link href="/hallmark">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-900/40 to-primary/20 border border-purple-500/30 backdrop-blur-sm cursor-pointer hover:border-purple-400/50 transition-all group">
+                  <Shield className="w-4 h-4 text-purple-400 group-hover:text-purple-300" />
+                  <span className="text-xs md:text-sm font-medium text-purple-300 group-hover:text-purple-200">Blockchain Verified</span>
+                </div>
+              </Link>
             </motion.div>
             
             {/* DIY Repair Guides - Hero Feature Callout */}
