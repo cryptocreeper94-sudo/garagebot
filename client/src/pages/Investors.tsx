@@ -12,7 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import {
   TrendingUp, DollarSign, Users, Zap, Shield, Globe, 
   Target, Rocket, BarChart3, CheckCircle, Mail, Building2,
-  Car, Bike, Anchor, Truck, Wrench
+  Car, Bike, Anchor, Truck, Wrench, Calendar, Flag, Star,
+  Sparkles, Database, Brain, Store, Link2, Award
 } from "lucide-react";
 
 export default function Investors() {
@@ -181,6 +182,250 @@ export default function Investors() {
                   <span className="font-tech">{type.label}</span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Comprehensive Roadmap Section */}
+          <div className="mb-16">
+            <div className="text-center mb-12">
+              <Badge className="mb-4 bg-purple-500/20 text-purple-400 border-purple-500/30 font-mono">
+                <Calendar className="w-3 h-3 inline mr-1" /> PRODUCT ROADMAP
+              </Badge>
+              <h2 className="text-3xl font-tech uppercase mb-4">
+                Building the <span className="text-primary">Future</span>
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Our phased approach to becoming the definitive platform for vehicle ownership and maintenance.
+              </p>
+            </div>
+
+            <div className="relative">
+              {/* Timeline connector */}
+              <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-green-500 via-primary to-purple-500" />
+
+              {/* Phase 1 - Foundation (Completed) */}
+              <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative mb-12"
+              >
+                <div className="flex items-center gap-4 mb-4 md:justify-center">
+                  <div className="w-16 h-16 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center z-10">
+                    <CheckCircle className="w-8 h-8 text-green-400" />
+                  </div>
+                  <div className="md:absolute md:left-[calc(50%+40px)]">
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 mb-1">COMPLETED</Badge>
+                    <h3 className="text-xl font-tech uppercase">Phase 1: Foundation</h3>
+                    <p className="text-sm text-muted-foreground">Q4 2024</p>
+                  </div>
+                </div>
+                <Card className="ml-20 md:ml-0 md:mr-[calc(50%+30px)] p-6 bg-green-500/5 border-green-500/20">
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Parts Aggregator MVP:</strong> 40+ retailers integrated with unified search</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>My Garage:</strong> Vehicle management with VIN decoding & NHTSA recalls</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Buddy AI Assistant:</strong> Conversational parts finder with memory</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Genesis Hallmark:</strong> Blockchain-verified vehicle passports on Solana</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>DIY Repair Guides:</strong> AI-generated step-by-step maintenance instructions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Pro Subscriptions:</strong> Founders Circle pricing with Stripe integration</span>
+                    </li>
+                  </ul>
+                </Card>
+              </motion.div>
+
+              {/* Phase 2 - Growth (Current) */}
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative mb-12"
+              >
+                <div className="flex items-center gap-4 mb-4 md:justify-center md:flex-row-reverse">
+                  <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center z-10 animate-pulse">
+                    <Rocket className="w-8 h-8 text-primary" />
+                  </div>
+                  <div className="md:absolute md:right-[calc(50%+40px)] md:text-right">
+                    <Badge className="bg-primary/20 text-primary border-primary/30 mb-1">IN PROGRESS</Badge>
+                    <h3 className="text-xl font-tech uppercase">Phase 2: Growth</h3>
+                    <p className="text-sm text-muted-foreground">Q1-Q2 2025</p>
+                  </div>
+                </div>
+                <Card className="ml-20 md:ml-[calc(50%+30px)] p-6 bg-primary/5 border-primary/20">
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span><strong>Affiliate Network Tier 2:</strong> Product data feeds with real pricing & images</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span><strong>SMS Service Reminders:</strong> Twilio-powered maintenance notifications</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span><strong>Shop Portal V2:</strong> Full mechanic management with estimates & scheduling</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span><strong>Insurance Comparison:</strong> Multi-carrier quotes for auto, boat, RV</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span><strong>Community Ratings:</strong> User reviews for parts, shops, and vendors</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span><strong>Mobile App (PWA):</strong> Native-like experience on iOS and Android</span>
+                    </li>
+                  </ul>
+                </Card>
+              </motion.div>
+
+              {/* Phase 3 - Expansion */}
+              <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative mb-12"
+              >
+                <div className="flex items-center gap-4 mb-4 md:justify-center">
+                  <div className="w-16 h-16 rounded-full bg-yellow-500/20 border-2 border-yellow-500/50 flex items-center justify-center z-10">
+                    <Database className="w-8 h-8 text-yellow-400" />
+                  </div>
+                  <div className="md:absolute md:left-[calc(50%+40px)]">
+                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 mb-1">Q3-Q4 2025</Badge>
+                    <h3 className="text-xl font-tech uppercase">Phase 3: Expansion</h3>
+                    <p className="text-sm text-muted-foreground">Data & Partnerships</p>
+                  </div>
+                </div>
+                <Card className="ml-20 md:ml-0 md:mr-[calc(50%+30px)] p-6 bg-yellow-500/5 border-yellow-500/20">
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-2">
+                      <Flag className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Direct Retailer APIs:</strong> Real-time inventory & pricing from major retailers</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Flag className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Smartcar Integration:</strong> Live vehicle data from 30+ connected car brands</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Flag className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>OBD-II Diagnostics:</strong> Real-time fault code reading and recommendations</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Flag className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Fleet Management:</strong> Multi-vehicle dashboards for businesses</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Flag className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Video Repair Guides:</strong> AI-curated YouTube integration per step</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Flag className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Dealership Network:</strong> New car dealer partnerships for service history</span>
+                    </li>
+                  </ul>
+                </Card>
+              </motion.div>
+
+              {/* Phase 4 - Scale */}
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative mb-12"
+              >
+                <div className="flex items-center gap-4 mb-4 md:justify-center md:flex-row-reverse">
+                  <div className="w-16 h-16 rounded-full bg-purple-500/20 border-2 border-purple-500/50 flex items-center justify-center z-10">
+                    <Brain className="w-8 h-8 text-purple-400" />
+                  </div>
+                  <div className="md:absolute md:right-[calc(50%+40px)] md:text-right">
+                    <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 mb-1">2026</Badge>
+                    <h3 className="text-xl font-tech uppercase">Phase 4: Scale</h3>
+                    <p className="text-sm text-muted-foreground">AI & Marketplace</p>
+                  </div>
+                </div>
+                <Card className="ml-20 md:ml-[calc(50%+30px)] p-6 bg-purple-500/5 border-purple-500/20">
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>AI Predictive Maintenance:</strong> Machine learning for failure prediction</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Parts Marketplace:</strong> P2P used parts marketplace with verification</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Vehicle Passport NFTs:</strong> Transferable ownership records on-chain</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>AR Part Identification:</strong> Point your phone at a part to identify it</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Global Expansion:</strong> Launch in Canada, UK, and Australia</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Enterprise Solutions:</strong> White-label platform for dealership groups</span>
+                    </li>
+                  </ul>
+                </Card>
+              </motion.div>
+
+              {/* Vision */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-purple-500 to-green-500 flex items-center justify-center z-10 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+                    <Award className="w-10 h-10 text-white" />
+                  </div>
+                </div>
+                <Card className="max-w-2xl mx-auto p-8 bg-gradient-to-br from-primary/10 via-purple-500/10 to-green-500/10 border-primary/30 text-center">
+                  <h3 className="text-2xl font-tech uppercase mb-4 text-primary">The Vision</h3>
+                  <p className="text-lg text-muted-foreground mb-6">
+                    By 2027, GarageBot will be the <strong className="text-foreground">definitive platform</strong> for 
+                    vehicle ownership — the place every owner goes to find parts, track maintenance, verify history, 
+                    and connect with services. A single source of truth for every vehicle on the road.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    <div className="text-center">
+                      <div className="text-3xl font-tech font-bold text-primary">1M+</div>
+                      <div className="text-xs text-muted-foreground uppercase">Active Users</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-tech font-bold text-green-400">$10M+</div>
+                      <div className="text-xs text-muted-foreground uppercase">ARR Target</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-tech font-bold text-purple-400">100+</div>
+                      <div className="text-xs text-muted-foreground uppercase">Retail Partners</div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
             </div>
           </div>
 
