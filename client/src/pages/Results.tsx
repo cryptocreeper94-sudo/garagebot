@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useSearch } from "wouter";
 import { motion } from "framer-motion";
-import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight, Navigation, Search, Package, Wrench } from "lucide-react";
+import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight, Navigation, Search, Package, Wrench, Bell } from "lucide-react";
 import Nav from "@/components/Nav";
 import VehicleFunFacts from "@/components/VehicleFunFacts";
+import { PriceAlertButton, PriceAlertsPanel } from "@/components/PriceAlerts";
 import ShareButton from "@/components/ShareButton";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -446,6 +447,11 @@ export default function Results() {
                 </ul>
               </div>
 
+              {/* Price Alerts Panel (Pro Feature) */}
+              <div className="mt-6">
+                <PriceAlertsPanel />
+              </div>
+
               {/* Fun Facts Section */}
               <div className="mt-6">
                 <VehicleFunFacts 
@@ -473,6 +479,10 @@ export default function Results() {
                 <Badge variant="outline" className="font-mono text-[10px] border-yellow-500/30 text-yellow-400">
                   <Info className="w-3 h-3 mr-1" /> {sortedResults.length} RETAILERS
                 </Badge>
+                <PriceAlertButton 
+                  partName={displayQuery} 
+                  partNumber={partNumber || undefined}
+                />
               </div>
               <div className="flex gap-1 items-center">
                 <span className="text-[9px] text-muted-foreground font-mono mr-1 hidden sm:inline">VIEW:</span>
