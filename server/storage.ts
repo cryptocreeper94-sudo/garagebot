@@ -261,6 +261,8 @@ export interface IStorage {
   
   // DIY Repair Guides - Steps
   getGuideSteps(guideId: string): Promise<GuideStep[]>;
+  getGuideStepCount(guideId: string): Promise<number>;
+  getMultipleGuideStepCounts(guideIds: string[]): Promise<Map<string, number>>;
   createGuideStep(step: InsertGuideStep): Promise<GuideStep>;
   updateGuideStep(id: string, updates: Partial<GuideStep>): Promise<GuideStep | undefined>;
   
@@ -1337,6 +1339,35 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(guideSteps)
       .where(eq(guideSteps.guideId, guideId))
       .orderBy(asc(guideSteps.stepNumber));
+  }
+  
+  async getGuideStepCount(guideId: string): Promise<number> {
+    const result = await db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(guideSteps)
+      .where(eq(guideSteps.guideId, guideId));
+    return result[0]?.count || 0;
+  }
+  
+  async getMultipleGuideStepCounts(guideIds: string[]): Promise<Map<string, number>> {
+    if (guideIds.length === 0) return new Map();
+    
+    const result = await db.select({
+      guideId: guideSteps.guideId,
+      count: sql<number>`COUNT(*)::int`
+    })
+      .from(guideSteps)
+      .where(sql`${guideSteps.guideId} = ANY(${guideIds})`)
+      .groupBy(guideSteps.guideId);
+    
+    const counts = new Map<string, number>();
+    for (const row of result) {
+      counts.set(row.guideId, row.count);
+    }
+    // Ensure all requested IDs have an entry (default 0)
+    for (const id of guideIds) {
+      if (!counts.has(id)) counts.set(id, 0);
+    }
+    return counts;
   }
   
   async createGuideStep(step: InsertGuideStep): Promise<GuideStep> {

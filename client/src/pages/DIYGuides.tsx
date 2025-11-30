@@ -104,11 +104,25 @@ export default function DIYGuides() {
     }
   };
 
-  const openGuide = (guide: RepairGuide) => {
+  const openGuide = async (guide: RepairGuide) => {
     if (guide.isPremium && !isPro) {
       return;
     }
-    setSelectedGuide(guide);
+    
+    // Fetch full guide with steps from individual endpoint
+    try {
+      const response = await fetch(`/api/diy-guides/${guide.slug}`);
+      if (response.ok) {
+        const fullGuide = await response.json();
+        setSelectedGuide(fullGuide);
+      } else {
+        // Fallback to listing data if detail fetch fails
+        setSelectedGuide(guide);
+      }
+    } catch (error) {
+      console.error("Error fetching guide details:", error);
+      setSelectedGuide(guide);
+    }
     setCurrentStep(0);
   };
 
@@ -258,7 +272,7 @@ export default function DIYGuides() {
                                         {guide.title}
                                       </h4>
                                       <p className="text-xs text-muted-foreground">
-                                        {guide.steps?.length || 0} steps
+                                        {(guide as any).stepCount || guide.steps?.length || 0} steps
                                       </p>
                                     </div>
                                     <Badge className={`${difficulty.color} text-black text-[10px] flex-shrink-0 ${isLocked ? 'mt-6' : ''}`}>
