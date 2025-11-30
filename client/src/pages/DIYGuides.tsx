@@ -68,7 +68,7 @@ export default function DIYGuides() {
   const [selectedGuide, setSelectedGuide] = useState<RepairGuide | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(["car"]);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(["car", "motorcycle", "boat", "atv"]);
   const { user } = useAuth();
   const isPro = user?.subscriptionTier === 'pro' || user?.subscriptionTier === 'founder';
 
