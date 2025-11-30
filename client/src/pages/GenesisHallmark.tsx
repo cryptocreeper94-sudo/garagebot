@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
+import { BlockchainStatus } from "@/components/BlockchainStatus";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
 
 interface Hallmark {
@@ -231,6 +232,12 @@ export default function GenesisHallmark() {
                       </span>
                     </div>
                   </div>
+                  
+                  <BlockchainStatus 
+                    entityType="hallmark" 
+                    entityId={hallmark.id}
+                    showVerifyButton={true}
+                  />
                 </div>
               ) : (
                 <div className="space-y-4">
