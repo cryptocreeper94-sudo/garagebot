@@ -1152,6 +1152,9 @@ export const repairGuides = pgTable("repair_guides", {
   publishedAt: timestamp("published_at"),
   lastReviewedAt: timestamp("last_reviewed_at"),
   
+  // Pro tier gating
+  isPremium: boolean("is_premium").default(false),
+  
   // Metadata
   tags: text("tags").array(),
   searchKeywords: text("search_keywords").array(),
