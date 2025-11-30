@@ -33,6 +33,22 @@ export default function AddToHomeScreen() {
       return;
     }
 
+    // Wait for onboarding modal to be seen/dismissed before showing PWA prompt
+    const hasSeenOnboarding = localStorage.getItem('garagebot_onboarding_seen');
+    if (!hasSeenOnboarding) {
+      // Check periodically if onboarding was dismissed
+      const checkInterval = setInterval(() => {
+        if (localStorage.getItem('garagebot_onboarding_seen')) {
+          clearInterval(checkInterval);
+          setTimeout(() => setShowPrompt(true), 500);
+        }
+      }, 500);
+      
+      // Cleanup after 30 seconds if never dismissed
+      setTimeout(() => clearInterval(checkInterval), 30000);
+      return;
+    }
+
     const isIOSDevice = /iPhone|iPad|iPod/i.test(navigator.userAgent) && 
                         !(window as any).MSStream;
     setIsIOS(isIOSDevice);
