@@ -32,7 +32,7 @@ import type {
   GuideProgress, InsertGuideProgress,
   PriceAlert, InsertPriceAlert
 } from "@shared/schema";
-import { eq, and, desc, sql, asc, ilike, or, gte, lte } from "drizzle-orm";
+import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -1356,7 +1356,7 @@ export class DatabaseStorage implements IStorage {
       count: sql<number>`COUNT(*)::int`
     })
       .from(guideSteps)
-      .where(sql`${guideSteps.guideId} = ANY(${guideIds})`)
+      .where(inArray(guideSteps.guideId, guideIds))
       .groupBy(guideSteps.guideId);
     
     const counts = new Map<string, number>();
