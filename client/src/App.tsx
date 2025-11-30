@@ -29,6 +29,7 @@ import DevPortal from "@/pages/DevPortal";
 import Pro from "@/pages/Pro";
 import GenesisHallmark from "@/pages/GenesisHallmark";
 import DIYGuides from "@/pages/DIYGuides";
+import TermsOfService from "@/pages/TermsOfService";
 
 function Router() {
   return (
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/insurance" component={Insurance} />
       <Route path="/auth" component={Auth} />
       <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/terms" component={TermsOfService} />
       <Route path="/investors" component={Investors} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/account" component={AccountSetup} />

@@ -75,6 +75,13 @@ Preferred communication style: Simple, everyday language.
 - **Technology**: Solana network via Helius RPC, `@solana/web3.js`.
 - **Features**: SHA-256 hashing, on-chain transaction submission, transaction signature storage, Solscan links.
 
+## Recent Updates (November 2024)
+- **Terms of Service Page**: Added `/terms` route with comprehensive legal content.
+- **Investor Roadmap**: Comprehensive 4-phase roadmap (Foundation → Growth → Expansion → Scale) with 2027 vision.
+- **Modal Fix**: PWA install prompt now waits for onboarding modal to close, preventing button click issues.
+- **CSS Polish**: Added `glow-primary` and `glow-secondary` effects for premium CTA buttons.
+- **Footer Links**: All links now properly connected (Terms, Privacy, social media, Dev Portal).
+
 # External Dependencies
 
 ## Third-Party Services

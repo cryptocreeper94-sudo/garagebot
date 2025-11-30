@@ -65,9 +65,9 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
                   <FileText className="w-3 h-3 inline mr-1" /> Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
                 <a href="mailto:support@garagebot.io" className="text-muted-foreground hover:text-primary transition-colors">
