@@ -19,6 +19,7 @@ import {
   Calendar, DollarSign, MapPin, ChevronRight, Loader2, Brain
 } from "lucide-react";
 import SmartRecommendations from "@/components/SmartRecommendations";
+import { BlockchainStatus } from "@/components/BlockchainStatus";
 
 interface Vehicle {
   id: string;
@@ -481,6 +482,13 @@ export default function Garage() {
                             <p className="text-sm mt-1">{selectedVehicle.notes}</p>
                           </div>
                         )}
+                        
+                        <BlockchainStatus 
+                          entityType="vehicle" 
+                          entityId={selectedVehicle.id}
+                          showVerifyButton={true}
+                        />
+                        
                         <Button className="w-full font-tech uppercase" onClick={() => window.location.href = `/results?year=${selectedVehicle.year}&make=${selectedVehicle.make}&model=${selectedVehicle.model}`} data-testid="button-shop-parts">
                           <Search className="w-4 h-4 mr-2" /> Shop Parts for This Vehicle
                         </Button>

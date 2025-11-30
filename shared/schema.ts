@@ -1415,3 +1415,46 @@ export const priceAlerts = pgTable("price_alerts", {
 export const insertPriceAlertSchema = createInsertSchema(priceAlerts).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertPriceAlert = z.infer<typeof insertPriceAlertSchema>;
 export type PriceAlert = typeof priceAlerts.$inferSelect;
+
+// ============================================
+// BLOCKCHAIN VERIFICATIONS (Solana)
+// ============================================
+
+export const blockchainVerifications = pgTable("blockchain_verifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Entity being verified
+  entityType: text("entity_type").notNull(), // 'hallmark' | 'vehicle'
+  entityId: varchar("entity_id").notNull(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Verification data
+  dataHash: text("data_hash").notNull(), // SHA-256 hash of the entity data
+  txSignature: text("tx_signature"), // Solana transaction signature
+  
+  // Status tracking
+  status: text("status").default("pending"), // 'pending' | 'submitted' | 'confirmed' | 'failed'
+  network: text("network").default("mainnet-beta"), // 'mainnet-beta' | 'devnet'
+  
+  // Error handling
+  errorMessage: text("error_message"),
+  retryCount: integer("retry_count").default(0),
+  
+  // Timestamps
+  submittedAt: timestamp("submitted_at"),
+  confirmedAt: timestamp("confirmed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_blockchain_entity").on(table.entityType, table.entityId),
+  index("IDX_blockchain_user").on(table.userId),
+  index("IDX_blockchain_status").on(table.status),
+]);
+
+export const insertBlockchainVerificationSchema = createInsertSchema(blockchainVerifications).omit({ 
+  id: true, 
+  createdAt: true,
+  submittedAt: true,
+  confirmedAt: true,
+});
+export type InsertBlockchainVerification = z.infer<typeof insertBlockchainVerificationSchema>;
+export type BlockchainVerification = typeof blockchainVerifications.$inferSelect;

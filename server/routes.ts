@@ -4961,6 +4961,203 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // BLOCKCHAIN VERIFICATION ROUTES (Solana)
+  // ============================================
+  
+  const blockchainService = await import('./services/blockchain');
+  
+  // Get user's blockchain verifications
+  app.get('/api/blockchain/verifications', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const verifications = await storage.getBlockchainVerificationsByUser(userId);
+      res.json(verifications);
+    } catch (error) {
+      console.error("Get blockchain verifications error:", error);
+      res.status(500).json({ error: "Failed to get verifications" });
+    }
+  });
+  
+  // Get verification status for an entity (with ownership check)
+  app.get('/api/blockchain/status/:entityType/:entityId', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const { entityType, entityId } = req.params;
+      
+      // Verify ownership based on entity type
+      if (entityType === 'hallmark') {
+        const hallmark = await storage.getHallmark(entityId);
+        if (!hallmark) {
+          return res.status(404).json({ error: "Hallmark not found" });
+        }
+        if (hallmark.userId !== userId) {
+          return res.status(403).json({ error: "Not authorized to view this verification" });
+        }
+      } else if (entityType === 'vehicle') {
+        const vehicle = await storage.getVehicle(entityId);
+        if (!vehicle) {
+          return res.status(404).json({ error: "Vehicle not found" });
+        }
+        if (vehicle.userId !== userId) {
+          return res.status(403).json({ error: "Not authorized to view this verification" });
+        }
+      } else {
+        return res.status(400).json({ error: "Invalid entity type" });
+      }
+      
+      const verification = await storage.getLatestVerification(entityType, entityId);
+      
+      if (!verification) {
+        return res.json({ status: 'not_verified', verification: null });
+      }
+      
+      res.json({
+        status: verification.status,
+        verification: {
+          ...verification,
+          solscanUrl: verification.txSignature && !verification.txSignature.startsWith('HASH_') && !verification.txSignature.startsWith('DEMO_')
+            ? blockchainService.getSolscanUrl(verification.txSignature, verification.network as 'mainnet-beta' | 'devnet')
+            : null
+        }
+      });
+    } catch (error) {
+      console.error("Get verification status error:", error);
+      res.status(500).json({ error: "Failed to get verification status" });
+    }
+  });
+  
+  // Verify a hallmark on blockchain
+  app.post('/api/blockchain/hallmark/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const hallmarkId = req.params.id;
+      
+      const hallmark = await storage.getHallmark(hallmarkId);
+      if (!hallmark) {
+        return res.status(404).json({ error: "Hallmark not found" });
+      }
+      if (hallmark.userId !== userId) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+      
+      // Check for existing verification
+      const existing = await storage.getLatestVerification('hallmark', hallmarkId);
+      if (existing && (existing.status === 'confirmed' || existing.status === 'submitted')) {
+        return res.json({ 
+          message: "Already verified",
+          verification: existing,
+          solscanUrl: existing.txSignature && !existing.txSignature.startsWith('HASH_')
+            ? blockchainService.getSolscanUrl(existing.txSignature, existing.network as 'mainnet-beta' | 'devnet')
+            : null
+        });
+      }
+      
+      // Prepare data and create verification
+      const blockchainData = blockchainService.prepareHallmarkData(hallmark);
+      const result = await blockchainService.createVerification(blockchainData, 'devnet');
+      
+      const verification = await storage.createBlockchainVerification({
+        entityType: 'hallmark',
+        entityId: hallmarkId,
+        userId,
+        dataHash: result.dataHash,
+        txSignature: result.txSignature,
+        status: result.status,
+        network: 'devnet',
+        errorMessage: result.error,
+      });
+      
+      // Update with timestamps if submitted
+      if (result.status === 'submitted' || result.status === 'confirmed') {
+        await storage.updateBlockchainVerification(verification.id, {
+          submittedAt: new Date(),
+          confirmedAt: result.status === 'confirmed' ? new Date() : undefined,
+        });
+      }
+      
+      res.json({
+        success: result.success,
+        verification,
+        solscanUrl: result.solscanUrl,
+      });
+    } catch (error) {
+      console.error("Verify hallmark error:", error);
+      res.status(500).json({ error: "Failed to verify hallmark on blockchain" });
+    }
+  });
+  
+  // Verify a vehicle on blockchain
+  app.post('/api/blockchain/vehicle/:id', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const vehicleId = req.params.id;
+      
+      const vehicle = await storage.getVehicle(vehicleId);
+      if (!vehicle) {
+        return res.status(404).json({ error: "Vehicle not found" });
+      }
+      if (vehicle.userId !== userId) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+      
+      // Check for existing verification
+      const existing = await storage.getLatestVerification('vehicle', vehicleId);
+      if (existing && (existing.status === 'confirmed' || existing.status === 'submitted')) {
+        return res.json({ 
+          message: "Already verified",
+          verification: existing,
+          solscanUrl: existing.txSignature && !existing.txSignature.startsWith('HASH_')
+            ? blockchainService.getSolscanUrl(existing.txSignature, existing.network as 'mainnet-beta' | 'devnet')
+            : null
+        });
+      }
+      
+      // Prepare data and create verification
+      const blockchainData = blockchainService.prepareVehicleData(vehicle);
+      const result = await blockchainService.createVerification(blockchainData, 'devnet');
+      
+      const verification = await storage.createBlockchainVerification({
+        entityType: 'vehicle',
+        entityId: vehicleId,
+        userId,
+        dataHash: result.dataHash,
+        txSignature: result.txSignature,
+        status: result.status,
+        network: 'devnet',
+        errorMessage: result.error,
+      });
+      
+      // Update with timestamps if submitted
+      if (result.status === 'submitted' || result.status === 'confirmed') {
+        await storage.updateBlockchainVerification(verification.id, {
+          submittedAt: new Date(),
+          confirmedAt: result.status === 'confirmed' ? new Date() : undefined,
+        });
+      }
+      
+      res.json({
+        success: result.success,
+        verification,
+        solscanUrl: result.solscanUrl,
+      });
+    } catch (error) {
+      console.error("Verify vehicle error:", error);
+      res.status(500).json({ error: "Failed to verify vehicle on blockchain" });
+    }
+  });
+  
+  // Check Helius connection status
+  app.get('/api/blockchain/health', async (req, res) => {
+    try {
+      const status = await blockchainService.checkHeliusConnection();
+      res.json(status);
+    } catch (error) {
+      console.error("Blockchain health check error:", error);
+      res.status(500).json({ connected: false, error: String(error) });
+    }
+  });
+
   return httpServer;
 }
 

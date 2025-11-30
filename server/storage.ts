@@ -8,7 +8,7 @@ import {
   repairOrders, repairOrderItems, estimates, estimateItems, appointments, shopInventory,
   technicianTimeEntries, digitalInspections, inspectionItems, shopSettings, integrationCredentials,
   vehicleCategories, repairGuides, guideSteps, guideFitment, partTerminology, guideRatings, guideProgress,
-  priceAlerts
+  priceAlerts, blockchainVerifications
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -30,7 +30,8 @@ import type {
   GuideStep, InsertGuideStep, GuideFitment, InsertGuideFitment,
   PartTerminology, InsertPartTerminology, GuideRating, InsertGuideRating,
   GuideProgress, InsertGuideProgress,
-  PriceAlert, InsertPriceAlert
+  PriceAlert, InsertPriceAlert,
+  BlockchainVerification, InsertBlockchainVerification
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -115,6 +116,7 @@ export interface IStorage {
   getScanHistory(userId: string): Promise<ScanHistory[]>;
 
   // Hallmarks
+  getHallmark(id: string): Promise<Hallmark | undefined>;
   getHallmarkByUserId(userId: string): Promise<Hallmark | undefined>;
   getHallmarkByAssetNumber(assetNumber: number): Promise<Hallmark | undefined>;
   searchHallmarks(query: string): Promise<Hallmark[]>;
@@ -291,6 +293,15 @@ export interface IStorage {
   createPriceAlert(alert: InsertPriceAlert): Promise<PriceAlert>;
   updatePriceAlert(id: string, updates: Partial<PriceAlert>): Promise<PriceAlert | undefined>;
   deletePriceAlert(id: string): Promise<boolean>;
+  
+  // Blockchain Verifications (Solana)
+  getBlockchainVerification(id: string): Promise<BlockchainVerification | undefined>;
+  getBlockchainVerificationsByEntity(entityType: string, entityId: string): Promise<BlockchainVerification[]>;
+  getBlockchainVerificationsByUser(userId: string): Promise<BlockchainVerification[]>;
+  getLatestVerification(entityType: string, entityId: string): Promise<BlockchainVerification | undefined>;
+  createBlockchainVerification(verification: InsertBlockchainVerification): Promise<BlockchainVerification>;
+  updateBlockchainVerification(id: string, updates: Partial<BlockchainVerification>): Promise<BlockchainVerification | undefined>;
+  getPendingVerifications(): Promise<BlockchainVerification[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -592,6 +603,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Hallmarks
+  async getHallmark(id: string): Promise<Hallmark | undefined> {
+    const [hallmark] = await db.select().from(hallmarks).where(eq(hallmarks.id, id));
+    return hallmark;
+  }
+  
   async getHallmarkByUserId(userId: string): Promise<Hallmark | undefined> {
     const [hallmark] = await db.select().from(hallmarks).where(eq(hallmarks.userId, userId));
     return hallmark;
@@ -1522,6 +1538,60 @@ export class DatabaseStorage implements IStorage {
   async deletePriceAlert(id: string): Promise<boolean> {
     await db.delete(priceAlerts).where(eq(priceAlerts.id, id));
     return true;
+  }
+  
+  // Blockchain Verifications (Solana)
+  async getBlockchainVerification(id: string): Promise<BlockchainVerification | undefined> {
+    const [verification] = await db.select().from(blockchainVerifications).where(eq(blockchainVerifications.id, id));
+    return verification;
+  }
+  
+  async getBlockchainVerificationsByEntity(entityType: string, entityId: string): Promise<BlockchainVerification[]> {
+    return await db.select().from(blockchainVerifications)
+      .where(and(
+        eq(blockchainVerifications.entityType, entityType),
+        eq(blockchainVerifications.entityId, entityId)
+      ))
+      .orderBy(desc(blockchainVerifications.createdAt));
+  }
+  
+  async getBlockchainVerificationsByUser(userId: string): Promise<BlockchainVerification[]> {
+    return await db.select().from(blockchainVerifications)
+      .where(eq(blockchainVerifications.userId, userId))
+      .orderBy(desc(blockchainVerifications.createdAt));
+  }
+  
+  async getLatestVerification(entityType: string, entityId: string): Promise<BlockchainVerification | undefined> {
+    const [verification] = await db.select().from(blockchainVerifications)
+      .where(and(
+        eq(blockchainVerifications.entityType, entityType),
+        eq(blockchainVerifications.entityId, entityId)
+      ))
+      .orderBy(desc(blockchainVerifications.createdAt))
+      .limit(1);
+    return verification;
+  }
+  
+  async createBlockchainVerification(verification: InsertBlockchainVerification): Promise<BlockchainVerification> {
+    const [newVerification] = await db.insert(blockchainVerifications).values(verification).returning();
+    return newVerification;
+  }
+  
+  async updateBlockchainVerification(id: string, updates: Partial<BlockchainVerification>): Promise<BlockchainVerification | undefined> {
+    const [verification] = await db.update(blockchainVerifications)
+      .set(updates)
+      .where(eq(blockchainVerifications.id, id))
+      .returning();
+    return verification;
+  }
+  
+  async getPendingVerifications(): Promise<BlockchainVerification[]> {
+    return await db.select().from(blockchainVerifications)
+      .where(or(
+        eq(blockchainVerifications.status, 'pending'),
+        eq(blockchainVerifications.status, 'submitted')
+      ))
+      .orderBy(asc(blockchainVerifications.createdAt));
   }
 }
 
