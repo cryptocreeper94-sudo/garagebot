@@ -227,7 +227,7 @@ export default function ProSubscription() {
             <Button
               onClick={handleSubscribe}
               disabled={isPro || subscribeMutation.isPending}
-              className="w-full mt-6 h-12 font-tech uppercase text-lg bg-gradient-to-r from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-black"
+              className="w-full mt-6 h-12 font-tech uppercase text-lg bg-gradient-to-r from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-black shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6),0_0_15px_rgba(234,179,8,0.4)] transition-all"
               data-testid="button-subscribe-pro"
             >
               {subscribeMutation.isPending ? (
