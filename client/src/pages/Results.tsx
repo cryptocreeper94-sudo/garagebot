@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearch } from "wouter";
 import { motion } from "framer-motion";
-import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight, Navigation, Search, Package, Wrench, Bell } from "lucide-react";
+import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight, Navigation, Search, Package, Wrench, Bell, ChevronDown } from "lucide-react";
 import Nav from "@/components/Nav";
 import VehicleFunFacts from "@/components/VehicleFunFacts";
 import { PriceAlertButton, PriceAlertsPanel } from "@/components/PriceAlerts";
@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
 import { VENDORS, VendorInfo, generateVendorSearchUrl, getVendorsForVehicleType } from "@/lib/mockData";
 
@@ -331,51 +332,66 @@ export default function Results() {
               </p>
             </div>
 
-            <div className="space-y-6">
-              <div className="p-4 rounded bg-white/5 border border-white/5">
-                <h3 className="font-mono text-xs uppercase text-muted-foreground mb-3">Search Query</h3>
-                <p className="text-sm font-tech text-primary truncate">{displayQuery}</p>
-                {(year || make || model) && (
-                  <p className="text-[10px] text-muted-foreground mt-1">
-                    {[year, make, model].filter(Boolean).join(' ')}
-                  </p>
-                )}
-              </div>
+            <div className="p-4 rounded bg-white/5 border border-white/5 mb-4">
+              <h3 className="font-mono text-xs uppercase text-muted-foreground mb-2">Search Query</h3>
+              <p className="text-sm font-tech text-primary truncate">{displayQuery}</p>
+              {(year || make || model) && (
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {[year, make, model].filter(Boolean).join(' ')}
+                </p>
+              )}
+            </div>
 
-              {/* ZIP Code Input */}
-              <div className="space-y-2">
-                <h3 className="font-mono text-xs uppercase text-muted-foreground">Your Location</h3>
-                <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    placeholder="ZIP Code"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                    className="h-8 text-xs bg-black/20 border-white/10"
-                    data-testid="input-zipcode"
-                  />
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="h-8 px-2 text-xs border-primary/30"
-                    onClick={() => {
-                      if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(() => {
-                          // Would integrate with geocoding API
-                        });
-                      }
-                    }}
-                    data-testid="button-use-location"
-                  >
-                    <MapPin className="w-3 h-3" />
-                  </Button>
-                </div>
-                <p className="text-[9px] text-muted-foreground">Enter ZIP for local store results</p>
-              </div>
+            <Accordion type="multiple" defaultValue={["filters", "location"]} className="space-y-2">
+              <AccordionItem value="location" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+                <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-green-400" />
+                    <span className="font-tech uppercase text-xs">Location</span>
+                    {zipCode && <Badge variant="outline" className="text-[9px] h-4 px-1 border-green-500/30 text-green-400">{zipCode}</Badge>}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-3 pb-3">
+                  <div className="flex gap-2">
+                    <Input
+                      type="text"
+                      placeholder="ZIP Code"
+                      value={zipCode}
+                      onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                      className="h-8 text-xs bg-black/20 border-white/10"
+                      data-testid="input-zipcode"
+                    />
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-8 px-2 text-xs border-primary/30"
+                      onClick={() => {
+                        if (navigator.geolocation) {
+                          navigator.geolocation.getCurrentPosition(() => {});
+                        }
+                      }}
+                      data-testid="button-use-location"
+                    >
+                      <MapPin className="w-3 h-3" />
+                    </Button>
+                  </div>
+                  <p className="text-[9px] text-muted-foreground mt-1">Enter ZIP for local stores</p>
+                </AccordionContent>
+              </AccordionItem>
 
-              <div className="space-y-2">
-                <h3 className="font-mono text-xs uppercase text-muted-foreground">Filters</h3>
-                <div className="space-y-2">
+              <AccordionItem value="filters" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+                <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-primary" />
+                    <span className="font-tech uppercase text-xs">Filters</span>
+                    {(showLocalOnly || showOEMOnly || showAftermarketOnly) && (
+                      <Badge variant="outline" className="text-[9px] h-4 px-1 border-primary/30 text-primary">
+                        {[showLocalOnly, showOEMOnly, showAftermarketOnly].filter(Boolean).length}
+                      </Badge>
+                    )}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-3 pb-3 space-y-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id="localPickup" 
@@ -412,12 +428,18 @@ export default function Results() {
                       <Wrench className="w-3 h-3 text-purple-400" /> Aftermarket
                     </label>
                   </div>
-                </div>
-              </div>
+                </AccordionContent>
+              </AccordionItem>
 
-              <div className="space-y-2">
-                <h3 className="font-mono text-xs uppercase text-muted-foreground">Retailer Types</h3>
-                <div className="space-y-1">
+              <AccordionItem value="retailers" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+                <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Store className="w-4 h-4 text-amber-400" />
+                    <span className="font-tech uppercase text-xs">Retailer Types</span>
+                    <Badge variant="outline" className="text-[9px] h-4 px-1 border-white/20">{enhancedVendorResults.length}</Badge>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-3 pb-3 space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="flex items-center gap-1">
                       <Store className="w-3 h-3 text-green-400" /> With Local Stores
@@ -434,33 +456,47 @@ export default function Results() {
                       {enhancedVendorResults.filter(v => !v.vendor.hasLocalPickup).length}
                     </span>
                   </div>
-                </div>
-              </div>
+                </AccordionContent>
+              </AccordionItem>
 
-              <div className="p-4 rounded bg-primary/5 border border-primary/20">
-                <h3 className="font-mono text-xs uppercase text-primary mb-2">How It Works</h3>
-                <ul className="space-y-1 text-[10px] text-muted-foreground">
-                  <li>1. Click any retailer to search their site</li>
-                  <li>2. Compare prices across all vendors</li>
-                  <li>3. Local pickup prioritized for speed</li>
-                  <li>4. We earn commissions on some purchases</li>
-                </ul>
-              </div>
+              <AccordionItem value="alerts" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+                <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-yellow-400" />
+                    <span className="font-tech uppercase text-xs">Price Alerts</span>
+                    <Badge variant="outline" className="text-[9px] h-4 px-1 border-primary/30 text-primary">PRO</Badge>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-3 pb-3">
+                  <PriceAlertsPanel />
+                </AccordionContent>
+              </AccordionItem>
 
-              {/* Price Alerts Panel (Pro Feature) */}
-              <div className="mt-6">
-                <PriceAlertsPanel />
-              </div>
+              <AccordionItem value="howit" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+                <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Info className="w-4 h-4 text-blue-400" />
+                    <span className="font-tech uppercase text-xs">How It Works</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-3 pb-3">
+                  <ul className="space-y-1 text-[10px] text-muted-foreground">
+                    <li>1. Click any retailer to search their site</li>
+                    <li>2. Compare prices across all vendors</li>
+                    <li>3. Local pickup prioritized for speed</li>
+                    <li>4. We earn commissions on some purchases</li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
-              {/* Fun Facts Section */}
-              <div className="mt-6">
-                <VehicleFunFacts 
-                  query={query} 
-                  make={make} 
-                  model={model} 
-                  vehicleType={vehicleType} 
-                />
-              </div>
+            <div className="mt-4">
+              <VehicleFunFacts 
+                query={query} 
+                make={make} 
+                model={model} 
+                vehicleType={vehicleType} 
+              />
             </div>
           </div>
 
