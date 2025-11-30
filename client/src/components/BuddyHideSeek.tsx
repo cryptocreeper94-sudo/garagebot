@@ -40,6 +40,10 @@ const BUDDY_COMMENTS: BuddyComment[] = [
   { text: "West Marine is your go-to for boat parts. I can check their inventory!", mascot: mascotTire, section: ['general'] },
   { text: "RV season coming up? Don't forget to check your roof seals!", mascot: mascotThinking, section: ['general'] },
   { text: "Diesel engines can last 500,000+ miles with proper maintenance!", mascot: mascotOilFilter, section: ['general'] },
+  { text: "NEW: Your vehicles can now be verified on the Solana blockchain! Check the Passport tab in your Garage.", mascot: mascotWaving, section: ['garage', 'home'] },
+  { text: "Genesis Hallmarks are now blockchain-certified! Tamper-proof ownership on Solana.", mascot: mascotThinking, section: ['home', 'general'] },
+  { text: "Did you know? Blockchain verification creates permanent, cryptographic proof of your vehicle's history!", mascot: mascotWaving, section: ['garage'] },
+  { text: "Your Genesis Hallmark can now be verified on-chain. View it on Solscan!", mascot: mascotThinking, section: ['home', 'dashboard'] },
 ];
 
 const getRandomPosition = (): React.CSSProperties => {

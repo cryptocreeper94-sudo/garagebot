@@ -8,6 +8,7 @@ import OnboardingModal from "@/components/OnboardingModal";
 import AIMascot from "@/components/AIMascot";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
+import { BlockchainAnnouncement } from "@/components/FeatureAnnouncement";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
@@ -75,6 +76,7 @@ function App() {
           <Toaster />
           <OnboardingModal />
           <AddToHomeScreen />
+          <BlockchainAnnouncement />
           <Router />
           <AIMascot mascotName="Buddy" />
           <BuddyHideSeek />
