@@ -3536,7 +3536,7 @@ export async function registerRoutes(
   // Get all repair guides with optional filters
   app.get("/api/diy-guides", async (req, res) => {
     try {
-      const { category, difficulty, vehicleCategory, systemType, search, includeSteps } = req.query;
+      const { category, difficulty, vehicleCategory, systemType, search } = req.query;
       const guides = await storage.getRepairGuides({
         category: category as string,
         difficulty: difficulty as string,
@@ -3545,26 +3545,17 @@ export async function registerRoutes(
         search: search as string,
       });
       
-      // Only include steps if explicitly requested (for performance)
-      if (includeSteps === 'true') {
-        const guidesWithSteps = await Promise.all(
-          guides.map(async (guide) => {
-            const steps = await storage.getGuideSteps(guide.id);
-            return { ...guide, steps };
-          })
-        );
-        return res.json(guidesWithSteps);
-      }
+      // Use efficient batch count query (single SQL statement)
+      const guideIds = guides.map(g => g.id);
+      const stepCounts = await storage.getMultipleGuideStepCounts(guideIds);
       
-      // Return guides with step count only (default - lightweight)
-      const guidesWithCount = await Promise.all(
-        guides.map(async (guide) => {
-          const steps = await storage.getGuideSteps(guide.id);
-          return { ...guide, steps };
-        })
-      );
+      // Return guides with step count only (lightweight for catalog view)
+      const guidesWithStepCount = guides.map(guide => ({
+        ...guide,
+        stepCount: stepCounts.get(guide.id) || 0
+      }));
       
-      res.json(guidesWithCount);
+      res.json(guidesWithStepCount);
     } catch (error) {
       console.error("Error fetching repair guides:", error);
       res.status(500).json({ error: "Failed to fetch guides" });
