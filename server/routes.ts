@@ -4029,6 +4029,339 @@ export async function registerRoutes(
   });
 
   // ============================================
+  // ADMIN: SEED DIY REPAIR GUIDES
+  // ============================================
+  
+  app.post("/api/admin/seed-diy-guides", async (req, res) => {
+    try {
+      const guides = [
+        {
+          title: "How to Change Your Engine Oil",
+          slug: "change-engine-oil",
+          description: "Complete step-by-step guide to changing your engine oil and filter. One of the most important maintenance tasks to extend engine life.",
+          category: "car",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 30,
+          partsCost: "25-60",
+          toolsRequired: ["Oil drain pan", "Socket wrench set", "Oil filter wrench", "Funnel", "Jack and jack stands", "Gloves", "Rags"],
+          partsRequired: ["Engine oil (check owner's manual for quantity)", "Oil filter"],
+          safetyWarnings: ["Never work under a vehicle supported only by a jack", "Allow engine to cool before starting", "Dispose of used oil properly at a recycling center"],
+          youtubeSearchQuery: "how to change engine oil DIY",
+          tags: ["oil change", "maintenance", "beginner", "essential"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Gather Materials", description: "Get the correct oil type and quantity from your owner's manual. Buy a new oil filter that matches your vehicle.", pro_tips: "Check YouTube for your specific year/make/model for oil capacity", warnings: null },
+            { stepNumber: 2, title: "Warm Up Engine", description: "Run the engine for 2-3 minutes to warm the oil. Warm oil drains faster and more completely.", pro_tips: "Don't get it too hot - you'll be working near hot components", warnings: "Hot oil and components can cause burns" },
+            { stepNumber: 3, title: "Raise Vehicle Safely", description: "Use a jack to raise the front of the vehicle and secure it on jack stands. Never rely on the jack alone.", pro_tips: "Use wheel chocks on the rear tires", warnings: "Ensure vehicle is stable before going underneath" },
+            { stepNumber: 4, title: "Locate Drain Plug", description: "Find the oil drain plug on the bottom of the oil pan. It's usually a single bolt at the lowest point.", pro_tips: "Take a photo before you start so you know the original position", warnings: null },
+            { stepNumber: 5, title: "Drain the Oil", description: "Place drain pan under plug. Remove plug with socket wrench, letting oil drain completely (5-10 min).", pro_tips: "The oil may spray out initially - position the pan accordingly", warnings: "Oil may be hot" },
+            { stepNumber: 6, title: "Replace Oil Filter", description: "Locate and remove old filter. Apply thin layer of new oil to new filter gasket. Install new filter hand-tight.", pro_tips: "Don't over-tighten the filter - hand tight plus 3/4 turn is usually enough", warnings: null },
+            { stepNumber: 7, title: "Reinstall Drain Plug", description: "Wipe the drain plug clean. Install with new washer if included. Tighten securely but don't over-torque.", pro_tips: "Many drain plugs are 17mm or 19mm", warnings: "Over-tightening can strip threads" },
+            { stepNumber: 8, title: "Add New Oil", description: "Lower vehicle. Remove oil filler cap and add new oil through funnel. Check dipstick for proper level.", pro_tips: "Add about 3/4 of the total capacity, then check and add more as needed", warnings: null },
+            { stepNumber: 9, title: "Check for Leaks", description: "Start engine and let idle for 1 minute. Check under vehicle for any leaks at drain plug or filter.", pro_tips: "It's normal for oil pressure light to take a few seconds to go off", warnings: null },
+            { stepNumber: 10, title: "Final Check", description: "Turn off engine, wait 2 minutes, recheck oil level. Add more if needed. Record mileage for next change.", pro_tips: "Most vehicles take oil changes every 5,000-7,500 miles with synthetic oil", warnings: null },
+          ]
+        },
+        {
+          title: "How to Replace Brake Pads",
+          slug: "replace-brake-pads",
+          description: "Learn how to safely replace your front disc brake pads. Save money and ensure your brakes are working properly.",
+          category: "car",
+          difficulty: "intermediate",
+          estimatedTimeMinutes: 60,
+          partsCost: "30-80",
+          toolsRequired: ["C-clamp or brake piston tool", "Socket wrench set", "Lug wrench", "Jack and jack stands", "Brake cleaner", "Wire brush", "Gloves"],
+          partsRequired: ["Brake pads (axle set)", "Brake pad grease (optional)"],
+          safetyWarnings: ["Support vehicle securely on jack stands", "Never use compressed air on brake dust - it may contain asbestos", "Don't let vehicle roll - use parking brake and wheel chocks"],
+          youtubeSearchQuery: "how to replace brake pads DIY",
+          tags: ["brakes", "safety", "intermediate", "essential"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Loosen Lug Nuts", description: "While vehicle is on the ground, slightly loosen the lug nuts on the wheel you're working on.", pro_tips: "Don't remove them completely yet", warnings: null },
+            { stepNumber: 2, title: "Raise and Secure Vehicle", description: "Jack up the vehicle and place it securely on jack stands. Remove the wheel.", pro_tips: "Work on one side at a time so you have a reference", warnings: "Ensure vehicle is stable" },
+            { stepNumber: 3, title: "Remove Caliper", description: "Locate the caliper bolts (usually two bolts on the back). Remove them and carefully lift the caliper off the rotor.", pro_tips: "Use a wire or bungee to hang the caliper - don't let it hang by the brake line", warnings: "Never let caliper hang by brake hose" },
+            { stepNumber: 4, title: "Remove Old Pads", description: "Slide the old brake pads out of the caliper bracket. Note how they're positioned.", pro_tips: "Take a photo for reference", warnings: null },
+            { stepNumber: 5, title: "Compress the Piston", description: "Use a C-clamp or brake piston tool to push the caliper piston back into the housing.", pro_tips: "Open the brake fluid reservoir cap to prevent pressure buildup", warnings: "Watch brake fluid level - it may overflow as you compress" },
+            { stepNumber: 6, title: "Install New Pads", description: "Slide the new brake pads into position. Apply brake grease to the back of pads if included.", pro_tips: "Make sure any wear indicators are positioned correctly", warnings: null },
+            { stepNumber: 7, title: "Reinstall Caliper", description: "Lower the caliper back over the new pads and rotor. Reinstall and tighten the caliper bolts.", pro_tips: "Torque to manufacturer specs if you have a torque wrench", warnings: null },
+            { stepNumber: 8, title: "Reinstall Wheel", description: "Put the wheel back on and hand-tighten the lug nuts in a star pattern.", pro_tips: "Final torque after lowering the vehicle", warnings: null },
+            { stepNumber: 9, title: "Pump the Brakes", description: "Before driving, pump the brake pedal several times until it feels firm.", pro_tips: "This seats the pads against the rotor", warnings: "Vehicle will not stop properly until pedal is firm" },
+            { stepNumber: 10, title: "Break In New Pads", description: "Drive gently for the first 100-200 miles, avoiding hard braking to properly bed the pads.", pro_tips: "You may hear some squeaking initially - this is normal", warnings: null },
+          ]
+        },
+        {
+          title: "How to Replace an Air Filter",
+          slug: "replace-air-filter",
+          description: "Quick and easy guide to replacing your engine air filter. Improves fuel economy and engine performance.",
+          category: "car",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 10,
+          partsCost: "15-40",
+          toolsRequired: ["Screwdriver (may not be needed)", "Shop vacuum (optional)"],
+          partsRequired: ["Engine air filter"],
+          safetyWarnings: ["Make sure engine is off and cool"],
+          youtubeSearchQuery: "how to replace engine air filter DIY",
+          tags: ["air filter", "maintenance", "beginner", "quick"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Locate Air Filter Box", description: "Find the air filter housing - it's usually a black plastic box near the engine with a large hose attached.", pro_tips: "Check your owner's manual if you can't find it", warnings: null },
+            { stepNumber: 2, title: "Open the Housing", description: "Unclip the clips or unscrew the screws holding the air filter housing lid in place.", pro_tips: "Some vehicles have spring clips, others have screws", warnings: null },
+            { stepNumber: 3, title: "Remove Old Filter", description: "Lift out the old air filter and note which direction it was installed.", pro_tips: "Check for debris or leaves that may have gotten into the housing", warnings: null },
+            { stepNumber: 4, title: "Clean Housing", description: "Wipe out the inside of the housing with a clean cloth. Remove any debris.", pro_tips: "Use a vacuum if there's a lot of dirt", warnings: null },
+            { stepNumber: 5, title: "Install New Filter", description: "Place the new filter in the housing, matching the orientation of the old one.", pro_tips: "Make sure it's seated properly with no gaps around the edges", warnings: null },
+            { stepNumber: 6, title: "Close Housing", description: "Replace the lid and secure all clips or screws. Make sure it's sealed properly.", pro_tips: "A poor seal lets unfiltered air into your engine", warnings: null },
+          ]
+        },
+        {
+          title: "How to Replace Spark Plugs",
+          slug: "replace-spark-plugs",
+          description: "Step-by-step guide to replacing spark plugs for better fuel economy and engine performance.",
+          category: "car",
+          difficulty: "intermediate",
+          estimatedTimeMinutes: 45,
+          partsCost: "20-80",
+          toolsRequired: ["Spark plug socket", "Ratchet with extensions", "Gap gauge", "Torque wrench (recommended)", "Anti-seize compound", "Dielectric grease"],
+          partsRequired: ["Spark plugs (set for your engine)"],
+          safetyWarnings: ["Work on a cold engine only", "Don't drop anything into spark plug holes"],
+          youtubeSearchQuery: "how to replace spark plugs DIY",
+          tags: ["spark plugs", "ignition", "tune-up", "intermediate"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Cool Engine Completely", description: "Make sure the engine is cold. Working on a hot engine can damage threads.", pro_tips: "Wait at least 2 hours after driving", warnings: "Hot engines can cause burns and thread damage" },
+            { stepNumber: 2, title: "Remove Engine Cover", description: "If your engine has a plastic cover, remove it to access the spark plugs.", pro_tips: "Take photos of any hose or wire routing", warnings: null },
+            { stepNumber: 3, title: "Disconnect Coil/Wire", description: "For each spark plug, disconnect the ignition coil or spark plug wire.", pro_tips: "Work on one plug at a time to avoid mixing up wires", warnings: null },
+            { stepNumber: 4, title: "Remove Spark Plug", description: "Use a spark plug socket with extension to unscrew the old spark plug.", pro_tips: "If it's stuck, apply penetrating oil and wait 10 minutes", warnings: "Don't force a stuck plug - you may break it" },
+            { stepNumber: 5, title: "Check Gap", description: "Verify the new spark plug gap matches your vehicle's specification.", pro_tips: "Gap is usually on a sticker under the hood or in the manual", warnings: null },
+            { stepNumber: 6, title: "Install New Plug", description: "Apply anti-seize to threads. Hand-start the plug, then torque to spec.", pro_tips: "For aluminum heads, torque is usually 12-18 ft-lbs", warnings: "Cross-threading destroys the cylinder head" },
+            { stepNumber: 7, title: "Reconnect Coil/Wire", description: "Apply dielectric grease to the boot and reconnect the coil or wire.", pro_tips: "You should feel/hear it click into place", warnings: null },
+            { stepNumber: 8, title: "Repeat for All Plugs", description: "Complete the same process for each remaining spark plug.", pro_tips: "Keep track of which plugs you've done", warnings: null },
+            { stepNumber: 9, title: "Reinstall Cover", description: "Put the engine cover back on and ensure everything is connected.", pro_tips: "Double-check all connections before starting", warnings: null },
+            { stepNumber: 10, title: "Test", description: "Start the engine and check for smooth idle. No misfires should occur.", pro_tips: "If engine runs rough, recheck your work", warnings: null },
+          ]
+        },
+        {
+          title: "How to Replace Windshield Wipers",
+          slug: "replace-windshield-wipers",
+          description: "Quick guide to replacing windshield wiper blades for better visibility in rain and snow.",
+          category: "car",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 5,
+          partsCost: "15-40",
+          toolsRequired: ["None usually required"],
+          partsRequired: ["Wiper blades (pair)", "Rear wiper blade (if applicable)"],
+          safetyWarnings: ["Be careful not to let the wiper arm snap back against the windshield"],
+          youtubeSearchQuery: "how to replace windshield wipers DIY",
+          tags: ["wipers", "visibility", "beginner", "quick"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Lift Wiper Arm", description: "Pull the wiper arm away from the windshield until it stays up on its own.", pro_tips: "Place a towel on the windshield in case the arm snaps back", warnings: "Arm can crack windshield if it snaps down" },
+            { stepNumber: 2, title: "Find Release Tab", description: "Locate the release mechanism where the blade attaches to the arm. Usually a tab or button.", pro_tips: "Look at the new blade to understand the attachment type", warnings: null },
+            { stepNumber: 3, title: "Remove Old Blade", description: "Press or pull the release and slide the old blade off the arm.", pro_tips: "Different brands use different attachment styles", warnings: null },
+            { stepNumber: 4, title: "Attach New Blade", description: "Slide the new blade onto the arm until it clicks into place.", pro_tips: "Most new blades come with adapters for different arm styles", warnings: null },
+            { stepNumber: 5, title: "Lower Arm Carefully", description: "Gently lower the wiper arm back to the windshield.", pro_tips: "Don't let it snap down", warnings: null },
+            { stepNumber: 6, title: "Test Wipers", description: "Turn on the wipers and spray washer fluid to test for smooth, streak-free operation.", pro_tips: "New blades may squeak initially", warnings: null },
+          ]
+        },
+        {
+          title: "How to Change Outboard Lower Unit Oil",
+          slug: "change-lower-unit-oil",
+          description: "Essential maintenance for outboard motors. Protect your lower unit gears and bearings by changing the gear oil regularly.",
+          category: "boat",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 20,
+          partsCost: "10-25",
+          toolsRequired: ["Gear lube pump or squeeze bottle", "Drain pan", "Screwdriver or socket set", "Rags"],
+          partsRequired: ["Lower unit gear oil (check manufacturer spec)", "Drain/fill plug gaskets"],
+          safetyWarnings: ["Check drained oil for water or metal shavings which indicate problems"],
+          youtubeSearchQuery: "how to change outboard lower unit oil",
+          tags: ["marine", "outboard", "lower unit", "gear oil", "maintenance"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Position Motor", description: "Tilt the outboard to vertical position. Place drain pan underneath lower unit.", pro_tips: "Let motor cool if recently run", warnings: null },
+            { stepNumber: 2, title: "Remove Drain Plug", description: "Remove the bottom drain/fill plug on the lower unit. Oil will start draining.", pro_tips: "This is usually on the side, near the prop", warnings: null },
+            { stepNumber: 3, title: "Remove Vent Plug", description: "Remove the upper vent plug to allow air in and speed up draining.", pro_tips: "Oil should flow freely now", warnings: null },
+            { stepNumber: 4, title: "Inspect Old Oil", description: "Check drained oil for milky color (water intrusion) or metal particles (gear wear).", pro_tips: "Clean oil is normal. Milky oil means seal problems", warnings: "Water in oil requires seal replacement" },
+            { stepNumber: 5, title: "Fill with New Oil", description: "Insert gear oil tube into BOTTOM plug hole. Pump oil up until it comes out the top vent hole.", pro_tips: "Filling from bottom pushes air out the top", warnings: null },
+            { stepNumber: 6, title: "Install Vent Plug", description: "While oil is still coming out top hole, install the vent plug with new gasket.", pro_tips: "This traps oil in with minimal air", warnings: null },
+            { stepNumber: 7, title: "Install Drain Plug", description: "Quickly remove fill tube and install bottom plug with new gasket.", pro_tips: "Some oil loss is normal", warnings: null },
+            { stepNumber: 8, title: "Wipe Clean", description: "Clean any spilled oil from the lower unit housing.", pro_tips: "Check for leaks after first use", warnings: null },
+          ]
+        },
+        {
+          title: "How to Change Motorcycle Oil",
+          slug: "change-motorcycle-oil",
+          description: "Complete guide to changing oil in your motorcycle. Includes drain plug and filter replacement.",
+          category: "motorcycle",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 30,
+          partsCost: "25-50",
+          toolsRequired: ["Socket set or wrenches", "Oil filter wrench", "Drain pan", "Funnel", "Torque wrench (recommended)"],
+          partsRequired: ["Motorcycle oil (check manual for type and quantity)", "Oil filter", "Drain plug washer"],
+          safetyWarnings: ["Ensure motorcycle is on center stand or securely supported", "Hot oil can cause burns"],
+          youtubeSearchQuery: "how to change motorcycle oil DIY",
+          tags: ["motorcycle", "oil change", "maintenance", "beginner"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Warm Up Engine", description: "Run the engine for 2-3 minutes to warm the oil. This helps it drain better.", pro_tips: "Don't get it too hot", warnings: "Be careful of hot pipes" },
+            { stepNumber: 2, title: "Position Motorcycle", description: "Place bike on center stand or secure on a lift. Ensure it's level.", pro_tips: "Level bike ensures accurate oil level reading later", warnings: null },
+            { stepNumber: 3, title: "Locate Drain Plug", description: "Find the oil drain plug on the bottom of the engine. Place drain pan underneath.", pro_tips: "Some bikes have multiple drain plugs", warnings: null },
+            { stepNumber: 4, title: "Drain Oil", description: "Remove drain plug and let oil drain completely. This takes 5-10 minutes.", pro_tips: "Tilt bike slightly to get more oil out", warnings: "Oil may be hot" },
+            { stepNumber: 5, title: "Replace Oil Filter", description: "Locate and remove old oil filter. Apply thin layer of oil to new filter gasket. Install hand-tight.", pro_tips: "Some filters are internal and require cover removal", warnings: null },
+            { stepNumber: 6, title: "Reinstall Drain Plug", description: "Install drain plug with new crush washer. Torque to spec.", pro_tips: "Over-tightening can strip threads", warnings: null },
+            { stepNumber: 7, title: "Add New Oil", description: "Remove oil filler cap. Add new oil through funnel. Check level on sight glass or dipstick.", pro_tips: "Add slightly less than full capacity, then check and add more", warnings: null },
+            { stepNumber: 8, title: "Check for Leaks", description: "Start engine briefly. Check for leaks at drain plug and filter.", pro_tips: "Oil light should go off within seconds", warnings: null },
+            { stepNumber: 9, title: "Final Level Check", description: "Turn off engine. Wait 2 minutes. Recheck oil level and top off if needed.", pro_tips: "Record mileage for next change", warnings: null },
+          ]
+        },
+        {
+          title: "How to Change ATV Oil",
+          slug: "change-atv-oil",
+          description: "Step-by-step guide to changing oil in your ATV or quad. Essential maintenance for off-road reliability.",
+          category: "atv",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 25,
+          partsCost: "20-40",
+          toolsRequired: ["Socket set", "Oil filter wrench", "Drain pan", "Funnel"],
+          partsRequired: ["ATV oil (check manual for type)", "Oil filter", "Drain plug gasket"],
+          safetyWarnings: ["Ensure ATV is on level ground and stable", "Dispose of oil properly"],
+          youtubeSearchQuery: "how to change ATV oil DIY",
+          tags: ["atv", "oil change", "off-road", "maintenance"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Warm Engine", description: "Run the ATV for a few minutes to warm the oil.", pro_tips: "This helps oil drain more completely", warnings: null },
+            { stepNumber: 2, title: "Position ATV", description: "Park on level ground. Put in neutral and engage parking brake.", pro_tips: "Use wheel chocks for extra stability", warnings: null },
+            { stepNumber: 3, title: "Locate Drain Plug", description: "Find the oil drain plug on the engine. It's usually on the bottom or side.", pro_tips: "Check your manual for exact location", warnings: null },
+            { stepNumber: 4, title: "Drain Oil", description: "Place pan under engine. Remove drain plug and let oil drain completely.", pro_tips: "Let it drain for at least 5 minutes", warnings: "Oil may be hot" },
+            { stepNumber: 5, title: "Change Oil Filter", description: "Locate and replace the oil filter. Apply oil to new filter gasket.", pro_tips: "Some ATVs have screen filters that just need cleaning", warnings: null },
+            { stepNumber: 6, title: "Reinstall Drain Plug", description: "Clean and reinstall drain plug with new gasket if needed.", pro_tips: "Tighten securely but don't over-torque", warnings: null },
+            { stepNumber: 7, title: "Add New Oil", description: "Add the correct type and amount of oil. Check your owner's manual.", pro_tips: "ATVs typically take 1.5-2.5 quarts", warnings: null },
+            { stepNumber: 8, title: "Check Level", description: "Start briefly, then check dipstick or sight glass. Add more if needed.", pro_tips: "Recheck after first ride", warnings: null },
+          ]
+        },
+        {
+          title: "How to Winterize a Lawn Mower",
+          slug: "winterize-lawn-mower",
+          description: "Prepare your lawn mower for winter storage to ensure it starts easily next spring.",
+          category: "small-engine",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 30,
+          partsCost: "10-20",
+          toolsRequired: ["Fuel stabilizer", "Drain pan", "Spark plug wrench", "Brush", "Oil for fogging (optional)"],
+          partsRequired: ["Fuel stabilizer", "Fresh oil"],
+          safetyWarnings: ["Work in well-ventilated area", "Disconnect spark plug before working on blade area"],
+          youtubeSearchQuery: "how to winterize lawn mower DIY",
+          tags: ["lawn mower", "winterize", "storage", "small engine"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Add Fuel Stabilizer", description: "Add fuel stabilizer to the gas tank according to package directions.", pro_tips: "Run engine for 5 minutes to circulate stabilizer", warnings: null },
+            { stepNumber: 2, title: "Change Oil", description: "Drain old oil and replace with fresh oil. Dispose of old oil properly.", pro_tips: "Fresh oil protects during storage", warnings: null },
+            { stepNumber: 3, title: "Clean Air Filter", description: "Remove and clean or replace the air filter.", pro_tips: "A clean filter means easier starting in spring", warnings: null },
+            { stepNumber: 4, title: "Disconnect Spark Plug", description: "Remove the spark plug wire for safety. Inspect and clean or replace plug.", pro_tips: "Gap new plugs to manufacturer spec", warnings: null },
+            { stepNumber: 5, title: "Clean Deck", description: "Scrape grass buildup from under the mower deck.", pro_tips: "A putty knife works well for this", warnings: "Blade can be sharp" },
+            { stepNumber: 6, title: "Inspect Blade", description: "Check blade condition. Sharpen or replace if needed.", pro_tips: "A sharp blade makes clean cuts", warnings: null },
+            { stepNumber: 7, title: "Fog Engine (Optional)", description: "Spray fogging oil into carburetor while running, then shut off.", pro_tips: "This coats internal parts for rust prevention", warnings: null },
+            { stepNumber: 8, title: "Store Properly", description: "Store in a dry location. Cover to protect from dust.", pro_tips: "Don't store where gas fumes could accumulate near ignition sources", warnings: null },
+          ]
+        },
+        {
+          title: "How to Flush RV Water Heater",
+          slug: "flush-rv-water-heater",
+          description: "Annual maintenance to remove sediment and keep your RV water heater working efficiently.",
+          category: "rv",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 30,
+          partsCost: "5-15",
+          toolsRequired: ["Anode rod wrench", "Garden hose", "Water heater wand (optional)", "Teflon tape"],
+          partsRequired: ["Replacement anode rod (if needed)", "Teflon tape"],
+          safetyWarnings: ["Turn off water heater and let cool before draining", "Turn off propane and/or electric heating elements"],
+          youtubeSearchQuery: "how to flush RV water heater",
+          tags: ["rv", "water heater", "maintenance", "flush"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Turn Off Heater", description: "Turn off the water heater - both propane and electric if equipped.", pro_tips: "Do this at least 12 hours before to let water cool", warnings: "Hot water can cause severe burns" },
+            { stepNumber: 2, title: "Turn Off Water", description: "Turn off water supply to the RV and relieve pressure by opening a faucet.", pro_tips: "Open both hot and cold to equalize pressure", warnings: null },
+            { stepNumber: 3, title: "Remove Drain Plug", description: "Remove the anode rod or drain plug from the water heater tank.", pro_tips: "Have a bucket ready - 6-10 gallons will drain out", warnings: "Stand clear of the drain" },
+            { stepNumber: 4, title: "Flush Tank", description: "Use a water heater wand or garden hose to flush sediment from inside the tank.", pro_tips: "Continue until water runs clear", warnings: null },
+            { stepNumber: 5, title: "Inspect Anode Rod", description: "Check the anode rod for corrosion. Replace if more than 50% eroded.", pro_tips: "A healthy rod protects the tank from rust", warnings: null },
+            { stepNumber: 6, title: "Reinstall Plug", description: "Apply Teflon tape and reinstall anode rod or drain plug.", pro_tips: "Don't over-tighten plastic fittings", warnings: null },
+            { stepNumber: 7, title: "Refill Tank", description: "Turn on water supply. Open a hot faucet and wait until water flows steadily.", pro_tips: "This removes air from the system", warnings: null },
+            { stepNumber: 8, title: "Turn On Heater", description: "Once tank is full and no air sputters from faucet, turn heater back on.", pro_tips: "Check for leaks at drain plug", warnings: null },
+          ]
+        },
+        {
+          title: "How to Check and Add Diesel Exhaust Fluid (DEF)",
+          slug: "check-add-def-fluid",
+          description: "Quick guide to checking and adding DEF in diesel vehicles. Essential for emissions system operation.",
+          category: "diesel",
+          difficulty: "beginner",
+          estimatedTimeMinutes: 5,
+          partsCost: "10-30",
+          toolsRequired: ["Funnel (optional)", "Rag"],
+          partsRequired: ["DEF fluid (2.5 gallon jug is common)"],
+          safetyWarnings: ["DEF is non-toxic but can stain paint if spilled", "Don't mix DEF with diesel fuel"],
+          youtubeSearchQuery: "how to add DEF fluid diesel truck",
+          tags: ["diesel", "def", "emissions", "maintenance"],
+          isPopular: true,
+          isPremium: false,
+          steps: [
+            { stepNumber: 1, title: "Locate DEF Tank", description: "Find the DEF tank filler. It usually has a blue cap, separate from the fuel filler.", pro_tips: "Common locations: next to fuel filler, under hood, or in trunk/bed area", warnings: null },
+            { stepNumber: 2, title: "Check Level", description: "Your dashboard will show DEF level. Most vehicles alert you at 1000 miles remaining.", pro_tips: "Don't ignore low DEF warnings - vehicle may not start", warnings: null },
+            { stepNumber: 3, title: "Open DEF Cap", description: "Remove the blue DEF filler cap. Some twist off, others pop up.", pro_tips: "Keep cap clean", warnings: null },
+            { stepNumber: 4, title: "Add DEF", description: "Pour DEF slowly into the filler. Most tanks hold 4-7 gallons.", pro_tips: "Use a funnel to avoid spills on paint", warnings: "Don't overfill" },
+            { stepNumber: 5, title: "Replace Cap", description: "Secure the DEF cap back in place. Check for any spills.", pro_tips: "Rinse any spills with water immediately", warnings: null },
+            { stepNumber: 6, title: "Verify Level", description: "Start the vehicle and check that DEF level now shows adequate.", pro_tips: "Level may take a moment to update", warnings: null },
+          ]
+        },
+      ];
+
+      const createdGuides = [];
+      for (const guideData of guides) {
+        try {
+          const { steps, ...guideInfo } = guideData;
+          
+          const guide = await storage.createRepairGuide(guideInfo as any);
+          createdGuides.push(guide);
+
+          if (steps && steps.length > 0) {
+            for (const step of steps) {
+              await storage.createGuideStep({
+                stepNumber: step.stepNumber,
+                title: step.title,
+                description: step.description,
+                proTips: step.pro_tips ? [step.pro_tips] : null,
+                warnings: step.warnings ? [step.warnings] : null,
+                guideId: guide.id,
+              } as any);
+            }
+          }
+        } catch (e: any) {
+          if (!e.message?.includes('duplicate')) {
+            console.error("Error creating guide:", guideData.title, e);
+          }
+        }
+      }
+
+      res.json({ 
+        message: "DIY repair guides seeded successfully",
+        count: createdGuides.length
+      });
+    } catch (error) {
+      console.error("Seed DIY guides error:", error);
+      res.status(500).json({ error: "Failed to seed DIY guides" });
+    }
+  });
+
+  // ============================================
   // PRICE ALERTS (Pro Feature)
   // ============================================
   
