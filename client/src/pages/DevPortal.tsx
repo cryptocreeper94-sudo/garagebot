@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Lock, CheckCircle2, Circle, Plus, ExternalLink, Trash2, 
   DollarSign, Link2, Settings, Zap, Users, Shield, Clock,
-  ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle
+  ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
+  BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,187 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
+
+const AFFILIATE_NETWORKS = [
+  {
+    id: "amazon",
+    name: "Amazon Associates",
+    logo: "🛒",
+    url: "https://affiliate-program.amazon.com",
+    commission: "1-10% (4.5% avg for auto)",
+    approval: "24-48 hours",
+    difficulty: "Easy",
+    retailers: ["Amazon Automotive", "Amazon Tools"],
+    requirements: [
+      "Active website or social media",
+      "Describe your promotional methods",
+      "Must make 3 qualifying sales in 180 days or account closes"
+    ],
+    steps: [
+      "Go to affiliate-program.amazon.com and click 'Sign Up'",
+      "Enter your website URL (use garagebot.io or garagebot.replit.app)",
+      "Describe your site: 'Auto parts search aggregator helping users find parts across retailers'",
+      "Choose 'Automotive' as primary category",
+      "Enter your payment/tax info",
+      "Get your Associate ID (looks like: garagebot-20)"
+    ],
+    integration: "Update vendor records with your Associate tag. Links become: amazon.com/dp/ASIN?tag=YOUR-TAG"
+  },
+  {
+    id: "cj",
+    name: "CJ Affiliate (Commission Junction)",
+    logo: "🔗",
+    url: "https://www.cj.com/join",
+    commission: "Varies by retailer (2-8%)",
+    approval: "1-3 business days for CJ, then apply to each retailer",
+    difficulty: "Medium",
+    retailers: ["Advance Auto Parts", "Summit Racing", "JEGS", "4 Wheel Parts", "Camping World", "CarParts.com"],
+    requirements: [
+      "Active website with content",
+      "Apply to CJ network first, then each advertiser separately",
+      "Some advertisers require minimum traffic"
+    ],
+    steps: [
+      "Sign up at cj.com/join as a Publisher",
+      "Complete your profile with website details",
+      "Once approved, search 'Advertisers' for automotive retailers",
+      "Apply to each retailer individually (Advance Auto, Summit, etc.)",
+      "Wait for each retailer to approve your application",
+      "Once approved, generate tracking links in the CJ dashboard"
+    ],
+    integration: "CJ provides unique tracking links for each retailer. Use their link generator or Deep Link Automation."
+  },
+  {
+    id: "shareasale",
+    name: "ShareASale",
+    logo: "💰",
+    url: "https://www.shareasale.com/info/affiliates/",
+    commission: "Varies by retailer (3-10%)",
+    approval: "24-72 hours for network, varies by retailer",
+    difficulty: "Easy",
+    retailers: ["Partzilla", "Jack's Small Engines", "Classic Industries", "RV Parts Country", "etrailer"],
+    requirements: [
+      "Active website",
+      "U.S. address for payments (or Payoneer)",
+      "Apply to network, then individual merchants"
+    ],
+    steps: [
+      "Go to shareasale.com and click 'Affiliate Sign Up'",
+      "Enter your website and traffic details",
+      "Describe your site: 'Automotive parts comparison and search platform'",
+      "Once approved, browse Merchants → Automotive category",
+      "Apply to relevant merchants (Partzilla, Jack's, etc.)",
+      "Generate affiliate links from merchant dashboard"
+    ],
+    integration: "ShareASale provides tracking links. Use their bookmarklet or API for deep linking."
+  },
+  {
+    id: "avantlink",
+    name: "AvantLink",
+    logo: "⚡",
+    url: "https://www.avantlink.com/affiliates/",
+    commission: "3-15% depending on retailer",
+    approval: "1-5 business days",
+    difficulty: "Medium",
+    retailers: ["Rocky Mountain ATV/MC", "Dennis Kirk", "RevZilla", "MotoSport", "Defender Marine"],
+    requirements: [
+      "Quality website with established content",
+      "More selective than other networks",
+      "Good for powersports/outdoor niches"
+    ],
+    steps: [
+      "Apply at avantlink.com/affiliates",
+      "Provide detailed website info and traffic estimates",
+      "AvantLink manually reviews applications (takes longer)",
+      "Once approved, search for merchants in Powersports/Automotive",
+      "Apply to each merchant program",
+      "Use their link builder or API for tracking"
+    ],
+    integration: "AvantLink has a good API for automated linking. Deep linking supported."
+  },
+  {
+    id: "impact",
+    name: "Impact (formerly Impact Radius)",
+    logo: "🎯",
+    url: "https://impact.com/partners/",
+    commission: "Varies (2-8%)",
+    approval: "2-5 business days",
+    difficulty: "Medium",
+    retailers: ["AutoZone", "Camping World", "Bass Pro Shops"],
+    requirements: [
+      "Established website with traffic",
+      "Apply to network, then individual brands",
+      "Some brands are invite-only"
+    ],
+    steps: [
+      "Sign up at impact.com as a Partner",
+      "Complete your media property profile",
+      "Search Marketplace for automotive brands",
+      "Apply to AutoZone and other relevant programs",
+      "Generate tracking links once approved"
+    ],
+    integration: "Impact provides Universal Tracking Tags and deep linking tools."
+  },
+  {
+    id: "ebay",
+    name: "eBay Partner Network",
+    logo: "🏷️",
+    url: "https://partnernetwork.ebay.com",
+    commission: "1-4% depending on category",
+    approval: "Instant to 24 hours",
+    difficulty: "Easy",
+    retailers: ["eBay Motors", "eBay Auto Parts"],
+    requirements: [
+      "Active website or social presence",
+      "Agree to eBay Partner Network terms",
+      "Easy approval process"
+    ],
+    steps: [
+      "Go to partnernetwork.ebay.com",
+      "Sign in with eBay account or create one",
+      "Complete the application form",
+      "Get approved (usually instant or same day)",
+      "Use link generator for any eBay listing or search"
+    ],
+    integration: "eBay provides campaign IDs. Append to any eBay URL: &campid=YOUR_ID&toolid=10001"
+  }
+];
+
+const DIRECT_RETAILERS = [
+  {
+    name: "RockAuto",
+    contact: "info@rockauto.com",
+    notes: "No affiliate program. Contact for potential partnership.",
+    status: "Direct outreach needed"
+  },
+  {
+    name: "O'Reilly Auto Parts",
+    contact: "partnerships@oreillyauto.com",
+    notes: "Contact for affiliate or commercial partnership opportunities.",
+    status: "Direct outreach needed"
+  },
+  {
+    name: "NAPA Auto Parts",
+    contact: "customerservice@napaonline.com",
+    notes: "May have regional affiliate programs. Contact for details.",
+    status: "Direct outreach needed"
+  },
+  {
+    name: "VMC Chinese Parts",
+    contact: "sales@vmcchineseparts.com",
+    notes: "Specializes in Chinese ATV/UTV/motorcycle parts.",
+    status: "Direct outreach needed"
+  },
+  {
+    name: "Car-Part.com",
+    contact: "info@car-part.com",
+    notes: "Salvage/used parts network. Contact for data access.",
+    status: "Direct outreach needed"
+  }
+];
 
 const DEV_PIN = "0424";
 
@@ -151,6 +332,7 @@ export default function DevPortal() {
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({ category: "features", title: "", description: "", priority: "medium", link: "" });
+  const [activeTab, setActiveTab] = useState("tasks");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -334,18 +516,199 @@ export default function DevPortal() {
           </div>
         </motion.div>
 
-        {tasks.length === 0 && !isLoading && (
-          <Card className="bg-card border-primary/30 p-8 text-center mb-8">
-            <AlertTriangle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <h3 className="font-tech text-xl mb-2">No Tasks Found</h3>
-            <p className="text-muted-foreground mb-4">Initialize your checklist with default tasks to get started</p>
-            <Button onClick={() => initTasksMutation.mutate()} className="font-tech uppercase">
-              <Plus className="w-4 h-4 mr-2" /> Initialize Checklist
-            </Button>
-          </Card>
-        )}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+            <TabsTrigger value="tasks" className="font-tech uppercase">
+              <CheckCheck className="w-4 h-4 mr-2" /> Task List
+            </TabsTrigger>
+            <TabsTrigger value="affiliates" className="font-tech uppercase">
+              <DollarSign className="w-4 h-4 mr-2" /> Affiliate Guide
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="flex justify-end mb-4">
+          <TabsContent value="affiliates" className="space-y-6">
+            <Card className="bg-gradient-to-br from-green-500/10 to-primary/5 border-green-500/30 p-6">
+              <h2 className="font-tech text-xl text-green-400 mb-2">How Affiliate Marketing Works</h2>
+              <p className="text-muted-foreground mb-4">
+                When users click a link on GarageBot and buy something, you earn a commission (typically 2-10% of the sale). 
+                Here's how to get set up with the major networks.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-primary" />
+                  <span>Sign up for affiliate networks</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Timer className="w-4 h-4 text-primary" />
+                  <span>Wait 1-5 days for approval</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-primary" />
+                  <span>Get paid monthly via check/PayPal</span>
+                </div>
+              </div>
+            </Card>
+
+            <div className="space-y-4">
+              <h3 className="font-tech text-lg text-primary">Affiliate Networks (Sign Up Here)</h3>
+              <Accordion type="multiple" className="space-y-3" defaultValue={["amazon", "cj"]}>
+                {AFFILIATE_NETWORKS.map(network => (
+                  <AccordionItem 
+                    key={network.id} 
+                    value={network.id}
+                    className="border border-primary/20 rounded-lg overflow-hidden bg-card/30"
+                  >
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5">
+                      <div className="flex items-center gap-3 w-full">
+                        <span className="text-2xl">{network.logo}</span>
+                        <div className="flex-1 text-left">
+                          <h4 className="font-tech font-bold">{network.name}</h4>
+                          <p className="text-xs text-muted-foreground">
+                            {network.retailers.slice(0, 3).join(", ")}{network.retailers.length > 3 ? ` +${network.retailers.length - 3} more` : ""}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={network.difficulty === "Easy" ? "border-green-500/50 text-green-400" : "border-yellow-500/50 text-yellow-400"}>
+                            {network.difficulty}
+                          </Badge>
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4 pt-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Commission Rate</p>
+                          <p className="text-sm font-medium text-green-400">{network.commission}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Approval Time</p>
+                          <p className="text-sm font-medium">{network.approval}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <p className="text-xs text-muted-foreground mb-2">Retailers Available</p>
+                        <div className="flex flex-wrap gap-1">
+                          {network.retailers.map(r => (
+                            <Badge key={r} variant="secondary" className="text-xs">{r}</Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mb-4">
+                        <p className="text-xs text-muted-foreground mb-2">Requirements</p>
+                        <ul className="text-sm space-y-1">
+                          {network.requirements.map((req, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <CheckCircle2 className="w-3 h-3 text-primary mt-1 flex-shrink-0" />
+                              <span>{req}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="mb-4">
+                        <p className="text-xs text-muted-foreground mb-2">Step-by-Step Setup</p>
+                        <ol className="text-sm space-y-2">
+                          {network.steps.map((step, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <span className="w-5 h-5 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+
+                      <div className="p-3 bg-primary/10 rounded-lg mb-4">
+                        <p className="text-xs text-muted-foreground mb-1">How to Integrate</p>
+                        <p className="text-sm">{network.integration}</p>
+                      </div>
+
+                      <Button asChild className="w-full font-tech uppercase">
+                        <a href={network.url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="w-4 h-4 mr-2" /> Sign Up at {network.name}
+                        </a>
+                      </Button>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-tech text-lg text-primary">Direct Outreach Needed</h3>
+              <p className="text-sm text-muted-foreground">
+                These retailers don't have standard affiliate programs. You'll need to contact them directly for partnership opportunities.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {DIRECT_RETAILERS.map(retailer => (
+                  <Card key={retailer.name} className="p-4 bg-card/50 border-primary/20">
+                    <h4 className="font-tech font-bold mb-1">{retailer.name}</h4>
+                    <p className="text-xs text-muted-foreground mb-2">{retailer.notes}</p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs border-yellow-500/50 text-yellow-400">
+                        {retailer.status}
+                      </Badge>
+                      <a 
+                        href={`mailto:${retailer.contact}`} 
+                        className="text-xs text-primary hover:underline flex items-center gap-1"
+                      >
+                        <ExternalLink className="w-3 h-3" /> {retailer.contact}
+                      </a>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            <Card className="bg-card border-primary/30 p-6">
+              <h3 className="font-tech text-lg text-primary mb-4">Recommended Order</h3>
+              <ol className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-green-500 text-black text-sm flex items-center justify-center flex-shrink-0 font-bold">1</span>
+                  <div>
+                    <p className="font-medium">Amazon Associates + eBay Partner Network</p>
+                    <p className="text-sm text-muted-foreground">Easiest approval, instant access to millions of products</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-yellow-500 text-black text-sm flex items-center justify-center flex-shrink-0 font-bold">2</span>
+                  <div>
+                    <p className="font-medium">CJ Affiliate + ShareASale</p>
+                    <p className="text-sm text-muted-foreground">Access to major auto parts retailers (Advance Auto, Summit, etc.)</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-primary text-black text-sm flex items-center justify-center flex-shrink-0 font-bold">3</span>
+                  <div>
+                    <p className="font-medium">AvantLink + Impact</p>
+                    <p className="text-sm text-muted-foreground">Powersports specialists and premium brands (AutoZone)</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-purple-500 text-black text-sm flex items-center justify-center flex-shrink-0 font-bold">4</span>
+                  <div>
+                    <p className="font-medium">Direct Outreach</p>
+                    <p className="text-sm text-muted-foreground">Email RockAuto, O'Reilly, NAPA for custom partnerships</p>
+                  </div>
+                </li>
+              </ol>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="tasks">
+            {tasks.length === 0 && !isLoading && (
+              <Card className="bg-card border-primary/30 p-8 text-center mb-8">
+                <AlertTriangle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+                <h3 className="font-tech text-xl mb-2">No Tasks Found</h3>
+                <p className="text-muted-foreground mb-4">Initialize your checklist with default tasks to get started</p>
+                <Button onClick={() => initTasksMutation.mutate()} className="font-tech uppercase">
+                  <Plus className="w-4 h-4 mr-2" /> Initialize Checklist
+                </Button>
+              </Card>
+            )}
+
+            <div className="flex justify-end mb-4">
           <Button 
             onClick={() => setShowAddTask(!showAddTask)} 
             variant="outline" 
@@ -533,6 +896,8 @@ export default function DevPortal() {
             );
           })}
         </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
