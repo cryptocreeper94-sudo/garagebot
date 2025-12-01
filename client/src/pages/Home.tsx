@@ -10,7 +10,7 @@ import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import VehicleTypeSelector from "@/components/VehicleTypeSelector";
-import WeatherWidget from "@/components/WeatherWidget";
+import FloatingWeatherButton from "@/components/FloatingWeatherButton";
 import VinScanner from "@/components/VinScanner";
 import PhotoSearch from "@/components/PhotoSearch";
 import VoiceSearch from "@/components/VoiceSearch";
@@ -91,15 +91,18 @@ export default function Home() {
       {/* Main Content */}
       <div className="pt-20 min-h-screen pb-8">
         
+        {/* Floating Weather Button - visible on all screens */}
+        <FloatingWeatherButton />
+        
         {/* DESKTOP PUZZLE LAYOUT - Only visible on lg+ screens */}
         <div className="hidden lg:block w-full px-4 xl:px-8 2xl:px-16">
-          {/* Row 1: Hero + Search + Weather */}
+          {/* Row 1: Hero + Search (2-column layout) */}
           <div className="grid grid-cols-12 gap-3 mb-3">
-            {/* Hero Block - spans 5 columns */}
+            {/* Hero Block - spans 7 columns */}
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="col-span-5 row-span-2"
+              className="col-span-7 row-span-2"
             >
               <div className="h-full glass-premium rounded-xl p-6 relative overflow-hidden shimmer">
                 {/* Sparkle decorations */}
@@ -180,12 +183,12 @@ export default function Home() {
               </div>
             </motion.div>
             
-            {/* Search Block - spans 4 columns */}
+            {/* Search Block - spans 5 columns */}
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="col-span-4"
+              className="col-span-5"
             >
               <Card className="glass-premium border-0 p-4 h-full card-holo rounded-xl">
                 <Tabs defaultValue="standard" className="w-full h-full flex flex-col">
@@ -285,24 +288,12 @@ export default function Home() {
               </Card>
             </motion.div>
             
-            {/* Weather Block - spans 3 columns */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.15 }}
-              className="col-span-3"
-            >
-              <div className="h-full">
-                <WeatherWidget />
-              </div>
-            </motion.div>
-            
-            {/* Quick Tools - spans 4 columns (under search) */}
+            {/* Quick Tools - spans 5 columns (under search) */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="col-span-4"
+              className="col-span-5"
             >
               <Card className="glass-premium border-primary/20 p-3 rounded-xl h-full">
                 <div className="flex items-center gap-2 mb-2">
@@ -347,39 +338,6 @@ export default function Home() {
                 </div>
               </Card>
             </motion.div>
-            
-            {/* Buddy AI Card - spans 3 columns (under weather) */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 }}
-              className="col-span-3"
-            >
-              <Card className="card-holo rounded-xl p-4 h-full relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full blur-3xl" />
-                <div className="relative z-10 h-full flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.5)] ring-pulse">
-                      <Bot className="w-4 h-4 text-black" />
-                    </div>
-                    <div>
-                      <h3 className="font-tech text-xs uppercase text-primary flex items-center gap-1">
-                        Meet Buddy
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                      </h3>
-                      <p className="text-[9px] text-muted-foreground">AI Parts Expert</p>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed flex-1">
-                    Tell Buddy what you need - he'll find the right part across 40+ retailers.
-                  </p>
-                  <Button onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()} className="w-full btn-cyber font-tech uppercase text-[10px] h-8 mt-2" data-testid="button-chat-buddy">
-                    <MessageCircle className="w-3 h-3 mr-1" />
-                    Chat with Buddy
-                  </Button>
-                </div>
-              </Card>
-            </motion.div>
           </div>
           
           {/* Row 2: Vehicle Types + Categories */}
@@ -395,14 +353,14 @@ export default function Home() {
             </div>
           </motion.div>
           
-          {/* Row 3: DIY Guides + Featured + Quick Links */}
+          {/* Row 3: DIY Guides + Quick Links (2-column) */}
           <div className="grid grid-cols-12 gap-3 mb-3">
-            {/* DIY Guides Card - spans 5 columns */}
+            {/* DIY Guides Card - spans 7 columns */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="col-span-5"
+              className="col-span-7"
             >
               <Link href="/diy-guides" data-testid="link-diy-guides">
                 <div className="relative group cursor-pointer h-full" data-testid="card-diy-guides-hero">
@@ -438,31 +396,13 @@ export default function Home() {
               </Link>
             </motion.div>
             
-            {/* Mission + Pro Cards - spans 4 columns */}
+            {/* Right Column - spans 5 columns with all quick links */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="col-span-4 space-y-3"
+              className="col-span-5 space-y-3"
             >
-              {/* Mission */}
-              <Card className="glass-premium border-white/10 p-4 rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <Car className="w-4 h-4 text-primary" />
-                  <h2 className="font-tech text-xs uppercase text-primary">Our Mission</h2>
-                </div>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  The only parts platform for <span className="text-foreground font-medium">every vehicle with an engine</span>.
-                </p>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {["Cars", "Trucks", "Motorcycles", "ATVs", "Boats", "RVs"].map((type) => (
-                    <span key={type} className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[8px] font-mono border border-primary/20">
-                      {type}
-                    </span>
-                  ))}
-                </div>
-              </Card>
-              
               {/* Go Pro Card */}
               <Link href="/pro">
                 <Card className="rainbow-border rounded-xl p-4 cursor-pointer group">
@@ -480,56 +420,66 @@ export default function Home() {
                   </Button>
                 </Card>
               </Link>
-            </motion.div>
-            
-            {/* Quick Links Grid - spans 3 columns */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="col-span-3 space-y-3"
-            >
-              <Link href="/garage">
-                <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-green-500/50 transition-all icon-bounce">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
-                      <Car className="w-4 h-4 text-green-400" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-tech uppercase text-foreground group-hover:text-green-400 transition-colors">My Garage</span>
-                      <p className="text-[9px] text-muted-foreground">Manage your fleet</p>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
               
-              <Link href="/hallmark">
-                <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-purple-500/50 transition-all icon-bounce">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-purple-400" />
+              {/* Quick Links Row */}
+              <div className="grid grid-cols-3 gap-2">
+                <Link href="/garage">
+                  <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-green-500/50 transition-all icon-bounce h-full">
+                    <div className="flex flex-col items-center gap-2 text-center">
+                      <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                        <Car className="w-5 h-5 text-green-400" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-tech uppercase text-foreground group-hover:text-green-400 transition-colors">My Garage</span>
+                        <p className="text-[9px] text-muted-foreground">Manage fleet</p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-xs font-tech uppercase text-foreground group-hover:text-purple-400 transition-colors">Genesis Hallmark</span>
-                      <p className="text-[9px] text-muted-foreground">NFT verification</p>
+                  </Card>
+                </Link>
+                
+                <Link href="/hallmark">
+                  <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-purple-500/50 transition-all icon-bounce h-full">
+                    <div className="flex flex-col items-center gap-2 text-center">
+                      <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                        <Shield className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-tech uppercase text-foreground group-hover:text-purple-400 transition-colors">Hallmark</span>
+                        <p className="text-[9px] text-muted-foreground">NFT verify</p>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              </Link>
+                  </Card>
+                </Link>
+                
+                <Link href="/invite">
+                  <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-primary/50 transition-all icon-bounce h-full">
+                    <div className="flex flex-col items-center gap-2 text-center">
+                      <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                        <Gift className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-tech uppercase text-foreground group-hover:text-primary transition-colors">Invite</span>
+                        <p className="text-[9px] text-muted-foreground">Earn Pro</p>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </div>
               
-              <Link href="/invite">
-                <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-primary/50 transition-all icon-bounce">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                      <Gift className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-tech uppercase text-foreground group-hover:text-primary transition-colors">Invite Friends</span>
-                      <p className="text-[9px] text-muted-foreground">Earn free Pro</p>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
+              {/* Mission Compact */}
+              <Card className="glass-premium border-white/10 p-3 rounded-xl">
+                <div className="flex items-center gap-2 mb-1">
+                  <Car className="w-3.5 h-3.5 text-primary" />
+                  <h2 className="font-tech text-[10px] uppercase text-primary">Every Vehicle With An Engine</h2>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {["Cars", "Trucks", "Motorcycles", "ATVs", "Boats", "RVs", "Generators"].map((type) => (
+                    <span key={type} className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[8px] font-mono border border-primary/20">
+                      {type}
+                    </span>
+                  ))}
+                </div>
+              </Card>
             </motion.div>
           </div>
           
@@ -773,11 +723,6 @@ export default function Home() {
                 Chat with Buddy
               </Button>
             </Card>
-          </motion.div>
-          
-          {/* Weather */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-4">
-            <WeatherWidget />
           </motion.div>
           
           {/* Featured Carousel */}
