@@ -17,6 +17,7 @@ interface WeatherData {
     visibility: number;
     pressure: number;
     uvIndex?: number;
+    isNight: boolean;
   };
   hourly: Array<{
     time: string;
@@ -239,6 +240,7 @@ export class WeatherService {
           icon: this.getWeatherIcon(data.current?.weather_code || 0, isDay),
           visibility: Math.round((data.current?.visibility || 0) / 1609.34),
           pressure: Math.round((data.current?.surface_pressure || 0) * 0.02953),
+          isNight: !isDay,
         },
         hourly,
         daily,
