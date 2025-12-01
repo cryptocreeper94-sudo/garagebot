@@ -84,8 +84,14 @@ Preferred communication style: Simple, everyday language.
 - **API Endpoints**: `/api/referrals/summary`, `/api/referrals/validate/:code`, `/api/referrals/redeem`
 
 ## Recent Updates (December 2024)
+- **React 18 Compatibility Fix**: Downgraded from React 19.2.0 to React 18.3.1 and framer-motion 12.x to 11.15.0 to fix "Objects are not valid as a React child" error. @tanstack/react-query 5.x has experimental React 19 support that caused CJS/ESM bundling issues.
 - **Member Referral Program**: Full points-based referral system with signup tracking, Pro conversion bonuses, and reward redemption.
 - **Dev Redirect**: Development mode auto-redirects to `/dev` page on first load for faster development workflow.
+
+## Version Constraints
+- **React**: ^18.3.1 (NOT React 19 - causes compatibility issues with @tanstack/react-query and framer-motion)
+- **framer-motion**: ^11.15.0 (NOT 12.x - designed for React 19)
+- **@tanstack/react-query**: ^5.60.5 (experimental React 19 support, stable with React 18)
 
 ## Recent Updates (November 2024)
 - **Terms of Service Page**: Added `/terms` route with comprehensive legal content.

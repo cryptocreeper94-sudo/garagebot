@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -34,41 +33,29 @@ import TermsOfService from "@/pages/TermsOfService";
 import InviteFriends from "@/pages/InviteFriends";
 
 function Router() {
-  const [location, setLocation] = useLocation();
-  
-  useEffect(() => {
-    if (import.meta.env.DEV && location === '/') {
-      const devRedirect = sessionStorage.getItem('garagebot_dev_redirect');
-      if (!devRedirect) {
-        sessionStorage.setItem('garagebot_dev_redirect', 'true');
-        setLocation('/dev');
-      }
-    }
-  }, [location, setLocation]);
-
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/results" component={Results} />
-      <Route path="/garage" component={Garage} />
-      <Route path="/shop-portal" component={ShopPortal} />
-      <Route path="/mechanics-garage" component={MechanicsGarage} />
-      <Route path="/insurance" component={Insurance} />
-      <Route path="/auth" component={Auth} />
-      <Route path="/privacy" component={PrivacyPolicy} />
-      <Route path="/terms" component={TermsOfService} />
-      <Route path="/investors" component={Investors} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/account" component={AccountSetup} />
-      <Route path="/checkout" component={Checkout} />
-      <Route path="/checkout/success" component={CheckoutSuccess} />
-      <Route path="/checkout/cancel" component={CheckoutCancel} />
-      <Route path="/dev" component={DevPortal} />
-      <Route path="/pro" component={Pro} />
-      <Route path="/hallmark" component={GenesisHallmark} />
-      <Route path="/diy-guides" component={DIYGuides} />
-      <Route path="/invite" component={InviteFriends} />
-      <Route component={NotFound} />
+      <Route path="/">{() => <Home />}</Route>
+      <Route path="/results">{() => <Results />}</Route>
+      <Route path="/garage">{() => <Garage />}</Route>
+      <Route path="/shop-portal">{() => <ShopPortal />}</Route>
+      <Route path="/mechanics-garage">{() => <MechanicsGarage />}</Route>
+      <Route path="/insurance">{() => <Insurance />}</Route>
+      <Route path="/auth">{() => <Auth />}</Route>
+      <Route path="/privacy">{() => <PrivacyPolicy />}</Route>
+      <Route path="/terms">{() => <TermsOfService />}</Route>
+      <Route path="/investors">{() => <Investors />}</Route>
+      <Route path="/dashboard">{() => <Dashboard />}</Route>
+      <Route path="/account">{() => <AccountSetup />}</Route>
+      <Route path="/checkout">{() => <Checkout />}</Route>
+      <Route path="/checkout/success">{() => <CheckoutSuccess />}</Route>
+      <Route path="/checkout/cancel">{() => <CheckoutCancel />}</Route>
+      <Route path="/dev">{() => <DevPortal />}</Route>
+      <Route path="/pro">{() => <Pro />}</Route>
+      <Route path="/hallmark">{() => <GenesisHallmark />}</Route>
+      <Route path="/diy-guides">{() => <DIYGuides />}</Route>
+      <Route path="/invite">{() => <InviteFriends />}</Route>
+      <Route>{() => <NotFound />}</Route>
     </Switch>
   );
 }
