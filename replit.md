@@ -75,6 +75,18 @@ Preferred communication style: Simple, everyday language.
 - **Technology**: Solana network via Helius RPC, `@solana/web3.js`.
 - **Features**: SHA-256 hashing, on-chain transaction submission, transaction signature storage, Solscan links.
 
+## Member Referral Program
+- **Route**: `/invite` for Invite Friends page
+- **Points Structure**: 100 pts per signup, 500 pts when referral goes Pro
+- **Redemption Tiers**: 500 pts = 1 month Pro, 1000 pts = 1 year Pro, 2500 pts = Lifetime Pro
+- **Database Tables**: `referral_invites`, `referral_point_transactions`, `referral_redemptions`
+- **User Fields**: `referralCode`, `referredByUserId`, `referralPointsBalance`
+- **API Endpoints**: `/api/referrals/summary`, `/api/referrals/validate/:code`, `/api/referrals/redeem`
+
+## Recent Updates (December 2024)
+- **Member Referral Program**: Full points-based referral system with signup tracking, Pro conversion bonuses, and reward redemption.
+- **Dev Redirect**: Development mode auto-redirects to `/dev` page on first load for faster development workflow.
+
 ## Recent Updates (November 2024)
 - **Terms of Service Page**: Added `/terms` route with comprehensive legal content.
 - **Investor Roadmap**: Comprehensive 4-phase roadmap (Foundation → Growth → Expansion → Scale) with 2027 vision.
