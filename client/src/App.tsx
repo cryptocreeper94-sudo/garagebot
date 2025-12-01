@@ -1,4 +1,5 @@
-import { Switch, Route } from "wouter";
+import { useEffect } from "react";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -30,8 +31,21 @@ import Pro from "@/pages/Pro";
 import GenesisHallmark from "@/pages/GenesisHallmark";
 import DIYGuides from "@/pages/DIYGuides";
 import TermsOfService from "@/pages/TermsOfService";
+import InviteFriends from "@/pages/InviteFriends";
 
 function Router() {
+  const [location, setLocation] = useLocation();
+  
+  useEffect(() => {
+    if (import.meta.env.DEV && location === '/') {
+      const devRedirect = sessionStorage.getItem('garagebot_dev_redirect');
+      if (!devRedirect) {
+        sessionStorage.setItem('garagebot_dev_redirect', 'true');
+        setLocation('/dev');
+      }
+    }
+  }, [location, setLocation]);
+
   return (
     <Switch>
       <Route path="/" component={Home} />
@@ -53,6 +67,7 @@ function Router() {
       <Route path="/pro" component={Pro} />
       <Route path="/hallmark" component={GenesisHallmark} />
       <Route path="/diy-guides" component={DIYGuides} />
+      <Route path="/invite" component={InviteFriends} />
       <Route component={NotFound} />
     </Switch>
   );

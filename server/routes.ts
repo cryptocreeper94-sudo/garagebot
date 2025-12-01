@@ -32,7 +32,7 @@ export async function registerRoutes(
   // Custom PIN-based Auth Routes
   app.post('/api/auth/signup', async (req, res) => {
     try {
-      const { username, mainPin, quickPin, firstName, lastName, phone, email, address, city, state, zipCode, enablePersistence } = req.body;
+      const { username, mainPin, quickPin, firstName, lastName, phone, email, address, city, state, zipCode, enablePersistence, referralCode } = req.body;
       
       // Validate username
       const usernameValidation = authService.validateUsername(username);
@@ -60,6 +60,15 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Username already taken" });
       }
       
+      // Validate referral code if provided
+      let referrer = null;
+      if (referralCode) {
+        referrer = await storage.getUserByReferralCode(referralCode.toUpperCase());
+        if (!referrer) {
+          return res.status(400).json({ error: "Invalid referral code" });
+        }
+      }
+      
       // Hash passwords
       const passwordHash = authService.hashPassword(mainPin);
       const quickPinHash = quickPin ? authService.hashPin(quickPin) : null;
@@ -67,9 +76,10 @@ export async function registerRoutes(
       // Generate recovery codes
       const { codes, hashedCodes } = authService.generateRecoveryCodes();
       
-      // Create user
+      // Create user with referral info
+      const userId = crypto.randomUUID();
       const user = await storage.upsertUser({
-        id: crypto.randomUUID(),
+        id: userId,
         username,
         passwordHash,
         quickPin: quickPinHash,
@@ -84,7 +94,29 @@ export async function registerRoutes(
         zipCode,
         persistenceEnabled: enablePersistence || false,
         persistenceExpiresAt: enablePersistence ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null,
+        referredByUserId: referrer?.id || null,
       });
+      
+      // Process referral if valid
+      if (referrer) {
+        // Create invite record
+        const invite = await storage.createReferralInvite({
+          referrerId: referrer.id,
+          referredId: user.id,
+          referralCode: referralCode.toUpperCase(),
+          status: 'signed_up',
+          signedUpAt: new Date(),
+        });
+        
+        // Award 100 points to referrer
+        await storage.awardReferralPoints(
+          referrer.id,
+          100,
+          'signup_bonus',
+          `${firstName || username} signed up using your referral code`,
+          invite.id
+        );
+      }
       
       // Set session
       (req.session as any).userId = user.id;
@@ -102,6 +134,7 @@ export async function registerRoutes(
           subscriptionTier: user.subscriptionTier 
         },
         recoveryCodes: codes,
+        referredBy: referrer ? (referrer.firstName || referrer.username) : null,
         message: "Account created successfully. Save your recovery codes!"
       });
     } catch (error) {
@@ -1122,6 +1155,103 @@ export async function registerRoutes(
       res.json(hallmark);
     } catch (error) {
       res.status(500).json({ error: "Failed to mint hallmark" });
+    }
+  });
+
+  // ============================================
+  // REFERRAL SYSTEM
+  // ============================================
+
+  // Get referral summary for logged-in user
+  app.get("/api/referrals/summary", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const summary = await storage.getReferralSummary(userId);
+      res.json(summary);
+    } catch (error) {
+      console.error("Error fetching referral summary:", error);
+      res.status(500).json({ error: "Failed to fetch referral summary" });
+    }
+  });
+
+  // Get point transaction history
+  app.get("/api/referrals/transactions", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const transactions = await storage.getPointTransactions(userId);
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      res.status(500).json({ error: "Failed to fetch transactions" });
+    }
+  });
+
+  // Get referral invites
+  app.get("/api/referrals/invites", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const invites = await storage.getReferralInvites(userId);
+      res.json(invites);
+    } catch (error) {
+      console.error("Error fetching invites:", error);
+      res.status(500).json({ error: "Failed to fetch invites" });
+    }
+  });
+
+  // Redeem points for rewards
+  app.post("/api/referrals/redeem", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const { rewardType } = req.body;
+
+      if (!['pro_month', 'pro_year', 'pro_lifetime'].includes(rewardType)) {
+        return res.status(400).json({ error: "Invalid reward type" });
+      }
+
+      const redemption = await storage.redeemPoints(userId, rewardType);
+      res.json({ 
+        success: true, 
+        redemption,
+        message: `Successfully redeemed for ${rewardType.replace('_', ' ')}!`
+      });
+    } catch (error: any) {
+      console.error("Error redeeming points:", error);
+      if (error.message === 'Insufficient points') {
+        return res.status(400).json({ error: "Insufficient points for this reward" });
+      }
+      res.status(500).json({ error: "Failed to redeem points" });
+    }
+  });
+
+  // Get redemption history
+  app.get("/api/referrals/redemptions", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const redemptions = await storage.getRedemptions(userId);
+      res.json(redemptions);
+    } catch (error) {
+      console.error("Error fetching redemptions:", error);
+      res.status(500).json({ error: "Failed to fetch redemptions" });
+    }
+  });
+
+  // Validate referral code (public - for signup page)
+  app.get("/api/referrals/validate/:code", async (req, res) => {
+    try {
+      const { code } = req.params;
+      const referrer = await storage.getUserByReferralCode(code.toUpperCase());
+      
+      if (referrer) {
+        res.json({ 
+          valid: true, 
+          referrerName: referrer.firstName || referrer.username 
+        });
+      } else {
+        res.json({ valid: false });
+      }
+    } catch (error) {
+      console.error("Error validating referral code:", error);
+      res.status(500).json({ error: "Failed to validate code" });
     }
   });
 

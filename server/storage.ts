@@ -8,7 +8,8 @@ import {
   repairOrders, repairOrderItems, estimates, estimateItems, appointments, shopInventory,
   technicianTimeEntries, digitalInspections, inspectionItems, shopSettings, integrationCredentials,
   vehicleCategories, repairGuides, guideSteps, guideFitment, partTerminology, guideRatings, guideProgress,
-  priceAlerts, blockchainVerifications
+  priceAlerts, blockchainVerifications,
+  referralInvites, referralPointTransactions, referralRedemptions
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -31,7 +32,10 @@ import type {
   PartTerminology, InsertPartTerminology, GuideRating, InsertGuideRating,
   GuideProgress, InsertGuideProgress,
   PriceAlert, InsertPriceAlert,
-  BlockchainVerification, InsertBlockchainVerification
+  BlockchainVerification, InsertBlockchainVerification,
+  ReferralInvite, InsertReferralInvite,
+  ReferralPointTransaction, InsertReferralPointTransaction,
+  ReferralRedemption, InsertReferralRedemption
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -302,6 +306,25 @@ export interface IStorage {
   createBlockchainVerification(verification: InsertBlockchainVerification): Promise<BlockchainVerification>;
   updateBlockchainVerification(id: string, updates: Partial<BlockchainVerification>): Promise<BlockchainVerification | undefined>;
   getPendingVerifications(): Promise<BlockchainVerification[]>;
+
+  // Referral System
+  getUserByReferralCode(code: string): Promise<User | undefined>;
+  generateReferralCode(userId: string): Promise<string>;
+  getReferralSummary(userId: string): Promise<{
+    referralCode: string;
+    pointsBalance: number;
+    totalInvites: number;
+    signedUp: number;
+    convertedToPro: number;
+  }>;
+  getReferralInvites(userId: string): Promise<ReferralInvite[]>;
+  getPointTransactions(userId: string): Promise<ReferralPointTransaction[]>;
+  awardReferralPoints(userId: string, amount: number, type: string, description: string, inviteId?: string): Promise<ReferralPointTransaction>;
+  createReferralInvite(invite: InsertReferralInvite): Promise<ReferralInvite>;
+  updateReferralInvite(id: string, updates: Partial<ReferralInvite>): Promise<ReferralInvite | undefined>;
+  createRedemption(redemption: InsertReferralRedemption): Promise<ReferralRedemption>;
+  redeemPoints(userId: string, rewardType: 'pro_month' | 'pro_year' | 'pro_lifetime'): Promise<ReferralRedemption>;
+  getRedemptions(userId: string): Promise<ReferralRedemption[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1592,6 +1615,195 @@ export class DatabaseStorage implements IStorage {
         eq(blockchainVerifications.status, 'submitted')
       ))
       .orderBy(asc(blockchainVerifications.createdAt));
+  }
+
+  // Referral System
+  async getUserByReferralCode(code: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.referralCode, code));
+    return user;
+  }
+
+  async generateReferralCode(userId: string): Promise<string> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (user?.referralCode) {
+      return user.referralCode;
+    }
+
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (attempts < maxAttempts) {
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      
+      const existing = await this.getUserByReferralCode(code);
+      if (!existing) {
+        await db.update(users)
+          .set({ referralCode: code })
+          .where(eq(users.id, userId));
+        return code;
+      }
+      attempts++;
+    }
+    
+    throw new Error('Failed to generate unique referral code');
+  }
+
+  async getReferralSummary(userId: string): Promise<{
+    referralCode: string;
+    pointsBalance: number;
+    totalInvites: number;
+    signedUp: number;
+    convertedToPro: number;
+  }> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    
+    if (!user?.referralCode) {
+      const code = await this.generateReferralCode(userId);
+      user.referralCode = code;
+    }
+
+    const invites = await db.select().from(referralInvites)
+      .where(eq(referralInvites.referrerId, userId));
+    
+    const signedUp = invites.filter(i => i.status === 'signed_up' || i.status === 'converted_pro').length;
+    const convertedToPro = invites.filter(i => i.status === 'converted_pro').length;
+
+    return {
+      referralCode: user?.referralCode || '',
+      pointsBalance: user?.referralPointsBalance || 0,
+      totalInvites: invites.length,
+      signedUp,
+      convertedToPro
+    };
+  }
+
+  async getReferralInvites(userId: string): Promise<ReferralInvite[]> {
+    return await db.select().from(referralInvites)
+      .where(eq(referralInvites.referrerId, userId))
+      .orderBy(desc(referralInvites.createdAt));
+  }
+
+  async getPointTransactions(userId: string): Promise<ReferralPointTransaction[]> {
+    return await db.select().from(referralPointTransactions)
+      .where(eq(referralPointTransactions.userId, userId))
+      .orderBy(desc(referralPointTransactions.createdAt));
+  }
+
+  async awardReferralPoints(
+    userId: string, 
+    amount: number, 
+    type: string, 
+    description: string, 
+    inviteId?: string
+  ): Promise<ReferralPointTransaction> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const currentBalance = user?.referralPointsBalance || 0;
+    const newBalance = currentBalance + amount;
+
+    await db.update(users)
+      .set({ referralPointsBalance: newBalance })
+      .where(eq(users.id, userId));
+
+    const [transaction] = await db.insert(referralPointTransactions).values({
+      userId,
+      amount,
+      type,
+      description,
+      referralInviteId: inviteId || null,
+      balanceAfter: newBalance
+    }).returning();
+
+    return transaction;
+  }
+
+  async createReferralInvite(invite: InsertReferralInvite): Promise<ReferralInvite> {
+    const [newInvite] = await db.insert(referralInvites).values(invite).returning();
+    return newInvite;
+  }
+
+  async updateReferralInvite(id: string, updates: Partial<ReferralInvite>): Promise<ReferralInvite | undefined> {
+    const [invite] = await db.update(referralInvites)
+      .set(updates)
+      .where(eq(referralInvites.id, id))
+      .returning();
+    return invite;
+  }
+
+  async createRedemption(redemption: InsertReferralRedemption): Promise<ReferralRedemption> {
+    const [newRedemption] = await db.insert(referralRedemptions).values(redemption).returning();
+    return newRedemption;
+  }
+
+  async redeemPoints(userId: string, rewardType: 'pro_month' | 'pro_year' | 'pro_lifetime'): Promise<ReferralRedemption> {
+    const pointsCosts = {
+      'pro_month': 500,
+      'pro_year': 1000,
+      'pro_lifetime': 2500
+    };
+    
+    const durations = {
+      'pro_month': 30,
+      'pro_year': 365,
+      'pro_lifetime': null
+    };
+
+    const pointsCost = pointsCosts[rewardType];
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    
+    if (!user || (user.referralPointsBalance || 0) < pointsCost) {
+      throw new Error('Insufficient points');
+    }
+
+    const newBalance = (user.referralPointsBalance || 0) - pointsCost;
+    
+    let subscriptionExtendedTo: Date | null = null;
+    if (rewardType === 'pro_lifetime') {
+      subscriptionExtendedTo = new Date('2099-12-31');
+    } else {
+      const currentExpiry = user.subscriptionExpiresAt || new Date();
+      const startDate = currentExpiry > new Date() ? currentExpiry : new Date();
+      subscriptionExtendedTo = new Date(startDate);
+      subscriptionExtendedTo.setDate(subscriptionExtendedTo.getDate() + durations[rewardType]!);
+    }
+
+    await db.update(users)
+      .set({ 
+        referralPointsBalance: newBalance,
+        subscriptionTier: 'pro',
+        subscriptionExpiresAt: subscriptionExtendedTo,
+        isFounder: rewardType === 'pro_lifetime' ? true : user.isFounder
+      })
+      .where(eq(users.id, userId));
+
+    const [redemption] = await db.insert(referralRedemptions).values({
+      userId,
+      rewardType,
+      pointsCost,
+      status: 'fulfilled',
+      fulfilledAt: new Date(),
+      subscriptionExtendedTo
+    }).returning();
+
+    await db.insert(referralPointTransactions).values({
+      userId,
+      amount: -pointsCost,
+      type: 'redemption',
+      description: `Redeemed for ${rewardType.replace('_', ' ')}`,
+      redemptionId: redemption.id,
+      balanceAfter: newBalance
+    });
+
+    return redemption;
+  }
+
+  async getRedemptions(userId: string): Promise<ReferralRedemption[]> {
+    return await db.select().from(referralRedemptions)
+      .where(eq(referralRedemptions.userId, userId))
+      .orderBy(desc(referralRedemptions.createdAt));
   }
 }
 

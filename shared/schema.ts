@@ -46,6 +46,9 @@ export const users = pgTable("users", {
   persistenceEnabled: boolean("persistence_enabled").default(false),
   persistenceExpiresAt: timestamp("persistence_expires_at"),
   lastLoginAt: timestamp("last_login_at"),
+  referralCode: text("referral_code").unique(),
+  referredByUserId: varchar("referred_by_user_id"),
+  referralPointsBalance: integer("referral_points_balance").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -1458,3 +1461,67 @@ export const insertBlockchainVerificationSchema = createInsertSchema(blockchainV
 });
 export type InsertBlockchainVerification = z.infer<typeof insertBlockchainVerificationSchema>;
 export type BlockchainVerification = typeof blockchainVerifications.$inferSelect;
+
+// ============================================
+// REFERRAL SYSTEM
+// ============================================
+
+// Track referral invites and conversions
+export const referralInvites = pgTable("referral_invites", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  referrerId: varchar("referrer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  referredId: varchar("referred_id").references(() => users.id, { onDelete: "set null" }),
+  referralCode: text("referral_code").notNull(),
+  status: text("status").default("pending"), // 'pending' | 'signed_up' | 'converted_pro'
+  signedUpAt: timestamp("signed_up_at"),
+  convertedAt: timestamp("converted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_referral_invites_referrer").on(table.referrerId),
+  index("IDX_referral_invites_referred").on(table.referredId),
+  index("IDX_referral_invites_code").on(table.referralCode),
+]);
+
+// Points transaction ledger
+export const referralPointTransactions = pgTable("referral_point_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  amount: integer("amount").notNull(), // Positive for earning, negative for spending
+  type: text("type").notNull(), // 'signup_bonus' | 'pro_conversion' | 'redemption'
+  description: text("description"),
+  referralInviteId: varchar("referral_invite_id").references(() => referralInvites.id, { onDelete: "set null" }),
+  redemptionId: varchar("redemption_id"),
+  balanceAfter: integer("balance_after").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_point_transactions_user").on(table.userId),
+  index("IDX_point_transactions_type").on(table.type),
+]);
+
+// Track point redemptions
+export const referralRedemptions = pgTable("referral_redemptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  rewardType: text("reward_type").notNull(), // 'pro_month' | 'pro_year' | 'pro_lifetime'
+  pointsCost: integer("points_cost").notNull(),
+  status: text("status").default("pending"), // 'pending' | 'fulfilled' | 'failed'
+  fulfilledAt: timestamp("fulfilled_at"),
+  subscriptionExtendedTo: timestamp("subscription_extended_to"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_redemptions_user").on(table.userId),
+  index("IDX_redemptions_status").on(table.status),
+]);
+
+// Schema exports for Referral System
+export const insertReferralInviteSchema = createInsertSchema(referralInvites).omit({ id: true, createdAt: true });
+export type InsertReferralInvite = z.infer<typeof insertReferralInviteSchema>;
+export type ReferralInvite = typeof referralInvites.$inferSelect;
+
+export const insertReferralPointTransactionSchema = createInsertSchema(referralPointTransactions).omit({ id: true, createdAt: true });
+export type InsertReferralPointTransaction = z.infer<typeof insertReferralPointTransactionSchema>;
+export type ReferralPointTransaction = typeof referralPointTransactions.$inferSelect;
+
+export const insertReferralRedemptionSchema = createInsertSchema(referralRedemptions).omit({ id: true, createdAt: true });
+export type InsertReferralRedemption = z.infer<typeof insertReferralRedemptionSchema>;
+export type ReferralRedemption = typeof referralRedemptions.$inferSelect;
