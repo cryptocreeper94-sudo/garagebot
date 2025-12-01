@@ -124,13 +124,23 @@ export default function BuddyHideSeek() {
   useEffect(() => {
     if (hasShownOnPage) return;
     
-    const shouldShow = Math.random() < 0.4;
+    const isHomePage = location === '/';
+    const isFirstVisit = !sessionStorage.getItem('buddyGreeted');
+    
+    if (isHomePage && isFirstVisit) {
+      sessionStorage.setItem('buddyGreeted', 'true');
+      const delay = 2000 + Math.random() * 2000;
+      const timer = setTimeout(showBuddy, delay);
+      return () => clearTimeout(timer);
+    }
+    
+    const shouldShow = Math.random() < 0.5;
     if (!shouldShow) {
       setHasShownOnPage(true);
       return;
     }
     
-    const delay = 3000 + Math.random() * 5000;
+    const delay = 4000 + Math.random() * 4000;
     const timer = setTimeout(showBuddy, delay);
     
     return () => clearTimeout(timer);
