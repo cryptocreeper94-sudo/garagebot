@@ -5,9 +5,10 @@ import {
   Lock, CheckCircle2, Circle, Plus, ExternalLink, Trash2, 
   DollarSign, Link2, Settings, Zap, Users, Shield, Clock,
   ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
-  BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard
+  BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList
 } from "lucide-react";
 import Nav from "@/components/Nav";
+import { FeatureInventory } from "@/components/FeatureInventory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -336,7 +337,7 @@ export default function DevPortal() {
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({ category: "features", title: "", description: "", priority: "medium", link: "" });
-  const [activeTab, setActiveTab] = useState("tasks");
+  const [activeTab, setActiveTab] = useState("features");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -521,7 +522,10 @@ export default function DevPortal() {
         </motion.div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6">
+            <TabsTrigger value="features" className="font-tech uppercase">
+              <ClipboardList className="w-4 h-4 mr-2" /> Features
+            </TabsTrigger>
             <TabsTrigger value="tasks" className="font-tech uppercase">
               <CheckCheck className="w-4 h-4 mr-2" /> Task List
             </TabsTrigger>
@@ -529,6 +533,10 @@ export default function DevPortal() {
               <DollarSign className="w-4 h-4 mr-2" /> Affiliate Guide
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="features" className="space-y-6">
+            <FeatureInventory />
+          </TabsContent>
 
           <TabsContent value="affiliates" className="space-y-6">
             <Card className="bg-gradient-to-br from-green-500/10 to-primary/5 border-green-500/30 p-6">
