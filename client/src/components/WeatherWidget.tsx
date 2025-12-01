@@ -12,8 +12,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Cloud, Sun, CloudRain, Wind, Droplets, ThermometerSun, 
   MapPin, RefreshCw, Settings, ChevronRight, Loader2,
-  Navigation, Eye, Gauge
+  Navigation, Eye, Gauge, Radar
 } from "lucide-react";
+import WeatherRadar from "./WeatherRadar";
 
 interface WeatherData {
   location: {
@@ -64,6 +65,8 @@ export default function WeatherWidget() {
   const [zipInput, setZipInput] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [localZip, setLocalZip] = useState<string | null>(null);
+  const [showRadar, setShowRadar] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const { data: preferences } = useQuery<UserPreferences>({
     queryKey: ["/api/user/preferences"],
@@ -168,6 +171,16 @@ export default function WeatherWidget() {
             </div>
           </div>
           <div className="flex items-center gap-1">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className={`h-8 w-8 relative ${showRadar ? 'text-primary' : ''}`}
+              onClick={() => setShowRadar(!showRadar)}
+              data-testid="button-toggle-radar"
+            >
+              <Radar className="w-4 h-4" />
+              {showRadar && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full animate-pulse" />}
+            </Button>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => refetch()} data-testid="button-refresh-weather">
               <RefreshCw className="w-4 h-4" />
             </Button>
@@ -213,6 +226,26 @@ export default function WeatherWidget() {
             </p>
           </div>
         </div>
+
+        <AnimatePresence>
+          {showRadar && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mb-6"
+            >
+              <WeatherRadar
+                lat={weather.location.lat}
+                lon={weather.location.lon}
+                onClose={() => setShowRadar(false)}
+                isFullscreen={isFullscreen}
+                onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-4 gap-3 mb-6">
           <div className="bg-muted/30 rounded-lg p-3 text-center">
