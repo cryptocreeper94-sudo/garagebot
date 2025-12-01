@@ -14,7 +14,6 @@ import FloatingWeatherButton from "@/components/FloatingWeatherButton";
 import VinScanner from "@/components/VinScanner";
 import PhotoSearch from "@/components/PhotoSearch";
 import VoiceSearch from "@/components/VoiceSearch";
-import BuddyHideSeek from "@/components/BuddyHideSeek";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -84,9 +83,6 @@ export default function Home() {
       
       <Nav />
       <MarketTicker />
-      
-      {/* Buddy Hide & Seek - Random pop-ups */}
-      <BuddyHideSeek />
       
       {/* Main Content */}
       <div className="pt-20 min-h-screen pb-8">
