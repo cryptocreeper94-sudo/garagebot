@@ -987,6 +987,69 @@ export async function registerRoutes(
     }
   });
 
+  // Weather Alerts API (NOAA - free, no API key required)
+  app.get("/api/weather/alerts", async (req, res) => {
+    try {
+      const { lat, lon } = req.query;
+      if (!lat || !lon) {
+        return res.status(400).json({ error: "Latitude and longitude required" });
+      }
+      
+      // First get the grid point for the location
+      const pointRes = await fetch(
+        `https://api.weather.gov/points/${lat},${lon}`,
+        { 
+          headers: { 
+            'User-Agent': 'GarageBot/1.0 (garagebot.io)',
+            'Accept': 'application/geo+json'
+          }
+        }
+      );
+      
+      if (!pointRes.ok) {
+        return res.json({ alerts: [] });
+      }
+      
+      const pointData = await pointRes.json();
+      const forecastZone = pointData.properties?.forecastZone;
+      const county = pointData.properties?.county;
+      
+      // Fetch active alerts for the area
+      const alertsRes = await fetch(
+        `https://api.weather.gov/alerts/active?point=${lat},${lon}`,
+        { 
+          headers: { 
+            'User-Agent': 'GarageBot/1.0 (garagebot.io)',
+            'Accept': 'application/geo+json'
+          }
+        }
+      );
+      
+      if (!alertsRes.ok) {
+        return res.json({ alerts: [] });
+      }
+      
+      const alertsData = await alertsRes.json();
+      
+      const alerts = (alertsData.features || []).map((feature: any) => ({
+        id: feature.properties?.id || feature.id,
+        event: feature.properties?.event,
+        severity: feature.properties?.severity,
+        headline: feature.properties?.headline,
+        description: feature.properties?.description,
+        instruction: feature.properties?.instruction,
+        effective: feature.properties?.effective,
+        expires: feature.properties?.expires,
+        areaDesc: feature.properties?.areaDesc,
+      }));
+      
+      res.json({ alerts });
+    } catch (error) {
+      console.error("Weather alerts API error:", error);
+      res.json({ alerts: [] });
+    }
+  });
+
   // User preferences for weather (stored ZIP, etc.)
   app.get("/api/user/preferences", isAuthenticated, async (req: any, res) => {
     try {

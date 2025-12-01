@@ -84,9 +84,18 @@ Preferred communication style: Simple, everyday language.
 - **API Endpoints**: `/api/referrals/summary`, `/api/referrals/validate/:code`, `/api/referrals/redeem`
 
 ## Recent Updates (December 2024)
+- **Weather Radar Integration**: Live weather radar with RainViewer tiles, NOAA storm alerts, animated playback controls, and layer toggles. Accessible via radar button in the weather widget.
 - **React 18 Compatibility Fix**: Downgraded from React 19.2.0 to React 18.3.1 and framer-motion 12.x to 11.15.0 to fix "Objects are not valid as a React child" error. @tanstack/react-query 5.x has experimental React 19 support that caused CJS/ESM bundling issues.
 - **Member Referral Program**: Full points-based referral system with signup tracking, Pro conversion bonuses, and reward redemption.
 - **Dev Redirect**: Development mode auto-redirects to `/dev` page on first load for faster development workflow.
+
+## Weather Radar System
+- **Component**: `WeatherRadar.tsx` with Leaflet map and RainViewer radar tiles
+- **Radar Data**: RainViewer API (free) for precipitation radar tiles with animated playback
+- **Storm Alerts**: NOAA Weather Alerts API (`/api/weather/alerts`) for real-time severe weather warnings
+- **Features**: Animated radar playback, layer controls (precipitation toggle, opacity slider), fullscreen mode, mobile-responsive design
+- **ZIP Persistence**: localStorage for guests, database for authenticated users via `/api/user/preferences`
+- **Dependencies**: `react-leaflet@^4.2.1` (React 18 compatible), `leaflet`
 
 ## Version Constraints
 - **React**: ^18.3.1 (NOT React 19 - causes compatibility issues with @tanstack/react-query and framer-motion)
