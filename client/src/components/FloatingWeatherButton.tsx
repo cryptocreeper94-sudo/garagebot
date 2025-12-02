@@ -183,7 +183,7 @@ export default function FloatingWeatherButton() {
     <>
       <motion.button
         onClick={() => setShowWeatherView(true)}
-        className={`fixed bottom-24 right-4 z-50 w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br ${gradientClass} backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 ${glowClass}`}
+        className="fixed bottom-24 right-4 z-50 w-16 h-16 md:w-20 md:h-20 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 bg-transparent border-0"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.5 }}
@@ -192,29 +192,33 @@ export default function FloatingWeatherButton() {
         data-testid="button-floating-weather"
       >
         {isLoading ? (
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <Loader2 className="w-10 h-10 animate-spin text-primary drop-shadow-[0_0_10px_rgba(6,182,212,0.6)]" />
         ) : (
-          <div className="relative w-full h-full flex items-center justify-center">
+          <div className="relative flex items-center justify-center">
             <motion.img
               src={currentIcon}
               alt="Weather"
-              className="w-12 h-12 md:w-14 md:h-14 object-contain drop-shadow-lg"
+              className={`w-16 h-16 md:w-20 md:h-20 object-contain ${glowClass}`}
+              style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }}
               animate={{ 
-                y: [0, -3, 0],
-                rotate: isNight ? [0, 1, -1, 0] : [0, 2, -2, 0]
+                y: [0, -4, 0],
+                rotate: isNight ? [0, 2, -2, 0] : [0, 3, -3, 0]
               }}
               transition={{ 
-                duration: isNight ? 6 : 4, 
+                duration: isNight ? 5 : 3.5, 
                 repeat: Infinity, 
                 ease: "easeInOut" 
               }}
             />
             {weather && (
-              <div className={`absolute -bottom-1 -right-1 backdrop-blur-sm rounded-full px-1.5 py-0.5 border ${isNight ? 'bg-indigo-900/80 border-indigo-400/30' : 'bg-black/80 border-white/20'}`}>
-                <span className={`text-[10px] font-mono font-bold ${isNight ? 'text-indigo-100' : 'text-white'}`}>
-                  {weather.current.temp}°
-                </span>
-              </div>
+              <span 
+                className="absolute bottom-0 right-0 text-sm md:text-base font-mono font-black text-white"
+                style={{ 
+                  textShadow: '0 0 8px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(6,182,212,0.5)'
+                }}
+              >
+                {weather.current.temp}°
+              </span>
             )}
           </div>
         )}

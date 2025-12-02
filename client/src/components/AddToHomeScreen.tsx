@@ -111,7 +111,7 @@ export default function AddToHomeScreen() {
           animate={{ opacity: isExiting ? 0 : 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
           onClick={handleDismiss}
           data-testid="pwa-overlay"
         >
@@ -131,7 +131,7 @@ export default function AddToHomeScreen() {
             }}
             exit={{ x: "100vw", opacity: 0, rotate: 15 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-[90vw] sm:max-w-sm"
+            className="w-full max-w-[90vw] sm:max-w-sm pointer-events-auto"
           >
             <Card className="relative bg-gradient-to-b from-card to-background border-primary/30 p-4 sm:p-6 shadow-[0_0_40px_rgba(6,182,212,0.2)] max-h-[85vh] overflow-y-auto">
               <Button

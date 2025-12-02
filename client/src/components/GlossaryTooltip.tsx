@@ -75,7 +75,7 @@ export default function GlossaryTooltip({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 backdrop-blur-sm p-4 pb-8"
+          className="fixed inset-0 z-[100] flex items-end justify-center p-4 pb-8 pointer-events-none"
           onClick={() => handleClose()}
           data-testid="glossary-tooltip-overlay"
         >
@@ -102,7 +102,7 @@ export default function GlossaryTooltip({
                 stiffness: 400
               }
             }}
-            className="relative flex flex-col items-center"
+            className="relative flex flex-col items-center pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <motion.div
@@ -202,7 +202,7 @@ export default function GlossaryTooltip({
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] pointer-events-none"
         >
           <motion.div
             initial={{ x: 0, opacity: 1, rotate: 0 }}
