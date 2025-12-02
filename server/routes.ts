@@ -5351,6 +5351,138 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // RELEASE VERSION CONTROL ROUTES
+  // ============================================
+
+  // Get all releases (optionally filter by status)
+  app.get('/api/releases', async (req, res) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const releases = await storage.getReleases(status ? { status } : undefined);
+      res.json(releases);
+    } catch (error) {
+      console.error("Get releases error:", error);
+      res.status(500).json({ error: "Failed to get releases" });
+    }
+  });
+
+  // Get latest published release
+  app.get('/api/releases/latest', async (req, res) => {
+    try {
+      const release = await storage.getLatestRelease();
+      res.json(release || null);
+    } catch (error) {
+      console.error("Get latest release error:", error);
+      res.status(500).json({ error: "Failed to get latest release" });
+    }
+  });
+
+  // Get next version number
+  app.get('/api/releases/next-version', async (req, res) => {
+    try {
+      const nextNumber = await storage.getNextVersionNumber();
+      res.json({ nextVersionNumber: nextNumber });
+    } catch (error) {
+      console.error("Get next version error:", error);
+      res.status(500).json({ error: "Failed to get next version number" });
+    }
+  });
+
+  // Get single release by ID
+  app.get('/api/releases/:id', async (req, res) => {
+    try {
+      const release = await storage.getRelease(req.params.id);
+      if (!release) {
+        return res.status(404).json({ error: "Release not found" });
+      }
+      res.json(release);
+    } catch (error) {
+      console.error("Get release error:", error);
+      res.status(500).json({ error: "Failed to get release" });
+    }
+  });
+
+  // Create new release (Dev Portal only)
+  app.post('/api/releases', async (req, res) => {
+    try {
+      const { version, versionType, title, changelog, highlights, notes, createdBy } = req.body;
+      
+      // Check if version already exists
+      const existing = await storage.getReleaseByVersion(version);
+      if (existing) {
+        return res.status(400).json({ error: "Version already exists" });
+      }
+      
+      // Get next version number
+      const versionNumber = await storage.getNextVersionNumber();
+      
+      const release = await storage.createRelease({
+        version,
+        versionType,
+        versionNumber,
+        title: title || null,
+        changelog: changelog || [],
+        highlights: highlights || null,
+        notes: notes || null,
+        status: 'draft',
+        createdBy: createdBy || null,
+      });
+      
+      res.status(201).json(release);
+    } catch (error) {
+      console.error("Create release error:", error);
+      res.status(500).json({ error: "Failed to create release" });
+    }
+  });
+
+  // Update release
+  app.patch('/api/releases/:id', async (req, res) => {
+    try {
+      const release = await storage.updateRelease(req.params.id, req.body);
+      if (!release) {
+        return res.status(404).json({ error: "Release not found" });
+      }
+      res.json(release);
+    } catch (error) {
+      console.error("Update release error:", error);
+      res.status(500).json({ error: "Failed to update release" });
+    }
+  });
+
+  // Publish a release
+  app.post('/api/releases/:id/publish', async (req, res) => {
+    try {
+      const release = await storage.publishRelease(req.params.id);
+      if (!release) {
+        return res.status(404).json({ error: "Release not found" });
+      }
+      res.json(release);
+    } catch (error) {
+      console.error("Publish release error:", error);
+      res.status(500).json({ error: "Failed to publish release" });
+    }
+  });
+
+  // Delete release (drafts only)
+  app.delete('/api/releases/:id', async (req, res) => {
+    try {
+      const release = await storage.getRelease(req.params.id);
+      if (!release) {
+        return res.status(404).json({ error: "Release not found" });
+      }
+      if (release.status === 'published') {
+        return res.status(400).json({ error: "Cannot delete published releases" });
+      }
+      
+      const deleted = await storage.deleteRelease(req.params.id);
+      res.json({ success: deleted });
+    } catch (error) {
+      console.error("Delete release error:", error);
+      res.status(500).json({ error: "Failed to delete release" });
+    }
+  });
+
   return httpServer;
 }
 
