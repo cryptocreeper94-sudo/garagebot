@@ -134,28 +134,34 @@ export default function DIYGuides() {
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
       
-      <div className="container mx-auto px-4 pt-24 pb-12">
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-xs font-mono tracking-wider mb-4">
-            <BookOpen className="w-4 h-4" />
-            DIY REPAIR GUIDES
-          </div>
-          
-          <h1 className="text-3xl md:text-4xl font-tech font-bold uppercase mb-2">
-            Step-by-Step <span className="text-primary">Repair Guides</span>
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-2">
-            Go at your own pace. Each guide includes detailed steps, pro tips, and video links.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            <span className="text-green-400">{guides.filter(g => !g.isPremium).length} Free Guides</span>
-            {" • "}
-            <span className="text-primary">{guides.filter(g => g.isPremium).length} Pro Guides</span>
-          </p>
+          <Card className="md:col-span-8 bg-card/50 border-primary/20 p-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-mono tracking-wider mb-2">
+              <BookOpen className="w-3 h-3" />
+              DIY REPAIR GUIDES
+            </div>
+            <h1 className="text-xl font-tech font-bold uppercase">
+              Step-by-Step <span className="text-primary">Repair Guides</span>
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Go at your own pace. Detailed steps, pro tips, and video links.
+            </p>
+          </Card>
+          <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4 flex items-center justify-center gap-4">
+            <div className="text-center">
+              <p className="text-xl font-bold text-green-400">{guides.filter(g => !g.isPremium).length}</p>
+              <p className="text-[10px] text-muted-foreground">Free</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold text-primary">{guides.filter(g => g.isPremium).length}</p>
+              <p className="text-[10px] text-muted-foreground">Pro</p>
+            </div>
+          </Card>
         </motion.div>
 
         <motion.div

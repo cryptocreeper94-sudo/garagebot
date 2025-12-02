@@ -245,18 +245,22 @@ export default function Garage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
-      <div className="container mx-auto px-4 pt-24 pb-12">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-tech font-bold uppercase text-primary" data-testid="text-page-title">My Garage</h1>
-            <p className="text-muted-foreground mt-2 font-mono">VEHICLE PASSPORT • RECALLS • SERVICE HISTORY</p>
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6">
+          <div className="md:col-span-8">
+            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+              <h1 className="text-2xl font-tech font-bold uppercase text-primary" data-testid="text-page-title">My Garage</h1>
+              <p className="text-muted-foreground text-xs font-mono">VEHICLE PASSPORT • RECALLS • SERVICE</p>
+            </Card>
           </div>
-          <Dialog open={addVehicleOpen} onOpenChange={setAddVehicleOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2 font-tech uppercase glow-primary" data-testid="button-add-vehicle">
-                <Plus className="w-4 h-4" /> Add Vehicle
-              </Button>
-            </DialogTrigger>
+          <div className="md:col-span-4">
+            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center">
+              <Dialog open={addVehicleOpen} onOpenChange={setAddVehicleOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2 font-tech uppercase text-xs glow-primary" data-testid="button-add-vehicle">
+                    <Plus className="w-3 h-3" /> Add Vehicle
+                  </Button>
+                </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="font-tech text-xl uppercase">Add Vehicle to Garage</DialogTitle>
@@ -356,7 +360,9 @@ export default function Garage() {
                 </Button>
               </div>
             </DialogContent>
-          </Dialog>
+              </Dialog>
+            </Card>
+          </div>
         </div>
 
         {vehiclesLoading ? (
