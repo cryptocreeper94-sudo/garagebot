@@ -9,7 +9,8 @@ import {
   technicianTimeEntries, digitalInspections, inspectionItems, shopSettings, integrationCredentials,
   vehicleCategories, repairGuides, guideSteps, guideFitment, partTerminology, guideRatings, guideProgress,
   priceAlerts, blockchainVerifications,
-  referralInvites, referralPointTransactions, referralRedemptions
+  referralInvites, referralPointTransactions, referralRedemptions,
+  releases
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -35,7 +36,8 @@ import type {
   BlockchainVerification, InsertBlockchainVerification,
   ReferralInvite, InsertReferralInvite,
   ReferralPointTransaction, InsertReferralPointTransaction,
-  ReferralRedemption, InsertReferralRedemption
+  ReferralRedemption, InsertReferralRedemption,
+  Release, InsertRelease
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -325,6 +327,17 @@ export interface IStorage {
   createRedemption(redemption: InsertReferralRedemption): Promise<ReferralRedemption>;
   redeemPoints(userId: string, rewardType: 'pro_month' | 'pro_year' | 'pro_lifetime'): Promise<ReferralRedemption>;
   getRedemptions(userId: string): Promise<ReferralRedemption[]>;
+
+  // Release Version Control
+  getReleases(filters?: { status?: string }): Promise<Release[]>;
+  getRelease(id: string): Promise<Release | undefined>;
+  getReleaseByVersion(version: string): Promise<Release | undefined>;
+  getLatestRelease(): Promise<Release | undefined>;
+  getNextVersionNumber(): Promise<number>;
+  createRelease(release: InsertRelease): Promise<Release>;
+  updateRelease(id: string, updates: Partial<Release>): Promise<Release | undefined>;
+  publishRelease(id: string): Promise<Release | undefined>;
+  deleteRelease(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1804,6 +1817,71 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(referralRedemptions)
       .where(eq(referralRedemptions.userId, userId))
       .orderBy(desc(referralRedemptions.createdAt));
+  }
+
+  // Release Version Control
+  async getReleases(filters?: { status?: string }): Promise<Release[]> {
+    if (filters?.status) {
+      return await db.select().from(releases)
+        .where(eq(releases.status, filters.status))
+        .orderBy(desc(releases.versionNumber));
+    }
+    return await db.select().from(releases).orderBy(desc(releases.versionNumber));
+  }
+
+  async getRelease(id: string): Promise<Release | undefined> {
+    const [release] = await db.select().from(releases).where(eq(releases.id, id));
+    return release;
+  }
+
+  async getReleaseByVersion(version: string): Promise<Release | undefined> {
+    const [release] = await db.select().from(releases).where(eq(releases.version, version));
+    return release;
+  }
+
+  async getLatestRelease(): Promise<Release | undefined> {
+    const [release] = await db.select().from(releases)
+      .where(eq(releases.status, 'published'))
+      .orderBy(desc(releases.versionNumber))
+      .limit(1);
+    return release;
+  }
+
+  async getNextVersionNumber(): Promise<number> {
+    const [result] = await db.select({ 
+      maxVersion: sql<number>`COALESCE(MAX(${releases.versionNumber}), 0)` 
+    }).from(releases);
+    return (result?.maxVersion || 0) + 1;
+  }
+
+  async createRelease(release: InsertRelease): Promise<Release> {
+    const [newRelease] = await db.insert(releases).values(release).returning();
+    return newRelease;
+  }
+
+  async updateRelease(id: string, updates: Partial<Release>): Promise<Release | undefined> {
+    const [release] = await db.update(releases)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(releases.id, id))
+      .returning();
+    return release;
+  }
+
+  async publishRelease(id: string): Promise<Release | undefined> {
+    const [release] = await db.update(releases)
+      .set({ 
+        status: 'published', 
+        publishedAt: new Date(),
+        updatedAt: new Date() 
+      })
+      .where(eq(releases.id, id))
+      .returning();
+    return release;
+  }
+
+  async deleteRelease(id: string): Promise<boolean> {
+    const result = await db.delete(releases).where(eq(releases.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 }
 
