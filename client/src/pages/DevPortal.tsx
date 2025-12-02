@@ -587,7 +587,7 @@ export default function DevPortal() {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans">
         <Nav />
-        <div className="pt-20 min-h-[calc(100vh-5rem)] flex items-center justify-center px-4">
+        <div className="pt-24 min-h-[calc(100vh-5rem)] flex items-center justify-center px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -632,7 +632,7 @@ export default function DevPortal() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
-      <div className="pt-20 min-h-[calc(100vh-5rem)] max-w-6xl mx-auto px-4 pb-20">
+      <div className="pt-24 min-h-[calc(100vh-5rem)] max-w-6xl mx-auto px-4 pb-20">
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
           {/* Header Card - spans 8 cols */}
