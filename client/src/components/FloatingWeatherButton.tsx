@@ -183,26 +183,26 @@ export default function FloatingWeatherButton() {
     <>
       <motion.button
         onClick={() => setShowWeatherView(true)}
-        className="fixed bottom-24 right-4 z-50 w-16 h-16 md:w-20 md:h-20 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 bg-transparent border-0"
+        className="fixed top-[88px] right-4 z-40 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
+        style={{ background: 'none', border: 'none', padding: 0 }}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.5 }}
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
         data-testid="button-floating-weather"
       >
         {isLoading ? (
-          <Loader2 className="w-10 h-10 animate-spin text-primary drop-shadow-[0_0_10px_rgba(6,182,212,0.6)]" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         ) : (
-          <div className="relative flex items-center justify-center">
+          <div className="relative">
             <motion.img
               src={currentIcon}
               alt="Weather"
-              className={`w-16 h-16 md:w-20 md:h-20 object-contain ${glowClass}`}
-              style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }}
+              className="w-12 h-12 md:w-14 md:h-14 object-contain"
               animate={{ 
-                y: [0, -4, 0],
-                rotate: isNight ? [0, 2, -2, 0] : [0, 3, -3, 0]
+                y: [0, -2, 0],
+                rotate: isNight ? [0, 1, -1, 0] : [0, 2, -2, 0]
               }}
               transition={{ 
                 duration: isNight ? 5 : 3.5, 
@@ -212,9 +212,10 @@ export default function FloatingWeatherButton() {
             />
             {weather && (
               <span 
-                className="absolute bottom-0 right-0 text-sm md:text-base font-mono font-black text-white"
+                className="absolute -bottom-1 -right-1 text-xs md:text-sm font-mono font-black"
                 style={{ 
-                  textShadow: '0 0 8px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(6,182,212,0.5)'
+                  color: '#fff',
+                  textShadow: '1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000'
                 }}
               >
                 {weather.current.temp}°
