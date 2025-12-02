@@ -101,7 +101,7 @@ export default function OnboardingModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
           onClick={handleRemindLater}
         >
           <motion.div
@@ -109,7 +109,7 @@ export default function OnboardingModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25 }}
-            className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-gradient-to-b from-[#0f1629] to-[#0a0f1e] border border-primary/30 rounded-2xl shadow-[0_0_60px_rgba(6,182,212,0.2)]"
+            className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-gradient-to-b from-[#0f1629] to-[#0a0f1e] border border-primary/30 rounded-2xl shadow-[0_0_60px_rgba(6,182,212,0.3)] pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
             data-testid="modal-onboarding"
           >

@@ -456,7 +456,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             animate={{ opacity: isExiting ? 0 : 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-50 pointer-events-none"
             onClick={handleClose}
             data-testid="ai-mascot-overlay"
           >
@@ -477,7 +477,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 }
               }}
               exit={{ x: "120vw", opacity: 0, rotate: -20, scale: 0.8 }}
-              className="fixed inset-x-2 sm:inset-x-auto sm:left-4 md:left-8 bottom-2 sm:bottom-4 flex flex-col items-center sm:items-start max-w-[96vw] sm:max-w-none"
+              className="fixed inset-x-2 sm:inset-x-auto sm:left-4 md:left-8 bottom-2 sm:bottom-4 flex flex-col items-center sm:items-start max-w-[96vw] sm:max-w-none pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
               data-testid="ai-mascot-chat"
             >
