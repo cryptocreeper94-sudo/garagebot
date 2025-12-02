@@ -632,47 +632,57 @@ export default function DevPortal() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
-      <div className="pt-20 min-h-[calc(100vh-5rem)] container mx-auto px-4 pb-20">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="font-tech text-3xl uppercase text-primary mb-2">Dev Portal</h1>
-              <p className="text-muted-foreground">Your daily checklist for building GarageBot</p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-2xl font-bold text-primary">{stats.percentage}%</p>
-                <p className="text-xs text-muted-foreground">{stats.completed}/{stats.total} Complete</p>
-              </div>
-              <div className="w-24 h-24 relative">
+      <div className="pt-20 min-h-[calc(100vh-5rem)] max-w-6xl mx-auto px-4 pb-20">
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+          {/* Header Card - spans 8 cols */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="md:col-span-8"
+          >
+            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+              <h1 className="font-tech text-2xl uppercase text-primary mb-1">Dev Portal</h1>
+              <p className="text-sm text-muted-foreground">Your daily checklist for building GarageBot</p>
+            </Card>
+          </motion.div>
+          
+          {/* Progress Ring Card - spans 4 cols */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="md:col-span-4"
+          >
+            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center gap-4">
+              <div className="w-16 h-16 relative">
                 <svg className="w-full h-full -rotate-90">
-                  <circle cx="48" cy="48" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
+                  <circle cx="32" cy="32" r="26" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
                   <circle 
-                    cx="48" cy="48" r="40" fill="none" stroke="hsl(var(--primary))" strokeWidth="8"
-                    strokeDasharray={`${stats.percentage * 2.51} 251`}
+                    cx="32" cy="32" r="26" fill="none" stroke="hsl(var(--primary))" strokeWidth="6"
+                    strokeDasharray={`${stats.percentage * 1.63} 163`}
                     strokeLinecap="round"
                   />
                 </svg>
               </div>
-            </div>
-          </div>
-        </motion.div>
+              <div className="text-center">
+                <p className="text-xl font-bold text-primary">{stats.percentage}%</p>
+                <p className="text-xs text-muted-foreground">{stats.completed}/{stats.total}</p>
+              </div>
+            </Card>
+          </motion.div>
+        </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6">
-            <TabsTrigger value="features" className="font-tech uppercase">
-              <ClipboardList className="w-4 h-4 mr-2" /> Features
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3 mb-4 max-w-md">
+            <TabsTrigger value="features" className="font-tech uppercase text-xs">
+              <ClipboardList className="w-3 h-3 mr-1" /> Features
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="font-tech uppercase">
-              <CheckCheck className="w-4 h-4 mr-2" /> Task List
+            <TabsTrigger value="tasks" className="font-tech uppercase text-xs">
+              <CheckCheck className="w-3 h-3 mr-1" /> Tasks
             </TabsTrigger>
-            <TabsTrigger value="affiliates" className="font-tech uppercase">
-              <DollarSign className="w-4 h-4 mr-2" /> Affiliate Guide
+            <TabsTrigger value="affiliates" className="font-tech uppercase text-xs">
+              <DollarSign className="w-3 h-3 mr-1" /> Affiliates
             </TabsTrigger>
           </TabsList>
 
