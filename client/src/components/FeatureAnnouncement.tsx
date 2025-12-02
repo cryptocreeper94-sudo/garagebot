@@ -64,7 +64,7 @@ export function FeatureAnnouncement({
           initial={{ opacity: 0 }}
           animate={{ opacity: isExiting ? 0 : 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
           onClick={handleDismiss}
           data-testid="modal-feature-announcement"
         >
@@ -73,7 +73,7 @@ export function FeatureAnnouncement({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25 }}
-            className="w-full max-w-md bg-gradient-to-b from-[#0f1629] to-[#0a0f1e] border border-cyan-500/30 rounded-2xl shadow-[0_0_60px_rgba(6,182,212,0.15)] overflow-hidden"
+            className="w-full max-w-md bg-gradient-to-b from-[#0f1629] to-[#0a0f1e] border border-cyan-500/30 rounded-2xl shadow-[0_0_60px_rgba(6,182,212,0.3)] overflow-hidden pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative">
