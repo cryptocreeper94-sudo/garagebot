@@ -5,7 +5,8 @@ import {
   Lock, CheckCircle2, Circle, Plus, ExternalLink, Trash2, 
   DollarSign, Link2, Settings, Zap, Users, Shield, Clock,
   ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
-  BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList
+  BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList,
+  Copy, Mail, Phone, User
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { FeatureInventory } from "@/components/FeatureInventory";
@@ -789,29 +790,196 @@ export default function DevPortal() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-tech text-lg text-primary">Direct Outreach Needed</h3>
+              <h3 className="font-tech text-lg text-primary">Direct Outreach / Special Programs</h3>
               <p className="text-sm text-muted-foreground">
-                These retailers don't have standard affiliate programs. You'll need to contact them directly for partnership opportunities.
+                These retailers need direct contact or have special programs. Click to expand for contact info and ready-to-send outreach letters.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {DIRECT_RETAILERS.map(retailer => (
-                  <Card key={retailer.name} className="p-4 bg-card/50 border-primary/20">
-                    <h4 className="font-tech font-bold mb-1">{retailer.name}</h4>
-                    <p className="text-xs text-muted-foreground mb-2">{retailer.notes}</p>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs border-yellow-500/50 text-yellow-400">
-                        {retailer.status}
-                      </Badge>
-                      <a 
-                        href={`mailto:${retailer.contact}`} 
-                        className="text-xs text-primary hover:underline flex items-center gap-1"
-                      >
-                        <ExternalLink className="w-3 h-3" /> {retailer.contact}
-                      </a>
-                    </div>
-                  </Card>
+              <Accordion type="multiple" className="space-y-3">
+                {DIRECT_RETAILERS.map((retailer, index) => (
+                  <AccordionItem 
+                    key={retailer.name} 
+                    value={`retailer-${index}`}
+                    className="border border-primary/20 rounded-lg overflow-hidden bg-card/30"
+                  >
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5">
+                      <div className="flex items-center gap-3 w-full">
+                        <span className="text-2xl">
+                          {retailer.name === "RockAuto" ? "🚗" : 
+                           retailer.name === "O'Reilly Auto Parts" ? "🔧" :
+                           retailer.name === "NAPA Auto Parts" ? "🔩" :
+                           retailer.name === "VMC Chinese Parts" ? "🏍️" : "♻️"}
+                        </span>
+                        <div className="flex-1 text-left">
+                          <h4 className="font-tech font-bold">{retailer.name}</h4>
+                          <p className="text-xs text-muted-foreground">
+                            {retailer.notes && retailer.notes.length > 60 
+                              ? `${retailer.notes.slice(0, 60)}...` 
+                              : retailer.notes || "Contact for partnership details"}
+                          </p>
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs ${
+                            (retailer.status || "").includes("✓") ? "border-green-500/50 text-green-400" :
+                            retailer.status === "API Partnership" ? "border-purple-500/50 text-purple-400" :
+                            "border-yellow-500/50 text-yellow-400"
+                          }`}
+                        >
+                          {retailer.status || "Contact Required"}
+                        </Badge>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4 pt-2">
+                      <div className="space-y-4">
+                        {/* Contact Info Section */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-primary/5 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-primary" />
+                            <div>
+                              <p className="text-xs text-muted-foreground">Primary Contact</p>
+                              {'contactUrl' in retailer ? (
+                                <a href={retailer.contactUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                                  {retailer.contact}
+                                </a>
+                              ) : (
+                                <a href={`mailto:${retailer.contact}`} className="text-sm text-primary hover:underline">
+                                  {retailer.contact}
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                          {'contactAlt' in retailer && (
+                            <div className="flex items-center gap-2">
+                              <Mail className="w-4 h-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">Alt Contact</p>
+                                <a href={`mailto:${retailer.contactAlt}`} className="text-sm hover:underline">
+                                  {retailer.contactAlt}
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          {'phone' in retailer && (
+                            <div className="flex items-center gap-2">
+                              <Phone className="w-4 h-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">Phone</p>
+                                <a href={`tel:${retailer.phone?.replace(/[^0-9]/g, '')}`} className="text-sm hover:underline">
+                                  {retailer.phone}
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          {'keyContact' in retailer && (
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">Key Contact</p>
+                                <p className="text-sm font-medium">{retailer.keyContact}</p>
+                              </div>
+                            </div>
+                          )}
+                          {'ceoContact' in retailer && (
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-amber-400" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">CEO Direct</p>
+                                <a href={`mailto:${retailer.ceoContact}`} className="text-sm text-amber-400 hover:underline">
+                                  {retailer.ceoContact}
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          {'apiUrl' in retailer && (
+                            <div className="flex items-center gap-2">
+                              <Link2 className="w-4 h-4 text-purple-400" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">API/Web Services</p>
+                                <a href={retailer.apiUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-purple-400 hover:underline">
+                                  View API Docs
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <p className="text-sm">{retailer.notes || "Contact for partnership details"}</p>
+
+                        {/* Outreach Letter Section - only render if letter exists */}
+                        {(() => {
+                          const letter = retailer.letterType 
+                            ? OUTREACH_LETTERS[retailer.letterType as keyof typeof OUTREACH_LETTERS] 
+                            : undefined;
+                          if (!letter) return null;
+                          return (
+                            <div className="mt-4 space-y-3">
+                              <div className="flex items-center justify-between flex-wrap gap-2">
+                                <h5 className="font-tech text-sm text-primary flex items-center gap-2">
+                                  <Mail className="w-4 h-4" /> Ready-to-Send Outreach Letter
+                                </h5>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(`Subject: ${letter.subject}\n\n${letter.body}`);
+                                      toast({
+                                        title: "Copied!",
+                                        description: "Full letter copied to clipboard",
+                                      });
+                                    }}
+                                  >
+                                    <Copy className="w-3 h-3 mr-1" /> Copy Letter
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(letter.subject);
+                                      toast({
+                                        title: "Copied!",
+                                        description: "Subject line copied to clipboard",
+                                      });
+                                    }}
+                                  >
+                                    <Copy className="w-3 h-3 mr-1" /> Copy Subject
+                                  </Button>
+                                </div>
+                              </div>
+                              
+                              <div className="bg-background/50 rounded-lg p-4 border border-primary/10">
+                                <p className="text-xs text-muted-foreground mb-1">Subject:</p>
+                                <p className="text-sm font-medium text-primary mb-3">{letter.subject}</p>
+                                <p className="text-xs text-muted-foreground mb-1">Letter:</p>
+                                <pre className="text-xs whitespace-pre-wrap font-sans leading-relaxed max-h-64 overflow-y-auto">
+                                  {letter.body}
+                                </pre>
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        {/* NAPA special message */}
+                        {retailer.name === "NAPA Auto Parts" && (
+                          <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                            <p className="text-sm text-green-400 font-medium">✓ No outreach letter needed!</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              NAPA has a standard affiliate program through FlexOffers. Just sign up there and apply to the NAPA program.
+                            </p>
+                            <Button asChild size="sm" className="mt-2 font-tech uppercase">
+                              <a href="https://www.flexoffers.com/affiliate-programs/napa-auto-affiliate-program/" target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="w-3 h-3 mr-1" /> Apply at FlexOffers
+                              </a>
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
                 ))}
-              </div>
+              </Accordion>
             </div>
 
             <Card className="bg-card border-primary/30 p-6">
