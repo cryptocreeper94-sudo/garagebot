@@ -2,11 +2,9 @@ import useEmblaCarousel from "embla-carousel-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Star, ShoppingCart, Zap } from "lucide-react";
-import { Link } from "wouter";
+import { Timer, ExternalLink, Zap, Sparkles } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { useCart } from "@/hooks/useCart";
 
 type Deal = {
   id: string;
@@ -16,12 +14,23 @@ type Deal = {
   originalPrice: string;
   discount: string;
   vendor: string;
+  vendorUrl?: string;
+  searchQuery?: string;
   imageUrl: string | null;
   expiresAt: string;
   isActive: boolean;
 };
 
-const FALLBACK_DEALS = [
+const RETAILER_URLS: Record<string, string> = {
+  "AutoZone": "https://www.autozone.com/searchresult?searchText=",
+  "O'Reilly": "https://www.oreillyauto.com/search?q=",
+  "Advance": "https://shop.advanceautoparts.com/web/SearchResults?searchTerm=",
+  "RockAuto": "https://www.rockauto.com/en/catalog/?a=",
+  "NAPA": "https://www.napaonline.com/search/",
+  "Amazon": "https://www.amazon.com/s?k=",
+};
+
+const FALLBACK_DEALS: Deal[] = [
   {
     id: "1",
     title: "Mobil 1 Advanced Full Synthetic",
@@ -31,6 +40,8 @@ const FALLBACK_DEALS = [
     discount: "25% OFF",
     imageUrl: "https://images.unsplash.com/photo-1635784063748-252802c6c25c?q=80&w=600&auto=format&fit=crop",
     vendor: "AutoZone",
+    vendorUrl: RETAILER_URLS["AutoZone"],
+    searchQuery: "mobil+1+5w30+synthetic+oil",
     expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
     isActive: true
   },
@@ -43,6 +54,8 @@ const FALLBACK_DEALS = [
     discount: "15% OFF",
     imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=600&auto=format&fit=crop",
     vendor: "O'Reilly",
+    vendorUrl: RETAILER_URLS["O'Reilly"],
+    searchQuery: "duralast+gold+brake+pads",
     expiresAt: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
     isActive: true
   },
@@ -55,6 +68,8 @@ const FALLBACK_DEALS = [
     discount: "$30 OFF",
     imageUrl: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=600&auto=format&fit=crop",
     vendor: "Advance",
+    vendorUrl: RETAILER_URLS["Advance"],
+    searchQuery: "diehard+platinum+agm+battery",
     expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
     isActive: true
   },
@@ -66,7 +81,9 @@ const FALLBACK_DEALS = [
     originalPrice: "59.99",
     discount: "$10 OFF",
     imageUrl: "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?q=80&w=600&auto=format&fit=crop",
-    vendor: "AutoZone",
+    vendor: "Amazon",
+    vendorUrl: RETAILER_URLS["Amazon"],
+    searchQuery: "K%26N+high+performance+air+filter",
     expiresAt: new Date(Date.now() + 28 * 60 * 60 * 1000).toISOString(),
     isActive: true
   }
@@ -80,22 +97,19 @@ async function fetchDeals(): Promise<Deal[]> {
 
 export default function FeaturedCarousel() {
   const [emblaRef] = useEmblaCarousel({ align: "start", loop: true });
-  const { addToCart } = useCart();
   
   const { data: deals = FALLBACK_DEALS } = useQuery({
     queryKey: ["deals"],
     queryFn: fetchDeals,
   });
 
-  const handleAddToCart = (deal: Deal) => {
-    addToCart({
-      productId: deal.id,
-      priceId: `price_${deal.id}`,
-      productName: deal.title,
-      productImage: deal.imageUrl || undefined,
-      quantity: 1,
-      unitPrice: parseFloat(deal.price),
-    });
+  const getDealUrl = (deal: Deal): string => {
+    if (deal.vendorUrl && deal.searchQuery) {
+      return `${deal.vendorUrl}${deal.searchQuery}`;
+    }
+    const baseUrl = RETAILER_URLS[deal.vendor] || RETAILER_URLS["Amazon"];
+    const searchTerm = encodeURIComponent(deal.title.replace(/\s+/g, '+'));
+    return `${baseUrl}${searchTerm}`;
   };
 
   return (
@@ -106,60 +120,68 @@ export default function FeaturedCarousel() {
           <h2 className="text-sm font-tech font-bold uppercase tracking-wide">
             Flash <span className="text-primary">Deals</span>
           </h2>
+          <Badge variant="outline" className="text-[8px] border-primary/30 text-primary/70 ml-1">
+            <Sparkles className="w-2 h-2 mr-1" />
+            SAMPLE
+          </Badge>
         </div>
-        <Button variant="link" className="text-[9px] font-mono text-muted-foreground hover:text-primary h-auto p-0">
-          VIEW ALL
-        </Button>
+        <span className="text-[9px] font-mono text-muted-foreground">
+          Live deals coming soon
+        </span>
       </div>
 
       <div className="overflow-hidden -mx-4 px-4" ref={emblaRef}>
         <div className="flex gap-2">
           {deals.map((deal) => {
             const timeLeft = formatDistanceToNow(new Date(deal.expiresAt), { addSuffix: false });
+            const dealUrl = getDealUrl(deal);
             return (
               <div className="flex-[0_0_55%] min-w-0 sm:flex-[0_0_32%] md:flex-[0_0_24%] lg:flex-[0_0_18%]" key={deal.id}>
-                <Card className="h-full bg-card/50 border-white/10 backdrop-blur-sm overflow-hidden group hover:border-primary/50 transition-all relative">
-                  {/* Compact Image */}
-                  <div className="h-20 w-full relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
-                    <img 
-                      src={deal.imageUrl || "https://images.unsplash.com/photo-1635784063748-252802c6c25c?q=80&w=600&auto=format&fit=crop"} 
-                      alt={deal.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70"
-                    />
-                    <Badge className="absolute top-1.5 right-1.5 z-20 bg-primary text-black font-bold font-mono text-[8px] px-1.5 py-0.5">
-                      {deal.discount}
-                    </Badge>
-                    <div className="absolute bottom-1 left-1.5 z-20 flex items-center gap-1 text-[8px] font-mono text-yellow-400">
-                      <Timer className="w-2.5 h-2.5" />
-                      <span>{timeLeft}</span>
-                    </div>
-                  </div>
-
-                  {/* Compact Content */}
-                  <div className="p-2">
-                    <h3 className="font-bold text-[10px] line-clamp-1 group-hover:text-primary transition-colors">{deal.title}</h3>
-                    <p className="text-[8px] text-muted-foreground line-clamp-1 mb-1">{deal.description}</p>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-1">
-                          <span className="font-mono font-bold text-xs text-white">${deal.price}</span>
-                          <span className="text-[8px] text-muted-foreground line-through">${deal.originalPrice}</span>
-                        </div>
-                        <p className="text-[7px] text-muted-foreground uppercase font-mono">{deal.vendor}</p>
+                <a 
+                  href={dealUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block h-full"
+                  data-testid={`link-deal-${deal.id}`}
+                >
+                  <Card className="h-full bg-card/50 border-white/10 backdrop-blur-sm overflow-hidden group hover:border-primary/50 transition-all relative cursor-pointer">
+                    {/* Compact Image */}
+                    <div className="h-20 w-full relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
+                      <img 
+                        src={deal.imageUrl || "https://images.unsplash.com/photo-1635784063748-252802c6c25c?q=80&w=600&auto=format&fit=crop"} 
+                        alt={deal.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70"
+                      />
+                      <Badge className="absolute top-1.5 right-1.5 z-20 bg-primary text-black font-bold font-mono text-[8px] px-1.5 py-0.5">
+                        {deal.discount}
+                      </Badge>
+                      <div className="absolute bottom-1 left-1.5 z-20 flex items-center gap-1 text-[8px] font-mono text-yellow-400">
+                        <Timer className="w-2.5 h-2.5" />
+                        <span>{timeLeft}</span>
                       </div>
-                      <Button 
-                        size="sm" 
-                        className="h-6 w-6 p-0 rounded-full bg-primary text-black hover:bg-white transition-colors"
-                        onClick={() => handleAddToCart(deal)}
-                        data-testid={`button-add-to-cart-${deal.id}`}
-                      >
-                        <ShoppingCart className="w-3 h-3" />
-                      </Button>
                     </div>
-                  </div>
-                </Card>
+
+                    {/* Compact Content */}
+                    <div className="p-2">
+                      <h3 className="font-bold text-[10px] line-clamp-1 group-hover:text-primary transition-colors">{deal.title}</h3>
+                      <p className="text-[8px] text-muted-foreground line-clamp-1 mb-1">{deal.description}</p>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono font-bold text-xs text-white">${deal.price}</span>
+                            <span className="text-[8px] text-muted-foreground line-through">${deal.originalPrice}</span>
+                          </div>
+                          <p className="text-[7px] text-muted-foreground uppercase font-mono">{deal.vendor}</p>
+                        </div>
+                        <div className="h-6 w-6 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-colors">
+                          <ExternalLink className="w-3 h-3 text-primary group-hover:text-black" />
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </a>
               </div>
             );
           })}
