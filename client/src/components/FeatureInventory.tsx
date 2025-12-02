@@ -291,52 +291,51 @@ export function FeatureInventory() {
         <span>Click features to mark as personally verified. Progress saves locally.</span>
       </div>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {FEATURE_CATEGORIES.map((category) => (
-          <Card key={category.name} className={`bg-gradient-to-br ${colorMap[category.color]} border overflow-hidden`}>
-            <CardHeader className="pb-2 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => toggleCategory(category.name)}>
-              <CardTitle className="text-white flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{category.icon}</span>
-                  {category.name}
-                  <Badge variant="outline" className="text-white/80 border-white/30 text-[10px] ml-2">
+          <Card key={category.name} className={`bg-gradient-to-br ${colorMap[category.color]} border overflow-hidden h-fit`}>
+            <CardHeader className="py-2 px-3 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => toggleCategory(category.name)}>
+              <CardTitle className="text-white flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm">{category.icon}</span>
+                  <span className="truncate">{category.name}</span>
+                  <Badge variant="outline" className="text-white/80 border-white/30 text-[9px] ml-1">
                     {category.features.filter(f => checkedFeatures.includes(f.id)).length}/{category.features.length}
                   </Badge>
                 </div>
-                {expandedCategories.includes(category.name) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                {expandedCategories.includes(category.name) ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
               </CardTitle>
             </CardHeader>
             {expandedCategories.includes(category.name) && (
-              <CardContent className="pt-0">
-                <div className="space-y-1.5">
+              <CardContent className="pt-0 px-2 pb-2">
+                <div className="space-y-1">
                   {category.features.map((feature) => (
                     <div 
                       key={feature.id} 
-                      className={`flex items-start gap-2 p-2 rounded-lg transition-all cursor-pointer ${checkedFeatures.includes(feature.id) ? 'bg-green-900/40 border border-green-500/50' : 'bg-black/20 hover:bg-black/30'}`} 
+                      className={`flex items-start gap-1.5 p-1.5 rounded transition-all cursor-pointer ${checkedFeatures.includes(feature.id) ? 'bg-green-900/40 border border-green-500/50' : 'bg-black/20 hover:bg-black/30'}`} 
                       onClick={() => toggleFeature(feature.id)}
                       data-testid={`feature-${feature.id}`}
                     >
                       <div className="mt-0.5">
-                        {checkedFeatures.includes(feature.id) ? <CheckCircle2 className="h-4 w-4 text-green-400" /> : <Circle className="h-4 w-4 text-white/40" />}
+                        {checkedFeatures.includes(feature.id) ? <CheckCircle2 className="h-3 w-3 text-green-400" /> : <Circle className="h-3 w-3 text-white/40" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`text-sm font-medium ${checkedFeatures.includes(feature.id) ? 'text-green-200' : 'text-white'}`}>{feature.name}</span>
-                          {feature.status === "complete" && <Badge className="bg-green-600/80 text-[9px] px-1.5 py-0">BUILT</Badge>}
-                          {feature.status === "partial" && <Badge className="bg-yellow-600/80 text-[9px] px-1.5 py-0">PARTIAL</Badge>}
-                          {feature.status === "planned" && <Badge className="bg-blue-600/80 text-[9px] px-1.5 py-0">PLANNED</Badge>}
+                        <div className="flex items-center gap-1 flex-wrap">
+                          <span className={`text-xs font-medium ${checkedFeatures.includes(feature.id) ? 'text-green-200' : 'text-white'}`}>{feature.name}</span>
+                          {feature.status === "complete" && <Badge className="bg-green-600/80 text-[8px] px-1 py-0">BUILT</Badge>}
+                          {feature.status === "partial" && <Badge className="bg-yellow-600/80 text-[8px] px-1 py-0">WIP</Badge>}
+                          {feature.status === "planned" && <Badge className="bg-blue-600/80 text-[8px] px-1 py-0">PLAN</Badge>}
                         </div>
-                        <p className="text-white/60 text-xs mt-0.5">{feature.description}</p>
                       </div>
                       {feature.route && (
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          className="h-6 w-6 p-0 text-white/60 hover:text-white hover:bg-white/10 shrink-0" 
+                          className="h-5 w-5 p-0 text-white/60 hover:text-white hover:bg-white/10 shrink-0" 
                           onClick={(e) => { e.stopPropagation(); window.location.href = feature.route!; }}
                           data-testid={`link-${feature.id}`}
                         >
-                          <ExternalLink className="h-3 w-3" />
+                          <ExternalLink className="h-2.5 w-2.5" />
                         </Button>
                       )}
                     </div>

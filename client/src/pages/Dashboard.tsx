@@ -56,31 +56,36 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-white">
       <Nav />
       
-      <div className="container mx-auto px-4 pt-24 pb-12">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-tech font-bold uppercase tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">
-              Mission Control
-            </h1>
-            <p className="text-muted-foreground font-mono text-sm mt-1 flex items-center gap-2">
-              <Terminal className="w-4 h-4" />
-              SYSTEM STATUS: ONLINE // VERSION 0.1.0-ALPHA
-            </p>
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
+        {/* Bento Header Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6">
+          <div className="md:col-span-8">
+            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+              <h1 className="text-2xl font-tech font-bold uppercase tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">
+                Mission Control
+              </h1>
+              <p className="text-muted-foreground font-mono text-xs mt-1 flex items-center gap-2">
+                <Terminal className="w-3 h-3" />
+                SYSTEM STATUS: ONLINE // VERSION 0.1.0-ALPHA
+              </p>
+            </Card>
           </div>
-          <div className="flex gap-2">
-            <Badge variant="outline" className="font-mono border-green-500/30 text-green-400 bg-green-500/10 animate-pulse">
-              <div className="w-2 h-2 rounded-full bg-green-400 mr-2" />
-              LIVE
-            </Badge>
-            <Button size="sm" variant="outline" className="font-tech uppercase border-primary/30 hover:border-primary hover:bg-primary/10 hover:text-primary">
-              <Cpu className="w-4 h-4 mr-2" />
-              System Logs
-            </Button>
+          <div className="md:col-span-4">
+            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center gap-3">
+              <Badge variant="outline" className="font-mono border-green-500/30 text-green-400 bg-green-500/10 animate-pulse">
+                <div className="w-2 h-2 rounded-full bg-green-400 mr-2" />
+                LIVE
+              </Badge>
+              <Button size="sm" variant="outline" className="font-tech uppercase text-xs border-primary/30 hover:border-primary hover:bg-primary/10 hover:text-primary">
+                <Cpu className="w-3 h-3 mr-1" />
+                Logs
+              </Button>
+            </Card>
           </div>
         </div>
 
         {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <Card className="bg-card/50 border-primary/20 backdrop-blur-sm p-6 relative overflow-hidden group hover:border-primary/50 transition-all">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Users className="w-24 h-24 text-primary" />
