@@ -320,7 +320,7 @@ export default function Results() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
-      <div className="pt-20 min-h-[calc(100vh-5rem)] container mx-auto px-4 pb-20">
+      <div className="pt-20 min-h-[calc(100vh-5rem)] max-w-6xl mx-auto px-4 pb-20">
         <div className="grid grid-cols-12 gap-6">
           
           {/* Left Column: Filters (Compact Sidebar) */}

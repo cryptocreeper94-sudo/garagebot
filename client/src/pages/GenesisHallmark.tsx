@@ -148,7 +148,7 @@ export default function GenesisHallmark() {
       
       <Nav />
       
-      <div className="pt-24 pb-16 container mx-auto px-4">
+      <div className="pt-24 pb-16 max-w-6xl mx-auto px-4">
         {/* Hero Section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

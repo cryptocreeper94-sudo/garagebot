@@ -131,7 +131,7 @@ export default function Insurance() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
-      <div className="container mx-auto px-4 pt-24 pb-12">
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-green-500/20 text-green-400 border-green-500/30 font-mono">
             COMPARE & SAVE
