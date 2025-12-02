@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink,
   ScanLine, Camera, Mic, Wrench, Car, Sparkles, MessageCircle, Bot, TrendingUp, Terminal,
-  BookOpen, PlayCircle, CheckCircle2, Images, Shield, Users, Zap, Star, Gift, Crown
+  BookOpen, PlayCircle, CheckCircle2, Images, Shield, Users, Zap, Star, Gift, Crown, X
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
@@ -36,6 +36,16 @@ export default function Home() {
   const [showVinScanner, setShowVinScanner] = useState(false);
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
   const [showVoiceSearch, setShowVoiceSearch] = useState(false);
+  const [showHeroBuddyPopup, setShowHeroBuddyPopup] = useState(false);
+
+  const HERO_BUDDY_TIPS = [
+    "Hey there! I'm Buddy, your AI parts expert. I search 40+ retailers to find you the best deal!",
+    "Pro tip: Add your vehicles to My Garage for instant fitment matching on every search!",
+    "Did you know? I can identify parts from photos! Just use the camera button.",
+    "Need a repair guide? I can generate step-by-step DIY instructions for any job!",
+    "Looking for local pickup? I prioritize stores near your ZIP code!",
+  ];
+  const [currentTip] = useState(() => HERO_BUDDY_TIPS[Math.floor(Math.random() * HERO_BUDDY_TIPS.length)]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,25 +131,86 @@ export default function Home() {
                       Welcome to
                     </p>
                     <div className="flex items-end relative">
-                      {/* Buddy leaning against the G */}
-                      <motion.div 
-                        initial={{ opacity: 0, x: -20, rotate: -10 }}
-                        animate={{ opacity: 1, x: 0, rotate: 8 }}
-                        transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                        className="absolute -left-2 xl:-left-4 -top-6 xl:-top-8 z-10"
-                        onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
-                      >
-                        <img 
-                          src={buddyMascot} 
-                          alt="Buddy" 
-                          className="w-14 h-14 xl:w-18 xl:h-18 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer hover:scale-110 hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all duration-300"
-                          style={{ transform: 'rotate(8deg) scaleX(-1)' }}
-                          data-testid="img-buddy-hero"
-                        />
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-tech text-primary/80 whitespace-nowrap">
-                          Click me!
-                        </div>
-                      </motion.div>
+                      {/* Buddy leaning against the G with local popup */}
+                      <div className="absolute -left-2 xl:-left-4 -top-6 xl:-top-8 z-20">
+                        <motion.div 
+                          initial={{ opacity: 0, x: -20, rotate: -10 }}
+                          animate={{ opacity: 1, x: 0, rotate: 8 }}
+                          transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+                          onClick={() => setShowHeroBuddyPopup(!showHeroBuddyPopup)}
+                          className="cursor-pointer"
+                        >
+                          <img 
+                            src={buddyMascot} 
+                            alt="Buddy" 
+                            className="w-14 h-14 xl:w-18 xl:h-18 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all duration-300"
+                            style={{ transform: 'rotate(8deg) scaleX(-1)' }}
+                            data-testid="img-buddy-hero"
+                          />
+                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-tech text-primary/80 whitespace-nowrap">
+                            Click me!
+                          </div>
+                        </motion.div>
+                        
+                        {/* Local comic bubble popup */}
+                        <AnimatePresence>
+                          {showHeroBuddyPopup && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                              className="absolute left-16 top-0 z-30 w-52"
+                            >
+                              <div 
+                                className="relative rounded-xl px-3 py-2"
+                                style={{
+                                  background: 'hsl(var(--card))',
+                                  border: '2px solid hsl(var(--primary))',
+                                  boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3)',
+                                }}
+                              >
+                                <p className="text-[10px] leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
+                                  {currentTip}
+                                </p>
+                                {/* Bubble tail pointing left to Buddy */}
+                                <div 
+                                  className="absolute top-4 -left-2"
+                                  style={{
+                                    width: 0,
+                                    height: 0,
+                                    borderTop: '8px solid transparent',
+                                    borderBottom: '8px solid transparent',
+                                    borderRight: '8px solid hsl(var(--primary))',
+                                  }}
+                                />
+                                <div 
+                                  className="absolute top-4 -left-1"
+                                  style={{
+                                    width: 0,
+                                    height: 0,
+                                    borderTop: '6px solid transparent',
+                                    borderBottom: '6px solid transparent',
+                                    borderRight: '6px solid hsl(var(--card))',
+                                    marginTop: '2px',
+                                  }}
+                                />
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); setShowHeroBuddyPopup(false); }}
+                                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
+                                  style={{
+                                    background: 'hsl(var(--card))',
+                                    border: '1.5px solid hsl(var(--primary))',
+                                    color: 'hsl(var(--primary))',
+                                  }}
+                                >
+                                  <X className="w-2 h-2" />
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                       
                       <h1 className="text-3xl xl:text-4xl 2xl:text-5xl font-tech font-black uppercase tracking-tight pl-10 xl:pl-12">
                         <span className="text-primary drop-shadow-[0_0_20px_rgba(6,182,212,0.9)] neon-text">G</span>
@@ -529,22 +600,72 @@ export default function Home() {
               Welcome to
             </p>
             <div className="relative inline-block mb-2">
-              {/* Buddy leaning against the G */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20, rotate: -10 }}
-                animate={{ opacity: 1, x: 0, rotate: 8 }}
-                transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                className="absolute -left-1 -top-8 z-10"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
-              >
-                <img 
-                  src={buddyMascot} 
-                  alt="Buddy" 
-                  className="w-12 h-12 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer hover:scale-110 transition-transform"
-                  style={{ transform: 'rotate(8deg) scaleX(-1)' }}
-                  data-testid="img-buddy-hero-mobile"
-                />
-              </motion.div>
+              {/* Buddy leaning against the G with local popup */}
+              <div className="absolute -left-1 -top-8 z-20">
+                <motion.div 
+                  initial={{ opacity: 0, x: -20, rotate: -10 }}
+                  animate={{ opacity: 1, x: 0, rotate: 8 }}
+                  transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+                  onClick={() => setShowHeroBuddyPopup(!showHeroBuddyPopup)}
+                  className="cursor-pointer"
+                >
+                  <img 
+                    src={buddyMascot} 
+                    alt="Buddy" 
+                    className="w-12 h-12 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 transition-transform"
+                    style={{ transform: 'rotate(8deg) scaleX(-1)' }}
+                    data-testid="img-buddy-hero-mobile"
+                  />
+                </motion.div>
+                
+                {/* Local comic bubble popup for mobile */}
+                <AnimatePresence>
+                  {showHeroBuddyPopup && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                      className="absolute left-14 top-0 z-30 w-48"
+                    >
+                      <div 
+                        className="relative rounded-xl px-3 py-2"
+                        style={{
+                          background: 'hsl(var(--card))',
+                          border: '2px solid hsl(var(--primary))',
+                          boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3)',
+                        }}
+                      >
+                        <p className="text-[10px] leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
+                          {currentTip}
+                        </p>
+                        {/* Bubble tail pointing left to Buddy */}
+                        <div 
+                          className="absolute top-3 -left-2"
+                          style={{
+                            width: 0,
+                            height: 0,
+                            borderTop: '6px solid transparent',
+                            borderBottom: '6px solid transparent',
+                            borderRight: '6px solid hsl(var(--primary))',
+                          }}
+                        />
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setShowHeroBuddyPopup(false); }}
+                          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
+                          style={{
+                            background: 'hsl(var(--card))',
+                            border: '1.5px solid hsl(var(--primary))',
+                            color: 'hsl(var(--primary))',
+                          }}
+                        >
+                          <X className="w-2 h-2" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               
               <h1 className="text-3xl font-tech font-black uppercase tracking-tight pl-8">
                 <span className="text-primary drop-shadow-[0_0_15px_rgba(6,182,212,0.9)] neon-text">G</span>
