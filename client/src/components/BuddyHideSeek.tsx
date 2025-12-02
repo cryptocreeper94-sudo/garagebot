@@ -42,8 +42,6 @@ const BUDDY_COMMENTS: BuddyComment[] = [
   { text: "Diesel engines can last 500,000+ miles with proper maintenance!", mascot: mascotOilFilter, section: ['general'] },
   { text: "NEW: Your vehicles can now be verified on the Solana blockchain! Check the Passport tab in your Garage.", mascot: mascotWaving, section: ['garage', 'home'] },
   { text: "Genesis Hallmarks are now blockchain-certified! Tamper-proof ownership on Solana.", mascot: mascotThinking, section: ['home', 'general'] },
-  { text: "Did you know? Blockchain verification creates permanent, cryptographic proof of your vehicle's history!", mascot: mascotWaving, section: ['garage'] },
-  { text: "Your Genesis Hallmark can now be verified on-chain. View it on Solscan!", mascot: mascotThinking, section: ['home', 'dashboard'] },
 ];
 
 type EntryDirection = 'left' | 'right' | 'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -53,21 +51,21 @@ const getRandomEntryDirection = (): EntryDirection => {
   return directions[Math.floor(Math.random() * directions.length)];
 };
 
-const getEntryAnimation = (direction: EntryDirection) => {
-  const animations: Record<EntryDirection, { x: number | string; y: number | string; rotate: number }> = {
-    'left': { x: '-120vw', y: 0, rotate: -20 },
-    'right': { x: '120vw', y: 0, rotate: 20 },
-    'top': { x: 0, y: '-100vh', rotate: 15 },
-    'bottom': { x: 0, y: '100vh', rotate: -15 },
-    'top-left': { x: '-80vw', y: '-60vh', rotate: -25 },
-    'top-right': { x: '80vw', y: '-60vh', rotate: 25 },
-    'bottom-left': { x: '-80vw', y: '60vh', rotate: 20 },
-    'bottom-right': { x: '80vw', y: '60vh', rotate: -20 },
+const getEntryPosition = (direction: EntryDirection): { x: number; y: number; rotate: number } => {
+  const positions: Record<EntryDirection, { x: number; y: number; rotate: number }> = {
+    'left': { x: -600, y: 0, rotate: -25 },
+    'right': { x: 600, y: 0, rotate: 25 },
+    'top': { x: 0, y: -500, rotate: 15 },
+    'bottom': { x: 0, y: 500, rotate: -15 },
+    'top-left': { x: -500, y: -400, rotate: -30 },
+    'top-right': { x: 500, y: -400, rotate: 30 },
+    'bottom-left': { x: -500, y: 400, rotate: 25 },
+    'bottom-right': { x: 500, y: 400, rotate: -25 },
   };
-  return animations[direction];
+  return positions[direction];
 };
 
-const getExitAnimation = (direction: EntryDirection) => {
+const getExitPosition = (direction: EntryDirection): { x: number; y: number; rotate: number } => {
   const opposites: Record<EntryDirection, EntryDirection> = {
     'left': 'right',
     'right': 'left',
@@ -78,7 +76,7 @@ const getExitAnimation = (direction: EntryDirection) => {
     'bottom-left': 'top-right',
     'bottom-right': 'top-left',
   };
-  return getEntryAnimation(opposites[direction]);
+  return getEntryPosition(opposites[direction]);
 };
 
 const getPageSection = (pathname: string): PageSection => {
@@ -110,7 +108,7 @@ export default function BuddyHideSeek() {
     setTimeout(() => {
       setIsVisible(false);
       setIsExiting(false);
-    }, 500);
+    }, 800);
   }, []);
 
   const showBuddy = useCallback(() => {
@@ -124,15 +122,14 @@ export default function BuddyHideSeek() {
     if (relevantComments.length === 0) return;
     
     const randomComment = relevantComments[Math.floor(Math.random() * relevantComments.length)];
+    const direction = getRandomEntryDirection();
     
     setCurrentComment(randomComment);
-    setEntryDirection(getRandomEntryDirection());
+    setEntryDirection(direction);
     setIsVisible(true);
     setHasShownOnPage(true);
-
-    setTimeout(() => {
-      hideWithAnimation();
-    }, 7000);
+    
+    setTimeout(hideWithAnimation, 8000);
   }, [location, hasShownOnPage, hideWithAnimation]);
 
   useEffect(() => {
@@ -168,82 +165,119 @@ export default function BuddyHideSeek() {
 
   if (!currentComment) return null;
 
-  const entryAnim = getEntryAnimation(entryDirection);
-  const exitAnim = getExitAnimation(entryDirection);
+  const entryPos = getEntryPosition(entryDirection);
+  const exitPos = getExitPosition(entryDirection);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isVisible && (
         <motion.div
+          key="buddy-popup"
           initial={{ 
-            x: entryAnim.x, 
-            y: entryAnim.y, 
-            opacity: 0, 
-            rotate: entryAnim.rotate,
-            scale: 0.6
+            x: entryPos.x, 
+            y: entryPos.y, 
+            rotate: entryPos.rotate,
+            scale: 0.8
           }}
           animate={{ 
-            x: isExiting ? exitAnim.x : 0, 
-            y: isExiting ? exitAnim.y : 0, 
-            opacity: isExiting ? 0 : 1,
-            rotate: isExiting ? exitAnim.rotate : 0,
-            scale: isExiting ? 0.6 : 1
+            x: isExiting ? exitPos.x : 0, 
+            y: isExiting ? exitPos.y : 0, 
+            rotate: isExiting ? exitPos.rotate : 0,
+            scale: isExiting ? 0.8 : 1
           }}
           exit={{ 
-            x: exitAnim.x, 
-            y: exitAnim.y, 
-            opacity: 0, 
-            rotate: exitAnim.rotate,
-            scale: 0.6
+            x: exitPos.x, 
+            y: exitPos.y, 
+            rotate: exitPos.rotate,
+            scale: 0.8
           }}
           transition={{
             type: "spring",
-            damping: 15,
-            stiffness: 120,
-            mass: 1,
-            bounce: 0.3
+            damping: 12,
+            stiffness: 80,
+            mass: 0.8,
           }}
-          className="fixed z-40 pointer-events-auto left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          className="fixed z-[100] pointer-events-none"
+          style={{
+            left: '50%',
+            top: '50%',
+            marginLeft: '-140px',
+            marginTop: '-120px',
+          }}
           data-testid="buddy-hide-seek"
         >
-          <div className="relative flex flex-col items-center">
-            {/* Speech bubble above Buddy */}
+          <div className="relative flex flex-col items-center pointer-events-auto">
+            {/* Speech bubble above Buddy - compact and fitted */}
             <motion.div 
-              className="w-72 sm:w-80 mb-2 pointer-events-auto"
-              initial={{ scale: 0.8, opacity: 0, y: 10 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+              className="max-w-[260px] mb-1"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 300, damping: 20 }}
             >
-              <div className="relative bg-card border-2 border-primary rounded-2xl p-4 shadow-[0_0_30px_rgba(6,182,212,0.3)]">
-                <p className="text-sm text-center text-foreground leading-relaxed">
+              <div 
+                className="relative rounded-xl px-4 py-3"
+                style={{
+                  background: 'hsl(var(--card))',
+                  border: '2px solid hsl(var(--primary))',
+                  boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3)',
+                }}
+              >
+                <p className="text-xs text-center leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
                   {currentComment.text}
                 </p>
-                {/* Speech bubble tail */}
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-primary" />
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-card" />
+                
+                {/* Speech bubble tail pointing down to Buddy */}
+                <div 
+                  className="absolute left-1/2 -translate-x-1/2 -bottom-2"
+                  style={{
+                    width: 0,
+                    height: 0,
+                    borderLeft: '10px solid transparent',
+                    borderRight: '10px solid transparent',
+                    borderTop: '10px solid hsl(var(--primary))',
+                  }}
+                />
+                <div 
+                  className="absolute left-1/2 -translate-x-1/2 -bottom-1.5"
+                  style={{
+                    width: 0,
+                    height: 0,
+                    borderLeft: '8px solid transparent',
+                    borderRight: '8px solid transparent',
+                    borderTop: '8px solid hsl(var(--card))',
+                  }}
+                />
                 
                 {/* Close button */}
                 <button 
                   onClick={hideWithAnimation}
-                  className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors z-10"
+                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+                  style={{
+                    background: 'hsl(var(--card))',
+                    border: '2px solid hsl(var(--primary))',
+                    color: 'hsl(var(--primary))',
+                  }}
                   data-testid="buddy-hide-seek-close"
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-2.5 h-2.5" />
                 </button>
               </div>
             </motion.div>
 
-            {/* Buddy mascot with bounce animation */}
+            {/* Buddy mascot with wobble animation */}
             <motion.img 
               src={currentComment.mascot}
               alt="Buddy"
-              className="w-28 h-28 object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]"
+              className="w-24 h-24 object-contain"
+              style={{
+                filter: 'drop-shadow(0 4px 12px rgba(6, 182, 212, 0.4))',
+              }}
               animate={{ 
-                y: [0, -8, 0],
-                rotate: [0, -3, 3, 0],
+                y: [0, -6, 0],
+                rotate: [-2, 2, -2],
               }}
               transition={{
-                duration: 2.5,
+                duration: 2,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
