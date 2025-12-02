@@ -83,6 +83,15 @@ Preferred communication style: Simple, everyday language.
 - **User Fields**: `referralCode`, `referredByUserId`, `referralPointsBalance`
 - **API Endpoints**: `/api/referrals/summary`, `/api/referrals/validate/:code`, `/api/referrals/redeem`
 
+## Release Version Control System
+- **Route**: `/dev` → "Releases" tab in Dev Portal
+- **Database Table**: `releases` with version, versionType, changelog, timestamps
+- **Version Types**: beta, stable, hotfix, major
+- **Features**: Draft → Publish workflow, timestamped releases, categorized changelogs
+- **API Endpoints**: `/api/releases`, `/api/releases/latest`, `/api/releases/:id/publish`
+- **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
+- **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
+
 ## Latest Publish: December 2, 2024 @ 6:45 PM EST
 
 ## Recent Updates (December 2024)
