@@ -92,9 +92,10 @@ Preferred communication style: Simple, everyday language.
 - **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
 - **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
 
-## Latest Publish: December 2, 2024 @ 6:45 PM EST
+## Latest Publish: December 2, 2024 @ 7:15 PM EST
 
 ## Recent Updates (December 2024)
+- **Release Version Control (Dec 2)**: Full release tracking system with versions, changelogs, footer badge. Agent instructions at `docs/RELEASE_SYSTEM_AGENT_COPY.txt`.
 - **Hero Buddy Local Popup (Dec 2)**: Clicking Buddy on the "G" now shows a compact local comic bubble with tips instead of opening full-screen chat. No blur/overlay.
 - **BuddyHideSeek Animation Fix (Dec 2)**: Random Buddy popup now properly sweeps in from 8 directions with spring physics. Removed blur overlay, compact fitted speech bubble.
 - **Bento Grid Layout (Dec 2)**: Applied max-w-6xl centered containers and bento grid headers across all major pages for consistent, compact desktop layouts.

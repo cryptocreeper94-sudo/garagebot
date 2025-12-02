@@ -22,7 +22,7 @@ export default function PrivacyPolicy() {
             </div>
             <div>
               <h1 className="text-3xl font-tech font-bold uppercase text-primary">Privacy Policy</h1>
-              <p className="text-muted-foreground text-sm font-mono">Last Updated: November 2024</p>
+              <p className="text-muted-foreground text-sm font-mono">Last Updated: December 2024</p>
             </div>
           </div>
           <Badge className="bg-green-500/20 text-green-400 border-green-500/30">

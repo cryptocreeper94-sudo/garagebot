@@ -246,6 +246,10 @@ export default function Investors() {
                       <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
                       <span><strong>Pro Subscriptions:</strong> Founders Circle pricing with Stripe integration</span>
                     </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <span><strong>Release Version Control:</strong> Timestamped version tracking with changelogs</span>
+                    </li>
                   </ul>
                 </Card>
               </motion.div>
