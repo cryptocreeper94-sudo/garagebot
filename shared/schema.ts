@@ -1525,3 +1525,52 @@ export type ReferralPointTransaction = typeof referralPointTransactions.$inferSe
 export const insertReferralRedemptionSchema = createInsertSchema(referralRedemptions).omit({ id: true, createdAt: true });
 export type InsertReferralRedemption = z.infer<typeof insertReferralRedemptionSchema>;
 export type ReferralRedemption = typeof referralRedemptions.$inferSelect;
+
+// ============================================
+// RELEASE VERSION CONTROL SYSTEM
+// ============================================
+
+// Track app releases with version control
+export const releases = pgTable("releases", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Version info
+  version: text("version").notNull().unique(), // 'beta.0', 'v1.0', 'v1.1', 'v2.0', etc.
+  versionType: text("version_type").notNull(), // 'beta' | 'stable' | 'hotfix' | 'major'
+  versionNumber: integer("version_number").notNull(), // Sequential for ordering (1, 2, 3...)
+  
+  // Release details
+  title: text("title"), // Optional release title/codename
+  changelog: jsonb("changelog").notNull(), // Array of { category: string, changes: string[] }
+  highlights: text("highlights").array(), // Key features for marketing
+  
+  // Status
+  status: text("status").default("draft"), // 'draft' | 'published' | 'archived'
+  publishedAt: timestamp("published_at"),
+  
+  // Blockchain verification (ties to hallmark system)
+  isBlockchainVerified: boolean("is_blockchain_verified").default(false),
+  blockchainVerificationId: varchar("blockchain_verification_id"),
+  
+  // Metadata
+  createdBy: varchar("created_by").references(() => users.id, { onDelete: "set null" }),
+  notes: text("notes"), // Internal dev notes
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_releases_version").on(table.version),
+  index("IDX_releases_status").on(table.status),
+  index("IDX_releases_published").on(table.publishedAt),
+]);
+
+// Schema exports for Release System
+export const insertReleaseSchema = createInsertSchema(releases).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true,
+  publishedAt: true,
+  isBlockchainVerified: true,
+  blockchainVerificationId: true,
+});
+export type InsertRelease = z.infer<typeof insertReleaseSchema>;
+export type Release = typeof releases.$inferSelect;
