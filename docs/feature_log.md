@@ -1,44 +1,48 @@
 # GarageBot Feature Log & Variable Tracker
 
+**Last Updated: December 2, 2024 @ 6:20 PM EST**
+
 ## Brand Identity
 - **Name:** GarageBot
 - **Tagline:** "Right Part. First Time. Every Engine."
 - **Domain:** garagebot.io (primary), garagebot.net (redirect)
 - **AI Mascot:** Buddy - gauge-eyed junkyard robot, conversational parts-finding assistant
 
-## Active Features
-*   **Universal Search Engine:** Aggregates results from 20+ retailers based on Year/Make/Model.
-*   **"My Garage" Fleet Management:** Saves vehicle specs for all vehicle types.
-*   **AI Assistant "Buddy":** Conversational search with image identification.
+## Active Features (Completed)
+*   **Universal Search Engine:** Aggregates results from 40+ retailers based on Year/Make/Model.
+*   **"My Garage" Fleet Management:** Saves vehicle specs for all vehicle types with VIN decoding.
+*   **AI Assistant "Buddy":** Conversational search with memory, smart recommendations, and animated mascot.
 *   **Glossary System:** Interactive definitions with Buddy mascot popups.
-*   **Developer Dashboard:** "Mission Control" for system monitoring and analytics.
+*   **Developer Dashboard:** "Mission Control" for system monitoring and affiliate tracking.
 *   **Shopping Cart:** Multi-vendor cart with Stripe checkout.
-*   **Vehicle Type Selector:** Support for cars, trucks, motorcycles, ATVs, boats, RVs, diesel, small engines.
+*   **Vehicle Type Selector:** Support for 18+ vehicle categories including cars, trucks, motorcycles, ATVs, boats, RVs, diesel, small engines, Chinese imports.
+*   **Genesis Hallmark ($2/vehicle):** On-chain vehicle identity with Solana blockchain verification.
+*   **Vehicle Passport:** VIN-decoded vehicle info with NHTSA recalls integration.
+*   **Pro Subscription ($2.99/month):** Founders Circle pricing with Stripe integration.
+*   **DIY Repair Guides:** AI-generated step-by-step maintenance instructions with YouTube links.
+*   **Insurance Comparison:** Multi-carrier quotes page with lead generation.
+*   **Mechanics Garage:** Shop management portal for professional mechanics.
+*   **Member Referral Program:** Points-based referral system with signup tracking and Pro conversion bonuses.
+*   **Weather Widget:** Live weather with radar integration and storm alerts.
+*   **Bento Grid Layout:** Consistent max-w-6xl containers across all pages.
 
 ## Planned Features (Backlog)
 *   **Local Pickup Integration:**
-    *   [ ] Geolocation to find nearest stores.
+    *   [x] ZIP-based location detection.
     *   [ ] Real-time store hours and inventory status.
-*   **Genesis Hallmark ($2/vehicle):**
-    *   [ ] On-chain vehicle identity.
-    *   [ ] VIN-decoded vehicle passport.
-    *   [ ] Service history tracking.
-*   **Pro Subscription ($2.99/month):**
-    *   [ ] Price Drop Alerts.
-    *   [ ] Priority AI support.
-    *   [ ] Advanced wishlist features.
-*   **Price Drop Alerts:**
-    *   [ ] User sets target price.
-    *   [ ] System monitors and notifies via Email/Push.
-*   **Wishlist & Projects:**
+*   **Affiliate Tier 2:**
+    *   [ ] Product data feeds with real pricing & images.
+    *   [ ] Direct retailer API integrations.
+*   **SMS Service Reminders:**
+    *   [ ] Twilio-powered maintenance notifications.
+*   **Community Features:**
+    *   [ ] User reviews for parts, shops, and vendors.
     *   [ ] Group parts by project (e.g., "Suspension Overhaul").
-    *   [ ] Shareable lists.
-*   **Payment Integration:**
-    *   [ ] Stripe Connect for direct checkout.
+    *   [ ] Shareable wishlists.
+*   **Payment Expansion:**
+    *   [x] Stripe Connect for direct checkout.
     *   [ ] Coinbase Commerce for crypto payments.
-*   **Mechanic Reviews:** Community-driven reliability ratings.
-*   **Build Guides:** Content integration with parts lists.
-*   **Insurance Comparison:** Quote aggregation from multiple carriers.
+*   **Mobile App (PWA):** Native-like experience on iOS and Android.
 
 ## Key Variables & Configuration
 *   **Affiliate Rates:** 5-8% average.
