@@ -114,45 +114,45 @@ export default function Home() {
                   SYSTEM ONLINE // 40+ RETAILERS
                 </div>
                 
-                {/* Logo + Title + Buddy */}
-                <div className="flex items-center gap-3 relative">
-                  <img 
-                    src={gbEmblem} 
-                    alt="GarageBot" 
-                    className="w-16 h-16 xl:w-20 xl:h-20 drop-shadow-[0_0_30px_rgba(6,182,212,0.7)] hover:drop-shadow-[0_0_50px_rgba(6,182,212,0.9)] transition-all duration-500 hover:scale-110 float"
-                    data-testid="img-garagebot-logo"
-                  />
-                  <div className="relative">
-                    <h1 className="text-2xl xl:text-3xl font-tech font-bold uppercase tracking-wide">
-                      <span className="text-primary drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]">G</span>
-                      <span className="text-foreground">arage</span>
-                      <span className="text-primary drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]">B</span>
-                      <span className="text-foreground">ot</span>
-                      <span className="text-primary/60">.io</span>
-                    </h1>
-                    <p className="text-sm text-muted-foreground/80 mt-1">
-                      Right Part. First Time. <span className="text-primary">Every Engine.</span>
+                {/* Full Welcome Title with Buddy leaning on G */}
+                <div className="relative">
+                  <div className="flex flex-col">
+                    <p className="text-sm xl:text-base font-tech text-muted-foreground tracking-widest uppercase mb-1">
+                      Welcome to
+                    </p>
+                    <div className="flex items-end relative">
+                      {/* Buddy leaning against the G */}
+                      <motion.div 
+                        initial={{ opacity: 0, x: -20, rotate: -10 }}
+                        animate={{ opacity: 1, x: 0, rotate: 8 }}
+                        transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+                        className="absolute -left-2 xl:-left-4 -top-6 xl:-top-8 z-10"
+                        onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
+                      >
+                        <img 
+                          src={buddyMascot} 
+                          alt="Buddy" 
+                          className="w-14 h-14 xl:w-18 xl:h-18 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer hover:scale-110 hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all duration-300"
+                          style={{ transform: 'rotate(8deg) scaleX(-1)' }}
+                          data-testid="img-buddy-hero"
+                        />
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-tech text-primary/80 whitespace-nowrap">
+                          Click me!
+                        </div>
+                      </motion.div>
+                      
+                      <h1 className="text-3xl xl:text-4xl 2xl:text-5xl font-tech font-black uppercase tracking-tight pl-10 xl:pl-12">
+                        <span className="text-primary drop-shadow-[0_0_20px_rgba(6,182,212,0.9)] neon-text">G</span>
+                        <span className="text-foreground">arage</span>
+                        <span className="text-primary drop-shadow-[0_0_20px_rgba(6,182,212,0.9)] neon-text">B</span>
+                        <span className="text-foreground">ot</span>
+                        <span className="text-primary/70 text-2xl xl:text-3xl">.io</span>
+                      </h1>
+                    </div>
+                    <p className="text-sm xl:text-base text-muted-foreground/80 mt-2 pl-10 xl:pl-12">
+                      Right Part. First Time. <span className="text-primary font-medium">Every Engine.</span>
                     </p>
                   </div>
-                  {/* Buddy leaning against title */}
-                  <motion.div 
-                    initial={{ opacity: 0, x: 20, rotate: 5 }}
-                    animate={{ opacity: 1, x: 0, rotate: -5 }}
-                    transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                    className="absolute -right-2 xl:right-0 -top-2"
-                    onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
-                  >
-                    <img 
-                      src={buddyMascot} 
-                      alt="Buddy" 
-                      className="w-16 h-16 xl:w-20 xl:h-20 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer hover:scale-110 hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all duration-300"
-                      style={{ transform: 'rotate(-8deg) translateY(-5px)' }}
-                      data-testid="img-buddy-hero"
-                    />
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] font-tech text-primary/80 whitespace-nowrap">
-                      Click me!
-                    </div>
-                  </motion.div>
                 </div>
                 
                 {/* Stats Row */}
@@ -524,36 +524,38 @@ export default function Home() {
               SYSTEM ONLINE // 40+ RETAILERS
             </div>
             
-            {/* Logo + Buddy side by side */}
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <img 
-                src={gbEmblem} 
-                alt="GarageBot" 
-                className="w-20 h-20 drop-shadow-[0_0_50px_rgba(6,182,212,0.7)]"
-                data-testid="img-garagebot-logo-mobile"
-              />
+            {/* Welcome Title with Buddy leaning on G */}
+            <p className="text-sm font-tech text-muted-foreground tracking-widest uppercase mb-2">
+              Welcome to
+            </p>
+            <div className="relative inline-block mb-2">
+              {/* Buddy leaning against the G */}
               <motion.div 
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5, type: "spring" }}
+                initial={{ opacity: 0, x: -20, rotate: -10 }}
+                animate={{ opacity: 1, x: 0, rotate: 8 }}
+                transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+                className="absolute -left-1 -top-8 z-10"
                 onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()}
-                className="cursor-pointer"
               >
                 <img 
                   src={buddyMascot} 
                   alt="Buddy" 
-                  className="w-16 h-16 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 transition-transform"
-                  style={{ transform: 'rotate(-8deg)' }}
+                  className="w-12 h-12 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer hover:scale-110 transition-transform"
+                  style={{ transform: 'rotate(8deg) scaleX(-1)' }}
                   data-testid="img-buddy-hero-mobile"
                 />
               </motion.div>
+              
+              <h1 className="text-3xl font-tech font-black uppercase tracking-tight pl-8">
+                <span className="text-primary drop-shadow-[0_0_15px_rgba(6,182,212,0.9)] neon-text">G</span>
+                <span className="text-foreground">arage</span>
+                <span className="text-primary drop-shadow-[0_0_15px_rgba(6,182,212,0.9)] neon-text">B</span>
+                <span className="text-foreground">ot</span>
+                <span className="text-primary/70 text-2xl">.io</span>
+              </h1>
             </div>
-            
-            <h1 className="text-2xl font-tech font-bold uppercase tracking-wide">
-              <span className="text-primary">G</span>arage<span className="text-primary">B</span>ot<span className="text-primary/60">.io</span>
-            </h1>
             <p className="text-sm text-muted-foreground/80 mt-2">
-              Right Part. First Time. <span className="text-primary">Every Engine.</span>
+              Right Part. First Time. <span className="text-primary font-medium">Every Engine.</span>
             </p>
             
             {/* Stats Badges */}
