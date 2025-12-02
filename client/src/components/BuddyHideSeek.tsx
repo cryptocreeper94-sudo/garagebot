@@ -46,16 +46,39 @@ const BUDDY_COMMENTS: BuddyComment[] = [
   { text: "Your Genesis Hallmark can now be verified on-chain. View it on Solscan!", mascot: mascotThinking, section: ['home', 'dashboard'] },
 ];
 
-const getRandomPosition = (): React.CSSProperties => {
-  const positions: React.CSSProperties[] = [
-    { bottom: '15%', right: '5%' },
-    { bottom: '20%', left: '5%' },
-    { top: '30%', right: '3%' },
-    { top: '40%', left: '3%' },
-    { bottom: '30%', right: '8%' },
-    { bottom: '25%', left: '8%' },
-  ];
-  return positions[Math.floor(Math.random() * positions.length)];
+type EntryDirection = 'left' | 'right' | 'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+
+const getRandomEntryDirection = (): EntryDirection => {
+  const directions: EntryDirection[] = ['left', 'right', 'top', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right'];
+  return directions[Math.floor(Math.random() * directions.length)];
+};
+
+const getEntryAnimation = (direction: EntryDirection) => {
+  const animations: Record<EntryDirection, { x: number | string; y: number | string; rotate: number }> = {
+    'left': { x: '-120vw', y: 0, rotate: -20 },
+    'right': { x: '120vw', y: 0, rotate: 20 },
+    'top': { x: 0, y: '-100vh', rotate: 15 },
+    'bottom': { x: 0, y: '100vh', rotate: -15 },
+    'top-left': { x: '-80vw', y: '-60vh', rotate: -25 },
+    'top-right': { x: '80vw', y: '-60vh', rotate: 25 },
+    'bottom-left': { x: '-80vw', y: '60vh', rotate: 20 },
+    'bottom-right': { x: '80vw', y: '60vh', rotate: -20 },
+  };
+  return animations[direction];
+};
+
+const getExitAnimation = (direction: EntryDirection) => {
+  const opposites: Record<EntryDirection, EntryDirection> = {
+    'left': 'right',
+    'right': 'left',
+    'top': 'bottom',
+    'bottom': 'top',
+    'top-left': 'bottom-right',
+    'top-right': 'bottom-left',
+    'bottom-left': 'top-right',
+    'bottom-right': 'top-left',
+  };
+  return getEntryAnimation(opposites[direction]);
 };
 
 const getPageSection = (pathname: string): PageSection => {
@@ -79,9 +102,8 @@ export default function BuddyHideSeek() {
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [currentComment, setCurrentComment] = useState<BuddyComment | null>(null);
-  const [position, setPosition] = useState<React.CSSProperties>({});
   const [hasShownOnPage, setHasShownOnPage] = useState(false);
-  const [enterFromLeft, setEnterFromLeft] = useState(true);
+  const [entryDirection, setEntryDirection] = useState<EntryDirection>('left');
 
   const hideWithAnimation = useCallback(() => {
     setIsExiting(true);
@@ -102,11 +124,9 @@ export default function BuddyHideSeek() {
     if (relevantComments.length === 0) return;
     
     const randomComment = relevantComments[Math.floor(Math.random() * relevantComments.length)];
-    const randomPos = getRandomPosition();
     
     setCurrentComment(randomComment);
-    setPosition(randomPos);
-    setEnterFromLeft(Math.random() > 0.5);
+    setEntryDirection(getRandomEntryDirection());
     setIsVisible(true);
     setHasShownOnPage(true);
 
@@ -148,91 +168,82 @@ export default function BuddyHideSeek() {
 
   if (!currentComment) return null;
 
-  const enterX = enterFromLeft ? -300 : 300;
-  const exitX = enterFromLeft ? 300 : -300;
+  const entryAnim = getEntryAnimation(entryDirection);
+  const exitAnim = getExitAnimation(entryDirection);
 
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ x: enterX, opacity: 0, rotate: enterFromLeft ? -15 : 15 }}
-          animate={{ 
-            x: isExiting ? exitX : 0, 
-            opacity: isExiting ? 0 : 1,
-            rotate: isExiting ? (enterFromLeft ? 15 : -15) : 0
+          initial={{ 
+            x: entryAnim.x, 
+            y: entryAnim.y, 
+            opacity: 0, 
+            rotate: entryAnim.rotate,
+            scale: 0.6
           }}
-          exit={{ x: exitX, opacity: 0, rotate: enterFromLeft ? 15 : -15 }}
+          animate={{ 
+            x: isExiting ? exitAnim.x : 0, 
+            y: isExiting ? exitAnim.y : 0, 
+            opacity: isExiting ? 0 : 1,
+            rotate: isExiting ? exitAnim.rotate : 0,
+            scale: isExiting ? 0.6 : 1
+          }}
+          exit={{ 
+            x: exitAnim.x, 
+            y: exitAnim.y, 
+            opacity: 0, 
+            rotate: exitAnim.rotate,
+            scale: 0.6
+          }}
           transition={{
             type: "spring",
-            damping: 20,
-            stiffness: 300,
-            mass: 0.8
+            damping: 15,
+            stiffness: 120,
+            mass: 1,
+            bounce: 0.3
           }}
-          className="fixed z-40 pointer-events-auto"
-          style={position}
+          className="fixed z-40 pointer-events-auto left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           data-testid="buddy-hide-seek"
         >
-          <div className="relative">
+          <div className="relative flex flex-col items-center">
+            {/* Speech bubble above Buddy */}
             <motion.div 
-              className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 pointer-events-auto"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              className="w-72 sm:w-80 mb-2 pointer-events-auto"
+              initial={{ scale: 0.8, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
             >
-              <div className="relative">
-                <svg 
-                  viewBox="0 0 280 120" 
-                  className="w-full h-auto"
-                  style={{ filter: 'drop-shadow(0 4px 12px rgba(6, 182, 212, 0.3))' }}
+              <div className="relative bg-card border-2 border-primary rounded-2xl p-4 shadow-[0_0_30px_rgba(6,182,212,0.3)]">
+                <p className="text-sm text-center text-foreground leading-relaxed">
+                  {currentComment.text}
+                </p>
+                {/* Speech bubble tail */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-primary" />
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-card" />
+                
+                {/* Close button */}
+                <button 
+                  onClick={hideWithAnimation}
+                  className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-card border-2 border-primary flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors z-10"
+                  data-testid="buddy-hide-seek-close"
                 >
-                  <ellipse 
-                    cx="140" 
-                    cy="50" 
-                    rx="135" 
-                    ry="45" 
-                    fill="hsl(var(--card))" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth="2"
-                  />
-                  <path 
-                    d="M 140 90 Q 145 105 150 110 Q 140 100 135 95" 
-                    fill="hsl(var(--card))" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth="2"
-                  />
-                  <ellipse 
-                    cx="140" 
-                    cy="50" 
-                    rx="130" 
-                    ry="40" 
-                    fill="hsl(var(--card))"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center px-6 pb-4">
-                  <p className="text-xs text-center text-foreground leading-tight">
-                    {currentComment.text}
-                  </p>
-                </div>
+                  <X className="w-3 h-3" />
+                </button>
               </div>
             </motion.div>
 
-            <button 
-              onClick={hideWithAnimation}
-              className="absolute -top-28 -right-2 w-5 h-5 rounded-full bg-card border border-primary/50 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors z-10"
-              data-testid="buddy-hide-seek-close"
-            >
-              <X className="w-3 h-3" />
-            </button>
-
+            {/* Buddy mascot with bounce animation */}
             <motion.img 
               src={currentComment.mascot}
               alt="Buddy"
-              className="w-24 h-24 object-contain drop-shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+              className="w-28 h-28 object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]"
               animate={{ 
-                y: [0, -5, 0],
+                y: [0, -8, 0],
+                rotate: [0, -3, 3, 0],
               }}
               transition={{
-                duration: 2,
+                duration: 2.5,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}

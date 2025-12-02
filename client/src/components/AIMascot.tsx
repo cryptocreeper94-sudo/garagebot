@@ -65,11 +65,40 @@ const searchContext = {
   lastQuery: ''
 };
 
+// Entry/exit animation directions for Buddy
+type EntryDirection = 'left' | 'right' | 'bottom-left' | 'bottom-right';
+
+const getRandomEntryDirection = (): EntryDirection => {
+  const directions: EntryDirection[] = ['left', 'right', 'bottom-left', 'bottom-right'];
+  return directions[Math.floor(Math.random() * directions.length)];
+};
+
+const getEntryAnimation = (direction: EntryDirection) => {
+  const animations: Record<EntryDirection, { x: string; y: string; rotate: number }> = {
+    'left': { x: '-120vw', y: '0', rotate: -25 },
+    'right': { x: '120vw', y: '0', rotate: 25 },
+    'bottom-left': { x: '-80vw', y: '60vh', rotate: 20 },
+    'bottom-right': { x: '80vw', y: '60vh', rotate: -20 },
+  };
+  return animations[direction];
+};
+
+const getExitAnimation = (direction: EntryDirection) => {
+  const opposites: Record<EntryDirection, EntryDirection> = {
+    'left': 'right',
+    'right': 'left',
+    'bottom-left': 'bottom-right',
+    'bottom-right': 'bottom-left',
+  };
+  return getEntryAnimation(opposites[direction]);
+};
+
 export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
   const [, navigate] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [entryDirection, setEntryDirection] = useState<EntryDirection>('left');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -460,24 +489,37 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             onClick={handleClose}
             data-testid="ai-mascot-overlay"
           >
-            {/* Buddy runs in from left and out to right */}
+            {/* Buddy swings in from random direction */}
             <motion.div
-              initial={{ x: "-120vw", opacity: 0, rotate: 20, scale: 0.8 }}
-              animate={{ 
-                x: isExiting ? "120vw" : 0, 
-                opacity: isExiting ? 0 : 1,
-                rotate: isExiting ? -20 : 0,
-                scale: isExiting ? 0.8 : 1,
-                transition: {
-                  type: "spring",
-                  damping: isExiting ? 15 : 12,
-                  stiffness: isExiting ? 120 : 100,
-                  mass: 1.2,
-                  velocity: isExiting ? 5 : 3
-                }
+              initial={{ 
+                x: getEntryAnimation(entryDirection).x, 
+                y: getEntryAnimation(entryDirection).y,
+                opacity: 0, 
+                rotate: getEntryAnimation(entryDirection).rotate, 
+                scale: 0.7 
               }}
-              exit={{ x: "120vw", opacity: 0, rotate: -20, scale: 0.8 }}
-              className="fixed inset-x-2 sm:inset-x-auto sm:left-4 md:left-8 bottom-2 sm:bottom-4 flex flex-col items-center sm:items-start max-w-[96vw] sm:max-w-none pointer-events-auto"
+              animate={{ 
+                x: isExiting ? getExitAnimation(entryDirection).x : 0, 
+                y: isExiting ? getExitAnimation(entryDirection).y : 0,
+                opacity: isExiting ? 0 : 1,
+                rotate: isExiting ? getExitAnimation(entryDirection).rotate : 0,
+                scale: isExiting ? 0.7 : 1,
+              }}
+              transition={{
+                type: "spring",
+                damping: isExiting ? 12 : 15,
+                stiffness: isExiting ? 100 : 120,
+                mass: 1,
+                bounce: 0.2
+              }}
+              exit={{ 
+                x: getExitAnimation(entryDirection).x, 
+                y: getExitAnimation(entryDirection).y,
+                opacity: 0, 
+                rotate: getExitAnimation(entryDirection).rotate, 
+                scale: 0.7 
+              }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center max-w-[96vw] sm:max-w-none pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
               data-testid="ai-mascot-chat"
             >
@@ -724,6 +766,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
           if (isOpen) {
             handleClose();
           } else {
+            setEntryDirection(getRandomEntryDirection());
             setIsOpen(true);
             setIsMinimized(false);
           }
