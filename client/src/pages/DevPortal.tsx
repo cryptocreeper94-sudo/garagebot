@@ -6,7 +6,7 @@ import {
   DollarSign, Link2, Settings, Zap, Users, Shield, Clock,
   ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
   BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList,
-  Copy, Mail, Phone, User
+  Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { FeatureInventory } from "@/components/FeatureInventory";
@@ -480,6 +480,15 @@ export default function DevPortal() {
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({ category: "features", title: "", description: "", priority: "medium", link: "" });
   const [activeTab, setActiveTab] = useState("features");
+  const [showNewRelease, setShowNewRelease] = useState(false);
+  const [newRelease, setNewRelease] = useState({
+    version: "",
+    versionType: "stable" as "beta" | "stable" | "hotfix" | "major",
+    title: "",
+    changelog: [{ category: "Features", changes: [""] }],
+    highlights: [""],
+    notes: "",
+  });
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -554,6 +563,149 @@ export default function DevPortal() {
       toast({ title: "Task deleted" });
     },
   });
+
+  // Release Version Control
+  interface Release {
+    id: string;
+    version: string;
+    versionType: string;
+    versionNumber: number;
+    title: string | null;
+    changelog: { category: string; changes: string[] }[];
+    highlights: string[] | null;
+    status: string;
+    publishedAt: string | null;
+    isBlockchainVerified: boolean;
+    notes: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  const { data: releases = [] } = useQuery<Release[]>({
+    queryKey: ['releases'],
+    queryFn: async () => {
+      const res = await fetch('/api/releases');
+      if (!res.ok) throw new Error('Failed to fetch releases');
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  const { data: latestRelease } = useQuery<Release | null>({
+    queryKey: ['latestRelease'],
+    queryFn: async () => {
+      const res = await fetch('/api/releases/latest');
+      if (!res.ok) throw new Error('Failed to fetch latest release');
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  const createReleaseMutation = useMutation({
+    mutationFn: async (release: typeof newRelease) => {
+      const res = await fetch('/api/releases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(release),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to create release');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['releases'] });
+      queryClient.invalidateQueries({ queryKey: ['latestRelease'] });
+      setShowNewRelease(false);
+      setNewRelease({
+        version: "",
+        versionType: "stable",
+        title: "",
+        changelog: [{ category: "Features", changes: [""] }],
+        highlights: [""],
+        notes: "",
+      });
+      toast({ title: "Release created", description: "New release saved as draft" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const publishReleaseMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/releases/${id}/publish`, { method: 'POST' });
+      if (!res.ok) throw new Error('Failed to publish release');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['releases'] });
+      queryClient.invalidateQueries({ queryKey: ['latestRelease'] });
+      toast({ title: "Release published!", description: "Version is now live" });
+    },
+  });
+
+  const deleteReleaseMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/releases/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete release');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['releases'] });
+      toast({ title: "Release deleted" });
+    },
+  });
+
+  const addChangelogCategory = () => {
+    setNewRelease(prev => ({
+      ...prev,
+      changelog: [...prev.changelog, { category: "", changes: [""] }]
+    }));
+  };
+
+  const addChangelogItem = (categoryIndex: number) => {
+    setNewRelease(prev => ({
+      ...prev,
+      changelog: prev.changelog.map((cat, i) => 
+        i === categoryIndex ? { ...cat, changes: [...cat.changes, ""] } : cat
+      )
+    }));
+  };
+
+  const updateChangelogCategory = (categoryIndex: number, category: string) => {
+    setNewRelease(prev => ({
+      ...prev,
+      changelog: prev.changelog.map((cat, i) => 
+        i === categoryIndex ? { ...cat, category } : cat
+      )
+    }));
+  };
+
+  const updateChangelogItem = (categoryIndex: number, itemIndex: number, value: string) => {
+    setNewRelease(prev => ({
+      ...prev,
+      changelog: prev.changelog.map((cat, i) => 
+        i === categoryIndex ? {
+          ...cat,
+          changes: cat.changes.map((c, j) => j === itemIndex ? value : c)
+        } : cat
+      )
+    }));
+  };
+
+  const removeChangelogItem = (categoryIndex: number, itemIndex: number) => {
+    setNewRelease(prev => ({
+      ...prev,
+      changelog: prev.changelog.map((cat, i) => 
+        i === categoryIndex ? {
+          ...cat,
+          changes: cat.changes.filter((_, j) => j !== itemIndex)
+        } : cat
+      ).filter(cat => cat.changes.length > 0)
+    }));
+  };
 
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -674,12 +826,15 @@ export default function DevPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 mb-4 max-w-md">
+          <TabsList className="grid w-full grid-cols-4 mb-4 max-w-xl">
             <TabsTrigger value="features" className="font-tech uppercase text-xs">
               <ClipboardList className="w-3 h-3 mr-1" /> Features
             </TabsTrigger>
             <TabsTrigger value="tasks" className="font-tech uppercase text-xs">
               <CheckCheck className="w-3 h-3 mr-1" /> Tasks
+            </TabsTrigger>
+            <TabsTrigger value="releases" className="font-tech uppercase text-xs">
+              <Tag className="w-3 h-3 mr-1" /> Releases
             </TabsTrigger>
             <TabsTrigger value="affiliates" className="font-tech uppercase text-xs">
               <DollarSign className="w-3 h-3 mr-1" /> Affiliates
@@ -688,6 +843,271 @@ export default function DevPortal() {
 
           <TabsContent value="features" className="space-y-6">
             <FeatureInventory />
+          </TabsContent>
+
+          <TabsContent value="releases" className="space-y-6">
+            {/* Current Version Banner */}
+            <Card className="bg-gradient-to-br from-primary/10 to-cyan-500/5 border-primary/30 p-6">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <GitBranch className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Current Version</p>
+                    <p className="font-tech text-2xl text-primary">
+                      {latestRelease?.version || "No releases yet"}
+                    </p>
+                    {latestRelease?.publishedAt && (
+                      <p className="text-xs text-muted-foreground">
+                        Published {new Date(latestRelease.publishedAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          timeZoneName: 'short'
+                        })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => setShowNewRelease(true)} 
+                  className="font-tech uppercase glow-primary"
+                >
+                  <Plus className="w-4 h-4 mr-2" /> New Release
+                </Button>
+              </div>
+            </Card>
+
+            {/* New Release Form */}
+            <AnimatePresence>
+              {showNewRelease && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <Card className="bg-card border-primary/30 p-6">
+                    <h3 className="font-tech text-lg text-primary mb-4">Create New Release</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <label className="text-sm text-muted-foreground mb-1 block">Version</label>
+                        <Input 
+                          placeholder="e.g., v1.0, beta.1, v1.2.3"
+                          value={newRelease.version}
+                          onChange={(e) => setNewRelease(prev => ({ ...prev, version: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-muted-foreground mb-1 block">Type</label>
+                        <Select 
+                          value={newRelease.versionType} 
+                          onValueChange={(v: "beta" | "stable" | "hotfix" | "major") => setNewRelease(prev => ({ ...prev, versionType: v }))}
+                        >
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="beta">Beta</SelectItem>
+                            <SelectItem value="stable">Stable</SelectItem>
+                            <SelectItem value="hotfix">Hotfix</SelectItem>
+                            <SelectItem value="major">Major</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-muted-foreground mb-1 block">Title (optional)</label>
+                        <Input 
+                          placeholder="e.g., Genesis Launch"
+                          value={newRelease.title}
+                          onChange={(e) => setNewRelease(prev => ({ ...prev, title: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm text-muted-foreground">Changelog</label>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={addChangelogCategory}
+                          className="text-xs"
+                        >
+                          <Plus className="w-3 h-3 mr-1" /> Add Category
+                        </Button>
+                      </div>
+                      <div className="space-y-4">
+                        {newRelease.changelog.map((cat, catIndex) => (
+                          <div key={catIndex} className="bg-background/50 rounded-lg p-3 border border-border">
+                            <Input 
+                              placeholder="Category (e.g., Features, Fixes, Improvements)"
+                              value={cat.category}
+                              onChange={(e) => updateChangelogCategory(catIndex, e.target.value)}
+                              className="mb-2 font-medium"
+                            />
+                            <div className="space-y-2">
+                              {cat.changes.map((change, changeIndex) => (
+                                <div key={changeIndex} className="flex gap-2">
+                                  <Input 
+                                    placeholder="What changed?"
+                                    value={change}
+                                    onChange={(e) => updateChangelogItem(catIndex, changeIndex, e.target.value)}
+                                    className="flex-1"
+                                  />
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => removeChangelogItem(catIndex, changeIndex)}
+                                    className="shrink-0 hover:text-red-400"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => addChangelogItem(catIndex)}
+                                className="w-full text-xs border-dashed"
+                              >
+                                <Plus className="w-3 h-3 mr-1" /> Add Change
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <label className="text-sm text-muted-foreground mb-1 block">Dev Notes (internal)</label>
+                      <Textarea 
+                        placeholder="Notes for your reference..."
+                        value={newRelease.notes}
+                        onChange={(e) => setNewRelease(prev => ({ ...prev, notes: e.target.value }))}
+                        rows={2}
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => createReleaseMutation.mutate(newRelease)} 
+                        disabled={!newRelease.version}
+                        className="font-tech"
+                      >
+                        <Save className="w-4 h-4 mr-2" /> Save as Draft
+                      </Button>
+                      <Button variant="ghost" onClick={() => setShowNewRelease(false)}>
+                        <X className="w-4 h-4 mr-2" /> Cancel
+                      </Button>
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Release History */}
+            <div className="space-y-4">
+              <h3 className="font-tech text-lg text-primary">Release History</h3>
+              
+              {releases.length === 0 && (
+                <Card className="bg-card/50 border-border p-8 text-center">
+                  <Archive className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No releases yet. Create your first release above!</p>
+                </Card>
+              )}
+
+              {releases.map((release) => (
+                <Card 
+                  key={release.id} 
+                  className={`bg-card border-border p-4 ${
+                    release.status === 'published' ? 'border-l-4 border-l-green-500' : 'border-l-4 border-l-yellow-500'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-tech text-xl text-primary">{release.version}</span>
+                        {release.title && <span className="text-muted-foreground">— {release.title}</span>}
+                        <Badge 
+                          variant="outline" 
+                          className={
+                            release.versionType === 'major' ? 'border-purple-500/50 text-purple-400' :
+                            release.versionType === 'stable' ? 'border-green-500/50 text-green-400' :
+                            release.versionType === 'hotfix' ? 'border-red-500/50 text-red-400' :
+                            'border-yellow-500/50 text-yellow-400'
+                          }
+                        >
+                          {release.versionType}
+                        </Badge>
+                        <Badge 
+                          variant={release.status === 'published' ? 'default' : 'secondary'}
+                          className={release.status === 'published' ? 'bg-green-500/20 text-green-400' : ''}
+                        >
+                          {release.status}
+                        </Badge>
+                        {release.isBlockchainVerified && (
+                          <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                            <Shield className="w-3 h-3 mr-1" /> Verified
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {release.status === 'published' && release.publishedAt
+                          ? `Published ${new Date(release.publishedAt).toLocaleDateString('en-US', {
+                              year: 'numeric', month: 'short', day: 'numeric', 
+                              hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+                            })}`
+                          : `Created ${new Date(release.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric', month: 'short', day: 'numeric'
+                            })}`
+                        }
+                      </p>
+
+                      {/* Changelog */}
+                      {release.changelog && Array.isArray(release.changelog) && release.changelog.length > 0 && (
+                        <div className="space-y-2">
+                          {release.changelog.map((cat: { category: string; changes: string[] }, i: number) => (
+                            <div key={i}>
+                              <p className="text-sm font-medium text-foreground">{cat.category}</p>
+                              <ul className="text-sm text-muted-foreground pl-4 list-disc">
+                                {cat.changes.map((c: string, j: number) => (
+                                  <li key={j}>{c}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {release.status === 'draft' && (
+                        <>
+                          <Button 
+                            size="sm"
+                            onClick={() => publishReleaseMutation.mutate(release.id)}
+                            className="font-tech uppercase text-xs"
+                          >
+                            <Rocket className="w-3 h-3 mr-1" /> Publish
+                          </Button>
+                          <Button 
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => deleteReleaseMutation.mutate(release.id)}
+                            className="text-muted-foreground hover:text-red-400"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
 
           <TabsContent value="affiliates" className="space-y-6">
