@@ -83,9 +83,11 @@ Preferred communication style: Simple, everyday language.
 - **User Fields**: `referralCode`, `referredByUserId`, `referralPointsBalance`
 - **API Endpoints**: `/api/referrals/summary`, `/api/referrals/validate/:code`, `/api/referrals/redeem`
 
-## Latest Publish: December 2, 2024 @ 6:20 PM EST
+## Latest Publish: December 2, 2024 @ 6:45 PM EST
 
 ## Recent Updates (December 2024)
+- **Hero Buddy Local Popup (Dec 2)**: Clicking Buddy on the "G" now shows a compact local comic bubble with tips instead of opening full-screen chat. No blur/overlay.
+- **BuddyHideSeek Animation Fix (Dec 2)**: Random Buddy popup now properly sweeps in from 8 directions with spring physics. Removed blur overlay, compact fitted speech bubble.
 - **Bento Grid Layout (Dec 2)**: Applied max-w-6xl centered containers and bento grid headers across all major pages for consistent, compact desktop layouts.
 - **Weather Radar Integration**: Live weather radar with RainViewer tiles, NOAA storm alerts, animated playback controls, and layer toggles. Accessible via radar button in the weather widget.
 - **React 18 Compatibility Fix**: Downgraded from React 19.2.0 to React 18.3.1 and framer-motion 12.x to 11.15.0 to fix "Objects are not valid as a React child" error. @tanstack/react-query 5.x has experimental React 19 support that caused CJS/ESM bundling issues.
