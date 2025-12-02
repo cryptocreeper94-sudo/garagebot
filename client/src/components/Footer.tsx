@@ -5,9 +5,27 @@ import {
   Wrench, Shield, Mail, Twitter, Github, Linkedin, 
   TrendingUp, FileText, Users, Phone, MapPin, Heart, Terminal
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
+interface Release {
+  id: string;
+  version: string;
+  versionType: string;
+  publishedAt: string | null;
+}
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  
+  const { data: latestRelease } = useQuery<Release | null>({
+    queryKey: ['latestRelease'],
+    queryFn: async () => {
+      const res = await fetch('/api/releases/latest');
+      if (!res.ok) return null;
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 5,
+  });
 
   return (
     <footer className="bg-card/50 border-t border-border/40 mt-auto">
@@ -116,6 +134,16 @@ export default function Footer() {
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             Made with <Heart className="w-3 h-3 text-red-500 fill-red-500" /> in the USA
           </div>
+
+          {latestRelease?.version && (
+            <Badge 
+              variant="outline" 
+              className="text-xs font-mono text-muted-foreground border-border/50 hover:border-primary/50 transition-colors cursor-default"
+              data-testid="badge-version"
+            >
+              {latestRelease.version}
+            </Badge>
+          )}
 
           <Link href="/dev">
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary text-xs gap-1">
