@@ -116,7 +116,7 @@ export default function Home() {
                 
                 {/* Full Welcome Title with Buddy leaning on G */}
                 <div className="relative">
-                  <div className="flex flex-col">
+                  <div className="flex flex-col items-center text-center">
                     <p className="text-sm xl:text-base font-tech text-muted-foreground tracking-widest uppercase mb-1">
                       Welcome to
                     </p>
@@ -149,7 +149,7 @@ export default function Home() {
                         <span className="text-primary/70 text-2xl xl:text-3xl">.io</span>
                       </h1>
                     </div>
-                    <p className="text-sm xl:text-base text-muted-foreground/80 mt-2 pl-10 xl:pl-12">
+                    <p className="text-sm xl:text-base text-muted-foreground/80 mt-2">
                       Right Part. First Time. <span className="text-primary font-medium">Every Engine.</span>
                     </p>
                   </div>
