@@ -193,7 +193,7 @@ export default function ShopPortal() {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans">
         <Nav />
-        <div className="container mx-auto px-4 pt-24 flex items-center justify-center">
+        <div className="max-w-6xl mx-auto px-4 pt-24 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       </div>
@@ -204,7 +204,7 @@ export default function ShopPortal() {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans">
         <Nav />
-        <div className="container mx-auto px-4 pt-24 text-center">
+        <div className="max-w-6xl mx-auto px-4 pt-24 text-center">
           <Store className="w-24 h-24 mx-auto mb-6 text-primary/30" />
           <h1 className="text-3xl font-tech font-bold uppercase text-primary mb-4">Shop Portal</h1>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
@@ -221,19 +221,23 @@ export default function ShopPortal() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
-      <div className="container mx-auto px-4 pt-24 pb-12">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-tech font-bold uppercase text-primary" data-testid="text-page-title">Shop Portal</h1>
-            <p className="text-muted-foreground mt-2 font-mono">CUSTOMER MANAGEMENT • SERVICE REMINDERS • MESSAGING</p>
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6">
+          <div className="md:col-span-8">
+            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+              <h1 className="text-2xl font-tech font-bold uppercase text-primary" data-testid="text-page-title">Shop Portal</h1>
+              <p className="text-muted-foreground text-xs font-mono">CUSTOMERS • REMINDERS • MESSAGING</p>
+            </Card>
           </div>
-          <Dialog open={createShopOpen} onOpenChange={setCreateShopOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2 font-tech uppercase glow-primary" data-testid="button-register-shop">
-                <Plus className="w-4 h-4" /> Register Shop
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+          <div className="md:col-span-4">
+            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center">
+              <Dialog open={createShopOpen} onOpenChange={setCreateShopOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2 font-tech uppercase text-xs glow-primary" data-testid="button-register-shop">
+                    <Plus className="w-3 h-3" /> Register Shop
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle className="font-tech text-xl uppercase">Register Your Shop</DialogTitle>
                 <DialogDescription>Add your business to the GarageBot network</DialogDescription>
@@ -286,7 +290,9 @@ export default function ShopPortal() {
                 </Button>
               </div>
             </DialogContent>
-          </Dialog>
+              </Dialog>
+            </Card>
+          </div>
         </div>
 
         {shopsLoading ? (

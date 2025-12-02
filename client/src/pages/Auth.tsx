@@ -209,7 +209,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
-      <div className="container mx-auto px-4 pt-24 pb-12">
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
         <div className="max-w-md mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
