@@ -167,35 +167,176 @@ const AFFILIATE_NETWORKS = [
 const DIRECT_RETAILERS = [
   {
     name: "RockAuto",
-    contact: "info@rockauto.com",
-    notes: "No affiliate program. Contact for potential partnership.",
-    status: "Direct outreach needed"
+    contact: "Contact Form",
+    contactUrl: "https://www.rockauto.com/help/",
+    notes: "No formal affiliate program. They partner directly with automotive forums using discount codes. Approach as a content partnership.",
+    status: "Forum Partnership",
+    letterType: "forum_partnership"
   },
   {
     name: "O'Reilly Auto Parts",
-    contact: "partnerships@oreillyauto.com",
-    notes: "Contact for affiliate or commercial partnership opportunities.",
-    status: "Direct outreach needed"
+    contact: "sponsorships@oreillyauto.com",
+    contactAlt: "CoOps@oreillyauto.com",
+    phone: "1-888-876-6759",
+    notes: "No online affiliate program, but has sponsorship and cooperative programs for business partnerships.",
+    status: "Sponsorship/B2B",
+    letterType: "sponsorship"
   },
   {
     name: "NAPA Auto Parts",
-    contact: "customerservice@napaonline.com",
-    notes: "May have regional affiliate programs. Contact for details.",
-    status: "Direct outreach needed"
+    contact: "FlexOffers.com",
+    contactUrl: "https://www.flexoffers.com/affiliate-programs/napa-auto-affiliate-program/",
+    notes: "Has affiliate program through FlexOffers! 2% commission, 30-day cookie. Sign up at FlexOffers first.",
+    status: "✓ Affiliate Available",
+    letterType: null
   },
   {
     name: "VMC Chinese Parts",
-    contact: "sales@vmcchineseparts.com",
-    notes: "Specializes in Chinese ATV/UTV/motorcycle parts.",
-    status: "Direct outreach needed"
+    contact: "support@vmcchineseparts.com",
+    phone: "(618) 529-2593",
+    keyContact: "Bryan Black (Managing Partner)",
+    notes: "Specializes in Chinese ATV/UTV/motorcycle/scooter parts. No current affiliate program - propose referral partnership.",
+    status: "Direct Outreach",
+    letterType: "referral_partnership"
   },
   {
     name: "Car-Part.com",
     contact: "info@car-part.com",
-    notes: "Salvage/used parts network. Contact for data access.",
-    status: "Direct outreach needed"
+    ceoContact: "jschroder@car-part.com",
+    keyContact: "Jeff Schroder (Founder & CEO)",
+    phone: "(859) 344-1925",
+    apiUrl: "https://products.car-part.com/webservices/",
+    notes: "World's largest recycled auto parts marketplace. Has web services/API for data access. $80B in searches annually.",
+    status: "API Partnership",
+    letterType: "api_partnership"
   }
 ];
+
+const OUTREACH_LETTERS = {
+  forum_partnership: {
+    subject: "GarageBot.io Partnership Inquiry - Auto Parts Search Platform",
+    body: `Dear RockAuto Team,
+
+I'm Jason, the founder of GarageBot.io, a comprehensive auto parts search aggregator that helps vehicle owners find the right parts across 40+ retailers.
+
+I understand RockAuto works with automotive communities through discount code partnerships rather than traditional affiliate programs. I'd love to explore a similar arrangement.
+
+**About GarageBot:**
+• Unified search across 40+ auto parts retailers
+• Covers all vehicle types: cars, trucks, boats, ATVs, motorcycles, RVs, and more
+• AI-powered part recommendations and DIY repair guides
+• Growing community of DIY enthusiasts and professional mechanics
+
+**Partnership Proposal:**
+• Feature RockAuto prominently as a trusted retailer
+• Provide exclusive discount codes to our user base
+• Drive qualified traffic from users actively searching for parts
+• Include RockAuto in our "Trusted Retailers" section
+
+I believe our platforms complement each other well - you have the inventory and pricing, we have the search technology and engaged audience.
+
+Would you be open to a brief call to discuss partnership opportunities?
+
+Best regards,
+Jason
+Founder, GarageBot.io
+https://garagebot.io`
+  },
+  sponsorship: {
+    subject: "GarageBot.io - Auto Parts Platform Partnership Opportunity",
+    body: `Dear O'Reilly Business Development Team,
+
+I'm reaching out regarding potential partnership opportunities between O'Reilly Auto Parts and GarageBot.io.
+
+**About GarageBot:**
+GarageBot.io is a comprehensive auto parts search aggregator that unifies inventory from 40+ retailers into a single searchable interface. We serve DIY enthusiasts, professional mechanics, and fleet managers.
+
+**Key Features:**
+• VIN-based vehicle identification and part matching
+• AI-powered repair guides and part recommendations
+• "Mechanics Garage" portal for professional shops
+• Coverage across cars, trucks, boats, ATVs, motorcycles, RVs, and more
+
+**Partnership Interests:**
+1. **Affiliate/Referral Program** - Drive qualified buyers to O'Reilly locations and online store
+2. **Local Pickup Integration** - Highlight O'Reilly stores for same-day pickup options
+3. **Commercial Account** - Access to B2B pricing for our Mechanics Garage portal users
+4. **Sponsorship** - Featured placement in our trusted retailers section
+
+Our users are actively searching for parts with purchase intent - making them highly valuable traffic for O'Reilly.
+
+I'd welcome the opportunity to discuss how we can work together.
+
+Best regards,
+Jason
+Founder, GarageBot.io
+https://garagebot.io
+`
+  },
+  referral_partnership: {
+    subject: "Partnership Inquiry - GarageBot.io Auto Parts Aggregator",
+    body: `Dear VMC Chinese Parts Team,
+
+I'm Jason, founder of GarageBot.io, and I'm reaching out about a potential referral partnership.
+
+**Why VMC Chinese Parts?**
+Your specialization in Chinese-built ATV, UTV, scooter, go-kart, and dirt bike parts fills an important niche that major retailers don't serve well. Our users often struggle to find parts for these vehicles.
+
+**About GarageBot:**
+• Auto parts search aggregator covering 40+ retailers
+• Strong focus on ALL vehicle types including ATVs, UTVs, scooters, and motorcycles
+• AI-powered part identification and recommendations
+• Growing user base of powersports enthusiasts
+
+**Proposed Partnership:**
+• Referral commission arrangement (we send buyers, you track and pay commission)
+• Featured placement in our "Powersports Parts" category
+• Integration of your catalog into our search results
+• Mutual promotion to our respective audiences
+
+Even a simple referral tracking link would allow us to drive qualified traffic your way while earning a small commission for successful sales.
+
+Would you be interested in exploring this opportunity?
+
+Best regards,
+Jason
+Founder, GarageBot.io
+https://garagebot.io`
+  },
+  api_partnership: {
+    subject: "API/Data Partnership Inquiry - GarageBot.io Parts Aggregator",
+    body: `Dear Mr. Schroder,
+
+I'm Jason, founder of GarageBot.io, a comprehensive auto parts search aggregator. I'm reaching out regarding potential API or data partnership opportunities with Car-Part.com.
+
+**Why Car-Part.com?**
+Your marketplace represents the gold standard for recycled/used auto parts - a category our users frequently request but we currently can't serve well. With $80 billion in annual part searches, your data would add tremendous value to our platform.
+
+**About GarageBot:**
+• Unified search across 40+ auto parts retailers (new parts focus currently)
+• VIN decoding and vehicle-specific part matching
+• AI-powered recommendations and DIY repair guides
+• "Mechanics Garage" portal for professional shops
+• Covers all vehicle types: cars, trucks, classics, exotics, and more
+
+**Partnership Interests:**
+1. **API Access** - Integrate your used parts inventory into our search results
+2. **Data Licensing** - Access to availability, pricing, and recycler network
+3. **Referral Partnership** - Drive qualified buyers to your marketplace
+4. **Interchange Data** - Leverage your Car-Part Interchange for better part matching
+
+I understand you offer web services at products.car-part.com. We'd be very interested in discussing integration possibilities and licensing terms.
+
+Would you have time for a brief call to explore this opportunity?
+
+Best regards,
+Jason
+Founder, GarageBot.io
+https://garagebot.io
+
+P.S. I'm particularly impressed by your CIECA API Standards work - proper data exchange is crucial for our industry.`
+  }
+};
 
 const DEV_PIN = "0424";
 
