@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -514,6 +515,7 @@ export default function Dashboard() {
           <AffiliatesDashboard />
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

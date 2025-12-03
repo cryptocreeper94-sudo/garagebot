@@ -1,0 +1,51 @@
+================================================================================
+SESSION HANDOFF TEMPLATE
+================================================================================
+
+PROJECT: [Project Name]
+LAST ACTIVITY: [Date & Time UTC]
+STATUS: [Development / Testing / Published]
+
+--------------------------------------------------------------------------------
+COMPLETED THIS SESSION:
+--------------------------------------------------------------------------------
+1. [Feature/Task] - Brief description
+   - File(s): [path/to/file.tsx]
+
+2. [Feature/Task] - Brief description
+   - File(s): [path/to/file.tsx]
+
+3. [Feature/Task] - Brief description
+   - File(s): [path/to/file.tsx]
+
+--------------------------------------------------------------------------------
+KEY CONTEXT FOR NEXT AGENT:
+--------------------------------------------------------------------------------
+- Stack: [React/Express/PostgreSQL/etc.]
+- State Management: [Zustand/Redux/etc.]
+- Styling: [TailwindCSS/CSS Modules/etc.]
+- Key Design Rules: [Any mandatory patterns]
+- Auth System: [How users log in]
+- Documentation: [Where to find project context - usually replit.md]
+
+--------------------------------------------------------------------------------
+ROADMAP / UPCOMING VERSIONS:
+--------------------------------------------------------------------------------
+- v[X.X] ([Target Date]): [Features]
+- v[X.X] ([Target Date]): [Features]
+
+--------------------------------------------------------------------------------
+NEXT STEPS:
+--------------------------------------------------------------------------------
+- [ ] [Immediate next task]
+- [ ] [Follow-up task]
+- [ ] [Future consideration]
+
+--------------------------------------------------------------------------------
+GIT COMMANDS TO PUSH CHANGES:
+--------------------------------------------------------------------------------
+git add -A
+git commit -m "[Descriptive commit message]"
+git push origin main
+
+================================================================================

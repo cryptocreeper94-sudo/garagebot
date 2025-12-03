@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -527,6 +528,7 @@ export default function DIYGuides() {
           )}
         </DialogContent>
       </Dialog>
+      <Footer />
     </div>
   );
 }

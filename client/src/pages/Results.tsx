@@ -3,6 +3,7 @@ import { useSearch } from "wouter";
 import { motion } from "framer-motion";
 import { Star, ExternalLink, Filter, Check, AlertCircle, Grid, List, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight, Navigation, Search, Package, Wrench, Bell, ChevronDown } from "lucide-react";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import VehicleFunFacts from "@/components/VehicleFunFacts";
 import { PriceAlertButton, PriceAlertsPanel } from "@/components/PriceAlerts";
 import ShareButton from "@/components/ShareButton";
@@ -684,6 +685,7 @@ export default function Results() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

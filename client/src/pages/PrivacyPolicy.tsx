@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
-      <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
         <div className="mb-8">
           <Link href="/">
             <Button variant="ghost" size="sm" className="mb-4">
@@ -176,6 +177,7 @@ export default function PrivacyPolicy() {
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import ProSubscription from "@/components/ProSubscription";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
 
@@ -15,6 +16,8 @@ export default function Pro() {
       <div className="pt-24 pb-16 max-w-6xl mx-auto px-4">
         <ProSubscription />
       </div>
+      
+      <Footer />
     </div>
   );
 }
