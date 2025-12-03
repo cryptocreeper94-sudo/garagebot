@@ -92,9 +92,15 @@ Preferred communication style: Simple, everyday language.
 - **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
 - **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
 
-## Latest Publish: December 2, 2024 @ 7:15 PM EST
+## Latest Publish: December 3, 2024 @ 8:29 AM EST
+
+## v1.0.0 "Genesis Launch" - PUBLISHED
+Ready for marketing launch with full feature set.
 
 ## Recent Updates (December 2024)
+- **v1.0.0 Genesis Launch (Dec 3)**: Official v1.0 release published with comprehensive changelog covering all features, UI/UX, and technical implementation.
+- **Footer Consistency (Dec 3)**: Added Footer component to all major pages (Insurance, Pro, Garage, GenesisHallmark, Dashboard, DIYGuides, Results, MechanicsGarage, TermsOfService, PrivacyPolicy).
+- **Container Width Standardization (Dec 3)**: Updated all pages to use max-w-6xl containers for consistent desktop layouts.
 - **Release Version Control (Dec 2)**: Full release tracking system with versions, changelogs, footer badge. Agent instructions at `docs/RELEASE_SYSTEM_AGENT_COPY.txt`.
 - **Hero Buddy Local Popup (Dec 2)**: Clicking Buddy on the "G" now shows a compact local comic bubble with tips instead of opening full-screen chat. No blur/overlay.
 - **BuddyHideSeek Animation Fix (Dec 2)**: Random Buddy popup now properly sweeps in from 8 directions with spring physics. Removed blur overlay, compact fitted speech bubble.
