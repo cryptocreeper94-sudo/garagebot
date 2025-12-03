@@ -1520,8 +1520,8 @@ export default function DevPortal() {
               )}
             </AnimatePresence>
 
-            {/* Tasks in 2-column grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Tasks in 2-column bento grid */}
+            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-3">
               {CATEGORIES.map((category) => {
                 const categoryTasks = getTasksByCategory(category.id);
                 const completedCount = categoryTasks.filter(t => t.status === 'completed').length;
