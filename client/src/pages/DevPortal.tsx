@@ -1529,7 +1529,7 @@ export default function DevPortal() {
                 const IconComponent = category.icon;
 
                 return (
-                  <Card key={category.id} className="bg-card border-border overflow-hidden">
+                  <Card key={category.id} className="bg-card border-border overflow-hidden h-fit">
                     <button
                       onClick={() => toggleCategory(category.id)}
                       className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition-colors"
@@ -1555,87 +1555,74 @@ export default function DevPortal() {
                         {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                       </div>
                     </button>
-
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: 'auto' }}
-                      exit={{ height: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-4 pb-4 space-y-2">
-                        {categoryTasks.map((task) => (
-                          <div
-                            key={task.id}
-                            className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
-                              task.status === 'completed' 
-                                ? 'bg-green-500/5 border-green-500/20' 
-                                : 'bg-white/5 border-white/10 hover:border-primary/30'
-                            }`}
-                          >
-                            <button
-                              onClick={() => toggleTaskMutation.mutate({ 
-                                id: task.id, 
-                                status: task.status === 'completed' ? 'pending' : 'completed' 
-                              })}
-                              className="mt-0.5 shrink-0"
-                            >
-                              {task.status === 'completed' ? (
-                                <CheckCircle2 className="w-5 h-5 text-green-400" />
-                              ) : (
-                                <Circle className="w-5 h-5 text-muted-foreground hover:text-primary" />
-                              )}
-                            </button>
-                            
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2">
-                                <div>
-                                  <p className={`font-medium ${task.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
-                                    {task.title}
-                                  </p>
-                                  {task.description && (
-                                    <p className="text-sm text-muted-foreground mt-0.5">{task.description}</p>
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: 'auto' }}
+                          exit={{ height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-3 pb-3 space-y-2">
+                            {categoryTasks.map((task) => (
+                              <div
+                                key={task.id}
+                                className={`flex items-start gap-2 p-2 rounded-lg border transition-all text-sm ${
+                                  task.status === 'completed' 
+                                    ? 'bg-green-500/5 border-green-500/20' 
+                                    : 'bg-white/5 border-white/10 hover:border-primary/30'
+                                }`}
+                              >
+                                <button
+                                  onClick={() => toggleTaskMutation.mutate({ 
+                                    id: task.id, 
+                                    status: task.status === 'completed' ? 'pending' : 'completed' 
+                                  })}
+                                  className="mt-0.5 shrink-0"
+                                >
+                                  {task.status === 'completed' ? (
+                                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                  ) : (
+                                    <Circle className="w-4 h-4 text-muted-foreground hover:text-primary" />
                                   )}
-                                </div>
-                                <div className="flex items-center gap-2 shrink-0">
-                                  {task.priority === 'high' && (
-                                    <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px]">HIGH</Badge>
-                                  )}
-                                  {task.link && (
-                                    <a 
-                                      href={task.link} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="text-primary hover:text-primary/80"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <ExternalLink className="w-4 h-4" />
-                                    </a>
-                                  )}
-                                  <button
-                                    onClick={() => deleteTaskMutation.mutate(task.id)}
-                                    className="text-muted-foreground hover:text-red-400 transition-colors"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
+                                </button>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <p className={`${task.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
+                                      {task.title}
+                                    </p>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                      {task.priority === 'high' && (
+                                        <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px] px-1 py-0">!</Badge>
+                                      )}
+                                      {task.link && (
+                                        <a 
+                                          href={task.link} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="text-primary hover:text-primary/80"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                      )}
+                                      <button
+                                        onClick={() => deleteTaskMutation.mutate(task.id)}
+                                        className="text-muted-foreground hover:text-red-400 transition-colors"
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                              {task.completedAt && (
-                                <p className="text-[10px] text-green-400 mt-1 flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  Completed {new Date(task.completedAt).toLocaleDateString()}
-                                </p>
-                              )}
-                            </div>
+                            ))}
+                            {categoryTasks.length === 0 && (
+                              <p className="text-center text-muted-foreground py-2 text-xs">No tasks</p>
+                            )}
                           </div>
-                        ))}
-                        {categoryTasks.length === 0 && (
-                          <p className="text-center text-muted-foreground py-4 text-sm">No tasks in this category</p>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
+                        </motion.div>
+                      )}
                     </AnimatePresence>
                   </Card>
                 );
