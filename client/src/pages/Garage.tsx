@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -707,6 +708,7 @@ export default function Garage() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

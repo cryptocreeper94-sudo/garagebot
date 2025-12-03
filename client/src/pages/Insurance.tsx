@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -132,16 +133,35 @@ export default function Insurance() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
-        <div className="text-center mb-12">
-          <Badge className="mb-4 bg-green-500/20 text-green-400 border-green-500/30 font-mono">
-            COMPARE & SAVE
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-tech font-bold uppercase mb-4">
-            <span className="text-primary">Insurance</span> Comparison
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-mono">
-            COMPARE RATES FROM 100+ CARRIERS • SAVE UP TO $996/YEAR • FREE QUOTES IN MINUTES
-          </p>
+        {/* Bento Grid Header */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="md:col-span-8"
+          >
+            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+              <Badge className="mb-2 bg-green-500/20 text-green-400 border-green-500/30 font-mono text-[10px]">
+                COMPARE & SAVE
+              </Badge>
+              <h1 className="text-2xl font-tech font-bold uppercase text-primary">Insurance Comparison</h1>
+              <p className="text-muted-foreground text-xs font-mono">COMPARE 100+ CARRIERS • SAVE UP TO $996/YEAR</p>
+            </Card>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="md:col-span-4"
+          >
+            <Card className="bg-gradient-to-br from-green-500/20 to-primary/10 border-green-500/30 p-4 h-full flex items-center justify-center gap-3">
+              <DollarSign className="w-8 h-8 text-green-400" />
+              <div className="text-center">
+                <p className="text-xl font-bold text-green-400">$996</p>
+                <p className="text-xs text-muted-foreground">Avg. Savings</p>
+              </div>
+            </Card>
+          </motion.div>
         </div>
 
         {/* Quick Quote Form */}
@@ -346,6 +366,7 @@ export default function Insurance() {
           </p>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
