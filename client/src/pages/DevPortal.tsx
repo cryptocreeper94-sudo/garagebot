@@ -845,41 +845,47 @@ export default function DevPortal() {
             <FeatureInventory />
           </TabsContent>
 
-          <TabsContent value="releases" className="space-y-6">
-            {/* Current Version Banner */}
-            <Card className="bg-gradient-to-br from-primary/10 to-cyan-500/5 border-primary/30 p-6">
-              <div className="flex items-center justify-between flex-wrap gap-4">
+          <TabsContent value="releases" className="space-y-4">
+            {/* Bento Grid: Current Version + Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Current Version - 8 cols */}
+              <Card className="md:col-span-8 bg-gradient-to-br from-primary/10 to-cyan-500/5 border-primary/30 p-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
                     <GitBranch className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Current Version</p>
-                    <p className="font-tech text-2xl text-primary">
+                    <p className="text-xs text-muted-foreground">Current Version</p>
+                    <p className="font-tech text-xl text-primary">
                       {latestRelease?.version || "No releases yet"}
                     </p>
                     {latestRelease?.publishedAt && (
                       <p className="text-xs text-muted-foreground">
                         Published {new Date(latestRelease.publishedAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          timeZoneName: 'short'
+                          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                         })}
                       </p>
                     )}
                   </div>
                 </div>
+              </Card>
+              
+              {/* Actions - 4 cols */}
+              <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4 flex flex-col justify-center gap-2">
                 <Button 
                   onClick={() => setShowNewRelease(true)} 
-                  className="font-tech uppercase glow-primary"
+                  className="font-tech uppercase text-xs w-full"
+                  size="sm"
                 >
-                  <Plus className="w-4 h-4 mr-2" /> New Release
+                  <Plus className="w-3 h-3 mr-1" /> New Release
                 </Button>
-              </div>
-            </Card>
+                {latestRelease && (
+                  <Badge className="text-center justify-center bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                    {releases.length} releases
+                  </Badge>
+                )}
+              </Card>
+            </div>
 
             {/* New Release Form */}
             <AnimatePresence>
@@ -1007,21 +1013,22 @@ export default function DevPortal() {
               )}
             </AnimatePresence>
 
-            {/* Release History */}
-            <div className="space-y-4">
-              <h3 className="font-tech text-lg text-primary">Release History</h3>
+            {/* Release History - 2 column grid */}
+            <div>
+              <h3 className="font-tech text-sm text-primary mb-3">Release History</h3>
               
               {releases.length === 0 && (
-                <Card className="bg-card/50 border-border p-8 text-center">
-                  <Archive className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No releases yet. Create your first release above!</p>
+                <Card className="bg-card/50 border-border p-6 text-center">
+                  <Archive className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No releases yet. Create your first release above!</p>
                 </Card>
               )}
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {releases.map((release) => (
                 <Card 
                   key={release.id} 
-                  className={`bg-card border-border p-4 ${
+                  className={`bg-card border-border p-3 ${
                     release.status === 'published' ? 'border-l-4 border-l-green-500' : 'border-l-4 border-l-yellow-500'
                   }`}
                 >
@@ -1107,35 +1114,43 @@ export default function DevPortal() {
                   </div>
                 </Card>
               ))}
+              </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="affiliates" className="space-y-6">
-            <Card className="bg-gradient-to-br from-green-500/10 to-primary/5 border-green-500/30 p-6">
-              <h2 className="font-tech text-xl text-green-400 mb-2">How Affiliate Marketing Works</h2>
-              <p className="text-muted-foreground mb-4">
-                When users click a link on GarageBot and buy something, you earn a commission (typically 2-10% of the sale). 
-                Here's how to get set up with the major networks.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-primary" />
-                  <span>Sign up for affiliate networks</span>
+          <TabsContent value="affiliates" className="space-y-4">
+            {/* Bento Grid: Intro + Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <Card className="md:col-span-8 bg-gradient-to-br from-green-500/10 to-primary/5 border-green-500/30 p-4">
+                <h2 className="font-tech text-lg text-green-400 mb-2">How Affiliate Marketing Works</h2>
+                <p className="text-sm text-muted-foreground">
+                  When users click a link on GarageBot and buy something, you earn a commission (typically 2-10% of the sale).
+                </p>
+              </Card>
+              <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <p className="font-tech text-xl text-primary">{AFFILIATE_NETWORKS.length}</p>
+                    <p className="text-[10px] text-muted-foreground">Networks</p>
+                  </div>
+                  <div>
+                    <p className="font-tech text-xl text-green-400">2-10%</p>
+                    <p className="text-[10px] text-muted-foreground">Commission</p>
+                  </div>
+                  <div>
+                    <p className="font-tech text-xl text-yellow-400">1-5d</p>
+                    <p className="text-[10px] text-muted-foreground">Approval</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Timer className="w-4 h-4 text-primary" />
-                  <span>Wait 1-5 days for approval</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-primary" />
-                  <span>Get paid monthly via check/PayPal</span>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
 
-            <div className="space-y-4">
-              <h3 className="font-tech text-lg text-primary">Affiliate Networks (Sign Up Here)</h3>
-              <Accordion type="multiple" className="space-y-3" defaultValue={["amazon", "cj"]}>
+            {/* 6/6 Grid: Networks + Retailers */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Left: Affiliate Networks */}
+              <div>
+                <h3 className="font-tech text-sm text-primary mb-2">Affiliate Networks</h3>
+                <Accordion type="multiple" className="space-y-2" defaultValue={["amazon"]}>
                 {AFFILIATE_NETWORKS.map(network => (
                   <AccordionItem 
                     key={network.id} 
@@ -1217,14 +1232,12 @@ export default function DevPortal() {
                   </AccordionItem>
                 ))}
               </Accordion>
-            </div>
+              </div>
 
-            <div className="space-y-4">
-              <h3 className="font-tech text-lg text-primary">Direct Outreach / Special Programs</h3>
-              <p className="text-sm text-muted-foreground">
-                These retailers need direct contact or have special programs. Click to expand for contact info and ready-to-send outreach letters.
-              </p>
-              <Accordion type="multiple" className="space-y-3">
+              {/* Right: Direct Retailers */}
+              <div>
+                <h3 className="font-tech text-sm text-primary mb-2">Direct Outreach</h3>
+                <Accordion type="multiple" className="space-y-2">
                 {DIRECT_RETAILERS.map((retailer, index) => (
                   <AccordionItem 
                     key={retailer.name} 
@@ -1410,41 +1423,32 @@ export default function DevPortal() {
                   </AccordionItem>
                 ))}
               </Accordion>
+              </div>
             </div>
 
-            <Card className="bg-card border-primary/30 p-6">
-              <h3 className="font-tech text-lg text-primary mb-4">Recommended Order</h3>
-              <ol className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-green-500 text-black text-sm flex items-center justify-center flex-shrink-0 font-bold">1</span>
-                  <div>
-                    <p className="font-medium">Amazon Associates + eBay Partner Network</p>
-                    <p className="text-sm text-muted-foreground">Easiest approval, instant access to millions of products</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-yellow-500 text-black text-sm flex items-center justify-center flex-shrink-0 font-bold">2</span>
-                  <div>
-                    <p className="font-medium">CJ Affiliate + ShareASale</p>
-                    <p className="text-sm text-muted-foreground">Access to major auto parts retailers (Advance Auto, Summit, etc.)</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-primary text-black text-sm flex items-center justify-center flex-shrink-0 font-bold">3</span>
-                  <div>
-                    <p className="font-medium">AvantLink + Impact</p>
-                    <p className="text-sm text-muted-foreground">Powersports specialists and premium brands (AutoZone)</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-purple-500 text-black text-sm flex items-center justify-center flex-shrink-0 font-bold">4</span>
-                  <div>
-                    <p className="font-medium">Direct Outreach</p>
-                    <p className="text-sm text-muted-foreground">Email RockAuto, O'Reilly, NAPA for custom partnerships</p>
-                  </div>
-                </li>
-              </ol>
-            </Card>
+            {/* Bottom: Recommended Order as 2x2 grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Card className="bg-card/50 border-green-500/30 p-3 text-center">
+                <span className="w-8 h-8 rounded-full bg-green-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">1</span>
+                <p className="text-xs font-medium">Amazon + eBay</p>
+                <p className="text-[10px] text-muted-foreground">Easiest approval</p>
+              </Card>
+              <Card className="bg-card/50 border-yellow-500/30 p-3 text-center">
+                <span className="w-8 h-8 rounded-full bg-yellow-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">2</span>
+                <p className="text-xs font-medium">CJ + ShareASale</p>
+                <p className="text-[10px] text-muted-foreground">Major retailers</p>
+              </Card>
+              <Card className="bg-card/50 border-primary/30 p-3 text-center">
+                <span className="w-8 h-8 rounded-full bg-primary text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">3</span>
+                <p className="text-xs font-medium">AvantLink + Impact</p>
+                <p className="text-[10px] text-muted-foreground">Powersports</p>
+              </Card>
+              <Card className="bg-card/50 border-purple-500/30 p-3 text-center">
+                <span className="w-8 h-8 rounded-full bg-purple-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">4</span>
+                <p className="text-xs font-medium">Direct Outreach</p>
+                <p className="text-[10px] text-muted-foreground">Custom deals</p>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="tasks">
@@ -1460,107 +1464,97 @@ export default function DevPortal() {
             )}
 
             <div className="flex justify-end mb-4">
-          <Button 
-            onClick={() => setShowAddTask(!showAddTask)} 
-            variant="outline" 
-            className="font-tech uppercase border-primary/30 hover:bg-primary/10"
-          >
-            <Plus className="w-4 h-4 mr-2" /> Add Task
-          </Button>
-        </div>
+              <Button 
+                onClick={() => setShowAddTask(!showAddTask)} 
+                variant="outline" 
+                className="font-tech uppercase border-primary/30 hover:bg-primary/10"
+                size="sm"
+              >
+                <Plus className="w-3 h-3 mr-1" /> Add Task
+              </Button>
+            </div>
 
-        <AnimatePresence>
-          {showAddTask && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-6"
-            >
-              <Card className="bg-card border-primary/30 p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <Select value={newTask.category} onValueChange={(v) => setNewTask(prev => ({ ...prev, category: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
-                    <SelectContent>
-                      {CATEGORIES.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={newTask.priority} onValueChange={(v) => setNewTask(prev => ({ ...prev, priority: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Input 
-                  placeholder="Task title" 
-                  value={newTask.title} 
-                  onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+            <AnimatePresence>
+              {showAddTask && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
                   className="mb-4"
-                />
-                <Textarea 
-                  placeholder="Description (optional)" 
-                  value={newTask.description} 
-                  onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
-                  className="mb-4"
-                />
-                <Input 
-                  placeholder="Link URL (optional)" 
-                  value={newTask.link} 
-                  onChange={(e) => setNewTask(prev => ({ ...prev, link: e.target.value }))}
-                  className="mb-4"
-                />
-                <div className="flex gap-2">
-                  <Button onClick={() => addTaskMutation.mutate(newTask)} disabled={!newTask.title} className="font-tech">
-                    <Save className="w-4 h-4 mr-2" /> Save Task
-                  </Button>
-                  <Button variant="ghost" onClick={() => setShowAddTask(false)}>
-                    <X className="w-4 h-4 mr-2" /> Cancel
-                  </Button>
-                </div>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="space-y-4">
-          {CATEGORIES.map((category) => {
-            const categoryTasks = getTasksByCategory(category.id);
-            const completedCount = categoryTasks.filter(t => t.status === 'completed').length;
-            const isExpanded = expandedCategories.includes(category.id);
-            const IconComponent = category.icon;
-
-            return (
-              <Card key={category.id} className="bg-card border-border overflow-hidden">
-                <button
-                  onClick={() => toggleCategory(category.id)}
-                  className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center ${category.color}`}>
-                      <IconComponent className="w-5 h-5" />
+                  <Card className="bg-card border-primary/30 p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                      <Select value={newTask.category} onValueChange={(v) => setNewTask(prev => ({ ...prev, category: v }))}>
+                        <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
+                        <SelectContent>
+                          {CATEGORIES.map(c => (
+                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={newTask.priority} onValueChange={(v) => setNewTask(prev => ({ ...prev, priority: v }))}>
+                        <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="text-left">
-                      <h3 className="font-tech text-lg uppercase">{category.name}</h3>
-                      <p className="text-xs text-muted-foreground">
-                        {completedCount}/{categoryTasks.length} completed
-                      </p>
+                    <Input 
+                      placeholder="Task title" 
+                      value={newTask.title} 
+                      onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                      className="mb-3"
+                    />
+                    <div className="flex gap-2">
+                      <Button onClick={() => addTaskMutation.mutate(newTask)} disabled={!newTask.title} className="font-tech" size="sm">
+                        <Save className="w-3 h-3 mr-1" /> Save
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => setShowAddTask(false)}>
+                        <X className="w-3 h-3 mr-1" /> Cancel
+                      </Button>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary transition-all duration-300"
-                        style={{ width: `${categoryTasks.length > 0 ? (completedCount / categoryTasks.length) * 100 : 0}%` }}
-                      />
-                    </div>
-                    {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-                  </div>
-                </button>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Tasks in 2-column grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {CATEGORIES.map((category) => {
+                const categoryTasks = getTasksByCategory(category.id);
+                const completedCount = categoryTasks.filter(t => t.status === 'completed').length;
+                const isExpanded = expandedCategories.includes(category.id);
+                const IconComponent = category.icon;
+
+                return (
+                  <Card key={category.id} className="bg-card border-border overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory(category.id)}
+                      className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center ${category.color}`}>
+                          <IconComponent className="w-4 h-4" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="font-tech text-sm uppercase">{category.name}</h3>
+                          <p className="text-[10px] text-muted-foreground">
+                            {completedCount}/{categoryTasks.length} done
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary transition-all duration-300"
+                            style={{ width: `${categoryTasks.length > 0 ? (completedCount / categoryTasks.length) * 100 : 0}%` }}
+                          />
+                        </div>
+                        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      </div>
+                    </button>
 
                 <AnimatePresence>
                   {isExpanded && (
@@ -1642,11 +1636,11 @@ export default function DevPortal() {
                       </div>
                     </motion.div>
                   )}
-                </AnimatePresence>
-              </Card>
-            );
-          })}
-        </div>
+                    </AnimatePresence>
+                  </Card>
+                );
+              })}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
