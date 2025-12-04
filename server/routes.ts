@@ -5340,10 +5340,10 @@ export async function registerRoutes(
     }
   });
   
-  // Check Helius connection status
+  // Check blockchain connection and wallet status
   app.get('/api/blockchain/health', async (req, res) => {
     try {
-      const status = await blockchainService.checkHeliusConnection();
+      const status = await blockchainService.checkBlockchainStatus();
       res.json(status);
     } catch (error) {
       console.error("Blockchain health check error:", error);

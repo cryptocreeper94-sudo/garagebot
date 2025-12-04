@@ -1,7 +1,18 @@
 import { createHash } from 'crypto';
-import { Connection, PublicKey, Transaction, SystemProgram, Keypair, sendAndConfirmTransaction } from '@solana/web3.js';
+import { 
+  Connection, 
+  Keypair, 
+  Transaction, 
+  TransactionInstruction,
+  sendAndConfirmTransaction,
+  PublicKey,
+  ComputeBudgetProgram
+} from '@solana/web3.js';
+import bs58 from 'bs58';
 
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
+const SOLANA_PRIVATE_KEY = process.env.SOLANA_PRIVATE_KEY;
+
 const HELIUS_RPC_URL = HELIUS_API_KEY 
   ? `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`
   : 'https://api.mainnet-beta.solana.com';
@@ -10,7 +21,9 @@ const DEVNET_RPC_URL = HELIUS_API_KEY
   ? `https://devnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`
   : 'https://api.devnet.solana.com';
 
-export type EntityType = 'hallmark' | 'vehicle';
+const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+
+export type EntityType = 'hallmark' | 'vehicle' | 'release';
 export type VerificationStatus = 'pending' | 'submitted' | 'confirmed' | 'failed';
 
 export interface BlockchainData {
@@ -45,6 +58,29 @@ export async function getConnection(network: 'mainnet-beta' | 'devnet' = 'mainne
   return new Connection(url, 'confirmed');
 }
 
+function getKeypair(): Keypair | null {
+  if (!SOLANA_PRIVATE_KEY) {
+    console.log('[blockchain] No SOLANA_PRIVATE_KEY configured');
+    return null;
+  }
+  
+  try {
+    const privateKeyBytes = bs58.decode(SOLANA_PRIVATE_KEY);
+    return Keypair.fromSecretKey(privateKeyBytes);
+  } catch (error) {
+    console.error('[blockchain] Failed to parse private key:', error);
+    try {
+      const jsonKey = JSON.parse(SOLANA_PRIVATE_KEY);
+      if (Array.isArray(jsonKey)) {
+        return Keypair.fromSecretKey(new Uint8Array(jsonKey));
+      }
+    } catch {
+      console.error('[blockchain] Private key is not valid base58 or JSON array');
+    }
+    return null;
+  }
+}
+
 export async function verifyTransactionStatus(
   txSignature: string,
   network: 'mainnet-beta' | 'devnet' = 'mainnet-beta'
@@ -72,10 +108,10 @@ export async function verifyTransactionStatus(
 export function prepareHallmarkData(hallmark: {
   id: string;
   userId: string;
-  assetNumber: number;
-  tier: string;
+  assetNumber: number | null;
+  tier?: string | null;
   vehicleId?: string | null;
-  isFounder?: boolean;
+  isFounder?: boolean | null;
   createdAt?: Date | null;
 }): BlockchainData {
   return {
@@ -125,48 +161,98 @@ export function prepareVehicleData(vehicle: {
   };
 }
 
+export function prepareReleaseData(release: {
+  id: string;
+  version: string;
+  versionType: string;
+  changelog?: Record<string, string[]> | null;
+  publishedAt?: Date | null;
+}): BlockchainData {
+  return {
+    entityType: 'release',
+    entityId: release.id,
+    userId: 'system',
+    timestamp: release.publishedAt?.toISOString() || new Date().toISOString(),
+    data: {
+      releaseVersion: release.version,
+      versionType: release.versionType,
+      changelogCategories: release.changelog ? Object.keys(release.changelog) : [],
+      platform: 'GarageBot',
+      schemaVersion: '1.0',
+    },
+  };
+}
+
 export async function submitMemoTransaction(
   dataHash: string,
   network: 'mainnet-beta' | 'devnet' = 'devnet'
 ): Promise<{ success: boolean; txSignature?: string; error?: string }> {
-  if (!HELIUS_API_KEY) {
+  const keypair = getKeypair();
+  
+  if (!keypair) {
+    console.log('[blockchain] No keypair available, using hash-only mode');
     return {
       success: true,
-      txSignature: `DEMO_${dataHash.substring(0, 16)}_${Date.now()}`,
+      txSignature: `HASH_${dataHash.substring(0, 32)}`,
     };
   }
 
   try {
-    const response = await fetch(`https://api.helius.xyz/v0/transactions?api-key=${HELIUS_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        network: network === 'devnet' ? 'devnet' : 'mainnet-beta',
-        type: 'memo',
-        data: `GarageBot:${dataHash}`,
-      }),
+    const connection = await getConnection(network);
+    
+    const memoContent = `GarageBot:${dataHash}`;
+    
+    const memoInstruction = new TransactionInstruction({
+      keys: [],
+      programId: MEMO_PROGRAM_ID,
+      data: Buffer.from(memoContent, 'utf-8'),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log('Helius API response:', response.status, errorText);
-      
-      return {
-        success: true,
-        txSignature: `HASH_${dataHash.substring(0, 32)}`,
-      };
-    }
+    const computeBudgetIx = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: 1000,
+    });
 
-    const result = await response.json();
+    const transaction = new Transaction();
+    transaction.add(computeBudgetIx);
+    transaction.add(memoInstruction);
+
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = keypair.publicKey;
+
+    console.log(`[blockchain] Submitting memo transaction to ${network}...`);
+    console.log(`[blockchain] Wallet: ${keypair.publicKey.toBase58()}`);
+    
+    const signature = await sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [keypair],
+      {
+        commitment: 'confirmed',
+        maxRetries: 3,
+      }
+    );
+
+    console.log(`[blockchain] Transaction confirmed: ${signature}`);
+    
     return {
       success: true,
-      txSignature: result.signature || result.txSignature || `HASH_${dataHash.substring(0, 32)}`,
+      txSignature: signature,
     };
-  } catch (error) {
-    console.error('Error submitting to blockchain:', error);
+  } catch (error: any) {
+    console.error('[blockchain] Transaction failed:', error);
+    
+    if (error.message?.includes('insufficient funds') || error.message?.includes('Insufficient')) {
+      return {
+        success: false,
+        error: 'Insufficient SOL balance for transaction fees. Please add SOL to your wallet.',
+      };
+    }
+    
     return {
       success: true,
       txSignature: `HASH_${dataHash.substring(0, 32)}`,
+      error: error.message,
     };
   }
 }
@@ -199,16 +285,47 @@ export async function createVerification(
   };
 }
 
-export async function checkHeliusConnection(): Promise<{ connected: boolean; network?: string; error?: string }> {
-  if (!HELIUS_API_KEY) {
-    return { connected: false, error: 'Helius API key not configured' };
+export async function checkBlockchainStatus(): Promise<{ 
+  connected: boolean; 
+  network?: string; 
+  walletAddress?: string;
+  balance?: number;
+  error?: string 
+}> {
+  const keypair = getKeypair();
+  
+  if (!keypair) {
+    return { 
+      connected: false, 
+      error: 'Solana wallet not configured. Add SOLANA_PRIVATE_KEY to secrets.' 
+    };
   }
   
   try {
     const connection = await getConnection('devnet');
+    const balance = await connection.getBalance(keypair.publicKey);
     const version = await connection.getVersion();
-    return { connected: true, network: 'devnet', ...version };
+    
+    return { 
+      connected: true, 
+      network: 'devnet',
+      walletAddress: keypair.publicKey.toBase58(),
+      balance: balance / 1e9,
+    };
   } catch (error) {
     return { connected: false, error: String(error) };
+  }
+}
+
+export async function getWalletBalance(network: 'mainnet-beta' | 'devnet' = 'devnet'): Promise<number | null> {
+  const keypair = getKeypair();
+  if (!keypair) return null;
+  
+  try {
+    const connection = await getConnection(network);
+    const balance = await connection.getBalance(keypair.publicKey);
+    return balance / 1e9;
+  } catch {
+    return null;
   }
 }
