@@ -115,24 +115,24 @@ export default function Nav() {
               
               {showVerifiedDetails && (
                 <div 
-                  className="absolute top-full mt-2 right-0 z-[60] w-72 p-3 rounded-lg border border-primary/30"
+                  className="absolute top-full mt-2 right-0 z-[100] w-72 p-4 rounded-xl border-2 border-green-500/40"
                   style={{
-                    background: 'hsl(var(--card))',
-                    boxShadow: '0 0 20px rgba(6,182,212,0.2)',
+                    background: 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.9), 0 0 30px rgba(34,197,94,0.2)',
                   }}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-tech uppercase text-green-500 flex items-center gap-1">
-                      <BadgeCheck className="w-4 h-4" /> Blockchain Verified
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-tech uppercase text-green-400 flex items-center gap-2">
+                      <BadgeCheck className="w-5 h-5" /> Blockchain Verified
                     </span>
                     <button
                       onClick={() => setShowVerifiedDetails(false)}
-                      className="text-muted-foreground hover:text-foreground"
+                      className="text-muted-foreground hover:text-white p-1 rounded hover:bg-white/10"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <p className="text-[10px] text-muted-foreground mb-2">
+                  <p className="text-xs text-gray-300 mb-3">
                     This application is verified on Solana mainnet.
                   </p>
                   {appHallmark?.solanaSignature && (
@@ -140,9 +140,9 @@ export default function Nav() {
                       href={`https://solscan.io/tx/${appHallmark.solanaSignature}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[10px] text-primary hover:underline"
+                      className="flex items-center gap-2 text-xs text-primary hover:underline bg-primary/10 px-3 py-2 rounded-lg"
                     >
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-4 h-4" />
                       View on Solscan
                     </a>
                   )}
