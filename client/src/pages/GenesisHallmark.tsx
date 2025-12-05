@@ -197,6 +197,7 @@ export default function GenesisHallmark() {
                       src={hallmarkBadge} 
                       alt="Genesis Hallmark Badge" 
                       className="w-full h-full object-contain rounded-xl shadow-[0_0_40px_rgba(168,85,247,0.3)]"
+                      data-testid="img-hallmark-badge"
                     />
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="font-tech text-[10px] uppercase tracking-wider text-purple-300/80 mb-1">Genesis Hallmark</span>
