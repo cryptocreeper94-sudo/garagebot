@@ -587,20 +587,20 @@ export default function Home() {
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-6 mb-4"
+            className="text-center py-8 mb-4"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-mono tracking-wider mb-4 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-xs font-mono tracking-wider mb-6 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               SYSTEM ONLINE // 40+ RETAILERS
             </div>
             
             {/* Welcome Title with Buddy leaning on G */}
-            <p className="text-sm font-tech text-muted-foreground tracking-widest uppercase mb-2">
+            <p className="text-base font-tech text-muted-foreground tracking-widest uppercase mb-3">
               Welcome to
             </p>
-            <div className="relative inline-block mb-2">
+            <div className="relative inline-block mb-4">
               {/* Buddy leaning against the G with local popup */}
-              <div className="absolute -left-1 -top-8 z-20">
+              <div className="absolute -left-6 -top-16 z-20">
                 <motion.div 
                   initial={{ opacity: 0, x: -20, rotate: -10 }}
                   animate={{ opacity: 1, x: 0, rotate: 8 }}
@@ -611,10 +611,13 @@ export default function Home() {
                   <img 
                     src={buddyMascot} 
                     alt="Buddy" 
-                    className="w-12 h-12 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 transition-transform"
+                    className="w-20 h-20 drop-shadow-[0_0_25px_rgba(6,182,212,0.7)] hover:scale-110 transition-transform"
                     style={{ transform: 'rotate(8deg) scaleX(-1)' }}
                     data-testid="img-buddy-hero-mobile"
                   />
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[9px] font-tech text-primary/80 whitespace-nowrap">
+                    Click me!
+                  </div>
                 </motion.div>
                 
                 {/* Local comic bubble popup for mobile */}
@@ -625,7 +628,7 @@ export default function Home() {
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.8, y: 10 }}
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      className="absolute left-14 top-0 z-30 w-48"
+                      className="absolute left-24 top-0 z-30 w-52"
                     >
                       <div 
                         className="relative rounded-xl px-3 py-2"
@@ -635,12 +638,12 @@ export default function Home() {
                           boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3)',
                         }}
                       >
-                        <p className="text-[10px] leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
+                        <p className="text-xs leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
                           {currentTip}
                         </p>
                         {/* Bubble tail pointing left to Buddy */}
                         <div 
-                          className="absolute top-3 -left-2"
+                          className="absolute top-4 -left-2"
                           style={{
                             width: 0,
                             height: 0,
@@ -651,14 +654,14 @@ export default function Home() {
                         />
                         <button 
                           onClick={(e) => { e.stopPropagation(); setShowHeroBuddyPopup(false); }}
-                          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
                           style={{
                             background: 'hsl(var(--card))',
                             border: '1.5px solid hsl(var(--primary))',
                             color: 'hsl(var(--primary))',
                           }}
                         >
-                          <X className="w-2 h-2" />
+                          <X className="w-2.5 h-2.5" />
                         </button>
                       </div>
                     </motion.div>
@@ -666,15 +669,15 @@ export default function Home() {
                 </AnimatePresence>
               </div>
               
-              <h1 className="text-3xl font-tech font-black uppercase tracking-tight pl-8">
-                <span className="text-primary drop-shadow-[0_0_15px_rgba(6,182,212,0.9)] neon-text">G</span>
+              <h1 className="text-5xl font-tech font-black uppercase tracking-tight pl-14">
+                <span className="text-primary drop-shadow-[0_0_25px_rgba(6,182,212,0.9)] neon-text">G</span>
                 <span className="text-foreground">arage</span>
-                <span className="text-primary drop-shadow-[0_0_15px_rgba(6,182,212,0.9)] neon-text">B</span>
+                <span className="text-primary drop-shadow-[0_0_25px_rgba(6,182,212,0.9)] neon-text">B</span>
                 <span className="text-foreground">ot</span>
-                <span className="text-primary/70 text-2xl">.io</span>
+                <span className="text-primary/70 text-3xl">.io</span>
               </h1>
             </div>
-            <p className="text-sm text-muted-foreground/80 mt-2">
+            <p className="text-base text-muted-foreground/80 mt-3">
               Right Part. First Time. <span className="text-primary font-medium">Every Engine.</span>
             </p>
             
