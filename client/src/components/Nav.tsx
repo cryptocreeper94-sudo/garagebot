@@ -124,31 +124,19 @@ export default function Nav() {
             </Badge>
           )}
           
-          {/* App Official Hallmark Badge - Clickable */}
-          <Link href="/hallmark">
-            <div 
-              className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-all cursor-pointer group hover:scale-105"
-              data-testid="badge-app-hallmark"
-            >
-              <Shield className="w-3.5 h-3.5 text-purple-400 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-              <span className="text-[10px] font-mono text-purple-400 font-bold hidden sm:inline">
-                GB-000001
-              </span>
-              {isVerified && (
-                <BadgeCheck className="w-3 h-3 text-green-500" />
-              )}
-            </div>
-          </Link>
-          
+          {/* App Official Hallmark Badge - Opens Popup */}
           {isVerified && (
             <div className="relative">
               <button
                 onClick={() => setShowVerifiedDetails(!showVerifiedDetails)}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition-colors cursor-pointer"
-                data-testid="badge-verified"
+                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-all cursor-pointer group hover:scale-105"
+                data-testid="badge-app-hallmark"
               >
-                <BadgeCheck className="w-3.5 h-3.5 text-green-500" />
-                <span className="text-[10px] font-tech uppercase text-green-500 hidden sm:inline">Verified</span>
+                <Shield className="w-3.5 h-3.5 text-purple-400 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+                <span className="text-[10px] font-mono text-purple-400 font-bold hidden sm:inline">
+                  GB-000001
+                </span>
+                <BadgeCheck className="w-3 h-3 text-green-500" />
               </button>
               
               {showVerifiedDetails && (
