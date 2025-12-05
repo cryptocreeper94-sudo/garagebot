@@ -183,7 +183,7 @@ export default function FloatingWeatherButton() {
     <>
       <motion.button
         onClick={() => setShowWeatherView(true)}
-        className="fixed top-[88px] right-4 z-40 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
+        className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-40 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
         style={{ background: 'none', border: 'none', padding: 0 }}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -193,13 +193,13 @@ export default function FloatingWeatherButton() {
         data-testid="button-floating-weather"
       >
         {isLoading ? (
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
         ) : (
           <div className="relative">
             <motion.img
               src={currentIcon}
               alt="Weather"
-              className="w-12 h-12 md:w-14 md:h-14 object-contain"
+              className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 object-contain"
               animate={{ 
                 y: [0, -2, 0],
                 rotate: isNight ? [0, 1, -1, 0] : [0, 2, -2, 0]
@@ -212,7 +212,7 @@ export default function FloatingWeatherButton() {
             />
             {weather && (
               <span 
-                className="absolute -bottom-1 -right-1 text-xs md:text-sm font-mono font-black"
+                className="absolute -bottom-1 -right-1 text-sm md:text-base font-mono font-black"
                 style={{ 
                   color: '#fff',
                   textShadow: '1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000'
