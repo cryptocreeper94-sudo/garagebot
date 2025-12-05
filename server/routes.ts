@@ -5364,6 +5364,75 @@ export async function registerRoutes(
     }
   });
   
+  // Verify a release on blockchain (admin endpoint with PIN)
+  app.post('/api/blockchain/release/:id', async (req, res) => {
+    try {
+      const releaseId = req.params.id;
+      const { pin } = req.body;
+      const DEV_PORTAL_PIN = '0424';
+      
+      if (pin !== DEV_PORTAL_PIN) {
+        return res.status(403).json({ error: "Access denied. Admin PIN required." });
+      }
+      
+      // Get release
+      const release = await storage.getRelease(releaseId);
+      if (!release) {
+        return res.status(404).json({ error: "Release not found" });
+      }
+      
+      // Check if already verified
+      const existingList = await storage.getBlockchainVerificationsByEntity('release', releaseId);
+      const existing = existingList.find(v => v.status === 'submitted' || v.status === 'confirmed');
+      if (existing) {
+        return res.json({
+          success: true,
+          alreadyVerified: true,
+          verification: existing,
+          solscanUrl: existing.txSignature 
+            ? blockchainService.getSolscanUrl(existing.txSignature, existing.network as 'mainnet-beta' | 'devnet')
+            : null,
+        });
+      }
+      
+      // Prepare and submit to blockchain
+      const blockchainData = blockchainService.prepareReleaseData(release);
+      const result = await blockchainService.createVerification(blockchainData, 'mainnet-beta');
+      
+      // Create hallmark entry for app verification badge using system user
+      const hallmark = await storage.createHallmark({
+        userId: 'system',
+        tokenId: `RELEASE-${release.version}`,
+        assetNumber: 0,
+        transactionHash: result.txSignature || result.dataHash,
+        metadata: JSON.stringify({
+          type: 'RELEASE_VERIFICATION',
+          version: release.version,
+          versionType: release.versionType,
+          dataHash: result.dataHash,
+          status: result.status,
+          network: 'mainnet-beta',
+        }),
+        solanaSignature: result.txSignature,
+        entityType: 'release',
+        entityId: releaseId,
+        displayName: `GarageBot v${release.version}`,
+        assetType: 'release',
+      });
+      
+      res.json({
+        success: result.success,
+        hallmark,
+        solscanUrl: result.solscanUrl,
+        dataHash: result.dataHash,
+        txSignature: result.txSignature,
+      });
+    } catch (error) {
+      console.error("Verify release error:", error);
+      res.status(500).json({ error: "Failed to verify release on blockchain" });
+    }
+  });
+  
   // Check blockchain connection and wallet status
   app.get('/api/blockchain/health', async (req, res) => {
     try {
