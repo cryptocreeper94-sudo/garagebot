@@ -129,7 +129,7 @@ export default function BuddyHideSeek() {
     setIsVisible(true);
     setHasShownOnPage(true);
     
-    setTimeout(hideWithAnimation, 8000);
+    setTimeout(hideWithAnimation, 15000);
   }, [location, hasShownOnPage, hideWithAnimation]);
 
   useEffect(() => {
@@ -217,12 +217,12 @@ export default function BuddyHideSeek() {
               <div 
                 className="relative rounded-xl px-4 py-3"
                 style={{
-                  background: 'hsl(var(--card))',
-                  border: '2px solid hsl(var(--primary))',
-                  boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3)',
+                  background: '#0d1117',
+                  border: '2px solid #06b6d4',
+                  boxShadow: '0 4px 20px rgba(6, 182, 212, 0.4)',
                 }}
               >
-                <p className="text-xs text-center leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
+                <p className="text-xs text-center leading-relaxed text-white">
                   {currentComment.text}
                 </p>
                 
@@ -234,7 +234,7 @@ export default function BuddyHideSeek() {
                     height: 0,
                     borderLeft: '10px solid transparent',
                     borderRight: '10px solid transparent',
-                    borderTop: '10px solid hsl(var(--primary))',
+                    borderTop: '10px solid #06b6d4',
                   }}
                 />
                 <div 
@@ -244,7 +244,7 @@ export default function BuddyHideSeek() {
                     height: 0,
                     borderLeft: '8px solid transparent',
                     borderRight: '8px solid transparent',
-                    borderTop: '8px solid hsl(var(--card))',
+                    borderTop: '8px solid #0d1117',
                   }}
                 />
                 
@@ -253,9 +253,9 @@ export default function BuddyHideSeek() {
                   onClick={hideWithAnimation}
                   className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center transition-colors"
                   style={{
-                    background: 'hsl(var(--card))',
-                    border: '2px solid hsl(var(--primary))',
-                    color: 'hsl(var(--primary))',
+                    background: '#0d1117',
+                    border: '2px solid #06b6d4',
+                    color: '#06b6d4',
                   }}
                   data-testid="buddy-hide-seek-close"
                 >
