@@ -431,9 +431,20 @@ export default function Garage() {
                 >
                   <Card className="bg-card border-primary/30 overflow-hidden">
                     <div className="h-32 bg-gradient-to-r from-primary/10 to-transparent flex items-end p-6">
-                      <div className="flex-1">
-                        <h2 className="text-3xl font-tech font-bold uppercase">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</h2>
-                        {selectedVehicle.trim && <p className="text-muted-foreground font-mono">{selectedVehicle.trim}</p>}
+                      <div className="flex items-center gap-4 flex-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setSelectedVehicle(null)} 
+                          className="text-muted-foreground hover:text-foreground"
+                          data-testid="button-back-to-fleet"
+                        >
+                          <ChevronRight className="w-4 h-4 rotate-180 mr-1" /> Back
+                        </Button>
+                        <div>
+                          <h2 className="text-3xl font-tech font-bold uppercase">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</h2>
+                          {selectedVehicle.trim && <p className="text-muted-foreground font-mono">{selectedVehicle.trim}</p>}
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         {!selectedVehicle.isPrimary && (
