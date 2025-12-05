@@ -92,12 +92,13 @@ Preferred communication style: Simple, everyday language.
 - **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
 - **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
 
-## Latest Publish: December 5, 2024 @ 8:05 PM EST
+## Latest Publish: December 5, 2024 @ 8:20 PM EST
 
-## v1.0.5 - PUBLISHED & BLOCKCHAIN VERIFIED
-Solana TX: `3XP2wnb6VMZBf7Zu5TuvuYtbpdsE4JfZQXcZfgzydcfJLNR9TREMjvVoFYstCbWdiEEmo8it8oXkNjX1o7pShp4A`
+## v1.0.6 - PUBLISHED & BLOCKCHAIN VERIFIED
+Solana TX: `qwM86zvbzA6NbSoqUirXqPbRcNUnkpSsvF34msdcWN8aJF4JEW6cC1yHbaJ9K1P89MqmTArFc6XYgatfYyW9B4a`
 
 ## All Versions Blockchain Verified
+- v1.0.6: `qwM86zvbzA6NbSoqUirXqPbRcNUnkpSsvF34msdcWN8aJF4JEW6cC1yHbaJ9K1P89MqmTArFc6XYgatfYyW9B4a`
 - v1.0.5: `3XP2wnb6VMZBf7Zu5TuvuYtbpdsE4JfZQXcZfgzydcfJLNR9TREMjvVoFYstCbWdiEEmo8it8oXkNjX1o7pShp4A`
 - v1.0.4: `5AUTquMgE1iZMxCM1bGpv9Fz2oSGtYYV6PL6DJDv65cTipKdG8fehkLxsKjuhVbhoekzDpg738AWTDkLC3nMfz43`
 - v1.0.3: `DvXsAW8AhxtasuHTv7e7FTJrvWCBF7Lt8VTyNESeWvfS5FHVt1cKKDi6fNS4NtthrF1zkvcuQhU4383L5YsWT4m`
@@ -106,6 +107,12 @@ Solana TX: `3XP2wnb6VMZBf7Zu5TuvuYtbpdsE4JfZQXcZfgzydcfJLNR9TREMjvVoFYstCbWdiEEm
 - v1.0.0: `4NJFuwVx43J65D8e7SrryuVqwmt5SAAGsxqsenJiNAmckVDLEwFfUY1o2MdR8przoYzLa1pbbyfCp9VySoYTmjwA`
 
 ## Recent Updates (December 2024)
+
+### v1.0.6 (Dec 5) - Genesis Hallmark Popup Enhancement
+- Genesis Hallmark popup shows GB-000001 QR code image with Buddy mascot
+- Home page now uses dynamic version from Footer component
+- All version displays pull from releases API
+- Enhanced hallmark popup with description and Solscan link
 
 ### v1.0.5 (Dec 5) - Mobile Modal Optimization
 - All modals now mobile-friendly with proper margins and close buttons
