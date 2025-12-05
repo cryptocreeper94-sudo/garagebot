@@ -139,19 +139,19 @@ export default function Nav() {
           </Link>
           
           {isVerified && (
-            <div className="relative hidden md:block">
+            <div className="relative">
               <button
                 onClick={() => setShowVerifiedDetails(!showVerifiedDetails)}
                 className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition-colors cursor-pointer"
                 data-testid="badge-verified"
               >
                 <BadgeCheck className="w-3.5 h-3.5 text-green-500" />
-                <span className="text-[10px] font-tech uppercase text-green-500">Verified</span>
+                <span className="text-[10px] font-tech uppercase text-green-500 hidden sm:inline">Verified</span>
               </button>
               
               {showVerifiedDetails && (
                 <div 
-                  className="absolute top-full mt-2 right-0 z-[100] w-72 p-4 rounded-xl border-2 border-green-500/40"
+                  className="fixed sm:absolute top-16 sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-2 z-[100] w-auto sm:w-72 p-4 rounded-xl border-2 border-green-500/40"
                   style={{
                     background: 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)',
                     boxShadow: '0 8px 32px rgba(0,0,0,0.9), 0 0 30px rgba(34,197,94,0.2)',
@@ -163,9 +163,10 @@ export default function Nav() {
                     </span>
                     <button
                       onClick={() => setShowVerifiedDetails(false)}
-                      className="text-muted-foreground hover:text-white p-1 rounded hover:bg-white/10"
+                      className="text-muted-foreground hover:text-white p-1.5 rounded hover:bg-white/10"
+                      data-testid="button-close-verified"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
                   <p className="text-xs text-gray-300 mb-3">
