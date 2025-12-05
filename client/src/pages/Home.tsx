@@ -159,7 +159,7 @@ export default function Home() {
                               animate={{ opacity: 1, scale: 1, y: 0 }}
                               exit={{ opacity: 0, scale: 0.8, y: 10 }}
                               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                              className="absolute left-28 xl:left-36 top-2 z-30 w-56"
+                              className="absolute left-28 xl:left-36 top-2 z-[60] w-56"
                             >
                               <div 
                                 className="relative rounded-xl px-4 py-3"
@@ -628,7 +628,7 @@ export default function Home() {
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.8, y: 10 }}
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      className="absolute left-24 top-0 z-30 w-52"
+                      className="absolute left-24 top-0 z-[60] w-52"
                     >
                       <div 
                         className="relative rounded-xl px-3 py-2"
