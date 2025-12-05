@@ -42,9 +42,9 @@ export default function VehicleTypeSelector() {
         </Link>
       </div>
       
-      {/* MOBILE: Horizontal scroll */}
+      {/* MOBILE: Horizontal scroll with images */}
       <div className="lg:hidden overflow-x-auto scrollbar-hide pb-2">
-        <div className="flex gap-4" style={{ minWidth: "max-content" }}>
+        <div className="flex gap-3" style={{ minWidth: "max-content" }}>
           {VEHICLE_TYPES.map((type, index) => (
             <Link key={type.id} href={`/results?type=${type.id}`}>
               <motion.div
@@ -53,19 +53,22 @@ export default function VehicleTypeSelector() {
                 transition={{ delay: index * 0.03 }}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative flex flex-col items-center justify-center w-[70px] h-[70px] md:w-20 md:h-20 rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm cursor-pointer hover:border-primary/60 hover:bg-primary/10 transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                className="group relative w-[100px] h-[120px] rounded-xl overflow-hidden cursor-pointer"
                 data-testid={`vehicle-type-${type.id}`}
               >
-                <motion.div 
-                  className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-1 group-hover:from-primary/30 group-hover:to-primary/15 transition-all duration-300 group-hover:shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                  whileHover={{ rotate: [0, -5, 5, 0] }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <type.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                </motion.div>
-                <span className="font-tech text-[7px] md:text-[9px] uppercase tracking-wide text-foreground text-center leading-tight w-full px-0.5 line-clamp-2">
-                  {type.name}
-                </span>
+                <img 
+                  src={type.image} 
+                  alt={type.name}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/20" />
+                <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
+                  <span className="font-tech text-[10px] uppercase tracking-wide text-white drop-shadow-lg">
+                    {type.name}
+                  </span>
+                </div>
+                <div className="absolute inset-0 border border-white/10 rounded-xl group-hover:border-primary/50 transition-colors" />
               </motion.div>
             </Link>
           ))}
@@ -102,20 +105,22 @@ export default function VehicleTypeSelector() {
                   transition={{ delay: index * 0.03 }}
                   whileHover={{ scale: 1.03, y: -4 }}
                   whileTap={{ scale: 0.98 }}
-                  className="group relative flex flex-col items-center justify-center w-[140px] h-[120px] rounded-xl border border-white/10 bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-sm cursor-pointer hover:border-primary/60 hover:from-primary/15 hover:to-primary/5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.25)]"
+                  className="group relative w-[160px] h-[180px] rounded-xl overflow-hidden cursor-pointer"
                   data-testid={`vehicle-type-desktop-${type.id}`}
                 >
-                  <motion.div 
-                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/25 to-primary/10 flex items-center justify-center mb-3 group-hover:from-primary/40 group-hover:to-primary/20 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-                    whileHover={{ rotate: [0, -8, 8, 0] }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <type.icon className="w-6 h-6 text-primary group-hover:drop-shadow-[0_0_10px_rgba(6,182,212,0.9)]" />
-                  </motion.div>
-                  <span className="font-tech text-[11px] uppercase tracking-wide text-foreground text-center leading-tight px-2">
-                    {type.name}
-                  </span>
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-primary/30 group-hover:bg-primary/60 group-hover:w-12 transition-all duration-300" />
+                  <img 
+                    src={type.image} 
+                    alt={type.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/20" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+                    <span className="font-tech text-xs uppercase tracking-wide text-white drop-shadow-lg">
+                      {type.name}
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 border-2 border-white/10 rounded-xl group-hover:border-primary/60 group-hover:shadow-[0_0_25px_rgba(6,182,212,0.3)] transition-all duration-300" />
                 </motion.div>
               </Link>
             ))}
