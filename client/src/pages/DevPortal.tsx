@@ -6,7 +6,7 @@ import {
   DollarSign, Link2, Settings, Zap, Users, Shield, Clock,
   ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
   BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList,
-  Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch
+  Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch, Blocks, Car
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { FeatureInventory } from "@/components/FeatureInventory";
@@ -601,6 +601,44 @@ export default function DevPortal() {
     enabled: isAuthenticated,
   });
 
+  // Blockchain Assets
+  interface BlockchainAsset {
+    id: string;
+    entityType: 'hallmark' | 'vehicle' | 'release';
+    entityId: string;
+    userId: string;
+    dataHash: string;
+    txSignature: string | null;
+    status: string;
+    network: string;
+    createdAt: string;
+    submittedAt: string | null;
+    confirmedAt: string | null;
+    entityDetails: any;
+    ownerInfo: { id: string; username: string; email: string } | null;
+    solscanUrl: string | null;
+  }
+
+  const { data: blockchainAssets = [], isLoading: loadingAssets } = useQuery<BlockchainAsset[]>({
+    queryKey: ['blockchainAssets'],
+    queryFn: async () => {
+      const res = await fetch(`/api/blockchain/all?pin=${DEV_PIN}`);
+      if (!res.ok) throw new Error('Failed to fetch blockchain assets');
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  const { data: blockchainHealth } = useQuery<{ connected: boolean; network?: string; walletAddress?: string; balance?: number }>({
+    queryKey: ['blockchainHealth'],
+    queryFn: async () => {
+      const res = await fetch('/api/blockchain/health');
+      if (!res.ok) throw new Error('Failed to fetch blockchain status');
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
   const createReleaseMutation = useMutation({
     mutationFn: async (release: typeof newRelease) => {
       const res = await fetch('/api/releases', {
@@ -826,7 +864,7 @@ export default function DevPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-4 max-w-xl">
+          <TabsList className="grid w-full grid-cols-5 mb-4 max-w-2xl">
             <TabsTrigger value="features" className="font-tech uppercase text-xs">
               <ClipboardList className="w-3 h-3 mr-1" /> Features
             </TabsTrigger>
@@ -835,6 +873,9 @@ export default function DevPortal() {
             </TabsTrigger>
             <TabsTrigger value="releases" className="font-tech uppercase text-xs">
               <Tag className="w-3 h-3 mr-1" /> Releases
+            </TabsTrigger>
+            <TabsTrigger value="blockchain" className="font-tech uppercase text-xs">
+              <Blocks className="w-3 h-3 mr-1" /> Blockchain
             </TabsTrigger>
             <TabsTrigger value="affiliates" className="font-tech uppercase text-xs">
               <DollarSign className="w-3 h-3 mr-1" /> Affiliates
@@ -1116,6 +1157,150 @@ export default function DevPortal() {
               ))}
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="blockchain" className="space-y-4">
+            {/* Blockchain Status Header */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Network Status - 8 cols */}
+              <Card className={`md:col-span-8 border-primary/30 p-4 ${blockchainHealth?.connected ? 'bg-gradient-to-br from-green-500/10 to-cyan-500/5' : 'bg-gradient-to-br from-red-500/10 to-orange-500/5'}`}>
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${blockchainHealth?.connected ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
+                    <Blocks className={`w-6 h-6 ${blockchainHealth?.connected ? 'text-green-400' : 'text-red-400'}`} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Solana Network</p>
+                    <p className="font-tech text-xl text-primary">
+                      {blockchainHealth?.connected ? blockchainHealth.network?.replace('-beta', '') : 'Disconnected'}
+                    </p>
+                    {blockchainHealth?.walletAddress && (
+                      <p className="text-xs text-muted-foreground font-mono truncate max-w-xs">
+                        Wallet: {blockchainHealth.walletAddress.slice(0, 8)}...{blockchainHealth.walletAddress.slice(-6)}
+                      </p>
+                    )}
+                  </div>
+                  {blockchainHealth?.balance !== undefined && (
+                    <Badge className="bg-primary/20 text-primary border-primary/30">
+                      {blockchainHealth.balance.toFixed(4)} SOL
+                    </Badge>
+                  )}
+                </div>
+              </Card>
+              
+              {/* Stats - 4 cols */}
+              <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4 flex flex-col justify-center gap-2">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <p className="text-lg font-bold text-primary">{blockchainAssets.filter(a => a.entityType === 'hallmark').length}</p>
+                    <p className="text-xs text-muted-foreground">Hallmarks</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-cyan-400">{blockchainAssets.filter(a => a.entityType === 'vehicle').length}</p>
+                    <p className="text-xs text-muted-foreground">Vehicles</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-purple-400">{blockchainAssets.filter(a => a.entityType === 'release').length}</p>
+                    <p className="text-xs text-muted-foreground">Releases</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Assets List */}
+            <Card className="bg-card/50 border-primary/20 p-4">
+              <h3 className="font-tech text-sm text-primary mb-4 flex items-center gap-2">
+                <Blocks className="w-4 h-4" />
+                All Blockchain-Verified Assets ({blockchainAssets.length})
+              </h3>
+              
+              {loadingAssets ? (
+                <div className="text-center py-8 text-muted-foreground">Loading assets...</div>
+              ) : blockchainAssets.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No blockchain-verified assets yet
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                  {blockchainAssets.map((asset) => (
+                    <div key={asset.id} className="bg-background/50 border border-primary/10 rounded-lg p-3">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                            asset.entityType === 'hallmark' ? 'bg-primary/20' :
+                            asset.entityType === 'vehicle' ? 'bg-cyan-500/20' :
+                            'bg-purple-500/20'
+                          }`}>
+                            {asset.entityType === 'hallmark' ? (
+                              <Shield className={`w-5 h-5 text-primary`} />
+                            ) : asset.entityType === 'vehicle' ? (
+                              <Car className={`w-5 h-5 text-cyan-400`} />
+                            ) : (
+                              <Tag className={`w-5 h-5 text-purple-400`} />
+                            )}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-tech text-sm uppercase text-primary">
+                                {asset.entityType}
+                              </span>
+                              <Badge className={`text-xs ${
+                                asset.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                                asset.status === 'submitted' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+                                'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                              }`}>
+                                {asset.status}
+                              </Badge>
+                              <Badge className="text-xs bg-primary/10 text-primary border-primary/20">
+                                {asset.network.replace('-beta', '')}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {asset.entityDetails ? (
+                                asset.entityType === 'hallmark' ? (
+                                  <>Genesis #{asset.entityDetails.assetNumber}: {asset.entityDetails.displayName || 'Unnamed'}</>
+                                ) : asset.entityType === 'vehicle' ? (
+                                  <>{asset.entityDetails.year} {asset.entityDetails.make} {asset.entityDetails.model}</>
+                                ) : (
+                                  <>v{asset.entityDetails.version} ({asset.entityDetails.versionType})</>
+                                )
+                              ) : 'Entity details not available'}
+                            </p>
+                            {asset.ownerInfo && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                                <User className="w-3 h-3" />
+                                {asset.ownerInfo.username || asset.ownerInfo.email}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right text-xs">
+                          <p className="text-muted-foreground">
+                            {new Date(asset.createdAt).toLocaleDateString('en-US', {
+                              month: 'short', day: 'numeric', year: '2-digit'
+                            })}
+                          </p>
+                          {asset.solscanUrl && (
+                            <a 
+                              href={asset.solscanUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline flex items-center gap-1 justify-end mt-1"
+                            >
+                              Solscan <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                          {asset.txSignature && !asset.solscanUrl && (
+                            <p className="font-mono text-muted-foreground truncate max-w-[100px]">
+                              {asset.txSignature.slice(0, 12)}...
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
           </TabsContent>
 
           <TabsContent value="affiliates" className="space-y-4">

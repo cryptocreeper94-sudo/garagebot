@@ -304,6 +304,7 @@ export interface IStorage {
   getBlockchainVerification(id: string): Promise<BlockchainVerification | undefined>;
   getBlockchainVerificationsByEntity(entityType: string, entityId: string): Promise<BlockchainVerification[]>;
   getBlockchainVerificationsByUser(userId: string): Promise<BlockchainVerification[]>;
+  getAllBlockchainVerifications(): Promise<BlockchainVerification[]>;
   getLatestVerification(entityType: string, entityId: string): Promise<BlockchainVerification | undefined>;
   createBlockchainVerification(verification: InsertBlockchainVerification): Promise<BlockchainVerification>;
   updateBlockchainVerification(id: string, updates: Partial<BlockchainVerification>): Promise<BlockchainVerification | undefined>;
@@ -1594,6 +1595,11 @@ export class DatabaseStorage implements IStorage {
   async getBlockchainVerificationsByUser(userId: string): Promise<BlockchainVerification[]> {
     return await db.select().from(blockchainVerifications)
       .where(eq(blockchainVerifications.userId, userId))
+      .orderBy(desc(blockchainVerifications.createdAt));
+  }
+  
+  async getAllBlockchainVerifications(): Promise<BlockchainVerification[]> {
+    return await db.select().from(blockchainVerifications)
       .orderBy(desc(blockchainVerifications.createdAt));
   }
   
