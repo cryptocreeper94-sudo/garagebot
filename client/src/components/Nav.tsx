@@ -9,6 +9,8 @@ import { useQuery } from "@tanstack/react-query";
 import { CartButton, MobileCartButton } from "@/components/CartDrawer";
 import { useCart } from "@/hooks/useCart";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
+import appHallmarkImage from "@assets/generated_images/garagebot_app_hallmark_01.png";
+import buddyWaving from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
 
 interface Subscription {
   status: 'active' | 'inactive' | 'canceled';
@@ -151,15 +153,15 @@ export default function Nav() {
               
               {showVerifiedDetails && (
                 <div 
-                  className="fixed sm:absolute top-16 sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-2 z-[100] w-auto sm:w-72 p-4 rounded-xl border-2 border-green-500/40"
+                  className="fixed sm:absolute top-16 sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-2 z-[100] w-auto sm:w-96 p-4 rounded-xl border-2 border-purple-500/40"
                   style={{
                     background: 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.9), 0 0 30px rgba(34,197,94,0.2)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.9), 0 0 40px rgba(168,85,247,0.25)',
                   }}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-tech uppercase text-green-400 flex items-center gap-2">
-                      <BadgeCheck className="w-5 h-5" /> Blockchain Verified
+                    <span className="text-sm font-tech uppercase text-purple-400 flex items-center gap-2">
+                      <Shield className="w-5 h-5" /> Genesis Hallmark
                     </span>
                     <button
                       onClick={() => setShowVerifiedDetails(false)}
@@ -169,15 +171,44 @@ export default function Nav() {
                       <X className="w-5 h-5" />
                     </button>
                   </div>
-                  <p className="text-xs text-gray-300 mb-3">
-                    This application is verified on Solana mainnet.
-                  </p>
+                  
+                  {/* Hallmark Image with Buddy */}
+                  <div className="flex items-end gap-3 mb-4">
+                    <div className="relative flex-shrink-0">
+                      <img 
+                        src={appHallmarkImage} 
+                        alt="GarageBot Genesis Hallmark GB-000001" 
+                        className="w-28 h-28 sm:w-36 sm:h-36 object-contain rounded-lg border border-purple-500/30 bg-black/30"
+                        style={{ boxShadow: '0 0 20px rgba(168,85,247,0.3)' }}
+                      />
+                      <div className="absolute -bottom-1 -right-1 bg-green-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                        <BadgeCheck className="w-2.5 h-2.5" /> VERIFIED
+                      </div>
+                    </div>
+                    <img 
+                      src={buddyWaving} 
+                      alt="Buddy" 
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-contain transform -scale-x-100"
+                      style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.5))' }}
+                    />
+                  </div>
+                  
+                  {/* Description */}
+                  <div className="space-y-2 mb-3">
+                    <p className="text-xs text-gray-300">
+                      <span className="text-purple-400 font-bold font-mono">GB-000001</span> is GarageBot's official Genesis Hallmark - a blockchain-verified digital certificate proving this is the authentic GarageBot application.
+                    </p>
+                    <p className="text-[10px] text-gray-500">
+                      Verified on Solana mainnet • Tamper-proof • Immutable record
+                    </p>
+                  </div>
+                  
                   {appHallmark?.solanaSignature && (
                     <a
                       href={`https://solscan.io/tx/${appHallmark.solanaSignature}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-xs text-primary hover:underline bg-primary/10 px-3 py-2 rounded-lg"
+                      className="flex items-center justify-center gap-2 text-xs text-primary hover:underline bg-primary/10 px-3 py-2.5 rounded-lg w-full font-medium"
                     >
                       <ExternalLink className="w-4 h-4" />
                       View on Solscan
