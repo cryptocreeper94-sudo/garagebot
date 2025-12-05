@@ -1,6 +1,8 @@
 # GarageBot Feature Log & Variable Tracker
 
-**Last Updated: December 2, 2024 @ 6:45 PM EST**
+**Last Updated: December 5, 2024 @ 7:35 PM EST**
+**Current Version: v1.0.3 (Blockchain Verified)**
+**Solana TX:** `DvXsAW8AhxtasuHTv7e7FTJrvWCBF7Lt8VTyNESeWvfS5FHVt1cKKDi6fNS4NtthrF1zkvcuQhU4383L5YsWT4m`
 
 ## Brand Identity
 - **Name:** GarageBot
@@ -8,23 +10,32 @@
 - **Domain:** garagebot.io (primary), garagebot.net (redirect)
 - **AI Mascot:** Buddy - gauge-eyed junkyard robot, conversational parts-finding assistant
 
+## Version History
+- **v1.0.3 (Dec 5):** UI polish, layout improvements, app hallmark badge, weather/Buddy repositioning
+- **v1.0.2 (Dec 5):** AI-generated carousel images, Genesis Hallmark visual badges
+- **v1.0.1 (Dec 4):** Bug fixes and polish
+- **v1.0.0 (Dec 3):** Genesis Launch - full feature release
+
 ## Active Features (Completed)
 *   **Universal Search Engine:** Aggregates results from 40+ retailers based on Year/Make/Model.
 *   **"My Garage" Fleet Management:** Saves vehicle specs for all vehicle types with VIN decoding.
-*   **AI Assistant "Buddy":** Conversational search with memory, smart recommendations, and animated mascot.
+*   **AI Assistant "Buddy":** Conversational search with memory, smart recommendations, and animated mascot (1.5x larger, bottom-right positioning).
 *   **Glossary System:** Interactive definitions with Buddy mascot popups.
 *   **Developer Dashboard:** "Mission Control" for system monitoring and affiliate tracking.
 *   **Shopping Cart:** Multi-vendor cart with Stripe checkout.
 *   **Vehicle Type Selector:** Support for 18+ vehicle categories including cars, trucks, motorcycles, ATVs, boats, RVs, diesel, small engines, Chinese imports.
-*   **Genesis Hallmark ($2/vehicle):** On-chain vehicle identity with Solana blockchain verification.
+*   **Genesis Hallmark ($2/vehicle):** On-chain vehicle identity with Solana mainnet verification, numbered badges with purple holographic styling.
+*   **App Hallmark Badge:** Clickable GB-000001 badge in header linking to Genesis Hallmark page.
 *   **Vehicle Passport:** VIN-decoded vehicle info with NHTSA recalls integration.
 *   **Pro Subscription ($2.99/month):** Founders Circle pricing with Stripe integration.
 *   **DIY Repair Guides:** AI-generated step-by-step maintenance instructions with YouTube links.
 *   **Insurance Comparison:** Multi-carrier quotes page with lead generation.
 *   **Mechanics Garage:** Shop management portal for professional mechanics.
 *   **Member Referral Program:** Points-based referral system with signup tracking and Pro conversion bonuses.
-*   **Weather Widget:** Live weather with radar integration and storm alerts.
+*   **Weather Widget:** Live weather with radar integration and storm alerts (bottom-left positioning).
 *   **Bento Grid Layout:** Consistent max-w-6xl containers across all pages.
+*   **Image Carousels:** AI-generated images for vehicle types and categories with horizontal navigation.
+*   **Release Version Control:** Timestamped versions with blockchain verification.
 
 ## Planned Features (Backlog)
 *   **Local Pickup Integration:**
