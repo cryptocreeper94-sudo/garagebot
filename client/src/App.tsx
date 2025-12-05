@@ -31,6 +31,7 @@ import GenesisHallmark from "@/pages/GenesisHallmark";
 import DIYGuides from "@/pages/DIYGuides";
 import TermsOfService from "@/pages/TermsOfService";
 import InviteFriends from "@/pages/InviteFriends";
+import VendorSignup from "@/pages/VendorSignup";
 
 function Router() {
   return (
@@ -55,6 +56,7 @@ function Router() {
       <Route path="/hallmark">{() => <GenesisHallmark />}</Route>
       <Route path="/diy-guides">{() => <DIYGuides />}</Route>
       <Route path="/invite">{() => <InviteFriends />}</Route>
+      <Route path="/vendor-signup">{() => <VendorSignup />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );
