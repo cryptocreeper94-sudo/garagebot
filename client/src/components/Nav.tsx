@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
@@ -8,8 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { CartButton, MobileCartButton } from "@/components/CartDrawer";
 import { useCart } from "@/hooks/useCart";
+import { QRCodeSVG } from "qrcode.react";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
-import appHallmarkImage from "@assets/generated_images/garagebot_app_hallmark_01.png";
 import buddyWaving from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
 
 interface Subscription {
@@ -140,7 +140,7 @@ export default function Nav() {
               
               {showVerifiedDetails && (
                 <div 
-                  className="fixed sm:absolute top-16 sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-2 z-[100] w-auto sm:w-96 p-4 rounded-xl border-2 border-purple-500/40"
+                  className="fixed sm:absolute top-16 sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-2 z-[100] w-auto sm:w-[420px] p-4 rounded-xl border-2 border-purple-500/40 max-h-[80vh] overflow-y-auto"
                   style={{
                     background: 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)',
                     boxShadow: '0 8px 32px rgba(0,0,0,0.9), 0 0 40px rgba(168,85,247,0.25)',
@@ -159,36 +159,71 @@ export default function Nav() {
                     </button>
                   </div>
                   
-                  {/* Hallmark Image with Buddy */}
-                  <div className="flex items-end gap-3 mb-4">
-                    <div className="relative flex-shrink-0">
-                      <img 
-                        src={appHallmarkImage} 
-                        alt="GarageBot Genesis Hallmark GB-000001" 
-                        className="w-28 h-28 sm:w-36 sm:h-36 object-contain rounded-lg border border-purple-500/30 bg-black/30"
-                        style={{ boxShadow: '0 0 20px rgba(168,85,247,0.3)' }}
+                  {/* QR Code with Buddy */}
+                  <div className="flex items-end gap-4 mb-4">
+                    <div className="relative flex-shrink-0 bg-white p-3 rounded-xl" style={{ boxShadow: '0 0 30px rgba(168,85,247,0.4)' }}>
+                      <QRCodeSVG 
+                        value="https://garagebot.io/verify/GB-000001"
+                        size={120}
+                        level="H"
+                        includeMargin={false}
+                        bgColor="#FFFFFF"
+                        fgColor="#0d1117"
                       />
-                      <div className="absolute -bottom-1 -right-1 bg-green-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                        <BadgeCheck className="w-2.5 h-2.5" /> VERIFIED
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full font-mono whitespace-nowrap">
+                        GB-000001
                       </div>
                     </div>
                     <img 
                       src={buddyWaving} 
                       alt="Buddy" 
-                      className="w-16 h-16 sm:w-20 sm:h-20 object-contain transform -scale-x-100"
+                      className="w-20 h-20 sm:w-24 sm:h-24 object-contain transform -scale-x-100"
                       style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.5))' }}
                     />
                   </div>
                   
-                  {/* Description */}
-                  <div className="space-y-2 mb-3">
-                    <p className="text-xs text-gray-300">
-                      <span className="text-purple-400 font-bold font-mono">GB-000001</span> is GarageBot's official Genesis Hallmark - a blockchain-verified digital certificate proving this is the authentic GarageBot application.
-                    </p>
-                    <p className="text-[10px] text-gray-500">
-                      Verified on Solana mainnet • Tamper-proof • Immutable record
-                    </p>
+                  {/* Serial Number */}
+                  <div className="bg-black/40 rounded-lg p-3 mb-3 border border-purple-500/20">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] text-gray-500 uppercase font-mono">Serial Number</span>
+                      <BadgeCheck className="w-4 h-4 text-green-500" />
+                    </div>
+                    <p className="text-lg font-mono font-bold text-purple-400">GB-000001</p>
+                    <p className="text-[10px] text-gray-500">GarageBot Application Genesis Certificate</p>
                   </div>
+                  
+                  {/* Blockchain Verification Details */}
+                  <div className="bg-black/40 rounded-lg p-3 mb-3 border border-green-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-[10px] text-green-400 uppercase font-mono font-bold">Blockchain Verified</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div>
+                        <span className="text-[9px] text-gray-500 block mb-0.5">Network</span>
+                        <span className="text-xs text-gray-300 font-mono">Solana Mainnet</span>
+                      </div>
+                      {latestRelease && (
+                        <div>
+                          <span className="text-[9px] text-gray-500 block mb-0.5">Latest Version</span>
+                          <span className="text-xs text-gray-300 font-mono">v{latestRelease.version}</span>
+                        </div>
+                      )}
+                      {appHallmark?.solanaSignature && (
+                        <div>
+                          <span className="text-[9px] text-gray-500 block mb-0.5">Transaction Hash</span>
+                          <p className="text-[10px] text-primary font-mono break-all leading-relaxed">
+                            {appHallmark.solanaSignature}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Description */}
+                  <p className="text-[11px] text-gray-400 mb-3 leading-relaxed">
+                    Scan the QR code to verify this is the authentic GarageBot application. This Genesis Hallmark is permanently recorded on the Solana blockchain.
+                  </p>
                   
                   {appHallmark?.solanaSignature && (
                     <a
