@@ -45,7 +45,7 @@ export default function CategoryGrid() {
       {/* MOBILE: Horizontal scroll with images */}
       <div className="lg:hidden overflow-x-auto scrollbar-hide pb-2">
         <div className="flex gap-3" style={{ minWidth: "max-content" }}>
-          {CATEGORIES.slice(0, 12).map((cat, index) => (
+          {CATEGORIES.map((cat, index) => (
             <Link key={cat.id} href={`/results?category=${cat.id}`}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
