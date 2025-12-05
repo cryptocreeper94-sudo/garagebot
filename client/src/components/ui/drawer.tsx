@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
+import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -41,14 +42,22 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-[80] mt-24 flex h-auto flex-col rounded-t-[10px] border border-primary/30 bg-card shadow-[0_0_60px_rgba(6,182,212,0.4)]",
+        "fixed inset-x-0 bottom-0 z-[80] mt-24 flex h-auto max-h-[90vh] flex-col rounded-t-[10px] border border-primary/30 bg-card shadow-[0_0_60px_rgba(6,182,212,0.4)]",
         className
       )}
       style={{ opacity: 1 }}
       {...props}
     >
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-primary/30" />
-      {children}
+      <div className="flex items-center justify-between px-4 pt-4">
+        <div className="mx-auto h-2 w-[100px] rounded-full bg-primary/30" />
+        <DrawerPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+          <X className="h-5 w-5" />
+          <span className="sr-only">Close</span>
+        </DrawerPrimitive.Close>
+      </div>
+      <div className="overflow-y-auto">
+        {children}
+      </div>
     </DrawerPrimitive.Content>
   </DrawerPortal>
 ))
