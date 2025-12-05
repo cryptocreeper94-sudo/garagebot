@@ -92,23 +92,44 @@ Preferred communication style: Simple, everyday language.
 - **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
 - **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
 
-## Latest Publish: December 3, 2024 @ 8:29 AM EST
+## Latest Publish: December 5, 2024 @ 7:35 PM EST
 
-## v1.0.0 "Genesis Launch" - PUBLISHED
-Ready for marketing launch with full feature set.
+## v1.0.3 - PUBLISHED & BLOCKCHAIN VERIFIED
+Solana TX: `DvXsAW8AhxtasuHTv7e7FTJrvWCBF7Lt8VTyNESeWvfS5FHVt1cKKDi6fNS4NtthrF1zkvcuQhU4383L5YsWT4m`
 
 ## Recent Updates (December 2024)
-- **v1.0.0 Genesis Launch (Dec 3)**: Official v1.0 release published with comprehensive changelog covering all features, UI/UX, and technical implementation.
-- **Footer Consistency (Dec 3)**: Added Footer component to all major pages (Insurance, Pro, Garage, GenesisHallmark, Dashboard, DIYGuides, Results, MechanicsGarage, TermsOfService, PrivacyPolicy).
-- **Container Width Standardization (Dec 3)**: Updated all pages to use max-w-6xl containers for consistent desktop layouts.
-- **Release Version Control (Dec 2)**: Full release tracking system with versions, changelogs, footer badge. Agent instructions at `docs/RELEASE_SYSTEM_AGENT_COPY.txt`.
-- **Hero Buddy Local Popup (Dec 2)**: Clicking Buddy on the "G" now shows a compact local comic bubble with tips instead of opening full-screen chat. No blur/overlay.
-- **BuddyHideSeek Animation Fix (Dec 2)**: Random Buddy popup now properly sweeps in from 8 directions with spring physics. Removed blur overlay, compact fitted speech bubble.
-- **Bento Grid Layout (Dec 2)**: Applied max-w-6xl centered containers and bento grid headers across all major pages for consistent, compact desktop layouts.
-- **Weather Radar Integration**: Live weather radar with RainViewer tiles, NOAA storm alerts, animated playback controls, and layer toggles. Accessible via radar button in the weather widget.
-- **React 18 Compatibility Fix**: Downgraded from React 19.2.0 to React 18.3.1 and framer-motion 12.x to 11.15.0 to fix "Objects are not valid as a React child" error. @tanstack/react-query 5.x has experimental React 19 support that caused CJS/ESM bundling issues.
-- **Member Referral Program**: Full points-based referral system with signup tracking, Pro conversion bonuses, and reward redemption.
-- **Dev Redirect**: Development mode auto-redirects to `/dev` page on first load for faster development workflow.
+
+### v1.0.3 (Dec 5) - UI Polish & Layout
+- Clickable app hallmark badge (GB-000001) in header linking to Genesis Hallmark page
+- Weather widget moved to bottom left corner, aligned with Buddy on same baseline
+- Buddy AI mascot increased to 1.5x size (80px mobile → 144px desktop)
+- All popups now 100% opacity with z-100 (no transparency issues)
+- Mobile optimized responsive sizing for weather and Buddy
+- Two-column hamburger menu layout on desktop
+
+### v1.0.2 (Dec 5) - Image Carousels & Hallmark Badges
+- AI-generated images for all 12 vehicle type carousel cards
+- AI-generated images for all 20 category carousel cards
+- Converted desktop accordions to horizontal image carousels with arrow navigation
+- Genesis Hallmark visual badge with dynamic asset number overlay
+- Generated numbered hallmark images (000000000-01 for app, 000000000-02 for founder)
+- Purple holographic glow effect on hallmark badges
+
+### v1.0.1 (Dec 4) - Bug Fixes
+- Minor UI fixes and polish
+
+### v1.0.0 "Genesis Launch" (Dec 3)
+- Official v1.0 release with full feature set
+- Footer component on all major pages
+- Container width standardization (max-w-6xl)
+- Release Version Control system
+- Bento grid layouts across all pages
+
+### Earlier Updates
+- **Weather Radar Integration**: Live weather radar with RainViewer tiles, NOAA storm alerts, animated playback.
+- **React 18 Compatibility**: Downgraded to React 18.3.1 and framer-motion 11.15.0 for stability.
+- **Member Referral Program**: Points-based referral system with Pro conversion bonuses.
+- **Dev Portal**: Full release management, affiliate network guides, blockchain verification.
 
 ## Weather Radar System
 - **Component**: `WeatherRadar.tsx` with Leaflet map and RainViewer radar tiles
