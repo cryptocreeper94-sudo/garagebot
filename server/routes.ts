@@ -5350,6 +5350,77 @@ export async function registerRoutes(
       res.status(500).json({ connected: false, error: String(error) });
     }
   });
+  
+  // Get all blockchain verifications (admin/dev portal view - requires PIN)
+  app.get('/api/blockchain/all', async (req, res) => {
+    try {
+      const pin = req.query.pin as string;
+      const DEV_PORTAL_PIN = '0424';
+      
+      if (pin !== DEV_PORTAL_PIN) {
+        return res.status(403).json({ error: "Access denied. Admin PIN required." });
+      }
+      
+      const verifications = await storage.getAllBlockchainVerifications();
+      
+      // Enrich with entity details
+      const enrichedVerifications = await Promise.all(
+        verifications.map(async (v) => {
+          let entityDetails: any = null;
+          let ownerInfo: any = null;
+          
+          if (v.entityType === 'hallmark') {
+            const hallmark = await storage.getHallmark(v.entityId);
+            if (hallmark) {
+              entityDetails = {
+                assetNumber: hallmark.assetNumber,
+                displayName: hallmark.displayName,
+                assetType: hallmark.assetType,
+              };
+              const user = await storage.getUser(hallmark.userId);
+              ownerInfo = user ? { id: user.id, username: user.username, email: user.email } : null;
+            }
+          } else if (v.entityType === 'vehicle') {
+            const vehicle = await storage.getVehicle(v.entityId);
+            if (vehicle) {
+              entityDetails = {
+                year: vehicle.year,
+                make: vehicle.make,
+                model: vehicle.model,
+                vin: vehicle.vin,
+                nickname: vehicle.nickname,
+              };
+              const user = await storage.getUser(vehicle.userId);
+              ownerInfo = user ? { id: user.id, username: user.username, email: user.email } : null;
+            }
+          } else if (v.entityType === 'release') {
+            const release = await storage.getReleaseByVersion(v.entityId);
+            if (release) {
+              entityDetails = {
+                version: release.version,
+                versionType: release.versionType,
+                status: release.status,
+              };
+            }
+          }
+          
+          return {
+            ...v,
+            entityDetails,
+            ownerInfo,
+            solscanUrl: v.txSignature && !v.txSignature.startsWith('HASH_') && !v.txSignature.startsWith('DEMO_')
+              ? blockchainService.getSolscanUrl(v.txSignature, v.network as 'mainnet-beta' | 'devnet')
+              : null,
+          };
+        })
+      );
+      
+      res.json(enrichedVerifications);
+    } catch (error) {
+      console.error("Get all blockchain verifications error:", error);
+      res.status(500).json({ error: "Failed to get all verifications" });
+    }
+  });
 
   // ============================================
   // RELEASE VERSION CONTROL ROUTES

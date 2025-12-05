@@ -20,8 +20,14 @@ import {
   Star,
   FileText,
   Package,
-  Link2
+  Link2,
+  Blocks,
+  Car,
+  ExternalLink,
+  Tag
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   LineChart, 
   Line, 
@@ -52,7 +58,54 @@ const SYSTEM_HEALTH = [
   { name: "Geolocation Service", status: "Operational", latency: "20ms", color: "text-green-400" },
 ];
 
+interface BlockchainAsset {
+  id: string;
+  entityType: 'hallmark' | 'vehicle' | 'release';
+  entityId: string;
+  userId: string;
+  dataHash: string;
+  txSignature: string | null;
+  status: string;
+  network: string;
+  createdAt: string;
+  submittedAt: string | null;
+  confirmedAt: string | null;
+  solscanUrl?: string | null;
+}
+
 export default function Dashboard() {
+  const { user } = useAuth();
+
+  const { data: myBlockchainAssets = [], isLoading: loadingAssets } = useQuery<BlockchainAsset[]>({
+    queryKey: ['myBlockchainVerifications'],
+    queryFn: async () => {
+      const res = await fetch('/api/blockchain/verifications');
+      if (!res.ok) throw new Error('Failed to fetch blockchain assets');
+      return res.json();
+    },
+    enabled: !!user,
+  });
+
+  const { data: myHallmarks = [] } = useQuery<any[]>({
+    queryKey: ['myHallmarks'],
+    queryFn: async () => {
+      const res = await fetch('/api/hallmarks/me');
+      if (!res.ok) throw new Error('Failed to fetch hallmarks');
+      return res.json();
+    },
+    enabled: !!user,
+  });
+
+  const { data: myVehicles = [] } = useQuery<any[]>({
+    queryKey: ['myVehicles'],
+    queryFn: async () => {
+      const res = await fetch('/api/vehicles');
+      if (!res.ok) throw new Error('Failed to fetch vehicles');
+      return res.json();
+    },
+    enabled: !!user,
+  });
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-white">
       <Nav />
@@ -338,6 +391,147 @@ export default function Dashboard() {
             </div>
           </Card>
         </div>
+
+        {/* My Blockchain Assets Section */}
+        {user && (
+          <div className="mt-8 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Blocks className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-tech font-bold uppercase text-white">My Blockchain Assets</h2>
+                <p className="text-xs text-muted-foreground font-mono">On-chain verified records // Solana mainnet</p>
+              </div>
+              <Badge className="bg-primary/20 text-primary border-primary/30">
+                {myBlockchainAssets.length} verified
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {/* Stats */}
+              <Card className="bg-card/50 border-primary/20 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-primary">{myBlockchainAssets.filter(a => a.entityType === 'hallmark').length}</p>
+                    <p className="text-xs text-muted-foreground">Hallmarks</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="bg-card/50 border-cyan-500/20 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                    <Car className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-cyan-400">{myBlockchainAssets.filter(a => a.entityType === 'vehicle').length}</p>
+                    <p className="text-xs text-muted-foreground">Vehicle Passports</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="bg-card/50 border-green-500/20 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <Tag className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-green-400">{myBlockchainAssets.filter(a => a.status === 'confirmed' || a.status === 'submitted').length}</p>
+                    <p className="text-xs text-muted-foreground">On-Chain</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Assets List */}
+            {loadingAssets ? (
+              <Card className="bg-card/30 border-white/10 p-6">
+                <div className="text-center py-4 text-muted-foreground">Loading your blockchain assets...</div>
+              </Card>
+            ) : myBlockchainAssets.length === 0 ? (
+              <Card className="bg-card/30 border-white/10 p-6">
+                <div className="text-center py-8">
+                  <Blocks className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
+                  <p className="text-muted-foreground mb-2">No blockchain-verified assets yet</p>
+                  <p className="text-xs text-muted-foreground/70">Mint a Genesis Hallmark or verify a vehicle to get started</p>
+                </div>
+              </Card>
+            ) : (
+              <Card className="bg-card/30 border-white/10 p-4">
+                <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                  {myBlockchainAssets.map((asset) => {
+                    const hallmark = asset.entityType === 'hallmark' 
+                      ? myHallmarks.find(h => h.id === asset.entityId) 
+                      : null;
+                    const vehicle = asset.entityType === 'vehicle' 
+                      ? myVehicles.find(v => v.id === asset.entityId) 
+                      : null;
+                    
+                    return (
+                      <div key={asset.id} className="bg-background/50 border border-primary/10 rounded-lg p-3">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                              asset.entityType === 'hallmark' ? 'bg-primary/20' : 'bg-cyan-500/20'
+                            }`}>
+                              {asset.entityType === 'hallmark' ? (
+                                <Shield className="w-5 h-5 text-primary" />
+                              ) : (
+                                <Car className="w-5 h-5 text-cyan-400" />
+                              )}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-tech text-sm uppercase text-primary">
+                                  {asset.entityType === 'hallmark' ? 'Genesis Hallmark' : 'Vehicle Passport'}
+                                </span>
+                                <Badge className={`text-xs ${
+                                  asset.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                                  asset.status === 'submitted' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+                                  'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                                }`}>
+                                  {asset.status}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {hallmark ? (
+                                  <>#{hallmark.assetNumber}: {hallmark.displayName || 'Unnamed Asset'}</>
+                                ) : vehicle ? (
+                                  <>{vehicle.year} {vehicle.make} {vehicle.model}</>
+                                ) : (
+                                  asset.entityId
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(asset.createdAt).toLocaleDateString('en-US', {
+                                month: 'short', day: 'numeric'
+                              })}
+                            </p>
+                            {asset.txSignature && !asset.txSignature.startsWith('HASH_') && !asset.txSignature.startsWith('DEMO_') && (
+                              <a 
+                                href={`https://solscan.io/tx/${asset.txSignature}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline flex items-center gap-1 justify-end text-xs mt-1"
+                              >
+                                Solscan <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
 
         {/* Jason's Dev Task List */}
         <div className="mt-8 mb-8">
