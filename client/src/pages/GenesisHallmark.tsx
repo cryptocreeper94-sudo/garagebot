@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 import { BlockchainStatus } from "@/components/BlockchainStatus";
 import bgImage from "@assets/generated_images/al_watermark_background_texture.png";
+import hallmarkBadge from "@assets/generated_images/genesis_hallmark_badge_template.png";
 
 interface Hallmark {
   id: string;
@@ -190,6 +191,22 @@ export default function GenesisHallmark() {
 
               {hallmark ? (
                 <div className="space-y-4">
+                  {/* Visual Hallmark Badge */}
+                  <div className="relative mx-auto w-48 h-48 mb-4">
+                    <img 
+                      src={hallmarkBadge} 
+                      alt="Genesis Hallmark Badge" 
+                      className="w-full h-full object-contain rounded-xl shadow-[0_0_40px_rgba(168,85,247,0.3)]"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="font-tech text-[10px] uppercase tracking-wider text-purple-300/80 mb-1">Genesis Hallmark</span>
+                      <span className="font-mono font-bold text-lg text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">
+                        GB-{hallmark.assetNumber.toString().padStart(6, '0')}
+                      </span>
+                      <span className="font-tech text-[8px] uppercase tracking-wider text-cyan-300/80 mt-1">Verified</span>
+                    </div>
+                  </div>
+
                   <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
                     <div className="flex items-center gap-2 text-green-400 mb-2">
                       <CheckCircle className="w-5 h-5" />
