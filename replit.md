@@ -92,12 +92,24 @@ Preferred communication style: Simple, everyday language.
 - **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
 - **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
 
-## Latest Publish: December 5, 2024 @ 7:35 PM EST
+## Latest Publish: December 5, 2024 @ 7:45 PM EST
 
-## v1.0.3 - PUBLISHED & BLOCKCHAIN VERIFIED
-Solana TX: `DvXsAW8AhxtasuHTv7e7FTJrvWCBF7Lt8VTyNESeWvfS5FHVt1cKKDi6fNS4NtthrF1zkvcuQhU4383L5YsWT4m`
+## v1.0.4 - PUBLISHED & BLOCKCHAIN VERIFIED
+Solana TX: `5AUTquMgE1iZMxCM1bGpv9Fz2oSGtYYV6PL6DJDv65cTipKdG8fehkLxsKjuhVbhoekzDpg738AWTDkLC3nMfz43`
+
+## All Versions Blockchain Verified
+- v1.0.4: `5AUTquMgE1iZMxCM1bGpv9Fz2oSGtYYV6PL6DJDv65cTipKdG8fehkLxsKjuhVbhoekzDpg738AWTDkLC3nMfz43`
+- v1.0.3: `DvXsAW8AhxtasuHTv7e7FTJrvWCBF7Lt8VTyNESeWvfS5FHVt1cKKDi6fNS4NtthrF1zkvcuQhU4383L5YsWT4m`
+- v1.0.2: `5gHRuwY3oWGnmVDAPvTWxfRdXUMSJ1r9tA2ze2hzAA3W5HMsJWN6BDQfdRfFFgfab7zdooveS3WSmdfjw7MMZSB5`
+- v1.0.1: `5cPLvQQHV1uHfxUB7gpbBhUd3c6gQaGtAhGzrDZgikgBeFF99mxZM45kR2CHHVvdenh5gZ7Z8nd6PTvkwGdDDGTn`
+- v1.0.0: `4NJFuwVx43J65D8e7SrryuVqwmt5SAAGsxqsenJiNAmckVDLEwFfUY1o2MdR8przoYzLa1pbbyfCp9VySoYTmjwA`
 
 ## Recent Updates (December 2024)
+
+### v1.0.4 (Dec 5) - Documentation & Blockchain
+- Updated all documentation to reflect latest changes
+- All past versions (1.0.0-1.0.3) now blockchain verified on Solana mainnet
+- Fixed Investors page retailer count (20+ → 40+)
 
 ### v1.0.3 (Dec 5) - UI Polish & Layout
 - Clickable app hallmark badge (GB-000001) in header linking to Genesis Hallmark page
