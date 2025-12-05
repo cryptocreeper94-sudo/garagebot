@@ -1126,22 +1126,42 @@ export async function registerRoutes(
 
   app.get("/api/hallmarks/app", async (req, res) => {
     try {
-      const hallmarks = await storage.getAllHallmarks();
-      const appHallmark = hallmarks.find((h: any) => 
-        h.entityType === 'release' || h.entityType === 'app'
+      // Get the latest blockchain-verified release as the app hallmark
+      const releases = await storage.getReleases();
+      const verifiedRelease = releases.find((r: any) => 
+        r.isBlockchainVerified && r.blockchainVerificationId
       );
-      if (appHallmark) {
+      
+      if (verifiedRelease) {
         res.json({ 
           hallmark: {
-            id: appHallmark.id,
-            tokenId: appHallmark.tokenId,
-            entityType: appHallmark.entityType,
-            solanaSignature: appHallmark.solanaSignature,
-            blockchainSignature: appHallmark.blockchainSignature,
+            id: verifiedRelease.id,
+            tokenId: `GB-000001`,
+            entityType: 'app',
+            solanaSignature: verifiedRelease.blockchainVerificationId,
+            blockchainSignature: verifiedRelease.blockchainVerificationId,
+            version: verifiedRelease.version,
           }
         });
       } else {
-        res.json({ hallmark: null });
+        // Fallback to hallmarks table with assetType
+        const hallmarks = await storage.getAllHallmarks();
+        const appHallmark = hallmarks.find((h: any) => 
+          h.assetType === 'release' || h.assetType === 'app'
+        );
+        if (appHallmark) {
+          res.json({ 
+            hallmark: {
+              id: appHallmark.id,
+              tokenId: appHallmark.tokenId,
+              entityType: appHallmark.assetType,
+              solanaSignature: appHallmark.transactionHash,
+              blockchainSignature: appHallmark.transactionHash,
+            }
+          });
+        } else {
+          res.json({ hallmark: null });
+        }
       }
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch app hallmark" });
