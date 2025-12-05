@@ -23,7 +23,6 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import buddyMascot from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
 import MarketTicker from "@/components/MarketTicker";
-import footerWave from "@assets/darkwave_footer_transparent.png";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -125,14 +124,14 @@ export default function Home() {
                 </div>
                 
                 {/* Full Welcome Title with Buddy leaning on G */}
-                <div className="relative">
+                <div className="relative py-4">
                   <div className="flex flex-col items-center text-center">
-                    <p className="text-sm xl:text-base font-tech text-muted-foreground tracking-widest uppercase mb-1">
+                    <p className="text-base xl:text-lg font-tech text-muted-foreground tracking-widest uppercase mb-2">
                       Welcome to
                     </p>
                     <div className="flex items-end relative">
                       {/* Buddy leaning against the G with local popup */}
-                      <div className="absolute -left-2 xl:-left-4 -top-6 xl:-top-8 z-20">
+                      <div className="absolute -left-8 xl:-left-12 -top-12 xl:-top-16 z-20">
                         <motion.div 
                           initial={{ opacity: 0, x: -20, rotate: -10 }}
                           animate={{ opacity: 1, x: 0, rotate: 8 }}
@@ -143,11 +142,11 @@ export default function Home() {
                           <img 
                             src={buddyMascot} 
                             alt="Buddy" 
-                            className="w-14 h-14 xl:w-18 xl:h-18 drop-shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:scale-110 hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all duration-300"
+                            className="w-24 h-24 xl:w-32 xl:h-32 drop-shadow-[0_0_30px_rgba(6,182,212,0.7)] hover:scale-110 hover:drop-shadow-[0_0_40px_rgba(6,182,212,0.9)] transition-all duration-300"
                             style={{ transform: 'rotate(8deg) scaleX(-1)' }}
                             data-testid="img-buddy-hero"
                           />
-                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-tech text-primary/80 whitespace-nowrap">
+                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] font-tech text-primary/80 whitespace-nowrap">
                             Click me!
                           </div>
                         </motion.div>
@@ -160,22 +159,22 @@ export default function Home() {
                               animate={{ opacity: 1, scale: 1, y: 0 }}
                               exit={{ opacity: 0, scale: 0.8, y: 10 }}
                               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                              className="absolute left-16 top-0 z-30 w-52"
+                              className="absolute left-28 xl:left-36 top-2 z-30 w-56"
                             >
                               <div 
-                                className="relative rounded-xl px-3 py-2"
+                                className="relative rounded-xl px-4 py-3"
                                 style={{
                                   background: 'hsl(var(--card))',
                                   border: '2px solid hsl(var(--primary))',
                                   boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3)',
                                 }}
                               >
-                                <p className="text-[10px] leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
+                                <p className="text-xs leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
                                   {currentTip}
                                 </p>
                                 {/* Bubble tail pointing left to Buddy */}
                                 <div 
-                                  className="absolute top-4 -left-2"
+                                  className="absolute top-5 -left-2"
                                   style={{
                                     width: 0,
                                     height: 0,
@@ -185,7 +184,7 @@ export default function Home() {
                                   }}
                                 />
                                 <div 
-                                  className="absolute top-4 -left-1"
+                                  className="absolute top-5 -left-1"
                                   style={{
                                     width: 0,
                                     height: 0,
@@ -197,14 +196,14 @@ export default function Home() {
                                 />
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); setShowHeroBuddyPopup(false); }}
-                                  className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
+                                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
                                   style={{
                                     background: 'hsl(var(--card))',
                                     border: '1.5px solid hsl(var(--primary))',
                                     color: 'hsl(var(--primary))',
                                   }}
                                 >
-                                  <X className="w-2 h-2" />
+                                  <X className="w-2.5 h-2.5" />
                                 </button>
                               </div>
                             </motion.div>
@@ -212,15 +211,15 @@ export default function Home() {
                         </AnimatePresence>
                       </div>
                       
-                      <h1 className="text-3xl xl:text-4xl 2xl:text-5xl font-tech font-black uppercase tracking-tight pl-10 xl:pl-12">
-                        <span className="text-primary drop-shadow-[0_0_20px_rgba(6,182,212,0.9)] neon-text">G</span>
+                      <h1 className="text-5xl xl:text-6xl 2xl:text-7xl font-tech font-black uppercase tracking-tight pl-16 xl:pl-20">
+                        <span className="text-primary drop-shadow-[0_0_30px_rgba(6,182,212,0.9)] neon-text">G</span>
                         <span className="text-foreground">arage</span>
-                        <span className="text-primary drop-shadow-[0_0_20px_rgba(6,182,212,0.9)] neon-text">B</span>
+                        <span className="text-primary drop-shadow-[0_0_30px_rgba(6,182,212,0.9)] neon-text">B</span>
                         <span className="text-foreground">ot</span>
-                        <span className="text-primary/70 text-2xl xl:text-3xl">.io</span>
+                        <span className="text-primary/70 text-3xl xl:text-4xl">.io</span>
                       </h1>
                     </div>
-                    <p className="text-sm xl:text-base text-muted-foreground/80 mt-2">
+                    <p className="text-base xl:text-lg text-muted-foreground/80 mt-3">
                       Right Part. First Time. <span className="text-primary font-medium">Every Engine.</span>
                     </p>
                   </div>
@@ -865,53 +864,20 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Footer */}
-      <footer className="border-t border-primary/20 bg-[#0a0f1e] relative overflow-hidden min-h-[250px]">
-        <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
-          <div className="absolute bottom-0 left-0 flex h-full w-[400%]" style={{ animation: 'waveScroll 120s linear infinite' }}>
-            <img src={footerWave} alt="" className="h-full w-1/4 object-cover object-bottom flex-shrink-0 opacity-80" />
-            <img src={footerWave} alt="" className="h-full w-1/4 object-cover object-bottom flex-shrink-0 opacity-80" style={{ transform: 'scaleX(-1)' }} />
-            <img src={footerWave} alt="" className="h-full w-1/4 object-cover object-bottom flex-shrink-0 opacity-80" />
-            <img src={footerWave} alt="" className="h-full w-1/4 object-cover object-bottom flex-shrink-0 opacity-80" style={{ transform: 'scaleX(-1)' }} />
+      {/* Footer - Thin Strip */}
+      <footer className="border-t border-border/30 bg-card/30 py-3">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">© 2025 DarkWave Studios, LLC</span>
+            <span className="hidden sm:inline text-border">|</span>
+            <span className="font-mono text-primary/80">v1.0.0</span>
+            <span className="hidden sm:inline text-border">|</span>
+            <Link href="/investors" className="hover:text-primary transition-colors" data-testid="footer-link-investors">Investors</Link>
+            <Link href="/terms" className="hover:text-primary transition-colors" data-testid="footer-link-terms">Terms</Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors" data-testid="footer-link-privacy">Privacy</Link>
+            <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
           </div>
         </div>
-        
-        <div className="container mx-auto px-4 text-center relative z-10 py-10 space-y-4">
-          <div className="flex flex-wrap justify-center gap-3 mb-4">
-            <Link href="/mechanics-garage">
-              <Button className="font-tech uppercase gap-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 shadow-lg shadow-orange-900/30 btn-glow" data-testid="footer-button-mechanics">
-                <Wrench className="w-4 h-4" />
-                Mechanics Garage
-              </Button>
-            </Link>
-            <Link href="/investors">
-              <Button className="font-tech uppercase gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 shadow-lg shadow-green-900/30 btn-glow" data-testid="footer-button-investors">
-                <TrendingUp className="w-4 h-4" />
-                Investors
-              </Button>
-            </Link>
-            <Link href="/dev">
-              <Button variant="outline" className="font-tech uppercase gap-2 border-primary/50 text-primary hover:bg-primary/10 shadow-lg" data-testid="footer-button-dev">
-                <Terminal className="w-4 h-4" />
-                Dev Portal
-              </Button>
-            </Link>
-          </div>
-          
-          <p className="font-mono text-sm text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-            © 2025 DarkWave Studios LLC. All Rights Reserved.
-          </p>
-          <a href="https://darkwavestudios.io" target="_blank" rel="noopener noreferrer" className="inline-block font-mono text-sm text-primary hover:text-primary/80 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]" data-testid="link-darkwave-studios">
-            Powered by DarkWave Studios LLC
-          </a>
-        </div>
-        
-        <style>{`
-          @keyframes waveScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-        `}</style>
       </footer>
     </div>
   );
