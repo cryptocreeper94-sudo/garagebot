@@ -1124,6 +1124,30 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/hallmarks/app", async (req, res) => {
+    try {
+      const hallmarks = await storage.getAllHallmarks();
+      const appHallmark = hallmarks.find((h: any) => 
+        h.entityType === 'release' || h.entityType === 'app'
+      );
+      if (appHallmark) {
+        res.json({ 
+          hallmark: {
+            id: appHallmark.id,
+            tokenId: appHallmark.tokenId,
+            entityType: appHallmark.entityType,
+            solanaSignature: appHallmark.solanaSignature,
+            blockchainSignature: appHallmark.blockchainSignature,
+          }
+        });
+      } else {
+        res.json({ hallmark: null });
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch app hallmark" });
+    }
+  });
+
   app.post("/api/hallmark/mint", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub || (req.session as any).userId;
