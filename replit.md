@@ -92,12 +92,13 @@ Preferred communication style: Simple, everyday language.
 - **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
 - **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
 
-## Latest Publish: December 5, 2024 @ 7:45 PM EST
+## Latest Publish: December 5, 2024 @ 8:05 PM EST
 
-## v1.0.4 - PUBLISHED & BLOCKCHAIN VERIFIED
-Solana TX: `5AUTquMgE1iZMxCM1bGpv9Fz2oSGtYYV6PL6DJDv65cTipKdG8fehkLxsKjuhVbhoekzDpg738AWTDkLC3nMfz43`
+## v1.0.5 - PUBLISHED & BLOCKCHAIN VERIFIED
+Solana TX: `3XP2wnb6VMZBf7Zu5TuvuYtbpdsE4JfZQXcZfgzydcfJLNR9TREMjvVoFYstCbWdiEEmo8it8oXkNjX1o7pShp4A`
 
 ## All Versions Blockchain Verified
+- v1.0.5: `3XP2wnb6VMZBf7Zu5TuvuYtbpdsE4JfZQXcZfgzydcfJLNR9TREMjvVoFYstCbWdiEEmo8it8oXkNjX1o7pShp4A`
 - v1.0.4: `5AUTquMgE1iZMxCM1bGpv9Fz2oSGtYYV6PL6DJDv65cTipKdG8fehkLxsKjuhVbhoekzDpg738AWTDkLC3nMfz43`
 - v1.0.3: `DvXsAW8AhxtasuHTv7e7FTJrvWCBF7Lt8VTyNESeWvfS5FHVt1cKKDi6fNS4NtthrF1zkvcuQhU4383L5YsWT4m`
 - v1.0.2: `5gHRuwY3oWGnmVDAPvTWxfRdXUMSJ1r9tA2ze2hzAA3W5HMsJWN6BDQfdRfFFgfab7zdooveS3WSmdfjw7MMZSB5`
@@ -105,6 +106,13 @@ Solana TX: `5AUTquMgE1iZMxCM1bGpv9Fz2oSGtYYV6PL6DJDv65cTipKdG8fehkLxsKjuhVbhoekz
 - v1.0.0: `4NJFuwVx43J65D8e7SrryuVqwmt5SAAGsxqsenJiNAmckVDLEwFfUY1o2MdR8przoYzLa1pbbyfCp9VySoYTmjwA`
 
 ## Recent Updates (December 2024)
+
+### v1.0.5 (Dec 5) - Mobile Modal Optimization
+- All modals now mobile-friendly with proper margins and close buttons
+- Drawer component: Added X close button, max-height 90vh with scroll
+- AlertDialog: Mobile margins w-[calc(100%-2rem)], max-height 85vh
+- Verified badge popup: Now visible on mobile, full-width positioning
+- All popups scroll if content overflows
 
 ### v1.0.4 (Dec 5) - Documentation & Blockchain
 - Updated all documentation to reflect latest changes
