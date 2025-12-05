@@ -185,7 +185,7 @@ export function prepareReleaseData(release: {
 
 export async function submitMemoTransaction(
   dataHash: string,
-  network: 'mainnet-beta' | 'devnet' = 'devnet'
+  network: 'mainnet-beta' | 'devnet' = 'mainnet-beta'
 ): Promise<{ success: boolean; txSignature?: string; error?: string }> {
   const keypair = getKeypair();
   
@@ -259,7 +259,7 @@ export async function submitMemoTransaction(
 
 export async function createVerification(
   data: BlockchainData,
-  network: 'mainnet-beta' | 'devnet' = 'devnet'
+  network: 'mainnet-beta' | 'devnet' = 'mainnet-beta'
 ): Promise<VerificationResult> {
   const dataHash = generateDataHash(data);
   
@@ -302,13 +302,13 @@ export async function checkBlockchainStatus(): Promise<{
   }
   
   try {
-    const connection = await getConnection('devnet');
+    const connection = await getConnection('mainnet-beta');
     const balance = await connection.getBalance(keypair.publicKey);
     const version = await connection.getVersion();
     
     return { 
       connected: true, 
-      network: 'devnet',
+      network: 'mainnet-beta',
       walletAddress: keypair.publicKey.toBase58(),
       balance: balance / 1e9,
     };
@@ -317,7 +317,7 @@ export async function checkBlockchainStatus(): Promise<{
   }
 }
 
-export async function getWalletBalance(network: 'mainnet-beta' | 'devnet' = 'devnet'): Promise<number | null> {
+export async function getWalletBalance(network: 'mainnet-beta' | 'devnet' = 'mainnet-beta'): Promise<number | null> {
   const keypair = getKeypair();
   if (!keypair) return null;
   

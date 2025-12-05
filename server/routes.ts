@@ -5248,7 +5248,7 @@ export async function registerRoutes(
       
       // Prepare data and create verification
       const blockchainData = blockchainService.prepareHallmarkData(hallmark);
-      const result = await blockchainService.createVerification(blockchainData, 'devnet');
+      const result = await blockchainService.createVerification(blockchainData, 'mainnet-beta');
       
       const verification = await storage.createBlockchainVerification({
         entityType: 'hallmark',
@@ -5257,7 +5257,7 @@ export async function registerRoutes(
         dataHash: result.dataHash,
         txSignature: result.txSignature,
         status: result.status,
-        network: 'devnet',
+        network: 'mainnet-beta',
         errorMessage: result.error,
       });
       
@@ -5308,7 +5308,7 @@ export async function registerRoutes(
       
       // Prepare data and create verification
       const blockchainData = blockchainService.prepareVehicleData(vehicle);
-      const result = await blockchainService.createVerification(blockchainData, 'devnet');
+      const result = await blockchainService.createVerification(blockchainData, 'mainnet-beta');
       
       const verification = await storage.createBlockchainVerification({
         entityType: 'vehicle',
@@ -5317,7 +5317,7 @@ export async function registerRoutes(
         dataHash: result.dataHash,
         txSignature: result.txSignature,
         status: result.status,
-        network: 'devnet',
+        network: 'mainnet-beta',
         errorMessage: result.error,
       });
       
