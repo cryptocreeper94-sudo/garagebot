@@ -31,6 +31,16 @@ interface Hallmark {
   solanaSignature?: string;
 }
 
+interface UserHallmark {
+  id: string;
+  assetNumber: number;
+  vehicleInfo?: {
+    year: number;
+    make: string;
+    model: string;
+  };
+}
+
 export default function Nav() {
   const [location] = useLocation();
   const isHome = location === "/";
@@ -67,6 +77,16 @@ export default function Nav() {
     },
   });
 
+  const { data: userHallmark } = useQuery<UserHallmark | null>({
+    queryKey: ['userHallmark'],
+    queryFn: async () => {
+      const res = await fetch('/api/hallmark');
+      if (!res.ok) return null;
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
   const isPro = subscription?.status === 'active';
   const isFounder = subscription?.isFounder === true || (user as any)?.isFounder === true;
   const isVerified = appHallmark?.solanaSignature || appHallmark?.blockchainSignature;
@@ -90,7 +110,7 @@ export default function Nav() {
           </Link>
         </div>
 
-        {/* Center: Version and Verified Badges */}
+        {/* Center: Version, Verified, and User Hallmark Badges */}
         <div className="flex items-center gap-2">
           {latestRelease && (
             <Badge 
@@ -110,7 +130,7 @@ export default function Nav() {
                 data-testid="badge-verified"
               >
                 <BadgeCheck className="w-3.5 h-3.5 text-green-500" />
-                <span className="text-[10px] font-tech uppercase text-green-500">Verified</span>
+                <span className="text-[10px] font-tech uppercase text-green-500 hidden sm:inline">Verified</span>
               </button>
               
               {showVerifiedDetails && (
@@ -149,6 +169,21 @@ export default function Nav() {
                 </div>
               )}
             </div>
+          )}
+
+          {/* User's Hallmark Badge */}
+          {userHallmark && (
+            <Link href="/hallmark">
+              <div 
+                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-colors cursor-pointer group"
+                data-testid="badge-user-hallmark"
+              >
+                <Shield className="w-3.5 h-3.5 text-purple-400 group-hover:drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+                <span className="text-[10px] font-mono text-purple-400 font-bold">
+                  GB-{userHallmark.assetNumber.toString().padStart(6, '0')}
+                </span>
+              </div>
+            </Link>
           )}
         </div>
 
@@ -193,72 +228,102 @@ export default function Nav() {
                   </div>
                 )}
                 
-                {/* Navigation Links */}
-                <div className="space-y-1">
-                  <Link href="/" onClick={() => setIsOpen(false)}>
-                    <div className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${location === '/' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-home">
-                      <Home className="w-5 h-5" />
-                      <span className="font-medium">Home</span>
-                    </div>
-                  </Link>
+                {/* Desktop: Two Column Layout / Mobile: Single Column */}
+                <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+                  {/* Column 1: Main Navigation */}
+                  <div className="space-y-1">
+                    <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider px-3 mb-2 block">Navigation</span>
+                    
+                    <Link href="/" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-home">
+                        <Home className="w-5 h-5" />
+                        <span className="font-medium">Home</span>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/garage" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/garage' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-garage">
+                        <Car className="w-5 h-5" />
+                        <span className="font-medium">My Garage</span>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/dashboard' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-dashboard">
+                        <LayoutDashboard className="w-5 h-5" />
+                        <span className="font-medium">Dashboard</span>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/guides" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/guides' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-guides">
+                        <FileText className="w-5 h-5" />
+                        <span className="font-medium">DIY Guides</span>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/shop-portal" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/shop-portal' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-shop-portal">
+                        <Store className="w-5 h-5" />
+                        <span className="font-medium">Mechanics Garage</span>
+                      </div>
+                    </Link>
+                  </div>
                   
-                  <Link href="/garage" onClick={() => setIsOpen(false)}>
-                    <div className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${location === '/garage' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-garage">
-                      <Car className="w-5 h-5" />
-                      <span className="font-medium">My Garage</span>
-                    </div>
-                  </Link>
-                  
-                  <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                    <div className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${location === '/dashboard' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-dashboard">
-                      <LayoutDashboard className="w-5 h-5" />
-                      <span className="font-medium">Dashboard</span>
-                    </div>
-                  </Link>
-                  
-                  <Link href="/shop-portal" onClick={() => setIsOpen(false)}>
-                    <div className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${location === '/shop-portal' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-shop-portal">
-                      <Store className="w-5 h-5" />
-                      <span className="font-medium">Shop Portal</span>
-                    </div>
-                  </Link>
-                  
-                  <Link href="/insurance" onClick={() => setIsOpen(false)}>
-                    <div className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${location === '/insurance' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-insurance">
-                      <Shield className="w-5 h-5" />
-                      <span className="font-medium">Insurance</span>
-                    </div>
-                  </Link>
-                  
-                  <Link href="/hallmark" onClick={() => setIsOpen(false)}>
-                    <div className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${location === '/hallmark' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-hallmark">
-                      <Shield className="w-5 h-5" />
-                      <span className="font-medium">Genesis Hallmark</span>
-                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[9px] font-mono ml-auto">NFT</Badge>
-                    </div>
-                  </Link>
-                  
-                  <Link href="/account" onClick={() => setIsOpen(false)}>
-                    <div className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${location === '/account' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-account">
-                      <Settings className="w-5 h-5" />
-                      <span className="font-medium">Account Settings</span>
-                    </div>
-                  </Link>
-                </div>
-                
-                {/* Coming Soon Section */}
-                <div className="pt-2">
-                  <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider px-3">Coming Soon</span>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center gap-3 px-3 py-3 rounded-lg text-muted-foreground/50" data-testid="menu-services">
-                      <Wrench className="w-5 h-5" />
-                      <span className="font-medium">Services</span>
-                      <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono ml-auto">SOON</Badge>
-                    </div>
-                    <div className="flex items-center gap-3 px-3 py-3 rounded-lg text-muted-foreground/50" data-testid="menu-ratings">
-                      <Star className="w-5 h-5" />
-                      <span className="font-medium">Ratings</span>
-                      <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono ml-auto">SOON</Badge>
+                  {/* Column 2: Features & Services */}
+                  <div className="space-y-1 mt-4 lg:mt-0">
+                    <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider px-3 mb-2 block">Features</span>
+                    
+                    <Link href="/hallmark" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/hallmark' ? 'bg-purple-500/10 text-purple-400' : 'text-foreground hover:bg-purple-500/5'}`} data-testid="menu-hallmark">
+                        <Shield className="w-5 h-5 text-purple-400" />
+                        <span className="font-medium">View Hallmark</span>
+                        {userHallmark && (
+                          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[9px] font-mono ml-auto">
+                            GB-{userHallmark.assetNumber.toString().padStart(6, '0')}
+                          </Badge>
+                        )}
+                        {!userHallmark && (
+                          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[9px] font-mono ml-auto">NFT</Badge>
+                        )}
+                      </div>
+                    </Link>
+                    
+                    <Link href="/insurance" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/insurance' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-insurance">
+                        <Shield className="w-5 h-5" />
+                        <span className="font-medium">Insurance</span>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/invite" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/invite' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-invite">
+                        <User className="w-5 h-5" />
+                        <span className="font-medium">Invite Friends</span>
+                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[9px] font-mono ml-auto">+100 pts</Badge>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/account" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/account' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-account">
+                        <Settings className="w-5 h-5" />
+                        <span className="font-medium">Account Settings</span>
+                      </div>
+                    </Link>
+                    
+                    {/* Coming Soon Items */}
+                    <div className="pt-2 mt-2 border-t border-white/10">
+                      <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider px-3 mb-1 block">Coming Soon</span>
+                      <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground/50" data-testid="menu-services">
+                        <Wrench className="w-4 h-4" />
+                        <span className="text-sm">Services</span>
+                        <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] font-mono ml-auto">SOON</Badge>
+                      </div>
+                      <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground/50" data-testid="menu-ratings">
+                        <Star className="w-4 h-4" />
+                        <span className="text-sm">Ratings</span>
+                        <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] font-mono ml-auto">SOON</Badge>
+                      </div>
                     </div>
                   </div>
                 </div>
