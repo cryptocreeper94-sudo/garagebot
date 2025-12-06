@@ -11,11 +11,11 @@ import rainyNightIcon from "@assets/generated_images/rainy_night_icon_floating.p
 import stormyNightIcon from "@assets/generated_images/stormy_night_lightning_icon_floating.png";
 import snowyNightIcon from "@assets/generated_images/snowy_night_icon_floating.png";
 import foggyNightIcon from "@assets/generated_images/foggy_misty_night_icon_floating.png";
-import sunnyDayIcon from "@assets/generated_images/sunny_day_weather_icon.png";
-import cloudyDayIcon from "@assets/generated_images/cloudy_day_weather_icon.png";
-import partlyCloudyDayIcon from "@assets/generated_images/partly_cloudy_day_icon.png";
-import rainyDayIcon from "@assets/generated_images/rainy_day_weather_icon.png";
-import snowyDayIcon from "@assets/generated_images/snowy_day_weather_icon.png";
+import sunnyDayIcon from "@assets/generated_images/sunny_day_icon_solid_background.png";
+import cloudyDayIcon from "@assets/generated_images/cloudy_day_icon_solid_background.png";
+import partlyCloudyDayIcon from "@assets/generated_images/partly_cloudy_icon_solid_background.png";
+import rainyDayIcon from "@assets/generated_images/rainy_day_icon_solid_background.png";
+import snowyDayIcon from "@assets/generated_images/snowy_day_icon_solid_background.png";
 
 interface WeatherData {
   location: {
