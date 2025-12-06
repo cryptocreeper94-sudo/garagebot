@@ -92,12 +92,15 @@ Preferred communication style: Simple, everyday language.
 - **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
 - **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
 
-## Latest Publish: December 5, 2024 @ 8:20 PM EST
+## Latest Publish: December 6, 2024 @ 2:23 PM EST
 
-## v1.0.6 - PUBLISHED & BLOCKCHAIN VERIFIED
-Solana TX: `qwM86zvbzA6NbSoqUirXqPbRcNUnkpSsvF34msdcWN8aJF4JEW6cC1yHbaJ9K1P89MqmTArFc6XYgatfYyW9B4a`
+## v1.0.9 - PUBLISHED & BLOCKCHAIN VERIFIED
+Solana TX: `mLM9zYVwFWjX4vgcFRHbMZ8a8PHGtwsX1KiaT8e8RMwCCt98ZGaCcHatjoqyRPRyvJit6ZXsDpQMHv7b4xkHoQC`
 
 ## All Versions Blockchain Verified
+- v1.0.9: `mLM9zYVwFWjX4vgcFRHbMZ8a8PHGtwsX1KiaT8e8RMwCCt98ZGaCcHatjoqyRPRyvJit6ZXsDpQMHv7b4xkHoQC`
+- v1.0.8: `5VwmpZ5i6ib98SdP3FmY9U73kPnBDLdAbcbEj3F7d5zZ7BtLnRPhfraMGvZdbqcovF2HQ8KqYuXsmrEouP7c6cym`
+- v1.0.7: `3HPoXiXnH4QKvNjAaKdsQEsHVDyjgEyEZpkccefmY4PQ7kzkLM1x51ir6mqqX5K91xhGJUN7oMcYhZSoQoxZuure`
 - v1.0.6: `qwM86zvbzA6NbSoqUirXqPbRcNUnkpSsvF34msdcWN8aJF4JEW6cC1yHbaJ9K1P89MqmTArFc6XYgatfYyW9B4a`
 - v1.0.5: `3XP2wnb6VMZBf7Zu5TuvuYtbpdsE4JfZQXcZfgzydcfJLNR9TREMjvVoFYstCbWdiEEmo8it8oXkNjX1o7pShp4A`
 - v1.0.4: `5AUTquMgE1iZMxCM1bGpv9Fz2oSGtYYV6PL6DJDv65cTipKdG8fehkLxsKjuhVbhoekzDpg738AWTDkLC3nMfz43`
@@ -107,6 +110,22 @@ Solana TX: `qwM86zvbzA6NbSoqUirXqPbRcNUnkpSsvF34msdcWN8aJF4JEW6cC1yHbaJ9K1P89Mqm
 - v1.0.0: `4NJFuwVx43J65D8e7SrryuVqwmt5SAAGsxqsenJiNAmckVDLEwFfUY1o2MdR8przoYzLa1pbbyfCp9VySoYTmjwA`
 
 ## Recent Updates (December 2024)
+
+### v1.0.9 (Dec 6) - Weather Widget Icon Enhancement
+- Regenerated all 5 daytime weather icons with solid circular backgrounds
+- Icons no longer blend into dark UI (sunny, cloudy, partly cloudy, rainy, snowy)
+- Improved visibility and contrast for weather widget
+
+### v1.0.8 (Dec 5) - QR Code Enhancement
+- Real scannable QR code in Genesis Hallmark popup
+- QR links to garagebot.io/verify/GB-000001
+- Buddy mascot beside QR code
+- Full blockchain verification details
+
+### v1.0.7 (Dec 5) - PWA Updates
+- Buddy mascot icon for PWA (full color, solid background)
+- Updated splash screen with Buddy
+- Updated manifest and service worker
 
 ### v1.0.6 (Dec 5) - Genesis Hallmark Popup Enhancement
 - Genesis Hallmark popup shows GB-000001 QR code image with Buddy mascot
