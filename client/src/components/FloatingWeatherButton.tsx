@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import WeatherRadarFull from "./WeatherRadarFull";
 
-import weatherIconDay from "@assets/generated_images/weather_icon_floating.png";
 import clearNightIcon from "@assets/generated_images/clear_night_moon_stars_icon_floating.png";
 import partlyCloudyNightIcon from "@assets/generated_images/partly_cloudy_night_icon_floating.png";
 import cloudyNightIcon from "@assets/generated_images/cloudy_overcast_night_icon_floating.png";
@@ -12,6 +11,11 @@ import rainyNightIcon from "@assets/generated_images/rainy_night_icon_floating.p
 import stormyNightIcon from "@assets/generated_images/stormy_night_lightning_icon_floating.png";
 import snowyNightIcon from "@assets/generated_images/snowy_night_icon_floating.png";
 import foggyNightIcon from "@assets/generated_images/foggy_misty_night_icon_floating.png";
+import sunnyDayIcon from "@assets/generated_images/sunny_day_weather_icon.png";
+import cloudyDayIcon from "@assets/generated_images/cloudy_day_weather_icon.png";
+import partlyCloudyDayIcon from "@assets/generated_images/partly_cloudy_day_icon.png";
+import rainyDayIcon from "@assets/generated_images/rainy_day_weather_icon.png";
+import snowyDayIcon from "@assets/generated_images/snowy_day_weather_icon.png";
 
 interface WeatherData {
   location: {
@@ -123,19 +127,29 @@ function getGlowColor(description: string, isNight: boolean): string {
 }
 
 function getWeatherIcon(description: string, isNight: boolean): string {
-  if (!isNight) return weatherIconDay;
-  
   const desc = description.toLowerCase();
   
-  if (desc.includes('thunder') || desc.includes('storm')) return stormyNightIcon;
-  if (desc.includes('rain') || desc.includes('drizzle') || desc.includes('shower')) return rainyNightIcon;
-  if (desc.includes('snow') || desc.includes('sleet') || desc.includes('ice')) return snowyNightIcon;
-  if (desc.includes('fog') || desc.includes('mist') || desc.includes('haze')) return foggyNightIcon;
-  if (desc.includes('overcast')) return cloudyNightIcon;
-  if (desc.includes('cloud') || desc.includes('partly')) return partlyCloudyNightIcon;
-  if (desc.includes('clear') || desc.includes('sunny')) return clearNightIcon;
+  if (isNight) {
+    if (desc.includes('thunder') || desc.includes('storm')) return stormyNightIcon;
+    if (desc.includes('rain') || desc.includes('drizzle') || desc.includes('shower')) return rainyNightIcon;
+    if (desc.includes('snow') || desc.includes('sleet') || desc.includes('ice')) return snowyNightIcon;
+    if (desc.includes('fog') || desc.includes('mist') || desc.includes('haze')) return foggyNightIcon;
+    if (desc.includes('overcast')) return cloudyNightIcon;
+    if (desc.includes('cloud') || desc.includes('partly')) return partlyCloudyNightIcon;
+    if (desc.includes('clear') || desc.includes('sunny')) return clearNightIcon;
+    return clearNightIcon;
+  }
   
-  return clearNightIcon;
+  if (desc.includes('thunder') || desc.includes('storm')) return rainyDayIcon;
+  if (desc.includes('rain') || desc.includes('drizzle') || desc.includes('shower')) return rainyDayIcon;
+  if (desc.includes('snow') || desc.includes('sleet') || desc.includes('ice')) return snowyDayIcon;
+  if (desc.includes('fog') || desc.includes('mist') || desc.includes('haze')) return cloudyDayIcon;
+  if (desc.includes('overcast')) return cloudyDayIcon;
+  if (desc.includes('cloud') && !desc.includes('partly')) return cloudyDayIcon;
+  if (desc.includes('partly') || (desc.includes('cloud') && desc.includes('clear'))) return partlyCloudyDayIcon;
+  if (desc.includes('clear') || desc.includes('sunny')) return sunnyDayIcon;
+  
+  return cloudyDayIcon;
 }
 
 export default function FloatingWeatherButton() {
