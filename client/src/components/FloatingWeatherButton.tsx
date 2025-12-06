@@ -161,7 +161,7 @@ export default function FloatingWeatherButton() {
     if (stored) setLocalZip(stored);
   }, []);
 
-  const effectiveZip = localZip || "10001";
+  const effectiveZip = localZip || "37201";
 
   const { data: weather, isLoading } = useQuery<WeatherData>({
     queryKey: ["/api/weather/zip", effectiveZip],
