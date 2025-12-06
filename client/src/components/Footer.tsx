@@ -42,6 +42,7 @@ export default function Footer() {
           <Link href="/terms" className="hover:text-primary transition-colors" data-testid="footer-link-terms">Terms</Link>
           <Link href="/privacy" className="hover:text-primary transition-colors" data-testid="footer-link-privacy">Privacy</Link>
           <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
+          <Link href="/dev" className="hover:text-primary transition-colors" data-testid="footer-link-dev">Dev</Link>
         </div>
       </div>
     </footer>
