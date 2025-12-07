@@ -103,7 +103,11 @@ export class EcosystemClient {
   private appName: string;
 
   constructor(config: EcosystemConfig) {
-    this.hubUrl = config.hubUrl.replace(/\/$/, "");
+    let url = config.hubUrl.replace(/\/$/, "");
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      url = "https://" + url;
+    }
+    this.hubUrl = url;
     this.apiKey = config.apiKey;
     this.apiSecret = config.apiSecret;
     this.appName = config.appName;
@@ -148,12 +152,13 @@ export class EcosystemClient {
     return response.json();
   }
 
-  async checkConnection(): Promise<{ connected: boolean; hubVersion?: string; appRegistered?: boolean }> {
+  async checkConnection(): Promise<{ connected: boolean; hubVersion?: string; appRegistered?: boolean; error?: string }> {
     try {
       const result = await this.request<{ version: string; registered: boolean }>("/api/ecosystem/status");
       return { connected: true, hubVersion: result.version, appRegistered: result.registered };
     } catch (error) {
-      return { connected: false };
+      console.log("[devhub] Connection error:", String(error));
+      return { connected: false, error: String(error) };
     }
   }
 
