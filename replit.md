@@ -92,12 +92,22 @@ Preferred communication style: Simple, everyday language.
 - **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
 - **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
 
-## Latest Publish: December 6, 2024 @ 2:23 PM EST
+## DarkWave Developer Hub Integration
+- **Hub URL**: https://darkwavestudios.io
+- **App Registration**: GarageBot registered as "garagebot-prod" in ORBIT Staffing Ecosystem Hub
+- **Client File**: `server/ecosystemHub.ts` - TypeScript client for hub API calls
+- **Credentials**: Stored as secrets `ORBIT_ECOSYSTEM_API_KEY` and `ORBIT_ECOSYSTEM_API_SECRET`
+- **Available Endpoints**: 14 total (sync workers, contractors, W-2, 1099, timesheets, certifications, code snippets, logs)
+- **Permissions**: Full read/write access for workers, contractors, 1099, timesheets, certifications, and code
+- **Integration Points**: Mechanics Garage shop management portal can sync staff data with DarkWave ecosystem
 
-## v1.0.9 - PUBLISHED & BLOCKCHAIN VERIFIED
-Solana TX: `mLM9zYVwFWjX4vgcFRHbMZ8a8PHGtwsX1KiaT8e8RMwCCt98ZGaCcHatjoqyRPRyvJit6ZXsDpQMHv7b4xkHoQC`
+## Latest Publish: December 7, 2024 @ 12:12 AM EST
+
+## v1.0.10 - PUBLISHED & BLOCKCHAIN VERIFIED
+Solana TX: `3j9uyTLN2E9HXMoNEu4FssLifNt1KtqcwyqWHGQmGYAf2kRHMCL43AVHMxNRyABkHy9f1Si52Lr2QzxyEMqhvcyZ`
 
 ## All Versions Blockchain Verified
+- v1.0.10: `3j9uyTLN2E9HXMoNEu4FssLifNt1KtqcwyqWHGQmGYAf2kRHMCL43AVHMxNRyABkHy9f1Si52Lr2QzxyEMqhvcyZ`
 - v1.0.9: `mLM9zYVwFWjX4vgcFRHbMZ8a8PHGtwsX1KiaT8e8RMwCCt98ZGaCcHatjoqyRPRyvJit6ZXsDpQMHv7b4xkHoQC`
 - v1.0.8: `5VwmpZ5i6ib98SdP3FmY9U73kPnBDLdAbcbEj3F7d5zZ7BtLnRPhfraMGvZdbqcovF2HQ8KqYuXsmrEouP7c6cym`
 - v1.0.7: `3HPoXiXnH4QKvNjAaKdsQEsHVDyjgEyEZpkccefmY4PQ7kzkLM1x51ir6mqqX5K91xhGJUN7oMcYhZSoQoxZuure`
@@ -110,6 +120,13 @@ Solana TX: `mLM9zYVwFWjX4vgcFRHbMZ8a8PHGtwsX1KiaT8e8RMwCCt98ZGaCcHatjoqyRPRyvJit
 - v1.0.0: `4NJFuwVx43J65D8e7SrryuVqwmt5SAAGsxqsenJiNAmckVDLEwFfUY1o2MdR8przoYzLa1pbbyfCp9VySoYTmjwA`
 
 ## Recent Updates (December 2024)
+
+### v1.0.10 (Dec 7) - DarkWave Developer Hub Integration
+- Connected GarageBot to ORBIT Staffing Ecosystem Hub at darkwavestudios.io
+- Full ecosystem data sync: workers, contractors, W-2, 1099, timesheets, certifications
+- Code snippet sharing between DarkWave ecosystem apps
+- All 14 API endpoints available with full permissions
+- Mechanics Garage can now sync staff with DarkWave ecosystem
 
 ### v1.0.9 (Dec 6) - Weather Widget Icon Enhancement
 - Regenerated all 5 daytime weather icons with solid circular backgrounds
