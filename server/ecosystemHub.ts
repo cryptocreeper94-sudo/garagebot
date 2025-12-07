@@ -241,11 +241,11 @@ export class EcosystemClient {
 }
 
 export function createDevHubClient(): EcosystemClient | null {
-  const hubUrl = process.env.DEV_HUB_URL;
-  const apiKey = process.env.DEV_HUB_API_KEY;
-  const apiSecret = process.env.DEV_HUB_API_SECRET;
+  const hubUrl = process.env.ORBIT_ECOSYSTEM_URL || "https://darkwavestudios.io";
+  const apiKey = process.env.ORBIT_ECOSYSTEM_API_KEY;
+  const apiSecret = process.env.ORBIT_ECOSYSTEM_API_SECRET;
 
-  if (!hubUrl || !apiKey || !apiSecret) {
+  if (!apiKey || !apiSecret) {
     console.log("[devhub] DarkWave Developer Hub not configured - skipping initialization");
     return null;
   }
