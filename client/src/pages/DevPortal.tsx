@@ -677,10 +677,18 @@ export default function DevPortal() {
       if (!res.ok) throw new Error('Failed to publish release');
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['releases'] });
       queryClient.invalidateQueries({ queryKey: ['latestRelease'] });
-      toast({ title: "Release published!", description: "Version is now live" });
+      if (data.isBlockchainVerified && data.blockchainVerificationId) {
+        toast({ 
+          title: "Release published & verified on Solana!", 
+          description: `TX: ${data.blockchainVerificationId.substring(0, 20)}...`,
+          duration: 8000,
+        });
+      } else {
+        toast({ title: "Release published!", description: "Version is now live" });
+      }
     },
   });
 
