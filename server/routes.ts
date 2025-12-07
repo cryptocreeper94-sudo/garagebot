@@ -5645,7 +5645,13 @@ export async function registerRoutes(
       // Auto-verify on Solana blockchain
       try {
         const blockchainService = await import('./services/blockchain');
-        const blockchainData = blockchainService.prepareReleaseData(release);
+        const blockchainData = blockchainService.prepareReleaseData({
+          id: release.id,
+          version: release.version,
+          versionType: release.versionType,
+          changelog: (release.changelog as Record<string, string[]>) ?? null,
+          publishedAt: release.publishedAt ?? null,
+        });
         const result = await blockchainService.createVerification(blockchainData, 'mainnet-beta');
         
         if (result.success && result.txSignature) {
