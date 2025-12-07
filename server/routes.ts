@@ -5641,6 +5641,34 @@ export async function registerRoutes(
       if (!release) {
         return res.status(404).json({ error: "Release not found" });
       }
+      
+      // Auto-verify on Solana blockchain
+      try {
+        const blockchainService = await import('./services/blockchain');
+        const blockchainData = blockchainService.prepareReleaseData(release);
+        const result = await blockchainService.createVerification(blockchainData, 'mainnet-beta');
+        
+        if (result.success && result.txSignature) {
+          // Update release with blockchain verification
+          await storage.updateRelease(release.id, {
+            isBlockchainVerified: true,
+            blockchainVerificationId: result.txSignature,
+          });
+          
+          console.log(`[blockchain] Auto-verified release ${release.version}: ${result.txSignature}`);
+          
+          return res.json({
+            ...release,
+            isBlockchainVerified: true,
+            blockchainVerificationId: result.txSignature,
+            solscanUrl: result.solscanUrl,
+          });
+        }
+      } catch (blockchainError) {
+        console.error("[blockchain] Auto-verification failed:", blockchainError);
+        // Still return success - release is published, blockchain is optional
+      }
+      
       res.json(release);
     } catch (error) {
       console.error("Publish release error:", error);

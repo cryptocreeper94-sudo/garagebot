@@ -373,6 +373,14 @@ export default function GenesisHallmark() {
                   </div>
                 ))}
               </div>
+              
+              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <p className="text-xs text-blue-300">
+                  <span className="font-medium">Blockchain verification is always opt-in.</span> Your vehicle data 
+                  is only hashed to Solana when you choose to create a hallmark. We never automatically 
+                  record your personal information on the blockchain without your consent.
+                </p>
+              </div>
             </Card>
           </motion.div>
 
