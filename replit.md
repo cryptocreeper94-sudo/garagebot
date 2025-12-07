@@ -74,6 +74,8 @@ Preferred communication style: Simple, everyday language.
 - **Purpose**: Tamper-proof verification of Genesis Hallmarks and Vehicle Passports on the Solana blockchain.
 - **Technology**: Solana network via Helius RPC, `@solana/web3.js`.
 - **Features**: SHA-256 hashing, on-chain transaction submission, transaction signature storage, Solscan links.
+- **Auto-Verification**: Releases are automatically hashed to Solana when published via `/api/releases/:id/publish`
+- **Customer Data**: Blockchain hashing is always opt-in for user data - clearly disclosed on Genesis Hallmark page and Privacy Policy
 
 ## Member Referral Program
 - **Route**: `/invite` for Invite Friends page
