@@ -129,6 +129,8 @@ export default function PrivacyPolicy() {
               <div>
                 <h2 className="text-xl font-tech uppercase mb-3">Genesis Hallmark & Blockchain</h2>
                 <div className="space-y-3 text-muted-foreground">
+                  <p className="font-medium text-blue-400">Blockchain verification is always opt-in.</p>
+                  <p>We never automatically record your personal information or vehicle data on the blockchain. You must explicitly choose to create a hallmark.</p>
                   <p>When you mint a Genesis Hallmark:</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
                     <li>Your vehicle information is recorded on-chain as part of the immutable vehicle passport</li>
