@@ -5667,6 +5667,195 @@ export async function registerRoutes(
     }
   });
 
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // DARKWAVE DEVELOPER HUB INTEGRATION
+  // Connects GarageBot to DarkWave ecosystem for cross-app data sync
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  const { createDevHubClient } = await import("./ecosystemHub");
+  const devHubClient = createDevHubClient();
+
+  // Test DarkWave Hub connection
+  app.get("/api/dev-hub/connect", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured", configured: false });
+    }
+    try {
+      const status = await devHubClient.checkConnection();
+      res.json(status);
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Push code snippet to hub
+  app.post("/api/dev-hub/snippet", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const { name, code, language, category, description, tags } = req.body;
+      const result = await devHubClient.pushSnippet({ name, code, language, category, description, tags });
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Get snippets from hub
+  app.get("/api/dev-hub/snippets", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const category = req.query.category as string | undefined;
+      const snippets = await devHubClient.getSnippets(category);
+      res.json({ success: true, snippets });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Sync W-2 employees and workers
+  app.post("/api/dev-hub/sync-workers", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const { workers } = req.body;
+      const result = await devHubClient.syncWorkers(workers);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Sync 1099 contractors
+  app.post("/api/dev-hub/sync-contractors", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const { contractors } = req.body;
+      const result = await devHubClient.syncContractors(contractors);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Sync 1099 payment data
+  app.post("/api/dev-hub/sync-1099", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const { year, payments } = req.body;
+      const result = await devHubClient.sync1099Data(year, payments);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Sync W-2 payroll data
+  app.post("/api/dev-hub/sync-w2", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const { year, payrolls } = req.body;
+      const result = await devHubClient.syncW2Payroll(year, payrolls);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Sync timesheets
+  app.post("/api/dev-hub/sync-timesheets", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const { timesheets } = req.body;
+      const result = await devHubClient.syncTimesheets(timesheets);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Sync certifications (ASE, EPA 608, etc.)
+  app.post("/api/dev-hub/sync-certs", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const { certifications } = req.body;
+      const result = await devHubClient.syncCertifications(certifications);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Get activity logs from hub
+  app.get("/api/dev-hub/logs", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const logs = await devHubClient.getActivityLogs(limit);
+      res.json({ success: true, logs });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Log activity to hub
+  app.post("/api/dev-hub/log", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const { action, details } = req.body;
+      const result = await devHubClient.logActivity(action, details);
+      res.json({ success: true, result });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Get workers for a specific shop (Mechanics Garage integration)
+  app.get("/api/dev-hub/shops/:shopId/workers", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const workers = await devHubClient.getWorkersByShop(req.params.shopId);
+      res.json({ success: true, workers });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // Get payroll summary for a shop
+  app.get("/api/dev-hub/shops/:shopId/payroll", async (req, res) => {
+    if (!devHubClient) {
+      return res.status(503).json({ error: "DarkWave Hub not configured" });
+    }
+    try {
+      const year = parseInt(req.query.year as string) || new Date().getFullYear();
+      const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
+      const summary = await devHubClient.getShopPayrollSummary(req.params.shopId, year, month);
+      res.json({ success: true, summary });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
   return httpServer;
 }
 
