@@ -1,0 +1,65 @@
+DARKWAVE ECOSYSTEM HUB INTEGRATION PACKAGE
+═══════════════════════════════════════════════════════════════════════════════
+
+HUB URL: https://darkwavestudios.io
+HUB HOST: ORBIT Staffing OS v2.6.1
+
+TO CONNECT:
+1. Register your app: POST https://darkwavestudios.io/api/admin/ecosystem/register-app
+   Body: { appName: "GarageBot", appSlug: "garagebot", description: "Shop management system" }
+   
+2. You'll receive: apiKey (dw_app_xxx) and apiSecret (dw_secret_yyy)
+   Store these securely - never expose them
+
+3. Copy this class into your codebase:
+
+import crypto from 'crypto';
+class EcosystemClient {
+  private hubUrl: string;
+  private apiKey: string;
+  private apiSecret: string;
+  constructor(hubUrl: string, apiKey: string, apiSecret: string) {
+    this.hubUrl = hubUrl;
+    this.apiKey = apiKey;
+    this.apiSecret = apiSecret;
+  }
+  private generateSignature(body: string, timestamp: string): string {
+    const message = `${body}${timestamp}`;
+    return crypto.createHmac('sha256', this.apiSecret).update(message).digest('hex');
+  }
+  private async request(method: string, endpoint: string, body?: any): Promise<any> {
+    const timestamp = Date.now().toString();
+    const bodyStr = body ? JSON.stringify(body) : '';
+    const signature = this.generateSignature(bodyStr, timestamp);
+    const headers: any = {
+      'X-Api-Key': this.apiKey,
+      'X-Api-Secret': this.apiSecret,
+      'X-Timestamp': timestamp,
+      'X-Signature': signature,
+      'Content-Type': 'application/json',
+    };
+    const url = `${this.hubUrl}${endpoint}`;
+    const response = await fetch(url, { method, headers, body: bodyStr || undefined });
+    if (!response.ok) throw new Error(`Hub error: ${response.status}`);
+    return response.json();
+  }
+  async syncW2Payroll(year: number, employees: any[]) { return this.request('POST', '/api/ecosystem/sync/w2', { year, employees }); }
+  async sync1099Payments(year: number, contractors: any[]) { return this.request('POST', '/api/ecosystem/sync/1099', { year, contractors }); }
+  async syncWorkers(workers: any[]) { return this.request('POST', '/api/ecosystem/sync/workers', { workers }); }
+  async syncContractors(contractors: any[]) { return this.request('POST', '/api/ecosystem/sync/contractors', { contractors }); }
+  async syncTimesheets(timesheets: any[]) { return this.request('POST', '/api/ecosystem/sync/timesheets', { timesheets }); }
+  async syncCertifications(certs: any[]) { return this.request('POST', '/api/ecosystem/sync/certifications', { certifications: certs }); }
+  async getShopWorkers(shopId: string) { return this.request('GET', `/api/ecosystem/shops/${shopId}/workers`); }
+  async getShopPayroll(shopId: string) { return this.request('GET', `/api/ecosystem/shops/${shopId}/payroll`); }
+  async getStatus() { return this.request('GET', '/api/ecosystem/status'); }
+  async pushSnippet(name: string, code: string, language: string, category: string, tags?: string[]) { return this.request('POST', '/api/ecosystem/snippets', { name, code, language, category, tags }); }
+  async logActivity(action: string, details: any) { return this.request('POST', '/api/ecosystem/logs', { action, details }); }
+}
+
+4. Instantiate and use:
+   const client = new EcosystemClient('https://darkwavestudios.io', 'dw_app_xxx', 'dw_secret_yyy');
+   await client.syncWorkers([{ id: 'w1', firstName: 'John', lastName: 'Doe', status: 'active' }]);
+   await client.syncW2Payroll(2025, [{id: 'e1', name: 'John Doe', grossPay: 50000}]);
+   const workers = await client.getShopWorkers('shop123');
+
+READY TO CONNECT ✅

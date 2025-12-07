@@ -109,8 +109,8 @@ export class EcosystemClient {
     this.appName = config.appName;
   }
 
-  private generateSignature(payload: string, timestamp: number): string {
-    const message = `${timestamp}.${payload}`;
+  private generateSignature(bodyStr: string, timestamp: string): string {
+    const message = `${bodyStr}${timestamp}`;
     return crypto
       .createHmac("sha256", this.apiSecret)
       .update(message)
@@ -122,22 +122,22 @@ export class EcosystemClient {
     method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
     body?: unknown
   ): Promise<T> {
-    const timestamp = Date.now();
-    const payload = body ? JSON.stringify(body) : "";
-    const signature = this.generateSignature(payload, timestamp);
+    const timestamp = Date.now().toString();
+    const bodyStr = body ? JSON.stringify(body) : "";
+    const signature = this.generateSignature(bodyStr, timestamp);
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "X-API-Key": this.apiKey,
-      "X-Timestamp": timestamp.toString(),
+      "X-Api-Key": this.apiKey,
+      "X-Api-Secret": this.apiSecret,
+      "X-Timestamp": timestamp,
       "X-Signature": signature,
-      "X-App-Name": this.appName,
     };
 
     const response = await fetch(`${this.hubUrl}${endpoint}`, {
       method,
       headers,
-      body: method !== "GET" ? payload : undefined,
+      body: method !== "GET" ? bodyStr : undefined,
     });
 
     if (!response.ok) {
@@ -170,47 +170,27 @@ export class EcosystemClient {
   }
 
   async syncWorkers(workers: Worker[]): Promise<{ synced: number; errors: string[] }> {
-    return this.request("/api/ecosystem/workers/sync", "POST", {
-      workers,
-      sourceApp: this.appName,
-    });
+    return this.request("/api/ecosystem/sync/workers", "POST", { workers });
   }
 
   async syncContractors(contractors: Contractor[]): Promise<{ synced: number; errors: string[] }> {
-    return this.request("/api/ecosystem/contractors/sync", "POST", {
-      contractors,
-      sourceApp: this.appName,
-    });
+    return this.request("/api/ecosystem/sync/contractors", "POST", { contractors });
   }
 
-  async sync1099Data(year: number, payments: Payment1099[]): Promise<{ synced: number; totalAmount: number }> {
-    return this.request("/api/ecosystem/1099/sync", "POST", {
-      year,
-      payments,
-      sourceApp: this.appName,
-    });
+  async sync1099Data(year: number, contractors: Payment1099[]): Promise<{ synced: number; totalAmount: number }> {
+    return this.request("/api/ecosystem/sync/1099", "POST", { year, contractors });
   }
 
-  async syncW2Payroll(year: number, payrolls: PayrollW2[]): Promise<{ synced: number; totalGross: number }> {
-    return this.request("/api/ecosystem/w2/sync", "POST", {
-      year,
-      payrolls,
-      sourceApp: this.appName,
-    });
+  async syncW2Payroll(year: number, employees: PayrollW2[]): Promise<{ synced: number; totalGross: number }> {
+    return this.request("/api/ecosystem/sync/w2", "POST", { year, employees });
   }
 
   async syncTimesheets(timesheets: Timesheet[]): Promise<{ synced: number; totalHours: number }> {
-    return this.request("/api/ecosystem/timesheets/sync", "POST", {
-      timesheets,
-      sourceApp: this.appName,
-    });
+    return this.request("/api/ecosystem/sync/timesheets", "POST", { timesheets });
   }
 
   async syncCertifications(certifications: Certification[]): Promise<{ synced: number; expiringSoon: number }> {
-    return this.request("/api/ecosystem/certifications/sync", "POST", {
-      certifications,
-      sourceApp: this.appName,
-    });
+    return this.request("/api/ecosystem/sync/certifications", "POST", { certifications });
   }
 
   async getActivityLogs(limit: number = 50): Promise<ActivityLog[]> {
