@@ -241,7 +241,7 @@ export class EcosystemClient {
 }
 
 export function createDevHubClient(): EcosystemClient | null {
-  const hubUrl = process.env.ORBIT_ECOSYSTEM_URL || "https://darkwavestudios.io";
+  const hubUrl = process.env.DEV_HUB_URL || process.env.ORBIT_ECOSYSTEM_URL || "https://darkwavestudios.io";
   const apiKey = process.env.ORBIT_ECOSYSTEM_API_KEY;
   const apiSecret = process.env.ORBIT_ECOSYSTEM_API_SECRET;
 
@@ -250,6 +250,7 @@ export function createDevHubClient(): EcosystemClient | null {
     return null;
   }
 
+  console.log(`[devhub] DarkWave Developer Hub initialized for ${hubUrl}`);
   return new EcosystemClient({
     hubUrl,
     apiKey,
