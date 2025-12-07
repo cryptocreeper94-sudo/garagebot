@@ -6,7 +6,8 @@ import {
   DollarSign, Link2, Settings, Zap, Users, Shield, Clock,
   ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
   BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList,
-  Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch, Blocks, Car
+  Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch, Blocks, Car,
+  MessageCircle, Send, Bot, Loader2
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { FeatureInventory } from "@/components/FeatureInventory";
@@ -490,6 +491,11 @@ export default function DevPortal() {
     notes: "",
   });
   
+  // Buddy AI Chat state
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatSessionId] = useState(() => `dev-portal-${Date.now()}`);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -704,6 +710,35 @@ export default function DevPortal() {
     },
   });
 
+  // Buddy AI Chat mutation
+  const chatMutation = useMutation({
+    mutationFn: async (message: string) => {
+      const res = await fetch('/api/ai/buddy/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, sessionId: chatSessionId }),
+      });
+      if (!res.ok) throw new Error('Failed to get response');
+      return res.json();
+    },
+    onSuccess: (data) => {
+      const responseText = typeof data.response === 'string' 
+        ? data.response 
+        : (data.response?.text || data.response?.message || JSON.stringify(data.response));
+      setChatMessages(prev => [...prev, { role: 'assistant', content: responseText }]);
+    },
+    onError: () => {
+      setChatMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I couldn't process that. Please try again." }]);
+    },
+  });
+
+  const sendChatMessage = () => {
+    if (!chatInput.trim()) return;
+    setChatMessages(prev => [...prev, { role: 'user', content: chatInput }]);
+    chatMutation.mutate(chatInput);
+    setChatInput("");
+  };
+
   const addChangelogCategory = () => {
     setNewRelease(prev => ({
       ...prev,
@@ -872,7 +907,7 @@ export default function DevPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 mb-4 max-w-2xl">
+          <TabsList className="grid w-full grid-cols-6 mb-4 max-w-3xl">
             <TabsTrigger value="features" className="font-tech uppercase text-xs">
               <ClipboardList className="w-3 h-3 mr-1" /> Features
             </TabsTrigger>
@@ -887,6 +922,9 @@ export default function DevPortal() {
             </TabsTrigger>
             <TabsTrigger value="affiliates" className="font-tech uppercase text-xs">
               <DollarSign className="w-3 h-3 mr-1" /> Affiliates
+            </TabsTrigger>
+            <TabsTrigger value="buddy" className="font-tech uppercase text-xs">
+              <Bot className="w-3 h-3 mr-1" /> Buddy
             </TabsTrigger>
           </TabsList>
 
@@ -1642,6 +1680,91 @@ export default function DevPortal() {
                 <p className="text-[10px] text-muted-foreground">Custom deals</p>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="buddy" className="space-y-4">
+            <Card className="bg-gradient-to-br from-cyan-500/10 to-primary/5 border-cyan-500/30">
+              <div className="p-4 border-b border-cyan-500/20 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                  <Bot className="w-5 h-5 text-cyan-400" />
+                </div>
+                <div>
+                  <h3 className="font-tech text-lg text-cyan-400">Buddy AI Assistant</h3>
+                  <p className="text-xs text-muted-foreground">Ask me anything about GarageBot, releases, or development</p>
+                </div>
+              </div>
+              
+              <div className="h-[400px] overflow-y-auto p-4 space-y-3">
+                {chatMessages.length === 0 && (
+                  <div className="text-center py-8">
+                    <Bot className="w-12 h-12 text-cyan-400/30 mx-auto mb-3" />
+                    <p className="text-muted-foreground text-sm">Start a conversation with Buddy</p>
+                    <p className="text-xs text-muted-foreground mt-1">Try: "What's the latest release?" or "Create a new release"</p>
+                  </div>
+                )}
+                {chatMessages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[80%] rounded-lg p-3 ${
+                      msg.role === 'user' 
+                        ? 'bg-primary/20 text-foreground' 
+                        : 'bg-cyan-500/10 border border-cyan-500/20 text-foreground'
+                    }`}>
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                  </div>
+                ))}
+                {chatMutation.isPending && (
+                  <div className="flex justify-start">
+                    <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-3">
+                      <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="p-4 border-t border-cyan-500/20 flex gap-2">
+                <Input
+                  placeholder="Ask Buddy anything..."
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendChatMessage()}
+                  className="flex-1 bg-background/50 border-cyan-500/30 focus:border-cyan-500"
+                  data-testid="input-buddy-chat"
+                />
+                <Button 
+                  onClick={sendChatMessage}
+                  disabled={!chatInput.trim() || chatMutation.isPending}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-black font-tech"
+                  data-testid="button-send-buddy"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+            
+            <Card className="bg-card/50 border-border p-4">
+              <h4 className="font-tech text-sm text-primary mb-2">Quick Commands</h4>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "What's the latest version?",
+                  "Show blockchain status",
+                  "How many retailers do we have?",
+                  "What's new in v1.0.10?",
+                ].map((cmd) => (
+                  <Button
+                    key={cmd}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs border-primary/30 hover:bg-primary/10"
+                    onClick={() => {
+                      setChatInput(cmd);
+                    }}
+                  >
+                    {cmd}
+                  </Button>
+                ))}
+              </div>
+            </Card>
           </TabsContent>
 
           <TabsContent value="tasks">
