@@ -21,7 +21,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
-import buddyMascot from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Footer";
 
@@ -36,16 +35,6 @@ export default function Home() {
   const [showVinScanner, setShowVinScanner] = useState(false);
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
   const [showVoiceSearch, setShowVoiceSearch] = useState(false);
-  const [showHeroBuddyPopup, setShowHeroBuddyPopup] = useState(false);
-
-  const HERO_BUDDY_TIPS = [
-    "Hey there! I'm Buddy, your AI parts expert. I search 40+ retailers to find you the best deal!",
-    "Pro tip: Add your vehicles to My Garage for instant fitment matching on every search!",
-    "Did you know? I can identify parts from photos! Just use the camera button.",
-    "Need a repair guide? I can generate step-by-step DIY instructions for any job!",
-    "Looking for local pickup? I prioritize stores near your ZIP code!",
-  ];
-  const [currentTip] = useState(() => HERO_BUDDY_TIPS[Math.floor(Math.random() * HERO_BUDDY_TIPS.length)]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,95 +113,15 @@ export default function Home() {
                   SYSTEM ONLINE // 40+ RETAILERS
                 </div>
                 
-                {/* Full Welcome Title with Buddy leaning on G */}
+                {/* Full Welcome Title */}
                 <div className="relative py-4">
                   <div className="flex flex-col items-center text-center">
                     <p className="text-base xl:text-lg font-tech text-muted-foreground tracking-widest uppercase mb-2">
                       Welcome to
                     </p>
                     <div className="flex items-end relative">
-                      {/* Buddy leaning against the G with local popup */}
-                      <div className="absolute -left-8 xl:-left-12 -top-12 xl:-top-16 z-20">
-                        <motion.div 
-                          initial={{ opacity: 0, x: -20, rotate: -10 }}
-                          animate={{ opacity: 1, x: 0, rotate: 8 }}
-                          transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                          onClick={() => setShowHeroBuddyPopup(!showHeroBuddyPopup)}
-                          className="cursor-pointer"
-                        >
-                          <img 
-                            src={buddyMascot} 
-                            alt="Buddy" 
-                            className="w-24 h-24 xl:w-32 xl:h-32 drop-shadow-[0_0_30px_rgba(6,182,212,0.7)] hover:scale-110 hover:drop-shadow-[0_0_40px_rgba(6,182,212,0.9)] transition-all duration-300"
-                            style={{ transform: 'rotate(8deg) scaleX(-1)' }}
-                            data-testid="img-buddy-hero"
-                          />
-                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] font-tech text-primary/80 whitespace-nowrap">
-                            Click me!
-                          </div>
-                        </motion.div>
-                        
-                        {/* Local comic bubble popup */}
-                        <AnimatePresence>
-                          {showHeroBuddyPopup && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                              animate={{ opacity: 1, scale: 1, y: 0 }}
-                              exit={{ opacity: 0, scale: 0.8, y: 10 }}
-                              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                              className="absolute left-28 xl:left-36 top-2 z-[60] w-56"
-                            >
-                              <div 
-                                className="relative rounded-xl px-4 py-3"
-                                style={{
-                                  background: 'hsl(var(--card))',
-                                  border: '2px solid hsl(var(--primary))',
-                                  boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3)',
-                                }}
-                              >
-                                <p className="text-xs leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
-                                  {currentTip}
-                                </p>
-                                {/* Bubble tail pointing left to Buddy */}
-                                <div 
-                                  className="absolute top-5 -left-2"
-                                  style={{
-                                    width: 0,
-                                    height: 0,
-                                    borderTop: '8px solid transparent',
-                                    borderBottom: '8px solid transparent',
-                                    borderRight: '8px solid hsl(var(--primary))',
-                                  }}
-                                />
-                                <div 
-                                  className="absolute top-5 -left-1"
-                                  style={{
-                                    width: 0,
-                                    height: 0,
-                                    borderTop: '6px solid transparent',
-                                    borderBottom: '6px solid transparent',
-                                    borderRight: '6px solid hsl(var(--card))',
-                                    marginTop: '2px',
-                                  }}
-                                />
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); setShowHeroBuddyPopup(false); }}
-                                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
-                                  style={{
-                                    background: 'hsl(var(--card))',
-                                    border: '1.5px solid hsl(var(--primary))',
-                                    color: 'hsl(var(--primary))',
-                                  }}
-                                >
-                                  <X className="w-2.5 h-2.5" />
-                                </button>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
                       
-                      <h1 className="text-5xl xl:text-6xl 2xl:text-7xl font-tech font-black uppercase tracking-tight pl-16 xl:pl-20">
+                      <h1 className="text-5xl xl:text-6xl 2xl:text-7xl font-tech font-black uppercase tracking-tight">
                         <span className="text-primary drop-shadow-[0_0_30px_rgba(6,182,212,0.9)] neon-text">G</span>
                         <span className="text-foreground">arage</span>
                         <span className="text-primary drop-shadow-[0_0_30px_rgba(6,182,212,0.9)] neon-text">B</span>
@@ -595,87 +504,17 @@ export default function Home() {
               SYSTEM ONLINE // 40+ RETAILERS
             </div>
             
-            {/* Welcome Title with Buddy leaning on G */}
+            {/* Welcome Title */}
             <p className="text-base font-tech text-muted-foreground tracking-widest uppercase mb-3">
               Welcome to
             </p>
             <div className="relative inline-block mb-4">
-              {/* Buddy leaning against the G with local popup */}
-              <div className="absolute -left-6 -top-16 z-20">
-                <motion.div 
-                  initial={{ opacity: 0, x: -20, rotate: -10 }}
-                  animate={{ opacity: 1, x: 0, rotate: 8 }}
-                  transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                  onClick={() => setShowHeroBuddyPopup(!showHeroBuddyPopup)}
-                  className="cursor-pointer"
-                >
-                  <img 
-                    src={buddyMascot} 
-                    alt="Buddy" 
-                    className="w-20 h-20 drop-shadow-[0_0_25px_rgba(6,182,212,0.7)] hover:scale-110 transition-transform"
-                    style={{ transform: 'rotate(8deg) scaleX(-1)' }}
-                    data-testid="img-buddy-hero-mobile"
-                  />
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[9px] font-tech text-primary/80 whitespace-nowrap">
-                    Click me!
-                  </div>
-                </motion.div>
-                
-                {/* Local comic bubble popup for mobile */}
-                <AnimatePresence>
-                  {showHeroBuddyPopup && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.8, y: 10 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      className="absolute left-24 top-0 z-[60] w-52"
-                    >
-                      <div 
-                        className="relative rounded-xl px-3 py-2"
-                        style={{
-                          background: 'hsl(var(--card))',
-                          border: '2px solid hsl(var(--primary))',
-                          boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3)',
-                        }}
-                      >
-                        <p className="text-xs leading-relaxed" style={{ color: 'hsl(var(--foreground))' }}>
-                          {currentTip}
-                        </p>
-                        {/* Bubble tail pointing left to Buddy */}
-                        <div 
-                          className="absolute top-4 -left-2"
-                          style={{
-                            width: 0,
-                            height: 0,
-                            borderTop: '6px solid transparent',
-                            borderBottom: '6px solid transparent',
-                            borderRight: '6px solid hsl(var(--primary))',
-                          }}
-                        />
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setShowHeroBuddyPopup(false); }}
-                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
-                          style={{
-                            background: 'hsl(var(--card))',
-                            border: '1.5px solid hsl(var(--primary))',
-                            color: 'hsl(var(--primary))',
-                          }}
-                        >
-                          <X className="w-2.5 h-2.5" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              
-              <h1 className="text-5xl font-tech font-black uppercase tracking-tight pl-14">
+              <h1 className="text-3xl sm:text-4xl font-tech font-black uppercase tracking-tight">
                 <span className="text-primary drop-shadow-[0_0_25px_rgba(6,182,212,0.9)] neon-text">G</span>
                 <span className="text-foreground">arage</span>
                 <span className="text-primary drop-shadow-[0_0_25px_rgba(6,182,212,0.9)] neon-text">B</span>
                 <span className="text-foreground">ot</span>
-                <span className="text-primary/70 text-3xl">.io</span>
+                <span className="text-primary/70 text-xl sm:text-2xl">.io</span>
               </h1>
             </div>
             <p className="text-base text-muted-foreground/80 mt-3">
