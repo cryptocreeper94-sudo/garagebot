@@ -784,25 +784,59 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 max-w-[200px]"
+            className="fixed bottom-24 right-4 md:bottom-28 md:right-6 z-[100]"
+            style={{ width: '280px' }}
           >
-            <div className="relative bg-card border-2 border-primary rounded-xl p-3 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+            <div 
+              className="relative rounded-2xl p-5"
+              style={{
+                background: '#0a0a0f',
+                border: '3px solid hsl(var(--primary))',
+                boxShadow: '0 8px 40px rgba(6, 182, 212, 0.5), 0 0 0 1px rgba(6, 182, 212, 0.2)',
+              }}
+            >
               <button 
                 onClick={dismissWelcome}
-                className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-card border border-primary flex items-center justify-center"
+                className="absolute -top-3 -right-3 w-7 h-7 rounded-full flex items-center justify-center"
+                style={{
+                  background: '#0a0a0f',
+                  border: '2px solid hsl(var(--primary))',
+                }}
               >
-                <X className="w-3 h-3 text-primary" />
+                <X className="w-4 h-4 text-primary" />
               </button>
-              <p className="text-xs leading-relaxed text-foreground">
-                Hey! I'm {mascotName}, your garage assistant. Tap me anytime you need help finding parts or repairs!
-              </p>
+              <div className="flex items-start gap-3">
+                <img 
+                  src={buddyCubeIcon} 
+                  alt="Buddy" 
+                  className="w-12 h-12 shrink-0"
+                  style={{ filter: 'drop-shadow(0 2px 6px rgba(6, 182, 212, 0.5))' }}
+                />
+                <div>
+                  <p className="text-sm font-tech text-primary font-bold mb-1">Hey there!</p>
+                  <p className="text-sm leading-relaxed text-foreground">
+                    I'm {mascotName}, your garage assistant. Tap me anytime you need help finding parts or repairs!
+                  </p>
+                </div>
+              </div>
+              {/* Speech bubble tail */}
               <div 
-                className="absolute -bottom-2 right-6"
+                className="absolute -bottom-3 right-8"
                 style={{
                   width: 0, height: 0,
-                  borderLeft: '8px solid transparent',
-                  borderRight: '8px solid transparent',
-                  borderTop: '8px solid hsl(var(--primary))',
+                  borderLeft: '12px solid transparent',
+                  borderRight: '12px solid transparent',
+                  borderTop: '12px solid hsl(var(--primary))',
+                }}
+              />
+              <div 
+                className="absolute -bottom-2 right-8"
+                style={{
+                  width: 0, height: 0,
+                  borderLeft: '10px solid transparent',
+                  borderRight: '10px solid transparent',
+                  borderTop: '10px solid #0a0a0f',
+                  marginLeft: '2px',
                 }}
               />
             </div>
@@ -853,12 +887,12 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             <img 
               src={buddyCubeIcon} 
               alt="Chat with Buddy" 
-              className="w-12 h-12 md:w-14 md:h-14 object-contain"
+              className="w-16 h-16 md:w-20 md:h-20 object-contain"
               style={{ 
-                filter: 'drop-shadow(0 2px 8px rgba(6, 182, 212, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))',
+                filter: 'drop-shadow(0 4px 12px rgba(6, 182, 212, 0.7)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5))',
               }}
             />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full animate-pulse" />
+            <span className="absolute top-0 right-0 w-3 h-3 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
           </motion.div>
         )}
       </motion.button>
