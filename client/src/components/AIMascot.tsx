@@ -695,7 +695,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
               <motion.img
                 src={isLoading ? mascotThinking : mascotWaving}
                 alt="Buddy the GarageBot mascot"
-                className="w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 object-contain ml-4 sm:ml-8"
+                className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 object-contain ml-4 sm:ml-8"
                 style={{ 
                   filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
                 }}
@@ -787,7 +787,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             <motion.img 
               src={mascotWaving} 
               alt="Chat with Buddy" 
-              className="w-20 h-20 md:w-28 md:h-28 lg:w-36 lg:h-36 object-contain"
+              className="w-28 h-28 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
               style={{ 
                 filter: 'drop-shadow(0 2px 8px rgba(0, 255, 255, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))',
               }}
