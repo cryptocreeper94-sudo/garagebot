@@ -14,6 +14,7 @@ import {
 
 import mascotWaving from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
 import mascotThinking from "@assets/mascot_transparent/robot_mascot_thinking_pose.png";
+import buddyCubeIcon from "@assets/generated_images/buddy_cube_icon.png";
 
 interface VehicleInfo {
   type?: string;
@@ -103,6 +104,25 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [hasSeenWelcome, setHasSeenWelcome] = useState(() => {
+    return localStorage.getItem('buddy_welcomed') === 'true';
+  });
+
+  useEffect(() => {
+    if (!hasSeenWelcome) {
+      const timer = setTimeout(() => {
+        setShowWelcome(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenWelcome]);
+
+  const dismissWelcome = () => {
+    setShowWelcome(false);
+    setHasSeenWelcome(true);
+    localStorage.setItem('buddy_welcomed', 'true');
+  };
   const [rateLimitError, setRateLimitError] = useState<{ message: string; retryAfter: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -757,12 +777,48 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
         )}
       </AnimatePresence>
 
+      {/* Welcome message popup for first-time visitors */}
+      <AnimatePresence>
+        {showWelcome && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 max-w-[200px]"
+          >
+            <div className="relative bg-card border-2 border-primary rounded-xl p-3 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+              <button 
+                onClick={dismissWelcome}
+                className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-card border border-primary flex items-center justify-center"
+              >
+                <X className="w-3 h-3 text-primary" />
+              </button>
+              <p className="text-xs leading-relaxed text-foreground">
+                Hey! I'm {mascotName}, your garage assistant. Tap me anytime you need help finding parts or repairs!
+              </p>
+              <div 
+                className="absolute -bottom-2 right-6"
+                style={{
+                  width: 0, height: 0,
+                  borderLeft: '8px solid transparent',
+                  borderRight: '8px solid transparent',
+                  borderTop: '8px solid hsl(var(--primary))',
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.button
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => {
+          if (showWelcome) {
+            dismissWelcome();
+          }
           if (isOpen) {
             handleClose();
           } else {
@@ -777,31 +833,33 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
       >
         {isOpen ? (
           <motion.div 
-            className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)]"
+            className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)]"
             style={{ filter: 'drop-shadow(0 2px 6px rgba(0, 255, 255, 0.3))' }}
           >
-            <X className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+            <X className="w-5 h-5 md:w-6 md:h-6 text-primary" />
           </motion.div>
         ) : (
-          <div className="relative">
-            <motion.img 
-              src={mascotWaving} 
+          <motion.div 
+            className="relative"
+            animate={{
+              y: [0, -2, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <img 
+              src={buddyCubeIcon} 
               alt="Chat with Buddy" 
-              className="w-28 h-28 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
+              className="w-12 h-12 md:w-14 md:h-14 object-contain"
               style={{ 
-                filter: 'drop-shadow(0 2px 8px rgba(0, 255, 255, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))',
-              }}
-              animate={{
-                y: [0, -4, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
+                filter: 'drop-shadow(0 2px 8px rgba(6, 182, 212, 0.6)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))',
               }}
             />
-            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-yellow-300 absolute -top-1 -right-1 animate-pulse" />
-          </div>
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full animate-pulse" />
+          </motion.div>
         )}
       </motion.button>
     </>
