@@ -267,7 +267,7 @@ export default function Garage() {
                 <DialogTitle className="font-tech text-xl uppercase">Add Vehicle to Garage</DialogTitle>
                 <DialogDescription>Scan your VIN to auto-fill vehicle details or enter manually</DialogDescription>
               </DialogHeader>
-              <div className="space-y-0 py-4">
+              <div className="space-y-3 py-4">
                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
                   <Label className="text-primary font-tech text-sm uppercase mb-2 block">Quick VIN Decode</Label>
                   <div className="flex gap-2">
@@ -310,31 +310,31 @@ export default function Garage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
+                <div className="flex overflow-x-auto md:grid md:grid-cols-4 gap-0 scrollbar-hide">
+                  <div className="min-w-[40vw] md:min-w-0 flex-shrink-0 p-1">
                     <Label>Year *</Label>
                     <Input value={newVehicle.year} onChange={(e) => setNewVehicle({ ...newVehicle, year: e.target.value })} placeholder="2024" data-testid="input-year" />
                   </div>
-                  <div>
+                  <div className="min-w-[40vw] md:min-w-0 flex-shrink-0 p-1">
                     <Label>Make *</Label>
                     <Input value={newVehicle.make} onChange={(e) => setNewVehicle({ ...newVehicle, make: e.target.value })} placeholder="Toyota" data-testid="input-make" />
                   </div>
-                  <div>
+                  <div className="min-w-[40vw] md:min-w-0 flex-shrink-0 p-1">
                     <Label>Model *</Label>
                     <Input value={newVehicle.model} onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })} placeholder="Tacoma" data-testid="input-model" />
                   </div>
-                  <div>
+                  <div className="min-w-[40vw] md:min-w-0 flex-shrink-0 p-1">
                     <Label>Trim</Label>
                     <Input value={newVehicle.trim} onChange={(e) => setNewVehicle({ ...newVehicle, trim: e.target.value })} placeholder="TRD Off-Road" data-testid="input-trim" />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="flex overflow-x-auto md:grid md:grid-cols-2 gap-0 scrollbar-hide">
+                  <div className="min-w-[45vw] md:min-w-0 flex-shrink-0 p-1">
                     <Label>Oil Type</Label>
                     <Input value={newVehicle.oilType} onChange={(e) => setNewVehicle({ ...newVehicle, oilType: e.target.value })} placeholder="0W-20 Synthetic" data-testid="input-oil" />
                   </div>
-                  <div>
+                  <div className="min-w-[45vw] md:min-w-0 flex-shrink-0 p-1">
                     <Label>Tire Size</Label>
                     <Input value={newVehicle.tireSize} onChange={(e) => setNewVehicle({ ...newVehicle, tireSize: e.target.value })} placeholder="265/70R16" data-testid="input-tire" />
                   </div>
@@ -475,9 +475,9 @@ export default function Garage() {
                         </TabsTrigger>
                       </TabsList>
 
-                      <TabsContent value="passport" className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-muted/50 rounded-lg p-4">
+                      <TabsContent value="passport" className="space-y-0">
+                        <div className="flex overflow-x-auto md:grid md:grid-cols-2 gap-0 scrollbar-hide">
+                          <div className="bg-muted/50 rounded-lg p-4 min-w-[45vw] md:min-w-0 flex-shrink-0">
                             <Label className="text-xs text-muted-foreground uppercase">VIN</Label>
                             <p className="font-mono text-sm">{selectedVehicle.vin || 'Not provided'}</p>
                           </div>
@@ -512,7 +512,7 @@ export default function Garage() {
                         </Button>
                       </TabsContent>
 
-                      <TabsContent value="ai" className="space-y-4">
+                      <TabsContent value="ai" className="space-y-0">
                         <SmartRecommendations 
                           vehicleId={selectedVehicle.id}
                           vehicleYear={selectedVehicle.year}
@@ -540,7 +540,7 @@ export default function Garage() {
                           </div>
                         ) : (
                           <ScrollArea className="h-[400px]">
-                            <div className="space-y-4">
+                            <div className="space-y-0">
                               {recalls.map((recall, index) => (
                                 <Card key={index} className="p-4 bg-destructive/5 border-destructive/20" data-testid={`card-recall-${index}`}>
                                   <div className="flex items-start gap-3">
@@ -578,7 +578,7 @@ export default function Garage() {
                                 <DialogTitle className="font-tech uppercase">Log Service Record</DialogTitle>
                                 <DialogDescription>Track maintenance for your {selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</DialogDescription>
                               </DialogHeader>
-                              <div className="space-y-4 py-4">
+                              <div className="space-y-2 py-4">
                                 <div>
                                   <Label>Service Type *</Label>
                                   <Input 
@@ -597,8 +597,8 @@ export default function Garage() {
                                     data-testid="input-service-description"
                                   />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
+                                <div className="flex overflow-x-auto md:grid md:grid-cols-2 gap-0 scrollbar-hide">
+                                  <div className="min-w-[45vw] md:min-w-0 flex-shrink-0 p-1">
                                     <Label>Mileage</Label>
                                     <Input 
                                       type="number"
@@ -608,7 +608,7 @@ export default function Garage() {
                                       data-testid="input-service-mileage"
                                     />
                                   </div>
-                                  <div>
+                                  <div className="min-w-[45vw] md:min-w-0 flex-shrink-0 p-1">
                                     <Label>Cost</Label>
                                     <Input 
                                       value={newService.cost} 
@@ -618,8 +618,8 @@ export default function Garage() {
                                     />
                                   </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
+                                <div className="flex overflow-x-auto md:grid md:grid-cols-2 gap-0 scrollbar-hide">
+                                  <div className="min-w-[45vw] md:min-w-0 flex-shrink-0 p-1">
                                     <Label>Shop/Location</Label>
                                     <Input 
                                       value={newService.shopName} 
@@ -628,7 +628,7 @@ export default function Garage() {
                                       data-testid="input-service-shop"
                                     />
                                   </div>
-                                  <div>
+                                  <div className="min-w-[45vw] md:min-w-0 flex-shrink-0 p-1">
                                     <Label>Date</Label>
                                     <Input 
                                       type="date"
