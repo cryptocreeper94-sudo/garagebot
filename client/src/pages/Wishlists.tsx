@@ -56,15 +56,16 @@ export default function Wishlists() {
   const [newItem, setNewItem] = useState({ partName: "", partNumber: "", estimatedPrice: "", quantity: "1", priority: "medium", notes: "" });
   const [copied, setCopied] = useState(false);
 
-  const { data: wishlists = [], isLoading: wishlistsLoading } = useQuery<Wishlist[]>({
+  const { data: wishlists = [], isLoading: wishlistsLoading, error: wishlistsError } = useQuery<Wishlist[]>({
     queryKey: ["/api/wishlists"],
     enabled: !!user,
   });
 
-  const { data: wishlistDetails, isLoading: detailsLoading } = useQuery<{ wishlist: Wishlist; items: WishlistItem[] }>({
+  const { data: wishlistDetails, isLoading: detailsLoading, error: wishlistError } = useQuery<{ wishlist: Wishlist; items: WishlistItem[] }>({
     queryKey: ["/api/wishlists", selectedWishlist],
     queryFn: async () => {
       const res = await fetch(`/api/wishlists/${selectedWishlist}`);
+      if (!res.ok) throw new Error("Failed to fetch wishlist details");
       return res.json();
     },
     enabled: !!selectedWishlist,
@@ -78,6 +79,7 @@ export default function Wishlists() {
         body: JSON.stringify(data),
         credentials: "include",
       });
+      if (!res.ok) throw new Error("Failed to create wishlist");
       return res.json();
     },
     onSuccess: () => {
@@ -85,6 +87,9 @@ export default function Wishlists() {
       setCreateOpen(false);
       setNewWishlist({ name: "", description: "", isPublic: false });
       toast({ title: "Wishlist created!" });
+    },
+    onError: () => {
+      toast({ title: "Failed to create wishlist", variant: "destructive" });
     },
   });
 
@@ -96,6 +101,7 @@ export default function Wishlists() {
         body: JSON.stringify({ ...data, quantity: parseInt(data.quantity) }),
         credentials: "include",
       });
+      if (!res.ok) throw new Error("Failed to add item");
       return res.json();
     },
     onSuccess: () => {
@@ -103,6 +109,9 @@ export default function Wishlists() {
       setAddItemOpen(false);
       setNewItem({ partName: "", partNumber: "", estimatedPrice: "", quantity: "1", priority: "medium", notes: "" });
       toast({ title: "Item added to wishlist!" });
+    },
+    onError: () => {
+      toast({ title: "Failed to add item", variant: "destructive" });
     },
   });
 
@@ -112,11 +121,15 @@ export default function Wishlists() {
         method: "DELETE",
         credentials: "include",
       });
+      if (!res.ok) throw new Error("Failed to delete item");
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/wishlists", selectedWishlist] });
       toast({ title: "Item removed" });
+    },
+    onError: () => {
+      toast({ title: "Failed to remove item", variant: "destructive" });
     },
   });
 
@@ -238,6 +251,12 @@ export default function Wishlists() {
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
+              ) : wishlistsError ? (
+                <div className="text-center py-8">
+                  <Package className="w-12 h-12 mx-auto mb-4 text-destructive" />
+                  <p className="text-destructive font-medium">Failed to load wishlists</p>
+                  <p className="text-sm text-muted-foreground">Please try again later</p>
+                </div>
               ) : wishlists.length === 0 ? (
                 <div className="text-center py-8">
                   <Package className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
@@ -291,6 +310,12 @@ export default function Wishlists() {
             ) : detailsLoading ? (
               <Card className="glass-dark border-primary/20 p-8 flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </Card>
+            ) : wishlistError ? (
+              <Card className="glass-dark border-destructive/20 p-8 text-center">
+                <Package className="w-12 h-12 mx-auto mb-4 text-destructive" />
+                <p className="text-destructive font-medium">Failed to load wishlist</p>
+                <p className="text-sm text-muted-foreground mt-2">Please try again later</p>
               </Card>
             ) : wishlistDetails ? (
               <Card className="glass-dark border-primary/20 p-6">
