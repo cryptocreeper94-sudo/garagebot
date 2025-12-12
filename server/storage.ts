@@ -10,7 +10,8 @@ import {
   vehicleCategories, repairGuides, guideSteps, guideFitment, partTerminology, guideRatings, guideProgress,
   priceAlerts, blockchainVerifications,
   referralInvites, referralPointTransactions, referralRedemptions,
-  releases
+  releases,
+  vendorReviews, wishlists, wishlistItems, projects, projectParts, smsPreferences
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -37,7 +38,11 @@ import type {
   ReferralInvite, InsertReferralInvite,
   ReferralPointTransaction, InsertReferralPointTransaction,
   ReferralRedemption, InsertReferralRedemption,
-  Release, InsertRelease
+  Release, InsertRelease,
+  VendorReview, InsertVendorReview,
+  Wishlist, InsertWishlist, WishlistItem, InsertWishlistItem,
+  Project, InsertProject, ProjectPart, InsertProjectPart,
+  SmsPreferences, InsertSmsPreferences
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -1888,6 +1893,129 @@ export class DatabaseStorage implements IStorage {
   async deleteRelease(id: string): Promise<boolean> {
     const result = await db.delete(releases).where(eq(releases.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // ============================================
+  // COMMUNITY FEATURES - Reviews, Wishlists, Projects
+  // ============================================
+
+  // Vendor Reviews
+  async getVendorReviews(vendorId: string): Promise<VendorReview[]> {
+    return await db.select().from(vendorReviews)
+      .where(eq(vendorReviews.vendorId, vendorId))
+      .orderBy(desc(vendorReviews.createdAt));
+  }
+
+  async createVendorReview(review: InsertVendorReview): Promise<VendorReview> {
+    const [newReview] = await db.insert(vendorReviews).values(review).returning();
+    return newReview;
+  }
+
+  // Wishlists
+  async getUserWishlists(userId: string): Promise<Wishlist[]> {
+    return await db.select().from(wishlists)
+      .where(eq(wishlists.userId, userId))
+      .orderBy(desc(wishlists.updatedAt));
+  }
+
+  async getWishlistById(id: string): Promise<{ wishlist: Wishlist; items: WishlistItem[] } | undefined> {
+    const [wishlist] = await db.select().from(wishlists).where(eq(wishlists.id, id));
+    if (!wishlist) return undefined;
+    const items = await db.select().from(wishlistItems).where(eq(wishlistItems.wishlistId, id));
+    return { wishlist, items };
+  }
+
+  async getWishlistByShareCode(shareCode: string): Promise<{ wishlist: Wishlist; items: WishlistItem[] } | undefined> {
+    const [wishlist] = await db.select().from(wishlists)
+      .where(and(eq(wishlists.shareCode, shareCode), eq(wishlists.isPublic, true)));
+    if (!wishlist) return undefined;
+    const items = await db.select().from(wishlistItems).where(eq(wishlistItems.wishlistId, wishlist.id));
+    return { wishlist, items };
+  }
+
+  async createWishlist(wishlist: InsertWishlist): Promise<Wishlist> {
+    const [newWishlist] = await db.insert(wishlists).values(wishlist).returning();
+    return newWishlist;
+  }
+
+  async incrementWishlistViews(id: string): Promise<void> {
+    await db.update(wishlists)
+      .set({ viewCount: sql`${wishlists.viewCount} + 1` })
+      .where(eq(wishlists.id, id));
+  }
+
+  async addWishlistItem(item: InsertWishlistItem): Promise<WishlistItem> {
+    const [newItem] = await db.insert(wishlistItems).values(item).returning();
+    return newItem;
+  }
+
+  async deleteWishlistItem(id: string): Promise<boolean> {
+    const result = await db.delete(wishlistItems).where(eq(wishlistItems.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // Projects
+  async getUserProjects(userId: string): Promise<Project[]> {
+    return await db.select().from(projects)
+      .where(eq(projects.userId, userId))
+      .orderBy(desc(projects.updatedAt));
+  }
+
+  async getProjectById(id: string): Promise<{ project: Project; parts: ProjectPart[] } | undefined> {
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    if (!project) return undefined;
+    const parts = await db.select().from(projectParts).where(eq(projectParts.projectId, id));
+    return { project, parts };
+  }
+
+  async createProject(project: InsertProject): Promise<Project> {
+    const [newProject] = await db.insert(projects).values(project).returning();
+    return newProject;
+  }
+
+  async updateProject(id: string, updates: Partial<Project>): Promise<Project | undefined> {
+    const [project] = await db.update(projects)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+    return project;
+  }
+
+  async addProjectPart(part: InsertProjectPart): Promise<ProjectPart> {
+    const [newPart] = await db.insert(projectParts).values(part).returning();
+    return newPart;
+  }
+
+  async updateProjectPart(id: string, updates: Partial<ProjectPart>): Promise<ProjectPart | undefined> {
+    const [part] = await db.update(projectParts)
+      .set(updates)
+      .where(eq(projectParts.id, id))
+      .returning();
+    return part;
+  }
+
+  async deleteProjectPart(id: string): Promise<boolean> {
+    const result = await db.delete(projectParts).where(eq(projectParts.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // SMS Preferences
+  async getSmsPreferences(userId: string): Promise<SmsPreferences | undefined> {
+    const [prefs] = await db.select().from(smsPreferences).where(eq(smsPreferences.userId, userId));
+    return prefs;
+  }
+
+  async upsertSmsPreferences(prefs: InsertSmsPreferences): Promise<SmsPreferences> {
+    const existing = await this.getSmsPreferences(prefs.userId);
+    if (existing) {
+      const [updated] = await db.update(smsPreferences)
+        .set({ ...prefs, updatedAt: new Date() })
+        .where(eq(smsPreferences.userId, prefs.userId))
+        .returning();
+      return updated;
+    }
+    const [newPrefs] = await db.insert(smsPreferences).values(prefs).returning();
+    return newPrefs;
   }
 }
 

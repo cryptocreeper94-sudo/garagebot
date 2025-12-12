@@ -5890,6 +5890,257 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // COMMUNITY FEATURES - Reviews, Wishlists, Projects
+  // ============================================
+
+  // Vendor Reviews
+  app.get("/api/vendors/:vendorId/reviews", async (req, res) => {
+    try {
+      const reviews = await storage.getVendorReviews(req.params.vendorId);
+      res.json(reviews);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch reviews" });
+    }
+  });
+
+  app.post("/api/vendors/:vendorId/reviews", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || req.session?.userId;
+      const review = await storage.createVendorReview({
+        vendorId: req.params.vendorId,
+        userId,
+        rating: req.body.rating,
+        title: req.body.title,
+        content: req.body.content,
+        shippingRating: req.body.shippingRating,
+        priceRating: req.body.priceRating,
+        qualityRating: req.body.qualityRating,
+        wouldRecommend: req.body.wouldRecommend,
+      });
+      res.json(review);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to create review" });
+    }
+  });
+
+  // Wishlists
+  app.get("/api/wishlists", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || req.session?.userId;
+      const wishlists = await storage.getUserWishlists(userId);
+      res.json(wishlists);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch wishlists" });
+    }
+  });
+
+  app.post("/api/wishlists", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || req.session?.userId;
+      const shareCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+      const wishlist = await storage.createWishlist({
+        userId,
+        name: req.body.name,
+        description: req.body.description,
+        vehicleId: req.body.vehicleId,
+        isPublic: req.body.isPublic || false,
+        shareCode,
+      });
+      res.json(wishlist);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to create wishlist" });
+    }
+  });
+
+  app.get("/api/wishlists/:id", async (req, res) => {
+    try {
+      const wishlist = await storage.getWishlistById(req.params.id);
+      if (!wishlist) return res.status(404).json({ error: "Wishlist not found" });
+      res.json(wishlist);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch wishlist" });
+    }
+  });
+
+  app.get("/api/wishlists/share/:shareCode", async (req, res) => {
+    try {
+      const result = await storage.getWishlistByShareCode(req.params.shareCode);
+      if (!result) return res.status(404).json({ error: "Wishlist not found" });
+      await storage.incrementWishlistViews(result.wishlist.id);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch wishlist" });
+    }
+  });
+
+  app.post("/api/wishlists/:id/items", isAuthenticated, async (req: any, res) => {
+    try {
+      const item = await storage.addWishlistItem({
+        wishlistId: req.params.id,
+        partName: req.body.partName,
+        partNumber: req.body.partNumber,
+        vendorSlug: req.body.vendorSlug,
+        estimatedPrice: req.body.estimatedPrice,
+        quantity: req.body.quantity || 1,
+        priority: req.body.priority || "medium",
+        notes: req.body.notes,
+      });
+      res.json(item);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to add item" });
+    }
+  });
+
+  app.delete("/api/wishlists/:wishlistId/items/:itemId", isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteWishlistItem(req.params.itemId);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to delete item" });
+    }
+  });
+
+  // Projects
+  app.get("/api/projects", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || req.session?.userId;
+      const projects = await storage.getUserProjects(userId);
+      res.json(projects);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch projects" });
+    }
+  });
+
+  app.post("/api/projects", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || req.session?.userId;
+      const shareCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+      const project = await storage.createProject({
+        userId,
+        name: req.body.name,
+        description: req.body.description,
+        vehicleId: req.body.vehicleId,
+        status: "planning",
+        targetBudget: req.body.targetBudget,
+        targetDate: req.body.targetDate ? new Date(req.body.targetDate) : null,
+        isPublic: req.body.isPublic || false,
+        shareCode,
+      });
+      res.json(project);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to create project" });
+    }
+  });
+
+  app.get("/api/projects/:id", async (req, res) => {
+    try {
+      const project = await storage.getProjectById(req.params.id);
+      if (!project) return res.status(404).json({ error: "Project not found" });
+      res.json(project);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+
+  app.patch("/api/projects/:id", isAuthenticated, async (req, res) => {
+    try {
+      const project = await storage.updateProject(req.params.id, req.body);
+      res.json(project);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update project" });
+    }
+  });
+
+  app.post("/api/projects/:id/parts", isAuthenticated, async (req: any, res) => {
+    try {
+      const part = await storage.addProjectPart({
+        projectId: req.params.id,
+        partName: req.body.partName,
+        partNumber: req.body.partNumber,
+        vendorSlug: req.body.vendorSlug,
+        purchaseUrl: req.body.purchaseUrl,
+        estimatedPrice: req.body.estimatedPrice,
+        quantity: req.body.quantity || 1,
+        status: "needed",
+        notes: req.body.notes,
+      });
+      res.json(part);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to add part" });
+    }
+  });
+
+  app.patch("/api/projects/:projectId/parts/:partId", isAuthenticated, async (req, res) => {
+    try {
+      const part = await storage.updateProjectPart(req.params.partId, req.body);
+      res.json(part);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update part" });
+    }
+  });
+
+  app.delete("/api/projects/:projectId/parts/:partId", isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteProjectPart(req.params.partId);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to delete part" });
+    }
+  });
+
+  // ============================================
+  // SMS PREFERENCES (Twilio Stub)
+  // ============================================
+
+  app.get("/api/sms/preferences", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || req.session?.userId;
+      const prefs = await storage.getSmsPreferences(userId);
+      res.json(prefs || { serviceReminders: false, priceAlerts: false, orderUpdates: false });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch SMS preferences" });
+    }
+  });
+
+  app.post("/api/sms/preferences", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || req.session?.userId;
+      const prefs = await storage.upsertSmsPreferences({
+        userId,
+        phoneNumber: req.body.phoneNumber,
+        serviceReminders: req.body.serviceReminders,
+        priceAlerts: req.body.priceAlerts,
+        orderUpdates: req.body.orderUpdates,
+        promotions: req.body.promotions,
+        quietHoursStart: req.body.quietHoursStart,
+        quietHoursEnd: req.body.quietHoursEnd,
+        timezone: req.body.timezone,
+      });
+      res.json(prefs);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to save SMS preferences" });
+    }
+  });
+
+  app.post("/api/sms/verify", isAuthenticated, async (req: any, res) => {
+    // Stub - would send verification SMS via Twilio
+    res.json({ 
+      success: true, 
+      message: "SMS verification not yet configured. Twilio integration pending.",
+      stubbed: true 
+    });
+  });
+
+  app.post("/api/sms/confirm", isAuthenticated, async (req: any, res) => {
+    // Stub - would verify the code
+    res.json({ 
+      success: false, 
+      message: "SMS verification not yet configured. Twilio integration pending.",
+      stubbed: true 
+    });
+  });
+
   return httpServer;
 }
 

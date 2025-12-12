@@ -1574,3 +1574,155 @@ export const insertReleaseSchema = createInsertSchema(releases).omit({
 });
 export type InsertRelease = z.infer<typeof insertReleaseSchema>;
 export type Release = typeof releases.$inferSelect;
+
+// ============================================
+// COMMUNITY FEATURES - Reviews, Wishlists, Projects
+// ============================================
+
+// Vendor Reviews - Community ratings for parts retailers
+export const vendorReviews = pgTable("vendor_reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  vendorId: varchar("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(),
+  title: text("title"),
+  content: text("content"),
+  shippingRating: integer("shipping_rating"),
+  priceRating: integer("price_rating"),
+  qualityRating: integer("quality_rating"),
+  wouldRecommend: boolean("would_recommend").default(true),
+  isVerifiedPurchase: boolean("is_verified_purchase").default(false),
+  helpfulCount: integer("helpful_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_vendor_reviews_vendor").on(table.vendorId),
+  index("IDX_vendor_reviews_user").on(table.userId),
+  index("IDX_vendor_reviews_rating").on(table.rating),
+]);
+
+export const insertVendorReviewSchema = createInsertSchema(vendorReviews).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertVendorReview = z.infer<typeof insertVendorReviewSchema>;
+export type VendorReview = typeof vendorReviews.$inferSelect;
+
+// Wishlists - Shareable parts lists
+export const wishlists = pgTable("wishlists", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  isPublic: boolean("is_public").default(false),
+  shareCode: text("share_code").unique(),
+  viewCount: integer("view_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_wishlists_user").on(table.userId),
+  index("IDX_wishlists_share").on(table.shareCode),
+]);
+
+export const wishlistItems = pgTable("wishlist_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  wishlistId: varchar("wishlist_id").notNull().references(() => wishlists.id, { onDelete: "cascade" }),
+  partName: text("part_name").notNull(),
+  partNumber: text("part_number"),
+  vendorSlug: text("vendor_slug"),
+  estimatedPrice: decimal("estimated_price", { precision: 10, scale: 2 }),
+  quantity: integer("quantity").default(1),
+  priority: text("priority").default("medium"),
+  notes: text("notes"),
+  isPurchased: boolean("is_purchased").default(false),
+  purchasedAt: timestamp("purchased_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_wishlist_items_wishlist").on(table.wishlistId),
+]);
+
+export const insertWishlistSchema = createInsertSchema(wishlists).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertWishlist = z.infer<typeof insertWishlistSchema>;
+export type Wishlist = typeof wishlists.$inferSelect;
+
+export const insertWishlistItemSchema = createInsertSchema(wishlistItems).omit({ id: true, createdAt: true });
+export type InsertWishlistItem = z.infer<typeof insertWishlistItemSchema>;
+export type WishlistItem = typeof wishlistItems.$inferSelect;
+
+// Projects - Group parts by repair project
+export const projects = pgTable("projects", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  status: text("status").default("planning"),
+  targetBudget: decimal("target_budget", { precision: 10, scale: 2 }),
+  actualSpent: decimal("actual_spent", { precision: 10, scale: 2 }).default("0"),
+  targetDate: timestamp("target_date"),
+  completedAt: timestamp("completed_at"),
+  imageUrl: text("image_url"),
+  isPublic: boolean("is_public").default(false),
+  shareCode: text("share_code").unique(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_projects_user").on(table.userId),
+  index("IDX_projects_vehicle").on(table.vehicleId),
+  index("IDX_projects_status").on(table.status),
+]);
+
+export const projectParts = pgTable("project_parts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  partName: text("part_name").notNull(),
+  partNumber: text("part_number"),
+  vendorSlug: text("vendor_slug"),
+  purchaseUrl: text("purchase_url"),
+  estimatedPrice: decimal("estimated_price", { precision: 10, scale: 2 }),
+  actualPrice: decimal("actual_price", { precision: 10, scale: 2 }),
+  quantity: integer("quantity").default(1),
+  status: text("status").default("needed"),
+  notes: text("notes"),
+  purchasedAt: timestamp("purchased_at"),
+  installedAt: timestamp("installed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_project_parts_project").on(table.projectId),
+  index("IDX_project_parts_status").on(table.status),
+]);
+
+export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertProject = z.infer<typeof insertProjectSchema>;
+export type Project = typeof projects.$inferSelect;
+
+export const insertProjectPartSchema = createInsertSchema(projectParts).omit({ id: true, createdAt: true });
+export type InsertProjectPart = z.infer<typeof insertProjectPartSchema>;
+export type ProjectPart = typeof projectParts.$inferSelect;
+
+// ============================================
+// SMS SERVICE (Twilio - Stubbed)
+// ============================================
+
+// SMS notification preferences
+export const smsPreferences = pgTable("sms_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  phoneNumber: text("phone_number"),
+  isVerified: boolean("is_verified").default(false),
+  verificationCode: text("verification_code"),
+  verificationExpiresAt: timestamp("verification_expires_at"),
+  serviceReminders: boolean("service_reminders").default(true),
+  priceAlerts: boolean("price_alerts").default(true),
+  orderUpdates: boolean("order_updates").default(true),
+  promotions: boolean("promotions").default(false),
+  quietHoursStart: text("quiet_hours_start"),
+  quietHoursEnd: text("quiet_hours_end"),
+  timezone: text("timezone").default("America/New_York"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_sms_prefs_user").on(table.userId),
+]);
+
+export const insertSmsPreferencesSchema = createInsertSchema(smsPreferences).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertSmsPreferences = z.infer<typeof insertSmsPreferencesSchema>;
+export type SmsPreferences = typeof smsPreferences.$inferSelect;
