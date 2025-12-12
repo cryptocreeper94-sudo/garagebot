@@ -246,16 +246,16 @@ export default function Garage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
-      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6">
-          <div className="md:col-span-8">
-            <Card className="bg-card/50 border-primary/20 p-4 h-full">
-              <h1 className="text-2xl font-tech font-bold uppercase text-primary" data-testid="text-page-title">My Garage</h1>
-              <p className="text-muted-foreground text-xs font-mono">VEHICLE PASSPORT • RECALLS • SERVICE</p>
+      <div className="w-full px-2 pt-12 pb-16">
+        <div className="flex overflow-x-auto md:grid md:grid-cols-12 gap-0 mb-0 scrollbar-hide">
+          <div className="md:col-span-8 min-w-[85vw] md:min-w-0 flex-shrink-0">
+            <Card className="bento-glass border-primary/20 p-3 h-full">
+              <h1 className="text-xl font-tech font-bold uppercase text-primary" data-testid="text-page-title">My Garage</h1>
+              <p className="text-muted-foreground text-[10px] font-mono">VEHICLE PASSPORT • RECALLS • SERVICE</p>
             </Card>
           </div>
           <div className="md:col-span-4">
-            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center">
+            <Card className="bento-glass bento-glow border-primary/20 p-3 h-full flex items-center justify-center">
               <Dialog open={addVehicleOpen} onOpenChange={setAddVehicleOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2 font-tech uppercase text-xs glow-primary" data-testid="button-add-vehicle">
@@ -267,7 +267,7 @@ export default function Garage() {
                 <DialogTitle className="font-tech text-xl uppercase">Add Vehicle to Garage</DialogTitle>
                 <DialogDescription>Scan your VIN to auto-fill vehicle details or enter manually</DialogDescription>
               </DialogHeader>
-              <div className="space-y-6 py-4">
+              <div className="space-y-0 py-4">
                 <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
                   <Label className="text-primary font-tech text-sm uppercase mb-2 block">Quick VIN Decode</Label>
                   <div className="flex gap-2">
@@ -380,8 +380,8 @@ export default function Garage() {
             </Button>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 space-y-4">
+          <div className="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-0 scrollbar-hide">
+            <div className="lg:col-span-1 space-y-0 min-w-[85vw] lg:min-w-0 flex-shrink-0">
               <h2 className="font-tech uppercase text-sm text-muted-foreground mb-2">Your Fleet ({vehicles.length})</h2>
               <AnimatePresence>
                 {vehicles.map((vehicle, index) => (

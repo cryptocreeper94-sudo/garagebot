@@ -13,7 +13,7 @@ export default function Pro() {
       
       <Nav />
       
-      <div className="pt-24 pb-16 max-w-6xl mx-auto px-4">
+      <div className="pt-12 pb-16 w-full px-2">
         <ProSubscription />
       </div>
       

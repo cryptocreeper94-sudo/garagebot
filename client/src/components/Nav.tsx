@@ -11,6 +11,7 @@ import { useCart } from "@/hooks/useCart";
 import { QRCodeSVG } from "qrcode.react";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import buddyWaving from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
+import HeaderWeather from "./HeaderWeather";
 
 interface Subscription {
   status: 'active' | 'inactive' | 'canceled';
@@ -94,30 +95,31 @@ export default function Nav() {
   const isVerified = appHallmark?.solanaSignature || appHallmark?.blockchainSignature;
 
   return (
-    <nav className="w-full h-16 border-b border-border/40 bg-background/80 backdrop-blur-md fixed top-0 z-50">
-      <div className="container mx-auto h-full flex items-center justify-between px-4">
+    <nav className="w-full h-[30px] border-b border-border/40 bg-background/95 backdrop-blur-md fixed top-0 z-50">
+      <div className="container mx-auto h-full flex items-center justify-between px-2">
         {/* Left side: Logo and Title */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
           <Link href="/">
-            <div className="flex items-center gap-1 cursor-pointer group">
+            <div className="flex items-center gap-0.5 cursor-pointer group">
               <img 
                 src={gbEmblem} 
                 alt="GB" 
-                className="w-12 h-12 md:w-14 md:h-14 object-contain drop-shadow-[0_0_12px_rgba(6,182,212,0.6)] group-hover:drop-shadow-[0_0_20px_rgba(6,182,212,0.9)] transition-all duration-300 group-hover:scale-105 -my-2"
+                className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(6,182,212,0.9)] transition-all duration-300"
               />
-              <span className="font-tech font-bold text-sm md:text-base tracking-wide uppercase text-foreground">
-                <span className="text-primary">G</span>arage<span className="text-primary">B</span>ot<span className="text-muted-foreground hidden sm:inline">.io</span>
+              <span className="font-tech font-bold text-[10px] tracking-wide uppercase text-foreground">
+                <span className="text-primary">G</span>arage<span className="text-primary">B</span>ot
               </span>
             </div>
           </Link>
         </div>
 
-        {/* Center: Version and App Hallmark Badge */}
-        <div className="flex items-center gap-2">
+        {/* Center: Weather, Version and App Hallmark Badge */}
+        <div className="flex items-center gap-1.5">
+          <HeaderWeather />
           {latestRelease && (
             <Badge 
               variant="outline" 
-              className="bg-primary/10 border-primary/30 text-primary font-mono text-[10px] px-2 py-0.5"
+              className="bg-primary/10 border-primary/30 text-primary font-mono text-[8px] px-1.5 py-0"
               data-testid="badge-version"
             >
               v{latestRelease.version}
@@ -128,19 +130,19 @@ export default function Nav() {
           <div className="relative">
             <button
               onClick={() => setShowVerifiedDetails(!showVerifiedDetails)}
-              className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-all cursor-pointer group hover:scale-105"
+              className="flex items-center gap-1 px-1.5 py-0 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-all cursor-pointer group"
               data-testid="badge-app-hallmark"
             >
-              <Shield className="w-3.5 h-3.5 text-purple-400 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-              <span className="text-[10px] font-mono text-purple-400 font-bold hidden sm:inline">
+              <Shield className="w-3 h-3 text-purple-400" />
+              <span className="text-[8px] font-mono text-purple-400 font-bold hidden sm:inline">
                 GB-000001
               </span>
-              {isVerified && <BadgeCheck className="w-3 h-3 text-green-500" />}
+              {isVerified && <BadgeCheck className="w-2.5 h-2.5 text-green-500" />}
             </button>
               
               {showVerifiedDetails && (
                 <div 
-                  className="fixed sm:absolute top-16 sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-2 z-[100] w-auto sm:w-[420px] p-4 rounded-xl border-2 border-purple-500/40 max-h-[80vh] overflow-y-auto"
+                  className="fixed sm:absolute top-[34px] sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-1 z-[100] w-auto sm:w-[420px] p-4 rounded-xl border-2 border-purple-500/40 max-h-[80vh] overflow-y-auto"
                   style={{
                     background: 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)',
                     boxShadow: '0 8px 32px rgba(0,0,0,0.9), 0 0 40px rgba(168,85,247,0.25)',
@@ -244,11 +246,11 @@ export default function Nav() {
           {userHallmark && (
             <Link href="/hallmark">
               <div 
-                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-colors cursor-pointer group"
+                className="flex items-center gap-1 px-1.5 py-0 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-colors cursor-pointer group"
                 data-testid="badge-user-hallmark"
               >
-                <Shield className="w-3.5 h-3.5 text-purple-400 group-hover:drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
-                <span className="text-[10px] font-mono text-purple-400 font-bold">
+                <Shield className="w-2.5 h-2.5 text-purple-400" />
+                <span className="text-[8px] font-mono text-purple-400 font-bold">
                   GB-{userHallmark.assetNumber.toString().padStart(6, '0')}
                 </span>
               </div>
@@ -257,11 +259,11 @@ export default function Nav() {
         </div>
 
         {/* Right side: Hamburger Menu */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Drawer open={isOpen} onOpenChange={setIsOpen}>
             <DrawerTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-foreground hover:bg-primary/10 hover:text-primary" data-testid="button-menu">
-                <Menu className="w-6 h-6" />
+              <Button variant="ghost" size="sm" className="text-foreground hover:bg-primary/10 hover:text-primary h-5 w-5 p-0" data-testid="button-menu">
+                <Menu className="w-4 h-4" />
               </Button>
             </DrawerTrigger>
             <DrawerContent className="bg-card border-t-primary/20">
