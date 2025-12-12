@@ -252,6 +252,7 @@ export default function DIYGuides() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.03 }}
+                                className="min-w-[75vw] md:min-w-0 flex-shrink-0"
                               >
                                 <Card 
                                   className={`p-4 bg-card/50 border-primary/20 transition-all cursor-pointer group relative overflow-hidden ${
