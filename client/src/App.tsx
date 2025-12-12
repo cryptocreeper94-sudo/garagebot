@@ -32,6 +32,8 @@ import DIYGuides from "@/pages/DIYGuides";
 import TermsOfService from "@/pages/TermsOfService";
 import InviteFriends from "@/pages/InviteFriends";
 import VendorSignup from "@/pages/VendorSignup";
+import Wishlists from "@/pages/Wishlists";
+import SharedWishlist from "@/pages/SharedWishlist";
 
 function Router() {
   return (
@@ -39,6 +41,8 @@ function Router() {
       <Route path="/">{() => <Home />}</Route>
       <Route path="/results">{() => <Results />}</Route>
       <Route path="/garage">{() => <Garage />}</Route>
+      <Route path="/wishlists">{() => <Wishlists />}</Route>
+      <Route path="/wishlist/:shareCode">{() => <SharedWishlist />}</Route>
       <Route path="/shop-portal">{() => <ShopPortal />}</Route>
       <Route path="/mechanics-garage">{() => <MechanicsGarage />}</Route>
       <Route path="/insurance">{() => <Insurance />}</Route>
