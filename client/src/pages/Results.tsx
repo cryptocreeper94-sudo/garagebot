@@ -321,8 +321,8 @@ export default function Results() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
-      <div className="pt-20 min-h-[calc(100vh-5rem)] max-w-6xl mx-auto px-4 pb-20">
-        <div className="grid grid-cols-12 gap-6">
+      <div className="pt-12 min-h-[calc(100vh-5rem)] w-full px-2 pb-16">
+        <div className="grid grid-cols-12 gap-0">
           
           {/* Left Column: Filters (Compact Sidebar) */}
           <div className="hidden lg:block col-span-3 border-r border-white/5 pr-6">

@@ -135,31 +135,31 @@ export default function DIYGuides() {
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
       
-      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
+      <div className="w-full px-2 pt-12 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6"
+          className="flex overflow-x-auto md:grid md:grid-cols-12 gap-0 mb-0 scrollbar-hide"
         >
-          <Card className="md:col-span-8 bg-card/50 border-primary/20 p-4">
+          <Card className="md:col-span-8 bento-glass border-primary/20 p-3 min-w-[85vw] md:min-w-0 flex-shrink-0">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-mono tracking-wider mb-2">
               <BookOpen className="w-3 h-3" />
               DIY REPAIR GUIDES
             </div>
-            <h1 className="text-xl font-tech font-bold uppercase">
+            <h1 className="text-lg font-tech font-bold uppercase">
               Step-by-Step <span className="text-primary">Repair Guides</span>
             </h1>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-xs">
               Go at your own pace. Detailed steps, pro tips, and video links.
             </p>
           </Card>
-          <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4 flex items-center justify-center gap-4">
+          <Card className="md:col-span-4 bento-glass bento-glow border-primary/20 p-3 flex items-center justify-center gap-4">
             <div className="text-center">
-              <p className="text-xl font-bold text-green-400">{guides.filter(g => !g.isPremium).length}</p>
+              <p className="text-lg font-bold text-green-400">{guides.filter(g => !g.isPremium).length}</p>
               <p className="text-[10px] text-muted-foreground">Free</p>
             </div>
             <div className="text-center">
-              <p className="text-xl font-bold text-primary">{guides.filter(g => g.isPremium).length}</p>
+              <p className="text-lg font-bold text-primary">{guides.filter(g => g.isPremium).length}</p>
               <p className="text-[10px] text-muted-foreground">Pro</p>
             </div>
           </Card>
@@ -169,7 +169,7 @@ export default function DIYGuides() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="max-w-lg mx-auto mb-8"
+          className="max-w-md mx-auto mb-2"
         >
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -177,7 +177,7 @@ export default function DIYGuides() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search all repairs..."
-              className="pl-10 bg-card/50 border-primary/20 focus:border-primary/50"
+              className="pl-10 bento-glass border-primary/20 focus:border-primary/50"
               data-testid="input-search-guides"
             />
           </div>
@@ -197,7 +197,7 @@ export default function DIYGuides() {
               type="multiple" 
               value={expandedCategories}
               onValueChange={setExpandedCategories}
-              className="space-y-3"
+              className="space-y-0"
             >
               {EQUIPMENT_CATEGORIES.map((category) => {
                 const categoryGuides = getGuidesByCategory(category.id);
@@ -210,7 +210,7 @@ export default function DIYGuides() {
                   <AccordionItem 
                     key={category.id} 
                     value={category.id}
-                    className="border border-primary/20 rounded-lg overflow-hidden bg-card/30 backdrop-blur-sm"
+                    className="border border-primary/20 rounded-lg overflow-hidden bento-glass"
                   >
                     <AccordionTrigger 
                       className={`px-4 py-3 hover:no-underline hover:bg-primary/5 transition-all group bg-gradient-to-r ${category.color}`}
@@ -234,13 +234,13 @@ export default function DIYGuides() {
                       </div>
                     </AccordionTrigger>
                     
-                    <AccordionContent className="px-4 pb-4 pt-2">
+                    <AccordionContent className="px-3 pb-3 pt-2">
                       {categoryGuides.length === 0 ? (
                         <p className="text-center text-muted-foreground py-4">
                           No guides found. More coming soon!
                         </p>
                       ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="flex overflow-x-auto gap-0 md:grid md:grid-cols-2 lg:grid-cols-3 scrollbar-hide">
                           {categoryGuides.map((guide, idx) => {
                             const difficulty = difficultyInfo[guide.difficulty] || difficultyInfo.beginner;
                             const DifficultyIcon = difficulty.icon;

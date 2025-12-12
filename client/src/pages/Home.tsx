@@ -10,7 +10,6 @@ import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import VehicleTypeSelector from "@/components/VehicleTypeSelector";
-import FloatingWeatherButton from "@/components/FloatingWeatherButton";
 import VinScanner from "@/components/VinScanner";
 import PhotoSearch from "@/components/PhotoSearch";
 import VoiceSearch from "@/components/VoiceSearch";
@@ -83,23 +82,20 @@ export default function Home() {
       <Nav />
       <MarketTicker />
       
-      {/* Main Content */}
-      <div className="pt-20 min-h-screen pb-8">
+      {/* Main Content - adjusted for 30px header */}
+      <div className="pt-12 min-h-screen pb-16">
         
-        {/* Floating Weather Button - visible on all screens */}
-        <FloatingWeatherButton />
-        
-        {/* DESKTOP PUZZLE LAYOUT - Only visible on lg+ screens */}
-        <div className="hidden lg:block w-full px-4 xl:px-8 2xl:px-16">
+        {/* DESKTOP BENTO LAYOUT - Only visible on lg+ screens */}
+        <div className="hidden lg:block w-full px-2 xl:px-4 2xl:px-8">
           {/* Row 1: Hero + Search (2-column layout) */}
-          <div className="grid grid-cols-12 gap-3 mb-3">
+          <div className="grid grid-cols-12 gap-0 mb-0">
             {/* Hero Block - spans 7 columns */}
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               className="col-span-7 row-span-2"
             >
-              <div className="h-full glass-premium rounded-xl p-6 relative overflow-hidden shimmer">
+              <div className="h-full bento-glass rounded-lg p-4 relative overflow-hidden">
                 {/* Sparkle decorations */}
                 <div className="sparkle-container">
                   <div className="sparkle" style={{ top: '10%', left: '10%' }} />
@@ -166,7 +162,7 @@ export default function Home() {
               transition={{ delay: 0.1 }}
               className="col-span-5"
             >
-              <Card className="glass-premium border-0 p-4 h-full card-holo rounded-xl">
+              <Card className="bento-glass border-0 p-3 h-full rounded-lg">
                 <Tabs defaultValue="standard" className="w-full h-full flex flex-col">
                   <TabsList className="w-full grid grid-cols-2 bg-black/40 h-9 p-1 rounded-lg mb-3">
                     <TabsTrigger value="standard" className="font-mono text-[10px] uppercase rounded-md data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Parts Search</TabsTrigger>
@@ -271,7 +267,7 @@ export default function Home() {
               transition={{ delay: 0.2 }}
               className="col-span-5"
             >
-              <Card className="glass-premium border-primary/20 p-3 rounded-xl h-full">
+              <Card className="bento-glass bento-glow border-primary/20 p-2 rounded-lg h-full">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-3.5 h-3.5 text-primary" />
                   <span className="font-tech text-[10px] uppercase text-primary">Quick Tools</span>
@@ -321,16 +317,16 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="glass-premium rounded-xl p-4 mb-3"
+            className="bento-glass rounded-lg p-3"
           >
             <VehicleTypeSelector />
-            <div className="mt-3">
+            <div className="mt-2">
               <CategoryGrid />
             </div>
           </motion.div>
           
           {/* Row 3: DIY Guides + Quick Links (2-column) */}
-          <div className="grid grid-cols-12 gap-3 mb-3">
+          <div className="grid grid-cols-12 gap-0 mb-0">
             {/* DIY Guides Card - spans 7 columns */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -341,7 +337,7 @@ export default function Home() {
               <Link href="/diy-guides" data-testid="link-diy-guides">
                 <div className="relative group cursor-pointer h-full" data-testid="card-diy-guides-hero">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-green-400 to-primary rounded-xl opacity-40 group-hover:opacity-80 blur transition-all duration-500 animate-pulse" />
-                  <div className="relative glass-premium rounded-xl p-5 h-full shimmer">
+                  <div className="relative bento-glass rounded-lg p-4 h-full">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-green-400 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.5)] ring-pulse">
                         <BookOpen className="w-6 h-6 text-black" />
@@ -377,11 +373,11 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="col-span-5 space-y-3"
+              className="col-span-5 space-y-1"
             >
               {/* Go Pro Card */}
               <Link href="/pro">
-                <Card className="rainbow-border rounded-xl p-4 cursor-pointer group">
+                <Card className="bento-glass bento-glow rounded-lg p-3 cursor-pointer group border-yellow-500/30">
                   <div className="flex items-center gap-2 mb-2">
                     <Crown className="w-4 h-4 text-yellow-400" />
                     <h2 className="font-tech text-xs uppercase text-gradient">Founders Circle</h2>
@@ -398,44 +394,41 @@ export default function Home() {
               </Link>
               
               {/* Quick Links Row */}
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-0">
                 <Link href="/garage">
-                  <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-green-500/50 transition-all icon-bounce h-full">
-                    <div className="flex flex-col items-center gap-2 text-center">
-                      <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                        <Car className="w-5 h-5 text-green-400" />
+                  <Card className="bento-glass p-2 rounded-lg cursor-pointer group hover:border-green-500/50 transition-all h-full">
+                    <div className="flex flex-col items-center gap-1.5 text-center">
+                      <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                        <Car className="w-4 h-4 text-green-400" />
                       </div>
                       <div>
-                        <span className="text-xs font-tech uppercase text-foreground group-hover:text-green-400 transition-colors">My Garage</span>
-                        <p className="text-[9px] text-muted-foreground">Manage fleet</p>
+                        <span className="text-[10px] font-tech uppercase text-foreground group-hover:text-green-400 transition-colors">Garage</span>
                       </div>
                     </div>
                   </Card>
                 </Link>
                 
                 <Link href="/hallmark">
-                  <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-purple-500/50 transition-all icon-bounce h-full">
-                    <div className="flex flex-col items-center gap-2 text-center">
-                      <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-purple-400" />
+                  <Card className="bento-glass p-2 rounded-lg cursor-pointer group hover:border-purple-500/50 transition-all h-full">
+                    <div className="flex flex-col items-center gap-1.5 text-center">
+                      <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-purple-400" />
                       </div>
                       <div>
-                        <span className="text-xs font-tech uppercase text-foreground group-hover:text-purple-400 transition-colors">Hallmark</span>
-                        <p className="text-[9px] text-muted-foreground">NFT verify</p>
+                        <span className="text-[10px] font-tech uppercase text-foreground group-hover:text-purple-400 transition-colors">Hallmark</span>
                       </div>
                     </div>
                   </Card>
                 </Link>
                 
                 <Link href="/invite">
-                  <Card className="glass-premium p-3 rounded-xl cursor-pointer group hover:border-primary/50 transition-all icon-bounce h-full">
-                    <div className="flex flex-col items-center gap-2 text-center">
-                      <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                        <Gift className="w-5 h-5 text-primary" />
+                  <Card className="bento-glass p-2 rounded-lg cursor-pointer group hover:border-primary/50 transition-all h-full">
+                    <div className="flex flex-col items-center gap-1.5 text-center">
+                      <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                        <Gift className="w-4 h-4 text-primary" />
                       </div>
                       <div>
-                        <span className="text-xs font-tech uppercase text-foreground group-hover:text-primary transition-colors">Invite</span>
-                        <p className="text-[9px] text-muted-foreground">Earn Pro</p>
+                        <span className="text-[10px] font-tech uppercase text-foreground group-hover:text-primary transition-colors">Invite</span>
                       </div>
                     </div>
                   </Card>
@@ -443,7 +436,7 @@ export default function Home() {
               </div>
               
               {/* Mission Compact */}
-              <Card className="glass-premium border-white/10 p-3 rounded-xl">
+              <Card className="bento-glass border-white/10 p-2 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
                   <Car className="w-3.5 h-3.5 text-primary" />
                   <h2 className="font-tech text-[10px] uppercase text-primary">Every Vehicle With An Engine</h2>
@@ -464,7 +457,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
-            className="mb-3"
+            className=""
           >
             <FeaturedCarousel />
           </motion.div>
@@ -474,7 +467,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="glass-premium rounded-xl p-4 overflow-hidden"
+            className="bento-glass rounded-lg p-3 overflow-hidden"
           >
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-2 text-center">Trusted Retail Partners</p>
             <div className="relative">
@@ -491,13 +484,15 @@ export default function Home() {
           </motion.div>
         </div>
         
-        {/* MOBILE LAYOUT - Only visible on smaller screens */}
-        <div className="lg:hidden w-full px-4">
+        {/* MOBILE BENTO LAYOUT - Only visible on smaller screens */}
+        <div className="lg:hidden w-full">
+          {/* Horizontal scroll container for dense bento layout */}
+          <div className="bento-scroll px-2">
           {/* Hero Section */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8 mb-4"
+            className="bento-glass rounded-lg p-4 text-center min-w-[85vw]"
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-xs font-mono tracking-wider mb-6 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -545,11 +540,11 @@ export default function Home() {
           </motion.div>
           
           {/* DIY Guides CTA */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="min-w-[70vw]">
             <Link href="/diy-guides">
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-green-400 to-primary rounded-xl opacity-50 group-hover:opacity-100 blur transition-all animate-pulse" />
-                <div className="relative bg-black/80 rounded-xl p-4 border border-primary/30">
+              <div className="relative group h-full">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-green-400 to-primary rounded-lg opacity-50 group-hover:opacity-100 blur transition-all animate-pulse" />
+                <div className="relative bento-glass rounded-lg p-3 h-full">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-green-400 flex items-center justify-center">
                       <BookOpen className="w-5 h-5 text-black" />
@@ -570,7 +565,7 @@ export default function Home() {
           </motion.div>
           
           {/* Vehicle Types + Categories */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-4 bg-black/20 -mx-4 px-4 py-4 border-y border-white/5">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="min-w-[80vw] bento-glass rounded-lg p-3">
             <VehicleTypeSelector />
             <div className="mt-3">
               <CategoryGrid />
@@ -578,8 +573,8 @@ export default function Home() {
           </motion.div>
           
           {/* Search Card */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-4">
-            <Card className="glass-panel border-0 p-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="min-w-[75vw]">
+            <Card className="bento-glass border-0 p-3">
               <form onSubmit={handleSearch} className="space-y-3">
                 <div className="grid grid-cols-3 gap-2">
                   <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -619,8 +614,8 @@ export default function Home() {
           </motion.div>
           
           {/* Quick Tools */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-4">
-            <Card className="bg-card/50 border-primary/20 p-3">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="min-w-[70vw]">
+            <Card className="bento-glass bento-glow border-primary/20 p-2">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-3 h-3 text-primary" />
                 <span className="font-tech text-[10px] uppercase text-primary">Quick Tools</span>
@@ -662,8 +657,8 @@ export default function Home() {
           </motion.div>
           
           {/* Buddy AI Card */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-4">
-            <Card className="bg-gradient-to-br from-primary/10 via-card/80 to-secondary/10 border-primary/30 p-4 neon-border">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="min-w-[65vw]">
+            <Card className="bento-glass bento-glow border-primary/30 p-3 h-full">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.5)]">
                   <Bot className="w-5 h-5 text-black" />
@@ -687,12 +682,12 @@ export default function Home() {
           </motion.div>
           
           {/* Featured Carousel */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mb-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="min-w-[80vw]">
             <FeaturedCarousel />
           </motion.div>
           
           {/* Trusted Retailers */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }} className="overflow-hidden mb-4">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }} className="bento-glass rounded-lg p-2 overflow-hidden min-w-[60vw]">
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-2 text-center">Trusted Partners</p>
             <div className="relative">
               <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10" />
@@ -704,6 +699,7 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
+          </div>
         </div>
       </div>
       
