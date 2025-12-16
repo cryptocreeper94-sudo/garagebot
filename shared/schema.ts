@@ -1726,3 +1726,108 @@ export const smsPreferences = pgTable("sms_preferences", {
 export const insertSmsPreferencesSchema = createInsertSchema(smsPreferences).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertSmsPreferences = z.infer<typeof insertSmsPreferencesSchema>;
 export type SmsPreferences = typeof smsPreferences.$inferSelect;
+
+// ============================================
+// ANALYTICS & SEO SYSTEM
+// ============================================
+
+// SEO settings per page/route
+export const seoPages = pgTable("seo_pages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  route: text("route").notNull().unique(),
+  title: text("title"),
+  description: text("description"),
+  keywords: text("keywords"),
+  ogTitle: text("og_title"),
+  ogDescription: text("og_description"),
+  ogImage: text("og_image"),
+  twitterTitle: text("twitter_title"),
+  twitterDescription: text("twitter_description"),
+  twitterImage: text("twitter_image"),
+  canonicalUrl: text("canonical_url"),
+  robots: text("robots").default("index, follow"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_seo_pages_route").on(table.route),
+]);
+
+export const insertSeoPageSchema = createInsertSchema(seoPages).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertSeoPage = z.infer<typeof insertSeoPageSchema>;
+export type SeoPage = typeof seoPages.$inferSelect;
+
+// Analytics sessions (visitor sessions)
+export const analyticsSessions = pgTable("analytics_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  visitorId: text("visitor_id").notNull(),
+  ipHash: text("ip_hash"),
+  userAgent: text("user_agent"),
+  browser: text("browser"),
+  os: text("os"),
+  device: text("device"),
+  country: text("country"),
+  city: text("city"),
+  referrer: text("referrer"),
+  utmSource: text("utm_source"),
+  utmMedium: text("utm_medium"),
+  utmCampaign: text("utm_campaign"),
+  landingPage: text("landing_page"),
+  exitPage: text("exit_page"),
+  pageViewCount: integer("page_view_count").default(0),
+  duration: integer("duration"),
+  isActive: boolean("is_active").default(true),
+  startedAt: timestamp("started_at").defaultNow(),
+  endedAt: timestamp("ended_at"),
+}, (table) => [
+  index("IDX_analytics_sessions_visitor").on(table.visitorId),
+  index("IDX_analytics_sessions_started").on(table.startedAt),
+  index("IDX_analytics_sessions_active").on(table.isActive),
+]);
+
+export const insertAnalyticsSessionSchema = createInsertSchema(analyticsSessions).omit({ id: true, startedAt: true });
+export type InsertAnalyticsSession = z.infer<typeof insertAnalyticsSessionSchema>;
+export type AnalyticsSession = typeof analyticsSessions.$inferSelect;
+
+// Analytics page views
+export const analyticsPageViews = pgTable("analytics_page_views", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").notNull().references(() => analyticsSessions.id, { onDelete: "cascade" }),
+  visitorId: text("visitor_id").notNull(),
+  route: text("route").notNull(),
+  title: text("title"),
+  referrer: text("referrer"),
+  duration: integer("duration"),
+  scrollDepth: integer("scroll_depth"),
+  viewedAt: timestamp("viewed_at").defaultNow(),
+}, (table) => [
+  index("IDX_page_views_session").on(table.sessionId),
+  index("IDX_page_views_route").on(table.route),
+  index("IDX_page_views_viewed").on(table.viewedAt),
+]);
+
+export const insertAnalyticsPageViewSchema = createInsertSchema(analyticsPageViews).omit({ id: true, viewedAt: true });
+export type InsertAnalyticsPageView = z.infer<typeof insertAnalyticsPageViewSchema>;
+export type AnalyticsPageView = typeof analyticsPageViews.$inferSelect;
+
+// Analytics events (custom event tracking)
+export const analyticsEvents = pgTable("analytics_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").references(() => analyticsSessions.id, { onDelete: "set null" }),
+  visitorId: text("visitor_id").notNull(),
+  eventName: text("event_name").notNull(),
+  eventCategory: text("event_category"),
+  eventLabel: text("event_label"),
+  eventValue: integer("event_value"),
+  route: text("route"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_events_session").on(table.sessionId),
+  index("IDX_events_name").on(table.eventName),
+  index("IDX_events_created").on(table.createdAt),
+]);
+
+export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).omit({ id: true, createdAt: true });
+export type InsertAnalyticsEvent = z.infer<typeof insertAnalyticsEventSchema>;
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;

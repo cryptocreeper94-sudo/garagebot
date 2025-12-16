@@ -4,12 +4,15 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/hooks/useCart";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import OnboardingModal from "@/components/OnboardingModal";
 import AIMascot from "@/components/AIMascot";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
 import { BlockchainAnnouncement } from "@/components/FeatureAnnouncement";
+
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
+
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Results from "@/pages/Results";
@@ -35,6 +38,11 @@ import VendorSignup from "@/pages/VendorSignup";
 import Wishlists from "@/pages/Wishlists";
 import SharedWishlist from "@/pages/SharedWishlist";
 import Projects from "@/pages/Projects";
+
+function AnalyticsTracker() {
+  useAnalytics();
+  return null;
+}
 
 function Router() {
   return (
@@ -88,6 +96,7 @@ function App() {
           <OnboardingModal />
           <AddToHomeScreen />
           <BlockchainAnnouncement />
+          <AnalyticsTracker />
           <Router />
           <AIMascot mascotName="Buddy" />
           <BuddyHideSeek />
