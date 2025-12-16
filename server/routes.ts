@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { createHash, randomBytes } from "crypto";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema } from "@shared/schema";
@@ -5457,17 +5458,16 @@ export async function registerRoutes(
         tokenId: `RELEASE-${release.version}`,
         assetNumber: 0,
         transactionHash: result.txSignature || result.dataHash,
-        metadata: JSON.stringify({
+        metadata: {
           type: 'RELEASE_VERIFICATION',
           version: release.version,
           versionType: release.versionType,
           dataHash: result.dataHash,
           status: result.status,
           network: 'mainnet-beta',
-        }),
-        solanaSignature: result.txSignature,
-        entityType: 'release',
-        entityId: releaseId,
+          entityType: 'release',
+          entityId: releaseId,
+        },
         displayName: `GarageBot v${release.version}`,
         assetType: 'release',
       });
@@ -5533,7 +5533,7 @@ export async function registerRoutes(
                 make: vehicle.make,
                 model: vehicle.model,
                 vin: vehicle.vin,
-                nickname: vehicle.nickname,
+                trim: vehicle.trim,
               };
               const user = await storage.getUser(vehicle.userId);
               ownerInfo = user ? { id: user.id, username: user.username, email: user.email } : null;
@@ -6495,8 +6495,7 @@ export async function registerRoutes(
       }
       
       // Verify secret by comparing hash
-      const crypto = require('crypto');
-      const hashedInputSecret = crypto.createHash('sha256').update(apiSecret).digest('hex');
+      const hashedInputSecret = createHash('sha256').update(apiSecret).digest('hex');
       if (credential.apiSecret !== hashedInputSecret) {
         return res.status(401).json({ 
           error: 'INVALID_CREDENTIALS',
@@ -6670,10 +6669,10 @@ export async function registerRoutes(
         data: appointments.map(a => ({
           id: a.id,
           appointmentNumber: a.appointmentNumber,
-          type: a.appointmentType,
+          type: a.serviceType,
           status: a.status,
-          scheduledDate: a.scheduledDate,
-          scheduledTime: a.scheduledTime,
+          scheduledStart: a.scheduledStart,
+          scheduledEnd: a.scheduledEnd,
           notes: a.notes,
           createdAt: a.createdAt
         })),
@@ -6803,12 +6802,11 @@ export async function registerRoutes(
       const { name, scopes, environment, rateLimitPerDay } = req.body;
       
       // Generate API key and secret
-      const crypto = require('crypto');
-      const apiKey = `gb_${environment === 'sandbox' ? 'test_' : ''}${crypto.randomBytes(24).toString('hex')}`;
-      const rawSecret = crypto.randomBytes(32).toString('hex');
+      const apiKey = `gb_${environment === 'sandbox' ? 'test_' : ''}${randomBytes(24).toString('hex')}`;
+      const rawSecret = randomBytes(32).toString('hex');
       
       // Hash the secret before storing (using SHA-256)
-      const hashedSecret = crypto.createHash('sha256').update(rawSecret).digest('hex');
+      const hashedSecret = createHash('sha256').update(rawSecret).digest('hex');
       
       const credential = await storage.createPartnerApiCredential({
         shopId: req.params.shopId,
@@ -7128,6 +7126,5 @@ function parseUserAgentOS(userAgent: string): string {
 }
 
 function hashIP(ip: string): string {
-  const crypto = require('crypto');
-  return crypto.createHash('sha256').update(ip + 'garagebot-salt').digest('hex').substring(0, 16);
+  return createHash('sha256').update(ip + 'garagebot-salt').digest('hex').substring(0, 16);
 }
