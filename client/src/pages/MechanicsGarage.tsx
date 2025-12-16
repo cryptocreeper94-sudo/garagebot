@@ -26,7 +26,7 @@ import {
   Play, Pause, Receipt, CreditCard, Search, Filter, ArrowUpDown,
   ChevronDown, MoreHorizontal, Edit, Trash2, ExternalLink, 
   CalendarDays, UserCheck, AlertTriangle, CircleDot, X, Link2,
-  RefreshCw, ArrowRight, Sparkles, Database, Shield, Globe
+  RefreshCw, ArrowRight, Sparkles, Database, Shield, Globe, Key, Copy, Activity
 } from "lucide-react";
 
 const VEHICLE_TYPES = [
@@ -110,6 +110,425 @@ interface Estimate {
   grandTotal?: string;
   status: string;
   createdAt: string;
+}
+
+interface ApiCredential {
+  id: string;
+  shopId: string;
+  name: string;
+  apiKey: string;
+  apiSecret: string;
+  environment: string;
+  scopes: string[];
+  rateLimitPerDay: number;
+  requestCount: number;
+  requestCountDaily: number;
+  lastUsedAt?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+interface ApiLogStats {
+  totalRequests: number;
+  successRequests: number;
+  errorRequests: number;
+  avgResponseTime: number;
+}
+
+const API_SCOPES = [
+  { id: 'orders:read', name: 'Read Orders', description: 'View repair orders and their status' },
+  { id: 'orders:write', name: 'Write Orders', description: 'Create and update repair orders' },
+  { id: 'customers:read', name: 'Read Customers', description: 'View customer information' },
+  { id: 'customers:write', name: 'Write Customers', description: 'Create and update customers' },
+  { id: 'appointments:read', name: 'Read Appointments', description: 'View scheduled appointments' },
+  { id: 'appointments:write', name: 'Write Appointments', description: 'Create and update appointments' },
+  { id: 'estimates:read', name: 'Read Estimates', description: 'View estimates and quotes' },
+  { id: 'estimates:write', name: 'Write Estimates', description: 'Create and update estimates' },
+  { id: 'analytics:read', name: 'Read Analytics', description: 'View shop analytics and reports' },
+  { id: 'shop:read', name: 'Read Shop', description: 'View shop profile and locations' },
+  { id: 'shop:write', name: 'Write Shop', description: 'Update shop profile' },
+  { id: 'staff:read', name: 'Read Staff', description: 'View team members' },
+  { id: 'staff:write', name: 'Write Staff', description: 'Manage team members' },
+];
+
+function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
+  const queryClient = useQueryClient();
+  const [createKeyOpen, setCreateKeyOpen] = useState(false);
+  const [newCredential, setNewCredential] = useState<ApiCredential | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [newKeyForm, setNewKeyForm] = useState({
+    name: '',
+    environment: 'production',
+    scopes: ['orders:read'] as string[],
+    rateLimitPerDay: 10000
+  });
+
+  const { data: credentials, isLoading } = useQuery<ApiCredential[]>({
+    queryKey: ['partner-api-credentials', shopId],
+    queryFn: async () => {
+      const res = await fetch(`/api/shops/${shopId}/api-credentials`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch credentials');
+      return res.json();
+    }
+  });
+
+  const { data: logsData } = useQuery<{ logs: any[]; stats: ApiLogStats }>({
+    queryKey: ['partner-api-logs', shopId],
+    queryFn: async () => {
+      const res = await fetch(`/api/shops/${shopId}/api-logs?limit=20`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch logs');
+      return res.json();
+    }
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (data: typeof newKeyForm) => {
+      const res = await fetch(`/api/shops/${shopId}/api-credentials`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) throw new Error('Failed to create credential');
+      return res.json();
+    },
+    onSuccess: (data) => {
+      setNewCredential(data);
+      setCreateKeyOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['partner-api-credentials', shopId] });
+      toast({ title: 'API Key Created', description: 'Save your credentials securely!' });
+    }
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const res = await fetch(`/api/shops/${shopId}/api-credentials/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive })
+      });
+      if (!res.ok) throw new Error('Failed to update credential');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['partner-api-credentials', shopId] });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/shops/${shopId}/api-credentials/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error('Failed to delete credential');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['partner-api-credentials', shopId] });
+      toast({ title: 'API Key Deleted' });
+    }
+  });
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const toggleScope = (scope: string) => {
+    setNewKeyForm(prev => ({
+      ...prev,
+      scopes: prev.scopes.includes(scope)
+        ? prev.scopes.filter(s => s !== scope)
+        : [...prev.scopes, scope]
+    }));
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <Card className="p-6 bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-teal-500/20 border-green-500/30 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 rounded-xl bg-green-500/20">
+              <Key className="w-8 h-8 text-green-500" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-tech font-bold uppercase">Partner API</h3>
+              <p className="text-muted-foreground">Programmatic access to your shop data</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-4">
+            <div className="flex items-center gap-2 text-sm">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>RESTful JSON API</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Shield className="w-4 h-4 text-blue-500" />
+              <span>Scoped permissions</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Activity className="w-4 h-4 text-purple-500" />
+              <span>Usage analytics</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Stats */}
+      {logsData?.stats && (
+        <div className="grid grid-cols-4 gap-4">
+          <Card className="p-4 bg-card/50">
+            <div className="text-sm text-muted-foreground mb-1">Total Requests (30d)</div>
+            <div className="text-2xl font-tech font-bold">{logsData.stats.totalRequests.toLocaleString()}</div>
+          </Card>
+          <Card className="p-4 bg-card/50">
+            <div className="text-sm text-muted-foreground mb-1">Success Rate</div>
+            <div className="text-2xl font-tech font-bold text-green-500">
+              {logsData.stats.totalRequests > 0 
+                ? Math.round((logsData.stats.successRequests / logsData.stats.totalRequests) * 100)
+                : 100}%
+            </div>
+          </Card>
+          <Card className="p-4 bg-card/50">
+            <div className="text-sm text-muted-foreground mb-1">Errors (30d)</div>
+            <div className="text-2xl font-tech font-bold text-red-500">{logsData.stats.errorRequests}</div>
+          </Card>
+          <Card className="p-4 bg-card/50">
+            <div className="text-sm text-muted-foreground mb-1">Avg Response</div>
+            <div className="text-2xl font-tech font-bold">{logsData.stats.avgResponseTime}ms</div>
+          </Card>
+        </div>
+      )}
+
+      {/* New Credential Modal */}
+      {newCredential && (
+        <Card className="p-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/30">
+          <div className="flex items-start gap-3 mb-4">
+            <AlertTriangle className="w-6 h-6 text-yellow-500 flex-shrink-0 mt-1" />
+            <div>
+              <h4 className="font-tech font-bold text-lg">Save Your Credentials</h4>
+              <p className="text-sm text-muted-foreground">The API secret will only be shown once. Save it securely now!</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs text-muted-foreground uppercase">API Key</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <code className="flex-1 p-3 rounded bg-black/30 font-mono text-sm break-all">{newCredential.apiKey}</code>
+                <Button size="icon" variant="ghost" onClick={() => copyToClipboard(newCredential.apiKey, 'key')} data-testid="copy-api-key">
+                  {copiedField === 'key' ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs text-muted-foreground uppercase">API Secret</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <code className="flex-1 p-3 rounded bg-black/30 font-mono text-sm break-all">{newCredential.apiSecret}</code>
+                <Button size="icon" variant="ghost" onClick={() => copyToClipboard(newCredential.apiSecret, 'secret')} data-testid="copy-api-secret">
+                  {copiedField === 'secret' ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+            <Button onClick={() => setNewCredential(null)} className="mt-4" data-testid="dismiss-credentials">
+              I've Saved My Credentials
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* API Keys */}
+      <Card className="p-6 bg-card/50">
+        <div className="flex items-center justify-between mb-6">
+          <h4 className="font-tech font-bold text-lg uppercase">API Keys</h4>
+          <Dialog open={createKeyOpen} onOpenChange={setCreateKeyOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2" data-testid="create-api-key">
+                <Plus className="w-4 h-4" /> Create API Key
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create API Key</DialogTitle>
+                <DialogDescription>Generate a new API key with specific permissions</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div>
+                  <Label>Name</Label>
+                  <Input 
+                    value={newKeyForm.name} 
+                    onChange={e => setNewKeyForm(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g., Production Integration"
+                    data-testid="api-key-name"
+                  />
+                </div>
+                <div>
+                  <Label>Environment</Label>
+                  <Select 
+                    value={newKeyForm.environment} 
+                    onValueChange={v => setNewKeyForm(prev => ({ ...prev, environment: v }))}
+                  >
+                    <SelectTrigger data-testid="api-key-environment">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="production">Production</SelectItem>
+                      <SelectItem value="sandbox">Sandbox (Testing)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="mb-3 block">Permissions (Scopes)</Label>
+                  <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                    {API_SCOPES.map(scope => (
+                      <div 
+                        key={scope.id}
+                        className={`p-3 rounded border cursor-pointer transition-colors ${
+                          newKeyForm.scopes.includes(scope.id)
+                            ? 'bg-primary/10 border-primary/50'
+                            : 'bg-card/50 border-border hover:border-primary/30'
+                        }`}
+                        onClick={() => toggleScope(scope.id)}
+                        data-testid={`scope-${scope.id}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Checkbox 
+                            checked={newKeyForm.scopes.includes(scope.id)} 
+                            onCheckedChange={() => toggleScope(scope.id)}
+                          />
+                          <div>
+                            <div className="font-medium text-sm">{scope.name}</div>
+                            <div className="text-xs text-muted-foreground">{scope.description}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label>Daily Rate Limit</Label>
+                  <Input 
+                    type="number"
+                    value={newKeyForm.rateLimitPerDay} 
+                    onChange={e => setNewKeyForm(prev => ({ ...prev, rateLimitPerDay: parseInt(e.target.value) || 10000 }))}
+                    data-testid="api-key-rate-limit"
+                  />
+                </div>
+                <Button 
+                  className="w-full" 
+                  onClick={() => createMutation.mutate(newKeyForm)}
+                  disabled={!newKeyForm.name || newKeyForm.scopes.length === 0 || createMutation.isPending}
+                  data-testid="submit-create-api-key"
+                >
+                  {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Key className="w-4 h-4 mr-2" />}
+                  Generate API Key
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : credentials?.length === 0 ? (
+          <div className="text-center py-12">
+            <Key className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+            <p className="text-muted-foreground">No API keys yet. Create one to get started.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {credentials?.map(cred => (
+              <Card key={cred.id} className={`p-4 ${cred.isActive ? 'bg-card/50' : 'bg-card/20 opacity-60'}`} data-testid={`api-credential-${cred.id}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${cred.isActive ? 'bg-green-500/10' : 'bg-gray-500/10'}`}>
+                      <Key className={`w-5 h-5 ${cred.isActive ? 'text-green-500' : 'text-gray-500'}`} />
+                    </div>
+                    <div>
+                      <div className="font-medium flex items-center gap-2">
+                        {cred.name}
+                        <Badge variant="outline" className={cred.environment === 'sandbox' ? 'bg-yellow-500/10 text-yellow-400' : 'bg-green-500/10 text-green-400'}>
+                          {cred.environment}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground font-mono">{cred.apiKey.slice(0, 20)}...</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-sm">{cred.requestCountDaily?.toLocaleString() || 0} / {cred.rateLimitPerDay?.toLocaleString()}</div>
+                      <div className="text-xs text-muted-foreground">requests today</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        size="sm" 
+                        variant={cred.isActive ? 'destructive' : 'default'}
+                        onClick={() => toggleMutation.mutate({ id: cred.id, isActive: !cred.isActive })}
+                        data-testid={`toggle-${cred.id}`}
+                      >
+                        {cred.isActive ? 'Disable' : 'Enable'}
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => deleteMutation.mutate(cred.id)}
+                        data-testid={`delete-${cred.id}`}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-3">
+                  {cred.scopes?.map(scope => (
+                    <Badge key={scope} variant="outline" className="text-[10px] bg-primary/5">{scope}</Badge>
+                  ))}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </Card>
+
+      {/* API Documentation Link */}
+      <Card className="p-6 bg-gradient-to-r from-blue-500/5 to-transparent border-blue-500/20">
+        <div className="flex items-start gap-4">
+          <div className="p-3 rounded-xl bg-blue-500/10">
+            <FileText className="w-8 h-8 text-blue-500" />
+          </div>
+          <div className="flex-1">
+            <h4 className="font-tech font-bold text-lg mb-2">API Documentation</h4>
+            <p className="text-sm text-muted-foreground mb-4">
+              Access your shop data programmatically. Base URL: <code className="bg-black/30 px-2 py-1 rounded text-primary">/api/partner/v1</code>
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded bg-card/50 border">
+                <div className="font-mono text-xs text-muted-foreground">GET</div>
+                <div className="font-mono text-sm">/shop</div>
+              </div>
+              <div className="p-3 rounded bg-card/50 border">
+                <div className="font-mono text-xs text-muted-foreground">GET</div>
+                <div className="font-mono text-sm">/orders</div>
+              </div>
+              <div className="p-3 rounded bg-card/50 border">
+                <div className="font-mono text-xs text-muted-foreground">GET</div>
+                <div className="font-mono text-sm">/appointments</div>
+              </div>
+              <div className="p-3 rounded bg-card/50 border">
+                <div className="font-mono text-xs text-muted-foreground">GET</div>
+                <div className="font-mono text-sm">/analytics</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
 }
 
 export default function MechanicsGarage() {
@@ -698,7 +1117,7 @@ export default function MechanicsGarage() {
 
                     {/* Tabs */}
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="p-6">
-                      <TabsList className="grid grid-cols-7 mb-6 h-auto">
+                      <TabsList className="grid grid-cols-8 mb-6 h-auto">
                         <TabsTrigger value="dashboard" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-dashboard">
                           <BarChart3 className="w-4 h-4" />
                           Dashboard
@@ -727,6 +1146,11 @@ export default function MechanicsGarage() {
                           <Link2 className="w-4 h-4" />
                           Integrations
                           <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                        </TabsTrigger>
+                        <TabsTrigger value="partner-api" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto relative" data-testid="tab-partner-api">
+                          <Key className="w-4 h-4" />
+                          API
+                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                         </TabsTrigger>
                       </TabsList>
 
@@ -1329,6 +1753,11 @@ export default function MechanicsGarage() {
                             </div>
                           </Card>
                         </div>
+                      </TabsContent>
+
+                      {/* Partner API Tab */}
+                      <TabsContent value="partner-api">
+                        <PartnerApiTab shopId={selectedShop.id} toast={toast} />
                       </TabsContent>
                     </Tabs>
                   </Card>

@@ -6494,8 +6494,10 @@ export async function registerRoutes(
         });
       }
       
-      // Verify secret (simple comparison - in production use bcrypt)
-      if (credential.apiSecret !== apiSecret) {
+      // Verify secret by comparing hash
+      const crypto = require('crypto');
+      const hashedInputSecret = crypto.createHash('sha256').update(apiSecret).digest('hex');
+      if (credential.apiSecret !== hashedInputSecret) {
         return res.status(401).json({ 
           error: 'INVALID_CREDENTIALS',
           message: 'Invalid API credentials.'
@@ -6637,7 +6639,7 @@ export async function registerRoutes(
   // Partner API: Get Orders (Repair Orders)
   app.get('/api/partner/v1/orders', partnerApiAuth, requireScope('orders:read'), async (req: any, res) => {
     try {
-      const orders = await storage.getRepairOrdersByShop(req.partnerCredential.shopId);
+      const orders = await storage.getRepairOrders(req.partnerCredential.shopId);
       const response = {
         data: orders.map(o => ({
           id: o.id,
@@ -6663,7 +6665,7 @@ export async function registerRoutes(
   // Partner API: Get Appointments
   app.get('/api/partner/v1/appointments', partnerApiAuth, requireScope('appointments:read'), async (req: any, res) => {
     try {
-      const appointments = await storage.getAppointmentsByShop(req.partnerCredential.shopId);
+      const appointments = await storage.getAppointments(req.partnerCredential.shopId);
       const response = {
         data: appointments.map(a => ({
           id: a.id,
@@ -6712,7 +6714,7 @@ export async function registerRoutes(
   // Partner API: Get Estimates
   app.get('/api/partner/v1/estimates', partnerApiAuth, requireScope('estimates:read'), async (req: any, res) => {
     try {
-      const estimates = await storage.getEstimatesByShop(req.partnerCredential.shopId);
+      const estimates = await storage.getEstimates(req.partnerCredential.shopId);
       const response = {
         data: estimates.map(e => ({
           id: e.id,
@@ -6769,10 +6771,21 @@ export async function registerRoutes(
         return res.status(403).json({ error: 'Access denied' });
       }
       const credentials = await storage.getPartnerApiCredentials(req.params.shopId);
-      // Don't expose secrets in list
+      // Never expose secrets - they are hashed and cannot be retrieved
       const safeCredentials = credentials.map(c => ({
-        ...c,
-        apiSecret: '••••••••••••••••'
+        id: c.id,
+        shopId: c.shopId,
+        name: c.name,
+        apiKey: c.apiKey,
+        environment: c.environment,
+        scopes: c.scopes,
+        rateLimitPerDay: c.rateLimitPerDay,
+        requestCount: c.requestCount,
+        requestCountDaily: c.requestCountDaily,
+        lastUsedAt: c.lastUsedAt,
+        isActive: c.isActive,
+        expiresAt: c.expiresAt,
+        createdAt: c.createdAt
       }));
       res.json(safeCredentials);
     } catch (err) {
@@ -6792,22 +6805,34 @@ export async function registerRoutes(
       // Generate API key and secret
       const crypto = require('crypto');
       const apiKey = `gb_${environment === 'sandbox' ? 'test_' : ''}${crypto.randomBytes(24).toString('hex')}`;
-      const apiSecret = crypto.randomBytes(32).toString('hex');
+      const rawSecret = crypto.randomBytes(32).toString('hex');
+      
+      // Hash the secret before storing (using SHA-256)
+      const hashedSecret = crypto.createHash('sha256').update(rawSecret).digest('hex');
       
       const credential = await storage.createPartnerApiCredential({
         shopId: req.params.shopId,
         name: name || 'API Key',
         apiKey,
-        apiSecret,
+        apiSecret: hashedSecret, // Store hashed version
         environment: environment || 'production',
         scopes: scopes || ['orders:read'],
         rateLimitPerDay: rateLimitPerDay || 10000,
         createdBy: req.user.claims.sub
       });
       
-      // Return full credential including secret (only shown once)
+      // Return the raw secret ONLY at creation time - it cannot be retrieved again
       res.json({
-        ...credential,
+        id: credential.id,
+        shopId: credential.shopId,
+        name: credential.name,
+        apiKey: credential.apiKey,
+        apiSecret: rawSecret, // Raw secret shown once
+        environment: credential.environment,
+        scopes: credential.scopes,
+        rateLimitPerDay: credential.rateLimitPerDay,
+        isActive: credential.isActive,
+        createdAt: credential.createdAt,
         message: 'Save these credentials securely. The API secret will not be shown again.'
       });
     } catch (err) {
