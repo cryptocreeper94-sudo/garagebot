@@ -112,3 +112,31 @@ Preferred communication style: Simple, everyday language.
 - **UI/Frontend**: `@radix-ui/*`, `tailwindcss`, `framer-motion`, `wouter`, `@tanstack/react-query`, `@stripe/react-stripe-js`, `react-leaflet`, `leaflet`
 - **Backend**: `express`, `drizzle-orm`, `@neondatabase/serverless`, `stripe`, `openai`, `express-session`, `passport`, `connect-pg-simple`, `@solana/web3.js`
 - **Build Tools**: `vite`, `esbuild`, `tsx`
+
+# Recent Updates (December 2024)
+
+## December 16, 2024 - Pre-Publish Sweep
+- Fixed crypto module import issue causing analytics session errors
+- Updated business_plan.md and feature_log.md with current pricing:
+  - Pro: $4.99/mo or $39.99/yr (Founders Circle)
+  - Mechanics: $29.99/mo or $249.99/yr
+  - Hallmark: $9.99 free / $1.99 Pro
+- Corrected version references to v1.0.10
+- Fixed Partner API appointment field mappings (scheduledStart/End)
+- Resolved LSP type errors in routes.ts
+- Verified database connections healthy
+- Confirmed Dev Portal PIN: 0424
+
+## December 7, 2024 - Partner API & Security
+- Implemented Partner API system for Mechanics Garage B2B integrations
+- API Key + Secret authentication with SHA-256 hashing
+- Secrets hashed before storage, shown only once at creation
+- Scoped permissions and rate limiting
+- DarkWave Developer Hub ecosystem integration
+
+## Pricing Summary (Current - Founders Circle)
+| Tier | Monthly | Annual | Notes |
+|------|---------|--------|-------|
+| Pro | $4.99 | $39.99 | Increases to $9.99/mo post-V2 |
+| Mechanics | $29.99 | $249.99 | Includes Partner API |
+| Hallmark | $9.99 (free) / $1.99 (Pro) | - | 80% Pro discount |
