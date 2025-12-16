@@ -1831,3 +1831,103 @@ export const analyticsEvents = pgTable("analytics_events", {
 export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).omit({ id: true, createdAt: true });
 export type InsertAnalyticsEvent = z.infer<typeof insertAnalyticsEventSchema>;
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+
+// Partner API Scopes
+export const PARTNER_API_SCOPES = [
+  'orders:read', 'orders:write',
+  'customers:read', 'customers:write',
+  'appointments:read', 'appointments:write',
+  'estimates:read', 'estimates:write',
+  'invoices:read', 'invoices:write',
+  'analytics:read',
+  'shop:read', 'shop:write',
+  'staff:read', 'staff:write',
+] as const;
+
+export type PartnerApiScope = typeof PARTNER_API_SCOPES[number];
+
+// Partner API credentials for shops
+export const partnerApiCredentials = pgTable("partner_api_credentials", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 100 }).notNull(),
+  apiKey: varchar("api_key", { length: 64 }).notNull().unique(),
+  apiSecret: text("api_secret").notNull(),
+  environment: varchar("environment", { length: 20 }).default("production"),
+  scopes: text("scopes").array().default(sql`ARRAY['orders:read']::text[]`),
+  rateLimitPerMinute: integer("rate_limit_per_minute").default(60),
+  rateLimitPerDay: integer("rate_limit_per_day").default(10000),
+  requestCount: integer("request_count").default(0),
+  requestCountDaily: integer("request_count_daily").default(0),
+  lastResetDate: timestamp("last_reset_date"),
+  lastUsedAt: timestamp("last_used_at"),
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"),
+  createdBy: varchar("created_by", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_partner_credentials_shop").on(table.shopId),
+  index("IDX_partner_credentials_api_key").on(table.apiKey),
+]);
+
+export const insertPartnerApiCredentialSchema = createInsertSchema(partnerApiCredentials).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertPartnerApiCredential = z.infer<typeof insertPartnerApiCredentialSchema>;
+export type PartnerApiCredential = typeof partnerApiCredentials.$inferSelect;
+
+// Partner API request logs
+export const partnerApiLogs = pgTable("partner_api_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  credentialId: varchar("credential_id").notNull().references(() => partnerApiCredentials.id, { onDelete: "cascade" }),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  method: varchar("method", { length: 10 }).notNull(),
+  endpoint: varchar("endpoint", { length: 255 }).notNull(),
+  statusCode: integer("status_code"),
+  responseTimeMs: integer("response_time_ms"),
+  requestBody: jsonb("request_body"),
+  responseBody: jsonb("response_body"),
+  errorCode: varchar("error_code", { length: 50 }),
+  errorMessage: text("error_message"),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_partner_logs_credential").on(table.credentialId),
+  index("IDX_partner_logs_shop").on(table.shopId),
+  index("IDX_partner_logs_created").on(table.createdAt),
+]);
+
+export const insertPartnerApiLogSchema = createInsertSchema(partnerApiLogs).omit({ id: true, createdAt: true });
+export type InsertPartnerApiLog = z.infer<typeof insertPartnerApiLogSchema>;
+export type PartnerApiLog = typeof partnerApiLogs.$inferSelect;
+
+// Shop locations (multi-location support)
+export const shopLocations = pgTable("shop_locations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 100 }).notNull(),
+  locationCode: varchar("location_code", { length: 20 }).notNull(),
+  addressLine1: varchar("address_line1", { length: 255 }).notNull(),
+  addressLine2: varchar("address_line2", { length: 255 }),
+  city: varchar("city", { length: 100 }).notNull(),
+  state: varchar("state", { length: 50 }).notNull(),
+  zipCode: varchar("zip_code", { length: 10 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 255 }),
+  managerName: varchar("manager_name", { length: 100 }),
+  isActive: boolean("is_active").default(true),
+  isPrimary: boolean("is_primary").default(false),
+  operatingHours: jsonb("operating_hours"),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  totalOrders: integer("total_orders").default(0),
+  totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_shop_locations_shop").on(table.shopId),
+]);
+
+export const insertShopLocationSchema = createInsertSchema(shopLocations).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertShopLocation = z.infer<typeof insertShopLocationSchema>;
+export type ShopLocation = typeof shopLocations.$inferSelect;
