@@ -6470,6 +6470,446 @@ export async function registerRoutes(
     }
   });
 
+  // ==================== PARTNER API v1 ====================
+  // API Authentication Middleware
+  const partnerApiAuth = async (req: any, res: any, next: any) => {
+    const startTime = Date.now();
+    const apiKey = req.headers['x-api-key'] as string;
+    const apiSecret = req.headers['x-api-secret'] as string;
+    
+    if (!apiKey || !apiSecret) {
+      return res.status(401).json({ 
+        error: 'UNAUTHORIZED',
+        message: 'Missing API credentials. Provide X-API-Key and X-API-Secret headers.'
+      });
+    }
+    
+    try {
+      const credential = await storage.getPartnerApiCredentialByApiKey(apiKey);
+      
+      if (!credential || !credential.isActive) {
+        return res.status(401).json({ 
+          error: 'INVALID_CREDENTIALS',
+          message: 'Invalid or inactive API credentials.'
+        });
+      }
+      
+      // Verify secret (simple comparison - in production use bcrypt)
+      if (credential.apiSecret !== apiSecret) {
+        return res.status(401).json({ 
+          error: 'INVALID_CREDENTIALS',
+          message: 'Invalid API credentials.'
+        });
+      }
+      
+      // Check expiration
+      if (credential.expiresAt && new Date(credential.expiresAt) < new Date()) {
+        return res.status(401).json({ 
+          error: 'CREDENTIALS_EXPIRED',
+          message: 'API credentials have expired.'
+        });
+      }
+      
+      // Check rate limits
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const lastReset = credential.lastResetDate ? new Date(credential.lastResetDate) : null;
+      const dailyCount = (!lastReset || lastReset < today) ? 0 : (credential.requestCountDaily || 0);
+      
+      if (dailyCount >= (credential.rateLimitPerDay || 10000)) {
+        return res.status(429).json({ 
+          error: 'RATE_LIMIT_EXCEEDED',
+          message: 'Daily rate limit exceeded. Resets at midnight UTC.'
+        });
+      }
+      
+      // Attach credential to request
+      req.partnerCredential = credential;
+      req.partnerStartTime = startTime;
+      
+      // Increment request count
+      await storage.incrementPartnerApiRequestCount(credential.id);
+      
+      next();
+    } catch (error) {
+      console.error('Partner API auth error:', error);
+      return res.status(500).json({ 
+        error: 'AUTH_ERROR',
+        message: 'Authentication error occurred.'
+      });
+    }
+  };
+  
+  // Scope check middleware factory
+  const requireScope = (requiredScope: string) => {
+    return (req: any, res: any, next: any) => {
+      const scopes = req.partnerCredential?.scopes || [];
+      if (!scopes.includes(requiredScope)) {
+        return res.status(403).json({
+          error: 'INSUFFICIENT_SCOPE',
+          message: `This endpoint requires the '${requiredScope}' scope.`
+        });
+      }
+      next();
+    };
+  };
+  
+  // Log Partner API request
+  const logPartnerApiRequest = async (req: any, statusCode: number, responseBody?: any, error?: { code: string; message: string }) => {
+    if (!req.partnerCredential) return;
+    
+    try {
+      await storage.createPartnerApiLog({
+        credentialId: req.partnerCredential.id,
+        shopId: req.partnerCredential.shopId,
+        method: req.method,
+        endpoint: req.originalUrl,
+        statusCode,
+        responseTimeMs: Date.now() - req.partnerStartTime,
+        requestBody: req.body || null,
+        responseBody: responseBody || null,
+        errorCode: error?.code || null,
+        errorMessage: error?.message || null,
+        ipAddress: (req.headers['x-forwarded-for'] as string)?.split(',')[0] || req.ip || null,
+        userAgent: req.headers['user-agent'] || null
+      });
+    } catch (e) {
+      console.error('Failed to log Partner API request:', e);
+    }
+  };
+
+  // Partner API: Get Shop Info
+  app.get('/api/partner/v1/shop', partnerApiAuth, requireScope('shop:read'), async (req: any, res) => {
+    try {
+      const shop = await storage.getShop(req.partnerCredential.shopId);
+      if (!shop) {
+        await logPartnerApiRequest(req, 404, null, { code: 'SHOP_NOT_FOUND', message: 'Shop not found' });
+        return res.status(404).json({ error: 'SHOP_NOT_FOUND', message: 'Shop not found' });
+      }
+      const response = {
+        id: shop.id,
+        name: shop.name,
+        slug: shop.slug,
+        email: shop.email,
+        phone: shop.phone,
+        address: shop.address,
+        city: shop.city,
+        state: shop.state,
+        zipCode: shop.zipCode,
+        isVerified: shop.isVerified,
+        tier: shop.tier,
+        rating: shop.rating,
+        reviewCount: shop.reviewCount
+      };
+      await logPartnerApiRequest(req, 200, response);
+      res.json(response);
+    } catch (err) {
+      await logPartnerApiRequest(req, 500, null, { code: 'SERVER_ERROR', message: 'Internal server error' });
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Internal server error' });
+    }
+  });
+
+  // Partner API: Get Shop Locations
+  app.get('/api/partner/v1/locations', partnerApiAuth, requireScope('shop:read'), async (req: any, res) => {
+    try {
+      const locations = await storage.getShopLocations(req.partnerCredential.shopId);
+      await logPartnerApiRequest(req, 200, { count: locations.length });
+      res.json({ data: locations, total: locations.length });
+    } catch (err) {
+      await logPartnerApiRequest(req, 500, null, { code: 'SERVER_ERROR', message: 'Internal server error' });
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Internal server error' });
+    }
+  });
+
+  // Partner API: Get Shop Analytics
+  app.get('/api/partner/v1/analytics', partnerApiAuth, requireScope('analytics:read'), async (req: any, res) => {
+    try {
+      const range = (req.query.range as string) || '30days';
+      const analytics = await storage.getShopAnalytics(req.partnerCredential.shopId, range);
+      await logPartnerApiRequest(req, 200, analytics);
+      res.json(analytics);
+    } catch (err) {
+      await logPartnerApiRequest(req, 500, null, { code: 'SERVER_ERROR', message: 'Internal server error' });
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Internal server error' });
+    }
+  });
+
+  // Partner API: Get Orders (Repair Orders)
+  app.get('/api/partner/v1/orders', partnerApiAuth, requireScope('orders:read'), async (req: any, res) => {
+    try {
+      const orders = await storage.getRepairOrdersByShop(req.partnerCredential.shopId);
+      const response = {
+        data: orders.map(o => ({
+          id: o.id,
+          orderNumber: o.orderNumber,
+          status: o.status,
+          laborTotal: o.laborTotal,
+          partsTotal: o.partsTotal,
+          taxTotal: o.taxTotal,
+          grandTotal: o.grandTotal,
+          createdAt: o.createdAt,
+          updatedAt: o.updatedAt
+        })),
+        total: orders.length
+      };
+      await logPartnerApiRequest(req, 200, { count: orders.length });
+      res.json(response);
+    } catch (err) {
+      await logPartnerApiRequest(req, 500, null, { code: 'SERVER_ERROR', message: 'Internal server error' });
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Internal server error' });
+    }
+  });
+
+  // Partner API: Get Appointments
+  app.get('/api/partner/v1/appointments', partnerApiAuth, requireScope('appointments:read'), async (req: any, res) => {
+    try {
+      const appointments = await storage.getAppointmentsByShop(req.partnerCredential.shopId);
+      const response = {
+        data: appointments.map(a => ({
+          id: a.id,
+          appointmentNumber: a.appointmentNumber,
+          type: a.appointmentType,
+          status: a.status,
+          scheduledDate: a.scheduledDate,
+          scheduledTime: a.scheduledTime,
+          notes: a.notes,
+          createdAt: a.createdAt
+        })),
+        total: appointments.length
+      };
+      await logPartnerApiRequest(req, 200, { count: appointments.length });
+      res.json(response);
+    } catch (err) {
+      await logPartnerApiRequest(req, 500, null, { code: 'SERVER_ERROR', message: 'Internal server error' });
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Internal server error' });
+    }
+  });
+
+  // Partner API: Get Customers
+  app.get('/api/partner/v1/customers', partnerApiAuth, requireScope('customers:read'), async (req: any, res) => {
+    try {
+      const customers = await storage.getShopCustomers(req.partnerCredential.shopId);
+      const response = {
+        data: customers.map(c => ({
+          id: c.id,
+          userId: c.userId,
+          vehicleId: c.vehicleId,
+          notes: c.notes,
+          lastVisit: c.lastVisit,
+          visitCount: c.visitCount,
+          createdAt: c.createdAt
+        })),
+        total: customers.length
+      };
+      await logPartnerApiRequest(req, 200, { count: customers.length });
+      res.json(response);
+    } catch (err) {
+      await logPartnerApiRequest(req, 500, null, { code: 'SERVER_ERROR', message: 'Internal server error' });
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Internal server error' });
+    }
+  });
+
+  // Partner API: Get Estimates
+  app.get('/api/partner/v1/estimates', partnerApiAuth, requireScope('estimates:read'), async (req: any, res) => {
+    try {
+      const estimates = await storage.getEstimatesByShop(req.partnerCredential.shopId);
+      const response = {
+        data: estimates.map(e => ({
+          id: e.id,
+          estimateNumber: e.estimateNumber,
+          status: e.status,
+          laborTotal: e.laborTotal,
+          partsTotal: e.partsTotal,
+          taxTotal: e.taxTotal,
+          grandTotal: e.grandTotal,
+          validUntil: e.validUntil,
+          createdAt: e.createdAt
+        })),
+        total: estimates.length
+      };
+      await logPartnerApiRequest(req, 200, { count: estimates.length });
+      res.json(response);
+    } catch (err) {
+      await logPartnerApiRequest(req, 500, null, { code: 'SERVER_ERROR', message: 'Internal server error' });
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Internal server error' });
+    }
+  });
+
+  // Partner API: API Usage Stats
+  app.get('/api/partner/v1/usage', partnerApiAuth, async (req: any, res) => {
+    try {
+      const credential = req.partnerCredential;
+      const stats = await storage.getPartnerApiLogStats(credential.shopId, 30);
+      const response = {
+        credential: {
+          name: credential.name,
+          environment: credential.environment,
+          scopes: credential.scopes,
+          rateLimitPerDay: credential.rateLimitPerDay,
+          requestCountDaily: credential.requestCountDaily,
+          requestCountTotal: credential.requestCount,
+          lastUsedAt: credential.lastUsedAt,
+          expiresAt: credential.expiresAt
+        },
+        stats
+      };
+      await logPartnerApiRequest(req, 200, response);
+      res.json(response);
+    } catch (err) {
+      await logPartnerApiRequest(req, 500, null, { code: 'SERVER_ERROR', message: 'Internal server error' });
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Internal server error' });
+    }
+  });
+
+  // Shop Portal: Manage API Credentials (requires authenticated shop owner)
+  app.get('/api/shops/:shopId/api-credentials', isAuthenticated, async (req: any, res) => {
+    try {
+      const shop = await storage.getShop(req.params.shopId);
+      if (!shop || shop.ownerId !== req.user.claims.sub) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      const credentials = await storage.getPartnerApiCredentials(req.params.shopId);
+      // Don't expose secrets in list
+      const safeCredentials = credentials.map(c => ({
+        ...c,
+        apiSecret: '••••••••••••••••'
+      }));
+      res.json(safeCredentials);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch API credentials' });
+    }
+  });
+
+  app.post('/api/shops/:shopId/api-credentials', isAuthenticated, async (req: any, res) => {
+    try {
+      const shop = await storage.getShop(req.params.shopId);
+      if (!shop || shop.ownerId !== req.user.claims.sub) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      const { name, scopes, environment, rateLimitPerDay } = req.body;
+      
+      // Generate API key and secret
+      const crypto = require('crypto');
+      const apiKey = `gb_${environment === 'sandbox' ? 'test_' : ''}${crypto.randomBytes(24).toString('hex')}`;
+      const apiSecret = crypto.randomBytes(32).toString('hex');
+      
+      const credential = await storage.createPartnerApiCredential({
+        shopId: req.params.shopId,
+        name: name || 'API Key',
+        apiKey,
+        apiSecret,
+        environment: environment || 'production',
+        scopes: scopes || ['orders:read'],
+        rateLimitPerDay: rateLimitPerDay || 10000,
+        createdBy: req.user.claims.sub
+      });
+      
+      // Return full credential including secret (only shown once)
+      res.json({
+        ...credential,
+        message: 'Save these credentials securely. The API secret will not be shown again.'
+      });
+    } catch (err) {
+      console.error('Failed to create API credential:', err);
+      res.status(500).json({ error: 'Failed to create API credentials' });
+    }
+  });
+
+  app.patch('/api/shops/:shopId/api-credentials/:credentialId', isAuthenticated, async (req: any, res) => {
+    try {
+      const shop = await storage.getShop(req.params.shopId);
+      if (!shop || shop.ownerId !== req.user.claims.sub) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      const credential = await storage.getPartnerApiCredential(req.params.credentialId);
+      if (!credential || credential.shopId !== req.params.shopId) {
+        return res.status(404).json({ error: 'Credential not found' });
+      }
+      
+      const { name, scopes, isActive, rateLimitPerDay } = req.body;
+      const updated = await storage.updatePartnerApiCredential(req.params.credentialId, {
+        name: name !== undefined ? name : credential.name,
+        scopes: scopes !== undefined ? scopes : credential.scopes,
+        isActive: isActive !== undefined ? isActive : credential.isActive,
+        rateLimitPerDay: rateLimitPerDay !== undefined ? rateLimitPerDay : credential.rateLimitPerDay
+      });
+      
+      res.json({ ...updated, apiSecret: '••••••••••••••••' });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update API credentials' });
+    }
+  });
+
+  app.delete('/api/shops/:shopId/api-credentials/:credentialId', isAuthenticated, async (req: any, res) => {
+    try {
+      const shop = await storage.getShop(req.params.shopId);
+      if (!shop || shop.ownerId !== req.user.claims.sub) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      const credential = await storage.getPartnerApiCredential(req.params.credentialId);
+      if (!credential || credential.shopId !== req.params.shopId) {
+        return res.status(404).json({ error: 'Credential not found' });
+      }
+      
+      await storage.deletePartnerApiCredential(req.params.credentialId);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to delete API credentials' });
+    }
+  });
+
+  // Shop Portal: API Logs
+  app.get('/api/shops/:shopId/api-logs', isAuthenticated, async (req: any, res) => {
+    try {
+      const shop = await storage.getShop(req.params.shopId);
+      if (!shop || shop.ownerId !== req.user.claims.sub) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      const limit = parseInt(req.query.limit as string) || 50;
+      const logs = await storage.getPartnerApiLogs(req.params.shopId, limit);
+      const stats = await storage.getPartnerApiLogStats(req.params.shopId, 30);
+      
+      res.json({ logs, stats });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch API logs' });
+    }
+  });
+
+  // Shop Locations Management
+  app.get('/api/shops/:shopId/locations', isAuthenticated, async (req: any, res) => {
+    try {
+      const shop = await storage.getShop(req.params.shopId);
+      if (!shop || shop.ownerId !== req.user.claims.sub) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      const locations = await storage.getShopLocations(req.params.shopId);
+      res.json(locations);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch locations' });
+    }
+  });
+
+  app.post('/api/shops/:shopId/locations', isAuthenticated, async (req: any, res) => {
+    try {
+      const shop = await storage.getShop(req.params.shopId);
+      if (!shop || shop.ownerId !== req.user.claims.sub) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      const location = await storage.createShopLocation({
+        shopId: req.params.shopId,
+        ...req.body
+      });
+      res.json(location);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to create location' });
+    }
+  });
+
   return httpServer;
 }
 
