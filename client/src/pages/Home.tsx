@@ -82,8 +82,8 @@ export default function Home() {
       <Nav />
       <MarketTicker />
       
-      {/* Main Content - adjusted for 30px header */}
-      <div className="pt-12 min-h-screen pb-16">
+      {/* Main Content - adjusted for 30px header + 32px ticker */}
+      <div className="pt-2 min-h-screen pb-16">
         
         {/* DESKTOP BENTO LAYOUT - Only visible on lg+ screens */}
         <div className="hidden lg:block w-full px-2 xl:px-4 2xl:px-8">
@@ -95,7 +95,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               className="col-span-7 row-span-2"
             >
-              <div className="h-full bento-glass rounded-lg p-4 relative overflow-hidden">
+              <div className="h-full bento-glass rounded-lg p-4 relative">
                 {/* Sparkle decorations */}
                 <div className="sparkle-container">
                   <div className="sparkle" style={{ top: '10%', left: '10%' }} />
