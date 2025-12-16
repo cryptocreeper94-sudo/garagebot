@@ -7,10 +7,11 @@ import {
   ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
   BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList,
   Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch, Blocks, Car,
-  MessageCircle, Send, Bot, Loader2
+  MessageCircle, Send, Bot, Loader2, BarChart3
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { FeatureInventory } from "@/components/FeatureInventory";
+import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -907,7 +908,7 @@ export default function DevPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 mb-4 max-w-3xl">
+          <TabsList className="grid w-full grid-cols-7 mb-4 max-w-4xl">
             <TabsTrigger value="features" className="font-tech uppercase text-xs">
               <ClipboardList className="w-3 h-3 mr-1" /> Features
             </TabsTrigger>
@@ -919,6 +920,9 @@ export default function DevPortal() {
             </TabsTrigger>
             <TabsTrigger value="blockchain" className="font-tech uppercase text-xs">
               <Blocks className="w-3 h-3 mr-1" /> Blockchain
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="font-tech uppercase text-xs">
+              <BarChart3 className="w-3 h-3 mr-1" /> Analytics
             </TabsTrigger>
             <TabsTrigger value="affiliates" className="font-tech uppercase text-xs">
               <DollarSign className="w-3 h-3 mr-1" /> Affiliates
@@ -1347,6 +1351,10 @@ export default function DevPortal() {
                 </div>
               )}
             </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-4">
+            <AnalyticsDashboard />
           </TabsContent>
 
           <TabsContent value="affiliates" className="space-y-4">

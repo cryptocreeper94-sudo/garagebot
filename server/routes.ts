@@ -2,8 +2,40 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
+import { z } from "zod";
+
+const analyticsSessionRequestSchema = z.object({
+  visitorId: z.string().min(1, "visitorId is required"),
+  userAgent: z.string().optional().nullable(),
+  referrer: z.string().optional().nullable(),
+  utmSource: z.string().optional().nullable(),
+  utmMedium: z.string().optional().nullable(),
+  utmCampaign: z.string().optional().nullable(),
+  landingPage: z.string().optional().nullable(),
+});
+
+const analyticsPageViewRequestSchema = z.object({
+  sessionId: z.string().min(1, "sessionId is required"),
+  visitorId: z.string().min(1, "visitorId is required"),
+  route: z.string().min(1, "route is required"),
+  title: z.string().optional().nullable(),
+  referrer: z.string().optional().nullable(),
+  duration: z.number().optional().nullable(),
+  scrollDepth: z.number().optional().nullable(),
+});
+
+const analyticsEventRequestSchema = z.object({
+  sessionId: z.string().optional().nullable(),
+  visitorId: z.string().min(1, "visitorId is required"),
+  eventName: z.string().min(1, "eventName is required"),
+  eventCategory: z.string().optional().nullable(),
+  eventLabel: z.string().optional().nullable(),
+  eventValue: z.number().optional().nullable(),
+  route: z.string().optional().nullable(),
+  metadata: z.record(z.any()).optional().nullable(),
+});
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { nhtsaService } from "./services/nhtsa";
 import { weatherService } from "./services/weather";
@@ -6141,6 +6173,303 @@ export async function registerRoutes(
     });
   });
 
+  // ============================================
+  // ANALYTICS & SEO SYSTEM
+  // ============================================
+
+  // SEO Pages CRUD
+  app.get("/api/seo/pages", async (req, res) => {
+    try {
+      const pages = await storage.getSeoPages();
+      res.json(pages);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch SEO pages" });
+    }
+  });
+
+  app.get("/api/seo/pages/:id", async (req, res) => {
+    try {
+      const page = await storage.getSeoPage(req.params.id);
+      if (!page) return res.status(404).json({ error: "SEO page not found" });
+      res.json(page);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch SEO page" });
+    }
+  });
+
+  app.get("/api/seo/route", async (req, res) => {
+    try {
+      const route = req.query.route as string;
+      if (!route) return res.status(400).json({ error: "Route parameter required" });
+      const page = await storage.getSeoPageByRoute(route);
+      res.json(page || null);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch SEO settings" });
+    }
+  });
+
+  app.post("/api/seo/pages", async (req, res) => {
+    try {
+      const result = insertSeoPageSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      const page = await storage.createSeoPage(result.data);
+      res.json(page);
+    } catch (err: any) {
+      if (err.code === '23505') {
+        return res.status(400).json({ error: "SEO settings already exist for this route" });
+      }
+      res.status(500).json({ error: "Failed to create SEO page" });
+    }
+  });
+
+  app.put("/api/seo/pages/:id", async (req, res) => {
+    try {
+      const result = insertSeoPageSchema.partial().safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      const page = await storage.updateSeoPage(req.params.id, result.data);
+      if (!page) return res.status(404).json({ error: "SEO page not found" });
+      res.json(page);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update SEO page" });
+    }
+  });
+
+  app.delete("/api/seo/pages/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteSeoPage(req.params.id);
+      if (!success) return res.status(404).json({ error: "SEO page not found" });
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to delete SEO page" });
+    }
+  });
+
+  // Analytics Tracking Endpoints
+  app.post("/api/analytics/session", async (req, res) => {
+    try {
+      const result = analyticsSessionRequestSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      
+      const { visitorId, userAgent, referrer, utmSource, utmMedium, utmCampaign, landingPage } = result.data;
+      
+      // Parse user agent for browser/device info
+      const browser = parseUserAgentBrowser(userAgent || '');
+      const device = parseUserAgentDevice(userAgent || '');
+      const os = parseUserAgentOS(userAgent || '');
+      
+      // Hash IP for privacy
+      const ip = req.ip || req.socket.remoteAddress || '';
+      const ipHash = hashIP(ip);
+      
+      // Check for existing active session
+      const existingSession = await storage.getAnalyticsSessionByVisitor(visitorId);
+      if (existingSession) {
+        return res.json({ sessionId: existingSession.id, existing: true });
+      }
+      
+      const sessionData = {
+        visitorId,
+        ipHash,
+        userAgent: userAgent || null,
+        browser: browser || null,
+        os: os || null,
+        device: device || null,
+        referrer: referrer || null,
+        utmSource: utmSource || null,
+        utmMedium: utmMedium || null,
+        utmCampaign: utmCampaign || null,
+        landingPage: landingPage || null,
+      };
+      
+      const insertResult = insertAnalyticsSessionSchema.safeParse(sessionData);
+      if (!insertResult.success) {
+        console.error("Analytics session insert validation failed:", insertResult.error);
+        return res.status(500).json({ error: "Internal data validation error" });
+      }
+      
+      const session = await storage.createAnalyticsSession(insertResult.data);
+      
+      res.json({ sessionId: session.id, existing: false });
+    } catch (err) {
+      console.error("Analytics session error:", err);
+      res.status(500).json({ error: "Failed to create session" });
+    }
+  });
+
+  app.post("/api/analytics/pageview", async (req, res) => {
+    try {
+      const result = analyticsPageViewRequestSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      
+      const { sessionId, visitorId, route, title, referrer, duration, scrollDepth } = result.data;
+      
+      const pageViewData = {
+        sessionId,
+        visitorId,
+        route,
+        title: title || null,
+        referrer: referrer || null,
+        duration: duration || null,
+        scrollDepth: scrollDepth || null,
+      };
+      
+      const insertResult = insertAnalyticsPageViewSchema.safeParse(pageViewData);
+      if (!insertResult.success) {
+        console.error("Analytics page view insert validation failed:", insertResult.error);
+        return res.status(500).json({ error: "Internal data validation error" });
+      }
+      
+      const pageView = await storage.createAnalyticsPageView(insertResult.data);
+      
+      res.json({ success: true, id: pageView.id });
+    } catch (err) {
+      console.error("Page view tracking error:", err);
+      res.status(500).json({ error: "Failed to track page view" });
+    }
+  });
+
+  app.post("/api/analytics/event", async (req, res) => {
+    try {
+      const result = analyticsEventRequestSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).message });
+      }
+      
+      const { sessionId, visitorId, eventName, eventCategory, eventLabel, eventValue, route, metadata } = result.data;
+      
+      const eventData = {
+        sessionId: sessionId || null,
+        visitorId,
+        eventName,
+        eventCategory: eventCategory || null,
+        eventLabel: eventLabel || null,
+        eventValue: eventValue || null,
+        route: route || null,
+        metadata: metadata || null,
+      };
+      
+      const insertResult = insertAnalyticsEventSchema.safeParse(eventData);
+      if (!insertResult.success) {
+        console.error("Analytics event insert validation failed:", insertResult.error);
+        return res.status(500).json({ error: "Internal data validation error" });
+      }
+      
+      const event = await storage.createAnalyticsEvent(insertResult.data);
+      
+      res.json({ success: true, id: event.id });
+    } catch (err) {
+      console.error("Event tracking error:", err);
+      res.status(500).json({ error: "Failed to track event" });
+    }
+  });
+
+  app.post("/api/analytics/session/:id/end", async (req, res) => {
+    try {
+      await storage.endAnalyticsSession(req.params.id);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to end session" });
+    }
+  });
+
+  // Analytics Dashboard Data Endpoints
+  app.get("/api/analytics/summary", async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 30;
+      const summary = await storage.getAnalyticsSummary(days);
+      res.json(summary);
+    } catch (err) {
+      console.error("Analytics summary error:", err);
+      res.status(500).json({ error: "Failed to fetch analytics summary" });
+    }
+  });
+
+  app.get("/api/analytics/realtime", async (req, res) => {
+    try {
+      const activeCount = await storage.getActiveSessionCount();
+      res.json({ activeVisitors: activeCount });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch real-time data" });
+    }
+  });
+
+  app.get("/api/analytics/traffic", async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 30;
+      const traffic = await storage.getTrafficByDate(days);
+      res.json(traffic);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch traffic data" });
+    }
+  });
+
+  app.get("/api/analytics/pages", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const pages = await storage.getTopPages(limit);
+      res.json(pages);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch top pages" });
+    }
+  });
+
+  app.get("/api/analytics/referrers", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const referrers = await storage.getTopReferrers(limit);
+      res.json(referrers);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch referrers" });
+    }
+  });
+
+  app.get("/api/analytics/devices", async (req, res) => {
+    try {
+      const devices = await storage.getDeviceBreakdown();
+      res.json(devices);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch device breakdown" });
+    }
+  });
+
+  app.get("/api/analytics/browsers", async (req, res) => {
+    try {
+      const browsers = await storage.getBrowserBreakdown();
+      res.json(browsers);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch browser breakdown" });
+    }
+  });
+
+  app.get("/api/analytics/geo", async (req, res) => {
+    try {
+      const geo = await storage.getGeoBreakdown();
+      res.json(geo);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch geo breakdown" });
+    }
+  });
+
+  app.get("/api/analytics/events", async (req, res) => {
+    try {
+      const eventName = req.query.event as string;
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const events = await storage.getAnalyticsEvents({ eventName, startDate, endDate });
+      res.json(events);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch events" });
+    }
+  });
+
   return httpServer;
 }
 
@@ -6301,4 +6630,39 @@ function buildVendorSearchUrlWithVehicle(
   const yearStr = year ? year.toString() : undefined;
   const path = getVendorSearchPathWithVehicle(slug, query, partNumber, yearStr, make, model);
   return baseUrl + path;
+}
+
+// Analytics helper functions
+function parseUserAgentBrowser(userAgent: string): string {
+  if (!userAgent) return 'Unknown';
+  if (userAgent.includes('Firefox')) return 'Firefox';
+  if (userAgent.includes('Edg')) return 'Edge';
+  if (userAgent.includes('Chrome')) return 'Chrome';
+  if (userAgent.includes('Safari')) return 'Safari';
+  if (userAgent.includes('Opera') || userAgent.includes('OPR')) return 'Opera';
+  return 'Other';
+}
+
+function parseUserAgentDevice(userAgent: string): string {
+  if (!userAgent) return 'Unknown';
+  if (/Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) {
+    if (/iPad|Tablet/i.test(userAgent)) return 'Tablet';
+    return 'Mobile';
+  }
+  return 'Desktop';
+}
+
+function parseUserAgentOS(userAgent: string): string {
+  if (!userAgent) return 'Unknown';
+  if (userAgent.includes('Windows')) return 'Windows';
+  if (userAgent.includes('Mac OS X')) return 'macOS';
+  if (userAgent.includes('Linux')) return 'Linux';
+  if (userAgent.includes('Android')) return 'Android';
+  if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) return 'iOS';
+  return 'Other';
+}
+
+function hashIP(ip: string): string {
+  const crypto = require('crypto');
+  return crypto.createHash('sha256').update(ip + 'garagebot-salt').digest('hex').substring(0, 16);
 }

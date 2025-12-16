@@ -11,7 +11,8 @@ import {
   priceAlerts, blockchainVerifications,
   referralInvites, referralPointTransactions, referralRedemptions,
   releases,
-  vendorReviews, wishlists, wishlistItems, projects, projectParts, smsPreferences
+  vendorReviews, wishlists, wishlistItems, projects, projectParts, smsPreferences,
+  seoPages, analyticsSessions, analyticsPageViews, analyticsEvents
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -42,7 +43,9 @@ import type {
   VendorReview, InsertVendorReview,
   Wishlist, InsertWishlist, WishlistItem, InsertWishlistItem,
   Project, InsertProject, ProjectPart, InsertProjectPart,
-  SmsPreferences, InsertSmsPreferences
+  SmsPreferences, InsertSmsPreferences,
+  SeoPage, InsertSeoPage, AnalyticsSession, InsertAnalyticsSession,
+  AnalyticsPageView, InsertAnalyticsPageView, AnalyticsEvent, InsertAnalyticsEvent
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -344,6 +347,45 @@ export interface IStorage {
   updateRelease(id: string, updates: Partial<Release>): Promise<Release | undefined>;
   publishRelease(id: string): Promise<Release | undefined>;
   deleteRelease(id: string): Promise<boolean>;
+
+  // SEO Pages
+  getSeoPages(): Promise<SeoPage[]>;
+  getSeoPage(id: string): Promise<SeoPage | undefined>;
+  getSeoPageByRoute(route: string): Promise<SeoPage | undefined>;
+  createSeoPage(page: InsertSeoPage): Promise<SeoPage>;
+  updateSeoPage(id: string, updates: Partial<SeoPage>): Promise<SeoPage | undefined>;
+  deleteSeoPage(id: string): Promise<boolean>;
+
+  // Analytics Sessions
+  createAnalyticsSession(session: InsertAnalyticsSession): Promise<AnalyticsSession>;
+  getAnalyticsSession(id: string): Promise<AnalyticsSession | undefined>;
+  getAnalyticsSessionByVisitor(visitorId: string): Promise<AnalyticsSession | undefined>;
+  updateAnalyticsSession(id: string, updates: Partial<AnalyticsSession>): Promise<AnalyticsSession | undefined>;
+  endAnalyticsSession(id: string): Promise<void>;
+  getActiveSessionCount(): Promise<number>;
+
+  // Analytics Page Views
+  createAnalyticsPageView(pageView: InsertAnalyticsPageView): Promise<AnalyticsPageView>;
+  getPageViewsBySession(sessionId: string): Promise<AnalyticsPageView[]>;
+
+  // Analytics Events
+  createAnalyticsEvent(event: InsertAnalyticsEvent): Promise<AnalyticsEvent>;
+  getAnalyticsEvents(filters?: { eventName?: string; startDate?: Date; endDate?: Date }): Promise<AnalyticsEvent[]>;
+
+  // Analytics Aggregations
+  getAnalyticsSummary(days: number): Promise<{
+    totalPageViews: number;
+    uniqueVisitors: number;
+    totalSessions: number;
+    avgSessionDuration: number;
+    bounceRate: number;
+  }>;
+  getTrafficByDate(days: number): Promise<{ date: string; pageViews: number; visitors: number }[]>;
+  getTopPages(limit: number): Promise<{ route: string; views: number }[]>;
+  getTopReferrers(limit: number): Promise<{ referrer: string; count: number }[]>;
+  getDeviceBreakdown(): Promise<{ device: string; count: number }[]>;
+  getBrowserBreakdown(): Promise<{ browser: string; count: number }[]>;
+  getGeoBreakdown(): Promise<{ country: string; count: number }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2016,6 +2058,243 @@ export class DatabaseStorage implements IStorage {
     }
     const [newPrefs] = await db.insert(smsPreferences).values(prefs).returning();
     return newPrefs;
+  }
+
+  // SEO Pages
+  async getSeoPages(): Promise<SeoPage[]> {
+    return await db.select().from(seoPages).orderBy(asc(seoPages.route));
+  }
+
+  async getSeoPage(id: string): Promise<SeoPage | undefined> {
+    const [page] = await db.select().from(seoPages).where(eq(seoPages.id, id));
+    return page;
+  }
+
+  async getSeoPageByRoute(route: string): Promise<SeoPage | undefined> {
+    const [page] = await db.select().from(seoPages).where(eq(seoPages.route, route));
+    return page;
+  }
+
+  async createSeoPage(page: InsertSeoPage): Promise<SeoPage> {
+    const [newPage] = await db.insert(seoPages).values(page).returning();
+    return newPage;
+  }
+
+  async updateSeoPage(id: string, updates: Partial<SeoPage>): Promise<SeoPage | undefined> {
+    const [page] = await db.update(seoPages)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(seoPages.id, id))
+      .returning();
+    return page;
+  }
+
+  async deleteSeoPage(id: string): Promise<boolean> {
+    const result = await db.delete(seoPages).where(eq(seoPages.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // Analytics Sessions
+  async createAnalyticsSession(session: InsertAnalyticsSession): Promise<AnalyticsSession> {
+    const [newSession] = await db.insert(analyticsSessions).values(session).returning();
+    return newSession;
+  }
+
+  async getAnalyticsSession(id: string): Promise<AnalyticsSession | undefined> {
+    const [session] = await db.select().from(analyticsSessions).where(eq(analyticsSessions.id, id));
+    return session;
+  }
+
+  async getAnalyticsSessionByVisitor(visitorId: string): Promise<AnalyticsSession | undefined> {
+    const [session] = await db.select().from(analyticsSessions)
+      .where(and(eq(analyticsSessions.visitorId, visitorId), eq(analyticsSessions.isActive, true)))
+      .orderBy(desc(analyticsSessions.startedAt))
+      .limit(1);
+    return session;
+  }
+
+  async updateAnalyticsSession(id: string, updates: Partial<AnalyticsSession>): Promise<AnalyticsSession | undefined> {
+    const [session] = await db.update(analyticsSessions)
+      .set(updates)
+      .where(eq(analyticsSessions.id, id))
+      .returning();
+    return session;
+  }
+
+  async endAnalyticsSession(id: string): Promise<void> {
+    await db.update(analyticsSessions)
+      .set({ isActive: false, endedAt: new Date() })
+      .where(eq(analyticsSessions.id, id));
+  }
+
+  async getActiveSessionCount(): Promise<number> {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(analyticsSessions)
+      .where(and(eq(analyticsSessions.isActive, true), gte(analyticsSessions.startedAt, thirtyMinutesAgo)));
+    return Number(result[0]?.count || 0);
+  }
+
+  // Analytics Page Views
+  async createAnalyticsPageView(pageView: InsertAnalyticsPageView): Promise<AnalyticsPageView> {
+    await db.update(analyticsSessions)
+      .set({ pageViewCount: sql`${analyticsSessions.pageViewCount} + 1` })
+      .where(eq(analyticsSessions.id, pageView.sessionId));
+    const [newPageView] = await db.insert(analyticsPageViews).values(pageView).returning();
+    return newPageView;
+  }
+
+  async getPageViewsBySession(sessionId: string): Promise<AnalyticsPageView[]> {
+    return await db.select().from(analyticsPageViews)
+      .where(eq(analyticsPageViews.sessionId, sessionId))
+      .orderBy(asc(analyticsPageViews.viewedAt));
+  }
+
+  // Analytics Events
+  async createAnalyticsEvent(event: InsertAnalyticsEvent): Promise<AnalyticsEvent> {
+    const [newEvent] = await db.insert(analyticsEvents).values(event).returning();
+    return newEvent;
+  }
+
+  async getAnalyticsEvents(filters?: { eventName?: string; startDate?: Date; endDate?: Date }): Promise<AnalyticsEvent[]> {
+    let query = db.select().from(analyticsEvents);
+    const conditions = [];
+    if (filters?.eventName) conditions.push(eq(analyticsEvents.eventName, filters.eventName));
+    if (filters?.startDate) conditions.push(gte(analyticsEvents.createdAt, filters.startDate));
+    if (filters?.endDate) conditions.push(lte(analyticsEvents.createdAt, filters.endDate));
+    if (conditions.length > 0) {
+      return await db.select().from(analyticsEvents).where(and(...conditions)).orderBy(desc(analyticsEvents.createdAt));
+    }
+    return await db.select().from(analyticsEvents).orderBy(desc(analyticsEvents.createdAt)).limit(500);
+  }
+
+  // Analytics Aggregations
+  async getAnalyticsSummary(days: number): Promise<{
+    totalPageViews: number;
+    uniqueVisitors: number;
+    totalSessions: number;
+    avgSessionDuration: number;
+    bounceRate: number;
+  }> {
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    
+    const [pageViewResult] = await db.select({ count: sql<number>`count(*)` })
+      .from(analyticsPageViews)
+      .where(gte(analyticsPageViews.viewedAt, startDate));
+    
+    const [visitorResult] = await db.select({ count: sql<number>`count(distinct ${analyticsSessions.visitorId})` })
+      .from(analyticsSessions)
+      .where(gte(analyticsSessions.startedAt, startDate));
+    
+    const [sessionResult] = await db.select({ count: sql<number>`count(*)` })
+      .from(analyticsSessions)
+      .where(gte(analyticsSessions.startedAt, startDate));
+    
+    const [durationResult] = await db.select({ avg: sql<number>`coalesce(avg(${analyticsSessions.duration}), 0)` })
+      .from(analyticsSessions)
+      .where(and(gte(analyticsSessions.startedAt, startDate), sql`${analyticsSessions.duration} is not null`));
+    
+    const [bounceResult] = await db.select({ 
+      bounces: sql<number>`count(*) filter (where ${analyticsSessions.pageViewCount} = 1)`,
+      total: sql<number>`count(*)`
+    })
+      .from(analyticsSessions)
+      .where(gte(analyticsSessions.startedAt, startDate));
+    
+    const bounceRate = bounceResult.total > 0 ? (bounceResult.bounces / bounceResult.total) * 100 : 0;
+    
+    return {
+      totalPageViews: Number(pageViewResult?.count || 0),
+      uniqueVisitors: Number(visitorResult?.count || 0),
+      totalSessions: Number(sessionResult?.count || 0),
+      avgSessionDuration: Math.round(Number(durationResult?.avg || 0)),
+      bounceRate: Math.round(bounceRate * 10) / 10
+    };
+  }
+
+  async getTrafficByDate(days: number): Promise<{ date: string; pageViews: number; visitors: number }[]> {
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    
+    const result = await db.select({
+      date: sql<string>`date_trunc('day', ${analyticsPageViews.viewedAt})::date::text`,
+      pageViews: sql<number>`count(*)`,
+      visitors: sql<number>`count(distinct ${analyticsPageViews.visitorId})`
+    })
+      .from(analyticsPageViews)
+      .where(gte(analyticsPageViews.viewedAt, startDate))
+      .groupBy(sql`date_trunc('day', ${analyticsPageViews.viewedAt})`)
+      .orderBy(sql`date_trunc('day', ${analyticsPageViews.viewedAt})`);
+    
+    return result.map(r => ({
+      date: r.date,
+      pageViews: Number(r.pageViews),
+      visitors: Number(r.visitors)
+    }));
+  }
+
+  async getTopPages(limit: number): Promise<{ route: string; views: number }[]> {
+    const result = await db.select({
+      route: analyticsPageViews.route,
+      views: sql<number>`count(*)`
+    })
+      .from(analyticsPageViews)
+      .groupBy(analyticsPageViews.route)
+      .orderBy(desc(sql`count(*)`))
+      .limit(limit);
+    
+    return result.map(r => ({ route: r.route, views: Number(r.views) }));
+  }
+
+  async getTopReferrers(limit: number): Promise<{ referrer: string; count: number }[]> {
+    const result = await db.select({
+      referrer: analyticsSessions.referrer,
+      count: sql<number>`count(*)`
+    })
+      .from(analyticsSessions)
+      .where(sql`${analyticsSessions.referrer} is not null and ${analyticsSessions.referrer} != ''`)
+      .groupBy(analyticsSessions.referrer)
+      .orderBy(desc(sql`count(*)`))
+      .limit(limit);
+    
+    return result.map(r => ({ referrer: r.referrer || 'Direct', count: Number(r.count) }));
+  }
+
+  async getDeviceBreakdown(): Promise<{ device: string; count: number }[]> {
+    const result = await db.select({
+      device: analyticsSessions.device,
+      count: sql<number>`count(*)`
+    })
+      .from(analyticsSessions)
+      .where(sql`${analyticsSessions.device} is not null`)
+      .groupBy(analyticsSessions.device)
+      .orderBy(desc(sql`count(*)`));
+    
+    return result.map(r => ({ device: r.device || 'Unknown', count: Number(r.count) }));
+  }
+
+  async getBrowserBreakdown(): Promise<{ browser: string; count: number }[]> {
+    const result = await db.select({
+      browser: analyticsSessions.browser,
+      count: sql<number>`count(*)`
+    })
+      .from(analyticsSessions)
+      .where(sql`${analyticsSessions.browser} is not null`)
+      .groupBy(analyticsSessions.browser)
+      .orderBy(desc(sql`count(*)`));
+    
+    return result.map(r => ({ browser: r.browser || 'Unknown', count: Number(r.count) }));
+  }
+
+  async getGeoBreakdown(): Promise<{ country: string; count: number }[]> {
+    const result = await db.select({
+      country: analyticsSessions.country,
+      count: sql<number>`count(*)`
+    })
+      .from(analyticsSessions)
+      .where(sql`${analyticsSessions.country} is not null`)
+      .groupBy(analyticsSessions.country)
+      .orderBy(desc(sql`count(*)`));
+    
+    return result.map(r => ({ country: r.country || 'Unknown', count: Number(r.count) }));
   }
 }
 
