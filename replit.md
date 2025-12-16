@@ -1,6 +1,6 @@
 # Overview
 
-GarageBot is a comprehensive auto parts aggregator platform unifying inventory from over 40 retailers into a single searchable interface. It enables users to search for parts across all vehicle types, including cars, trucks, RVs, boats, ATVs, motorcycles, and more. The platform aims to provide the "Right Part. First Time. Every Engine."
+GarageBot is a comprehensive auto parts aggregator platform unifying inventory from over 40 retailers into a single searchable interface. It aims to provide the "Right Part. First Time. Every Engine." across all vehicle types (cars, trucks, RVs, boats, ATVs, motorcycles).
 
 Key capabilities include:
 - Unifying parts search from 40+ retailers.
@@ -8,7 +8,7 @@ Key capabilities include:
 - AI-powered part recommendations and DIY repair guides.
 - Vehicle-aware affiliate search links for guaranteed fitment.
 - Shopping cart with Stripe payments.
-- Genesis Hallmark NFT system for early adopters.
+- Genesis Hallmark NFT system for early adopters on Solana.
 - Pro "Founders Circle" subscription for enhanced features.
 
 # User Preferences
@@ -28,32 +28,29 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend
 - **Framework**: React 18 with TypeScript, Vite.
-- **UI Components**: shadcn/ui on Radix UI primitives, styled with Tailwind CSS. "Deep Space / Future Forward" theme with electric cyan accents, custom fonts (Rajdhani, Inter, JetBrains Mono), and dark palette.
-- **UI Effects**: Custom CSS classes for hover glows, 3D buttons, card lifts, neon text, and animated pulsing glows.
-- **State Management**: TanStack Query for server state, React Context for cart, custom `useAuth` hook for authentication.
+- **UI Components**: shadcn/ui on Radix UI primitives, styled with Tailwind CSS. Theme is "Deep Space / Future Forward" with electric cyan accents, custom fonts (Rajdhani, Inter, JetBrains Mono), and a dark palette. Custom CSS for UI effects (glows, 3D buttons, neon text).
+- **State Management**: TanStack Query for server state, React Context for cart, custom `useAuth` hook.
 - **Routing**: Wouter for client-side routing.
-- **Animation**: Framer Motion for transitions and UI animations, including the Buddy AI mascot.
+- **Animation**: Framer Motion for UI animations, including the Buddy AI mascot.
 
 ## Backend
 - **Runtime**: Node.js with Express.js.
-- **API Design**: RESTful API with route handlers, protected by authentication middleware.
+- **API Design**: RESTful API with authentication middleware.
 - **Session Management**: Express-session with PostgreSQL session store.
 - **Authentication**: OpenID Connect (OIDC) with Replit's authentication service via Passport.js.
 
 ## AI Features (Buddy AI)
 - **Service**: Unified AI assistant powered by OpenAI.
-- **Animation**: Buddy mascot animates in/out using Framer Motion.
 - **Capabilities**: Chat with memory, smart part recommendations, AI-generated DIY repair guides, mechanic estimates, proactive alerts, and part definitions.
 
 ## Data Storage
 - **Database**: PostgreSQL via Neon serverless driver.
 - **ORM**: Drizzle ORM for type-safe queries.
-- **Core Tables**: Users, vehicles, vendors, deals, hallmarks, carts, orders, and sessions.
+- **Core Tables**: Users, vehicles, vendors, deals, hallmarks, carts, orders, sessions.
 - **Affiliate Tracking**: Tables for affiliate networks, partners, clicks, commissions, and payouts.
 
 ## Payment Processing
 - **Provider**: Stripe for credit card payments using Stripe Elements React components and backend SDK.
-- **Architecture**: Frontend for card collection, backend for Stripe API management, and webhook handling.
 
 ## Build & Deployment
 - **Development**: Client (Vite) and backend (tsx) dev servers with HMR.
@@ -62,159 +59,43 @@ Preferred communication style: Simple, everyday language.
 
 ## DIY Repair Guides System
 - **Taxonomy**: Comprehensive vehicle taxonomy across 18 categories.
-- **YouTube Integration**: Each guide includes YouTube search queries for video alternatives and per-step video links.
-- **Cross-Industry Terminology**: Translation table for part names across industries (e.g., marine to automotive).
+- **Content**: Each guide includes YouTube search queries for video alternatives and per-step video links.
+- **Translation**: Cross-industry terminology translation for part names.
 
 ## Affiliate Strategy
-- **Tier 1 (Current)**: Vehicle-aware search links to 40+ retailers.
-- **Tier 2 (Future)**: Product data feeds from affiliate networks for prices and images.
-- **Tier 3 (Future)**: Direct APIs with retailers for real-time inventory and pricing.
+- **Current**: Vehicle-aware search links to 40+ retailers.
+- **Future**: Product data feeds from affiliate networks and direct APIs with retailers for real-time inventory.
 
 ## Blockchain Verification
 - **Purpose**: Tamper-proof verification of Genesis Hallmarks and Vehicle Passports on the Solana blockchain.
 - **Technology**: Solana network via Helius RPC, `@solana/web3.js`.
-- **Features**: SHA-256 hashing, on-chain transaction submission, transaction signature storage, Solscan links.
-- **Auto-Verification**: Releases are automatically hashed to Solana when published via `/api/releases/:id/publish`
-- **Customer Data**: Blockchain hashing is always opt-in for user data - clearly disclosed on Genesis Hallmark page and Privacy Policy
+- **Features**: SHA-256 hashing, on-chain transaction submission, Solscan links. Auto-verification for releases. Customer data hashing is opt-in.
 
 ## Member Referral Program
-- **Route**: `/invite` for Invite Friends page
-- **Points Structure**: 100 pts per signup, 500 pts when referral goes Pro
-- **Redemption Tiers**: 500 pts = 1 month Pro, 1000 pts = 1 year Pro, 2500 pts = Lifetime Pro
-- **Database Tables**: `referral_invites`, `referral_point_transactions`, `referral_redemptions`
-- **User Fields**: `referralCode`, `referredByUserId`, `referralPointsBalance`
-- **API Endpoints**: `/api/referrals/summary`, `/api/referrals/validate/:code`, `/api/referrals/redeem`
+- **Features**: Points-based system for user signups and Pro conversions. Redemption for Pro membership tiers.
+- **Database**: `referral_invites`, `referral_point_transactions`, `referral_redemptions`.
 
 ## Release Version Control System
-- **Route**: `/dev` → "Releases" tab in Dev Portal
-- **Database Table**: `releases` with version, versionType, changelog, timestamps
-- **Version Types**: beta, stable, hotfix, major
-- **Features**: Draft → Publish workflow, timestamped releases, categorized changelogs
-- **API Endpoints**: `/api/releases`, `/api/releases/latest`, `/api/releases/:id/publish`
-- **Optional**: Blockchain verification via existing hallmark system (entityType: 'release')
-- **Implementation Guide**: `docs/release-version-control-guide.md` (copy-pasteable for other projects)
+- **Features**: Draft → Publish workflow, timestamped releases, categorized changelogs. Optional blockchain verification.
 
 ## DarkWave Developer Hub Integration
-- **Hub URL**: https://darkwavestudios.io
-- **App Registration**: GarageBot registered as "garagebot-prod" in ORBIT Staffing Ecosystem Hub
-- **Client File**: `server/ecosystemHub.ts` - TypeScript client for hub API calls
-- **Credentials**: Stored as secrets `ORBIT_ECOSYSTEM_API_KEY` and `ORBIT_ECOSYSTEM_API_SECRET`
-- **Available Endpoints**: 14 total (sync workers, contractors, W-2, 1099, timesheets, certifications, code snippets, logs)
-- **Permissions**: Full read/write access for workers, contractors, 1099, timesheets, certifications, and code
-- **Integration Points**: Mechanics Garage shop management portal can sync staff data with DarkWave ecosystem
+- **Integration**: GarageBot registered as "garagebot-prod" in ORBIT Staffing Ecosystem Hub at darkwavestudios.io.
+- **Functionality**: Syncs workers, contractors, timesheets, certifications, and code snippets. Full read/write access to various ecosystem data.
 
-## Latest Publish: December 7, 2024 @ 12:12 AM EST
-
-## v1.0.10 - PUBLISHED & BLOCKCHAIN VERIFIED
-Solana TX: `3j9uyTLN2E9HXMoNEu4FssLifNt1KtqcwyqWHGQmGYAf2kRHMCL43AVHMxNRyABkHy9f1Si52Lr2QzxyEMqhvcyZ`
-
-## All Versions Blockchain Verified
-- v1.0.10: `3j9uyTLN2E9HXMoNEu4FssLifNt1KtqcwyqWHGQmGYAf2kRHMCL43AVHMxNRyABkHy9f1Si52Lr2QzxyEMqhvcyZ`
-- v1.0.9: `mLM9zYVwFWjX4vgcFRHbMZ8a8PHGtwsX1KiaT8e8RMwCCt98ZGaCcHatjoqyRPRyvJit6ZXsDpQMHv7b4xkHoQC`
-- v1.0.8: `5VwmpZ5i6ib98SdP3FmY9U73kPnBDLdAbcbEj3F7d5zZ7BtLnRPhfraMGvZdbqcovF2HQ8KqYuXsmrEouP7c6cym`
-- v1.0.7: `3HPoXiXnH4QKvNjAaKdsQEsHVDyjgEyEZpkccefmY4PQ7kzkLM1x51ir6mqqX5K91xhGJUN7oMcYhZSoQoxZuure`
-- v1.0.6: `qwM86zvbzA6NbSoqUirXqPbRcNUnkpSsvF34msdcWN8aJF4JEW6cC1yHbaJ9K1P89MqmTArFc6XYgatfYyW9B4a`
-- v1.0.5: `3XP2wnb6VMZBf7Zu5TuvuYtbpdsE4JfZQXcZfgzydcfJLNR9TREMjvVoFYstCbWdiEEmo8it8oXkNjX1o7pShp4A`
-- v1.0.4: `5AUTquMgE1iZMxCM1bGpv9Fz2oSGtYYV6PL6DJDv65cTipKdG8fehkLxsKjuhVbhoekzDpg738AWTDkLC3nMfz43`
-- v1.0.3: `DvXsAW8AhxtasuHTv7e7FTJrvWCBF7Lt8VTyNESeWvfS5FHVt1cKKDi6fNS4NtthrF1zkvcuQhU4383L5YsWT4m`
-- v1.0.2: `5gHRuwY3oWGnmVDAPvTWxfRdXUMSJ1r9tA2ze2hzAA3W5HMsJWN6BDQfdRfFFgfab7zdooveS3WSmdfjw7MMZSB5`
-- v1.0.1: `5cPLvQQHV1uHfxUB7gpbBhUd3c6gQaGtAhGzrDZgikgBeFF99mxZM45kR2CHHVvdenh5gZ7Z8nd6PTvkwGdDDGTn`
-- v1.0.0: `4NJFuwVx43J65D8e7SrryuVqwmt5SAAGsxqsenJiNAmckVDLEwFfUY1o2MdR8przoYzLa1pbbyfCp9VySoYTmjwA`
-
-## Recent Updates (December 2024)
-
-### v1.0.10 (Dec 7) - DarkWave Developer Hub Integration
-- Connected GarageBot to ORBIT Staffing Ecosystem Hub at darkwavestudios.io
-- Full ecosystem data sync: workers, contractors, W-2, 1099, timesheets, certifications
-- Code snippet sharing between DarkWave ecosystem apps
-- All 14 API endpoints available with full permissions
-- Mechanics Garage can now sync staff with DarkWave ecosystem
-
-### v1.0.9 (Dec 6) - Weather Widget Icon Enhancement
-- Regenerated all 5 daytime weather icons with solid circular backgrounds
-- Icons no longer blend into dark UI (sunny, cloudy, partly cloudy, rainy, snowy)
-- Improved visibility and contrast for weather widget
-
-### v1.0.8 (Dec 5) - QR Code Enhancement
-- Real scannable QR code in Genesis Hallmark popup
-- QR links to garagebot.io/verify/GB-000001
-- Buddy mascot beside QR code
-- Full blockchain verification details
-
-### v1.0.7 (Dec 5) - PWA Updates
-- Buddy mascot icon for PWA (full color, solid background)
-- Updated splash screen with Buddy
-- Updated manifest and service worker
-
-### v1.0.6 (Dec 5) - Genesis Hallmark Popup Enhancement
-- Genesis Hallmark popup shows GB-000001 QR code image with Buddy mascot
-- Home page now uses dynamic version from Footer component
-- All version displays pull from releases API
-- Enhanced hallmark popup with description and Solscan link
-
-### v1.0.5 (Dec 5) - Mobile Modal Optimization
-- All modals now mobile-friendly with proper margins and close buttons
-- Drawer component: Added X close button, max-height 90vh with scroll
-- AlertDialog: Mobile margins w-[calc(100%-2rem)], max-height 85vh
-- Verified badge popup: Now visible on mobile, full-width positioning
-- All popups scroll if content overflows
-
-### v1.0.4 (Dec 5) - Documentation & Blockchain
-- Updated all documentation to reflect latest changes
-- All past versions (1.0.0-1.0.3) now blockchain verified on Solana mainnet
-- Fixed Investors page retailer count (20+ → 40+)
-
-### v1.0.3 (Dec 5) - UI Polish & Layout
-- Clickable app hallmark badge (GB-000001) in header linking to Genesis Hallmark page
-- Weather widget moved to bottom left corner, aligned with Buddy on same baseline
-- Buddy AI mascot increased to 1.5x size (80px mobile → 144px desktop)
-- All popups now 100% opacity with z-100 (no transparency issues)
-- Mobile optimized responsive sizing for weather and Buddy
-- Two-column hamburger menu layout on desktop
-
-### v1.0.2 (Dec 5) - Image Carousels & Hallmark Badges
-- AI-generated images for all 12 vehicle type carousel cards
-- AI-generated images for all 20 category carousel cards
-- Converted desktop accordions to horizontal image carousels with arrow navigation
-- Genesis Hallmark visual badge with dynamic asset number overlay
-- Generated numbered hallmark images (000000000-01 for app, 000000000-02 for founder)
-- Purple holographic glow effect on hallmark badges
-
-### v1.0.1 (Dec 4) - Bug Fixes
-- Minor UI fixes and polish
-
-### v1.0.0 "Genesis Launch" (Dec 3)
-- Official v1.0 release with full feature set
-- Footer component on all major pages
-- Container width standardization (max-w-6xl)
-- Release Version Control system
-- Bento grid layouts across all pages
-
-### Earlier Updates
-- **Weather Radar Integration**: Live weather radar with RainViewer tiles, NOAA storm alerts, animated playback.
-- **React 18 Compatibility**: Downgraded to React 18.3.1 and framer-motion 11.15.0 for stability.
-- **Member Referral Program**: Points-based referral system with Pro conversion bonuses.
-- **Dev Portal**: Full release management, affiliate network guides, blockchain verification.
+## Partner API System
+- **Purpose**: B2B API access for Mechanics Garage shops.
+- **Security**: API Key + Secret authentication with SHA-256 hashing, granular scopes, and rate limiting.
+- **Endpoints**: `/shop`, `/orders`, `/appointments`, `/customers`, `/estimates`, `/analytics`, `/locations`, `/usage`.
 
 ## Weather Radar System
-- **Component**: `WeatherRadar.tsx` with Leaflet map and RainViewer radar tiles
-- **Radar Data**: RainViewer API (free) for precipitation radar tiles with animated playback
-- **Storm Alerts**: NOAA Weather Alerts API (`/api/weather/alerts`) for real-time severe weather warnings
-- **Features**: Animated radar playback, layer controls (precipitation toggle, opacity slider), fullscreen mode, mobile-responsive design
-- **ZIP Persistence**: localStorage for guests, database for authenticated users via `/api/user/preferences`
-- **Dependencies**: `react-leaflet@^4.2.1` (React 18 compatible), `leaflet`
+- **Component**: `WeatherRadar.tsx` using Leaflet map and RainViewer radar tiles for precipitation.
+- **Alerts**: NOAA Weather Alerts API for severe weather warnings.
+- **Features**: Animated radar, layer controls, fullscreen mode, mobile-responsive design, ZIP persistence.
 
 ## Version Constraints
-- **React**: ^18.3.1 (NOT React 19 - causes compatibility issues with @tanstack/react-query and framer-motion)
-- **framer-motion**: ^11.15.0 (NOT 12.x - designed for React 19)
-- **@tanstack/react-query**: ^5.60.5 (experimental React 19 support, stable with React 18)
-
-## Recent Updates (November 2024)
-- **Terms of Service Page**: Added `/terms` route with comprehensive legal content.
-- **Investor Roadmap**: Comprehensive 4-phase roadmap (Foundation → Growth → Expansion → Scale) with 2027 vision.
-- **Modal Fix**: PWA install prompt now waits for onboarding modal to close, preventing button click issues.
-- **CSS Polish**: Added `glow-primary` and `glow-secondary` effects for premium CTA buttons.
-- **Footer Links**: All links now properly connected (Terms, Privacy, social media, Dev Portal).
+- **React**: ^18.3.1
+- **framer-motion**: ^11.15.0
+- **@tanstack/react-query**: ^5.60.5
 
 # External Dependencies
 
@@ -223,9 +104,11 @@ Solana TX: `3j9uyTLN2E9HXMoNEu4FssLifNt1KtqcwyqWHGQmGYAf2kRHMCL43AVHMxNRyABkHy9f
 - **Database**: Neon PostgreSQL
 - **Payments**: Stripe
 - **AI**: OpenAI GPT-4
-- **Blockchain**: Solana via Helius API
+- **Blockchain**: Solana (via Helius API)
+- **Weather Radar**: RainViewer API, NOAA Weather Alerts API
+- **Developer Hub**: ORBIT Staffing Ecosystem Hub (darkwavestudios.io)
 
 ## Key NPM Packages
-- **UI/Frontend**: `@radix-ui/*`, `tailwindcss`, `framer-motion`, `wouter`, `@tanstack/react-query`, `@stripe/react-stripe-js`
-- **Backend**: `express`, `drizzle-orm`, `@neondatabase/serverless`, `stripe`, `openai`, `express-session`, `passport`, `connect-pg-simple`
+- **UI/Frontend**: `@radix-ui/*`, `tailwindcss`, `framer-motion`, `wouter`, `@tanstack/react-query`, `@stripe/react-stripe-js`, `react-leaflet`, `leaflet`
+- **Backend**: `express`, `drizzle-orm`, `@neondatabase/serverless`, `stripe`, `openai`, `express-session`, `passport`, `connect-pg-simple`, `@solana/web3.js`
 - **Build Tools**: `vite`, `esbuild`, `tsx`
