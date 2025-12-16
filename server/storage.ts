@@ -12,7 +12,8 @@ import {
   referralInvites, referralPointTransactions, referralRedemptions,
   releases,
   vendorReviews, wishlists, wishlistItems, projects, projectParts, smsPreferences,
-  seoPages, analyticsSessions, analyticsPageViews, analyticsEvents
+  seoPages, analyticsSessions, analyticsPageViews, analyticsEvents,
+  partnerApiCredentials, partnerApiLogs, shopLocations
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -45,7 +46,9 @@ import type {
   Project, InsertProject, ProjectPart, InsertProjectPart,
   SmsPreferences, InsertSmsPreferences,
   SeoPage, InsertSeoPage, AnalyticsSession, InsertAnalyticsSession,
-  AnalyticsPageView, InsertAnalyticsPageView, AnalyticsEvent, InsertAnalyticsEvent
+  AnalyticsPageView, InsertAnalyticsPageView, AnalyticsEvent, InsertAnalyticsEvent,
+  PartnerApiCredential, InsertPartnerApiCredential, PartnerApiLog, InsertPartnerApiLog,
+  ShopLocation, InsertShopLocation
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -2295,6 +2298,183 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(sql`count(*)`));
     
     return result.map(r => ({ country: r.country || 'Unknown', count: Number(r.count) }));
+  }
+
+  // Partner API Credentials
+  async getPartnerApiCredentials(shopId: string): Promise<PartnerApiCredential[]> {
+    return db.select().from(partnerApiCredentials)
+      .where(eq(partnerApiCredentials.shopId, shopId))
+      .orderBy(desc(partnerApiCredentials.createdAt));
+  }
+
+  async getPartnerApiCredential(id: string): Promise<PartnerApiCredential | undefined> {
+    const [credential] = await db.select().from(partnerApiCredentials)
+      .where(eq(partnerApiCredentials.id, id));
+    return credential;
+  }
+
+  async getPartnerApiCredentialByApiKey(apiKey: string): Promise<PartnerApiCredential | undefined> {
+    const [credential] = await db.select().from(partnerApiCredentials)
+      .where(eq(partnerApiCredentials.apiKey, apiKey));
+    return credential;
+  }
+
+  async createPartnerApiCredential(credential: InsertPartnerApiCredential): Promise<PartnerApiCredential> {
+    const [created] = await db.insert(partnerApiCredentials).values(credential).returning();
+    return created;
+  }
+
+  async updatePartnerApiCredential(id: string, updates: Partial<PartnerApiCredential>): Promise<PartnerApiCredential | undefined> {
+    const [updated] = await db.update(partnerApiCredentials)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(partnerApiCredentials.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deletePartnerApiCredential(id: string): Promise<boolean> {
+    const result = await db.delete(partnerApiCredentials)
+      .where(eq(partnerApiCredentials.id, id));
+    return result.rowCount > 0;
+  }
+
+  async incrementPartnerApiRequestCount(id: string): Promise<void> {
+    const credential = await this.getPartnerApiCredential(id);
+    if (!credential) return;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const lastReset = credential.lastResetDate ? new Date(credential.lastResetDate) : null;
+    const shouldResetDaily = !lastReset || lastReset < today;
+    
+    await db.update(partnerApiCredentials)
+      .set({
+        requestCount: (credential.requestCount || 0) + 1,
+        requestCountDaily: shouldResetDaily ? 1 : (credential.requestCountDaily || 0) + 1,
+        lastResetDate: shouldResetDaily ? today : credential.lastResetDate,
+        lastUsedAt: new Date()
+      })
+      .where(eq(partnerApiCredentials.id, id));
+  }
+
+  // Partner API Logs
+  async getPartnerApiLogs(shopId: string, limit: number = 50): Promise<PartnerApiLog[]> {
+    return db.select().from(partnerApiLogs)
+      .where(eq(partnerApiLogs.shopId, shopId))
+      .orderBy(desc(partnerApiLogs.createdAt))
+      .limit(limit);
+  }
+
+  async createPartnerApiLog(log: InsertPartnerApiLog): Promise<PartnerApiLog> {
+    const [created] = await db.insert(partnerApiLogs).values(log).returning();
+    return created;
+  }
+
+  async getPartnerApiLogStats(shopId: string, days: number = 30): Promise<{
+    totalRequests: number;
+    successRequests: number;
+    errorRequests: number;
+    avgResponseTime: number;
+  }> {
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    
+    const [result] = await db.select({
+      totalRequests: sql<number>`count(*)`,
+      successRequests: sql<number>`count(*) filter (where ${partnerApiLogs.statusCode} >= 200 and ${partnerApiLogs.statusCode} < 300)`,
+      errorRequests: sql<number>`count(*) filter (where ${partnerApiLogs.statusCode} >= 400)`,
+      avgResponseTime: sql<number>`avg(${partnerApiLogs.responseTimeMs})`
+    })
+      .from(partnerApiLogs)
+      .where(and(
+        eq(partnerApiLogs.shopId, shopId),
+        gte(partnerApiLogs.createdAt, startDate)
+      ));
+    
+    return {
+      totalRequests: Number(result?.totalRequests || 0),
+      successRequests: Number(result?.successRequests || 0),
+      errorRequests: Number(result?.errorRequests || 0),
+      avgResponseTime: Math.round(Number(result?.avgResponseTime || 0))
+    };
+  }
+
+  // Shop Locations
+  async getShopLocations(shopId: string): Promise<ShopLocation[]> {
+    return db.select().from(shopLocations)
+      .where(eq(shopLocations.shopId, shopId))
+      .orderBy(desc(shopLocations.isPrimary), asc(shopLocations.name));
+  }
+
+  async getShopLocation(id: string): Promise<ShopLocation | undefined> {
+    const [location] = await db.select().from(shopLocations)
+      .where(eq(shopLocations.id, id));
+    return location;
+  }
+
+  async createShopLocation(location: InsertShopLocation): Promise<ShopLocation> {
+    const [created] = await db.insert(shopLocations).values(location).returning();
+    return created;
+  }
+
+  async updateShopLocation(id: string, updates: Partial<ShopLocation>): Promise<ShopLocation | undefined> {
+    const [updated] = await db.update(shopLocations)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(shopLocations.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteShopLocation(id: string): Promise<boolean> {
+    const result = await db.delete(shopLocations)
+      .where(eq(shopLocations.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Shop Analytics for Partner API
+  async getShopAnalytics(shopId: string, range: string = '30days'): Promise<{
+    totalOrders: number;
+    totalRevenue: number;
+    totalCustomers: number;
+    totalAppointments: number;
+    avgOrderValue: number;
+  }> {
+    const days = range === '7days' ? 7 : range === '90days' ? 90 : 30;
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    
+    const [orderStats] = await db.select({
+      totalOrders: sql<number>`count(*)`,
+      totalRevenue: sql<number>`coalesce(sum(${repairOrders.grandTotal}::numeric), 0)`,
+      avgOrderValue: sql<number>`coalesce(avg(${repairOrders.grandTotal}::numeric), 0)`
+    })
+      .from(repairOrders)
+      .where(and(
+        eq(repairOrders.shopId, shopId),
+        gte(repairOrders.createdAt, startDate)
+      ));
+    
+    const [customerCount] = await db.select({
+      count: sql<number>`count(distinct ${shopCustomers.userId})`
+    })
+      .from(shopCustomers)
+      .where(eq(shopCustomers.shopId, shopId));
+    
+    const [appointmentCount] = await db.select({
+      count: sql<number>`count(*)`
+    })
+      .from(appointments)
+      .where(and(
+        eq(appointments.shopId, shopId),
+        gte(appointments.createdAt, startDate)
+      ));
+    
+    return {
+      totalOrders: Number(orderStats?.totalOrders || 0),
+      totalRevenue: Number(orderStats?.totalRevenue || 0),
+      totalCustomers: Number(customerCount?.count || 0),
+      totalAppointments: Number(appointmentCount?.count || 0),
+      avgOrderValue: Math.round(Number(orderStats?.avgOrderValue || 0) * 100) / 100
+    };
   }
 }
 
