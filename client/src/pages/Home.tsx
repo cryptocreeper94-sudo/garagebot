@@ -485,14 +485,12 @@ export default function Home() {
         </div>
         
         {/* MOBILE BENTO LAYOUT - Only visible on smaller screens */}
-        <div className="lg:hidden w-full">
-          {/* Horizontal scroll container for dense bento layout */}
-          <div className="bento-scroll px-2">
+        <div className="lg:hidden w-full px-3 space-y-3">
           {/* Hero Section */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bento-glass rounded-lg p-4 text-center min-w-[85vw]"
+            className="bento-glass rounded-lg p-4 text-center"
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-xs font-mono tracking-wider mb-6 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
