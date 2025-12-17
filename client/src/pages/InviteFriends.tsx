@@ -160,7 +160,7 @@ export default function InviteFriends() {
     return (
       <div className="min-h-screen bg-background">
         <Nav />
-        <div className="pt-20 flex items-center justify-center min-h-[60vh]">
+        <div className="pt-[85px] flex items-center justify-center min-h-[60vh]">
           <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function InviteFriends() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
-      <main className="pt-20 pb-12 px-4">
+      <main className="pt-[85px] pb-12 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
