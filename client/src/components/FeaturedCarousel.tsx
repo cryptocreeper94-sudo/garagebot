@@ -130,7 +130,7 @@ export default function FeaturedCarousel() {
         </span>
       </div>
 
-      <div className="overflow-hidden -mx-4 px-4" ref={emblaRef}>
+      <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-2">
           {deals.map((deal) => {
             const timeLeft = formatDistanceToNow(new Date(deal.expiresAt), { addSuffix: false });
