@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import crypto from "crypto";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema } from "@shared/schema";
@@ -6495,7 +6496,6 @@ export async function registerRoutes(
       }
       
       // Verify secret by comparing hash
-      const crypto = require('crypto');
       const hashedInputSecret = crypto.createHash('sha256').update(apiSecret).digest('hex');
       if (credential.apiSecret !== hashedInputSecret) {
         return res.status(401).json({ 
@@ -6803,7 +6803,6 @@ export async function registerRoutes(
       const { name, scopes, environment, rateLimitPerDay } = req.body;
       
       // Generate API key and secret
-      const crypto = require('crypto');
       const apiKey = `gb_${environment === 'sandbox' ? 'test_' : ''}${crypto.randomBytes(24).toString('hex')}`;
       const rawSecret = crypto.randomBytes(32).toString('hex');
       
@@ -7128,6 +7127,5 @@ function parseUserAgentOS(userAgent: string): string {
 }
 
 function hashIP(ip: string): string {
-  const crypto = require('crypto');
   return crypto.createHash('sha256').update(ip + 'garagebot-salt').digest('hex').substring(0, 16);
 }
