@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import type { User } from "@shared/models/auth";
+import type { users } from "@shared/schema";
+
+type User = typeof users.$inferSelect;
 
 async function fetchUser(): Promise<User | null> {
   const response = await fetch("/api/auth/user", {
