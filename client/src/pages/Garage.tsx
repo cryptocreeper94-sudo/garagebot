@@ -238,7 +238,7 @@ export default function Garage() {
           <Button size="lg" className="font-tech uppercase gap-2" onClick={() => window.location.href = "/auth"} data-testid="button-login">
             Sign In with PIN
           </Button>
-          <p className="text-muted-foreground text-xs mt-4">Secure 8-digit PIN authentication</p>
+          <p className="text-muted-foreground text-xs mt-4">Secure 4-digit PIN authentication</p>
         </div>
       </div>
     );

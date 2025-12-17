@@ -74,11 +74,11 @@ export function validateUsername(username: string): { valid: boolean; error?: st
 }
 
 export function validateMainPin(pin: string): { valid: boolean; error?: string } {
-  if (pin.length !== 8) {
-    return { valid: false, error: "Main PIN must be exactly 8 digits" };
+  if (pin.length !== 4) {
+    return { valid: false, error: "PIN must be exactly 4 digits" };
   }
   if (!/^\d+$/.test(pin)) {
-    return { valid: false, error: "Main PIN must contain only numbers" };
+    return { valid: false, error: "PIN must contain only numbers" };
   }
   return { valid: true };
 }
