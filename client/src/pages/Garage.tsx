@@ -235,9 +235,10 @@ export default function Garage() {
           <Car className="w-24 h-24 mx-auto mb-6 text-primary/30" />
           <h1 className="text-3xl font-tech font-bold uppercase text-primary mb-4">Sign In to Access Your Garage</h1>
           <p className="text-muted-foreground mb-8">Keep track of your vehicles, maintenance history, and open recalls</p>
-          <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/api/login"} data-testid="button-login">
-            Sign In with Replit
+          <Button size="lg" className="font-tech uppercase gap-2" onClick={() => window.location.href = "/api/login"} data-testid="button-login">
+            Sign In
           </Button>
+          <p className="text-muted-foreground text-xs mt-4">Sign in with Google, Apple, GitHub, or Email</p>
         </div>
       </div>
     );
