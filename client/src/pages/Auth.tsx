@@ -248,16 +248,15 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">4-Digit PIN</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">Secure PIN</Label>
                       <div className="relative mt-1">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input 
                           type={showPin ? "text" : "password"}
                           value={loginForm.mainPin}
-                          onChange={(e) => setLoginForm({ ...loginForm, mainPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                          className="pl-10 pr-10 font-mono tracking-widest"
-                          placeholder="••••"
-                          maxLength={4}
+                          onChange={(e) => setLoginForm({ ...loginForm, mainPin: e.target.value })}
+                          className="pl-10 pr-10 font-mono"
+                          placeholder="Enter your secure PIN"
                           data-testid="input-login-pin"
                         />
                         <button 
@@ -295,7 +294,7 @@ export default function Auth() {
                     <Button 
                       className="w-full font-tech uppercase glow-primary"
                       onClick={handleLogin}
-                      disabled={isLoading || !loginForm.username || loginForm.mainPin.length !== 4}
+                      disabled={isLoading || !loginForm.username || loginForm.mainPin.length < 8}
                       data-testid="button-login"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <KeyRound className="w-4 h-4 mr-2" />}
@@ -308,52 +307,42 @@ export default function Auth() {
               <TabsContent value="signup">
                 <Card className="p-6 bg-card/50 border-primary/20">
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-xs uppercase text-muted-foreground">First Name</Label>
-                        <Input 
-                          value={signupForm.firstName}
-                          onChange={(e) => setSignupForm({ ...signupForm, firstName: e.target.value })}
-                          className="mt-1"
-                          data-testid="input-signup-firstname"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs uppercase text-muted-foreground">Last Name</Label>
-                        <Input 
-                          value={signupForm.lastName}
-                          onChange={(e) => setSignupForm({ ...signupForm, lastName: e.target.value })}
-                          className="mt-1"
-                          data-testid="input-signup-lastname"
-                        />
-                      </div>
+                    <div>
+                      <Label className="text-xs uppercase text-muted-foreground">Name *</Label>
+                      <Input 
+                        value={signupForm.firstName}
+                        onChange={(e) => setSignupForm({ ...signupForm, firstName: e.target.value })}
+                        className="mt-1"
+                        placeholder="Your full name"
+                        data-testid="input-signup-firstname"
+                      />
                     </div>
 
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">Username *</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">Email *</Label>
                       <div className="relative mt-1">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input 
-                          value={signupForm.username}
-                          onChange={(e) => setSignupForm({ ...signupForm, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
+                          type="email"
+                          value={signupForm.email}
+                          onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                           className="pl-10"
-                          placeholder="Choose a username"
-                          data-testid="input-signup-username"
+                          placeholder="your@email.com"
+                          data-testid="input-signup-email"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">4-Digit PIN *</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">Secure PIN *</Label>
                       <div className="relative mt-1">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input 
                           type={showPin ? "text" : "password"}
                           value={signupForm.mainPin}
-                          onChange={(e) => setSignupForm({ ...signupForm, mainPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                          className="pl-10 pr-10 font-mono tracking-widest"
-                          placeholder="Create 4-digit PIN"
-                          maxLength={4}
+                          onChange={(e) => setSignupForm({ ...signupForm, mainPin: e.target.value })}
+                          className="pl-10 pr-10 font-mono"
+                          placeholder="Create secure PIN"
                           data-testid="input-signup-mainpin"
                         />
                         <button 
@@ -364,36 +353,26 @@ export default function Auth() {
                           {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">{signupForm.mainPin.length}/4 digits</p>
+                      <div className="text-xs text-muted-foreground mt-1 space-y-0.5">
+                        <p className={signupForm.mainPin.length >= 8 ? "text-green-500" : ""}>• Minimum 8 characters {signupForm.mainPin.length >= 8 && "✓"}</p>
+                        <p className={/[A-Z]/.test(signupForm.mainPin) ? "text-green-500" : ""}>• At least 1 uppercase letter {/[A-Z]/.test(signupForm.mainPin) && "✓"}</p>
+                        <p className={/[a-z]/.test(signupForm.mainPin) ? "text-green-500" : ""}>• At least 1 lowercase letter {/[a-z]/.test(signupForm.mainPin) && "✓"}</p>
+                        <p className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(signupForm.mainPin) ? "text-green-500" : ""}>• At least 1 special character {/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(signupForm.mainPin) && "✓"}</p>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-xs uppercase text-muted-foreground">Phone</Label>
-                        <div className="relative mt-1">
-                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input 
-                            type="tel"
-                            value={signupForm.phone}
-                            onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
-                            className="pl-10"
-                            placeholder="(555) 123-4567"
-                            data-testid="input-signup-phone"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <Label className="text-xs uppercase text-muted-foreground">Email</Label>
-                        <div className="relative mt-1">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input 
-                            type="email"
-                            value={signupForm.email}
-                            onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
-                            className="pl-10"
-                            data-testid="input-signup-email"
-                          />
-                        </div>
+                    <div>
+                      <Label className="text-xs uppercase text-muted-foreground">Phone (Optional)</Label>
+                      <div className="relative mt-1">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input 
+                          type="tel"
+                          value={signupForm.phone}
+                          onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
+                          className="pl-10"
+                          placeholder="(555) 123-4567"
+                          data-testid="input-signup-phone"
+                        />
                       </div>
                     </div>
 
@@ -476,7 +455,7 @@ export default function Auth() {
                     <Button 
                       className="w-full font-tech uppercase glow-primary"
                       onClick={handleSignup}
-                      disabled={isLoading || !signupForm.username || signupForm.mainPin.length !== 4 || !signupForm.agreeTerms}
+                      disabled={isLoading || !signupForm.firstName || !signupForm.email || signupForm.mainPin.length < 8 || !/[A-Z]/.test(signupForm.mainPin) || !/[a-z]/.test(signupForm.mainPin) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(signupForm.mainPin) || !signupForm.agreeTerms}
                       data-testid="button-signup"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Shield className="w-4 h-4 mr-2" />}
@@ -553,21 +532,20 @@ export default function Auth() {
                           />
                         </div>
                         <div>
-                          <Label className="text-xs uppercase text-muted-foreground">New 4-Digit PIN</Label>
+                          <Label className="text-xs uppercase text-muted-foreground">New Secure PIN</Label>
                           <Input 
                             type="password"
                             value={recoveryForm.newPin}
-                            onChange={(e) => setRecoveryForm({ ...recoveryForm, newPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                            className="mt-1 font-mono tracking-widest"
-                            placeholder="Create new PIN"
-                            maxLength={4}
+                            onChange={(e) => setRecoveryForm({ ...recoveryForm, newPin: e.target.value })}
+                            className="mt-1 font-mono"
+                            placeholder="Min 8 chars, 1 upper, 1 lower, 1 special"
                             data-testid="input-recovery-newpin"
                           />
                         </div>
                         <Button 
                           className="w-full font-tech uppercase"
                           onClick={handleRecoveryVerify}
-                          disabled={isLoading || recoveryForm.code.length !== 6 || recoveryForm.newPin.length !== 4}
+                          disabled={isLoading || recoveryForm.code.length !== 6 || recoveryForm.newPin.length < 8}
                           data-testid="button-verify-recovery"
                         >
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
@@ -610,21 +588,20 @@ export default function Auth() {
                           <p className="text-xs text-muted-foreground mt-1">Enter one of your saved recovery codes</p>
                         </div>
                         <div>
-                          <Label className="text-xs uppercase text-muted-foreground">New 4-Digit PIN</Label>
+                          <Label className="text-xs uppercase text-muted-foreground">New Secure PIN</Label>
                           <Input 
                             type="password"
                             value={backupForm.newPin}
-                            onChange={(e) => setBackupForm({ ...backupForm, newPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                            className="mt-1 font-mono tracking-widest"
-                            placeholder="Create new PIN"
-                            maxLength={4}
+                            onChange={(e) => setBackupForm({ ...backupForm, newPin: e.target.value })}
+                            className="mt-1 font-mono"
+                            placeholder="Min 8 chars, 1 upper, 1 lower, 1 special"
                             data-testid="input-backup-newpin"
                           />
                         </div>
                         <Button 
                           className="w-full font-tech uppercase"
                           onClick={handleBackupCodeVerify}
-                          disabled={isLoading || !backupForm.username || backupForm.code.length < 9 || backupForm.newPin.length !== 4}
+                          disabled={isLoading || !backupForm.username || backupForm.code.length < 9 || backupForm.newPin.length < 8}
                           data-testid="button-verify-backup"
                         >
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

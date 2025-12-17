@@ -37,7 +37,7 @@ Preferred communication style: Simple, everyday language.
 - **Runtime**: Node.js with Express.js.
 - **API Design**: RESTful API with authentication middleware.
 - **Session Management**: Express-session with PostgreSQL session store.
-- **Authentication**: OpenID Connect (OIDC) with Replit's authentication service via Passport.js.
+- **Authentication**: Custom PIN-based login (Name + Email + secure 8+ character PIN with uppercase, lowercase, and special character requirements). Auth page at /auth.
 
 ## AI Features (Buddy AI)
 - **Service**: Unified AI assistant powered by OpenAI.
