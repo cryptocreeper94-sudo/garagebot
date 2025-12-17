@@ -246,7 +246,7 @@ export default function Garage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
-      <div className="w-full px-2 pt-12 pb-16">
+      <div className="w-full px-2 pt-20 lg:pt-16 pb-16">
         <div className="flex overflow-x-auto md:grid md:grid-cols-12 gap-0 mb-0 scrollbar-hide">
           <div className="md:col-span-8 min-w-[85vw] md:min-w-0 flex-shrink-0">
             <Card className="bento-glass border-primary/20 p-3 h-full">

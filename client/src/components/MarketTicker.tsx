@@ -13,7 +13,7 @@ const TICKER_ITEMS = [
 
 export default function MarketTicker() {
   return (
-    <div className="w-full bg-black/80 border-b border-primary/20 h-8 overflow-hidden flex items-center fixed top-16 z-40 backdrop-blur-md">
+    <div className="w-full bg-black/80 border-b border-primary/20 h-8 overflow-hidden flex items-center fixed top-[45px] z-40 backdrop-blur-md">
       <div className="px-3 h-full flex items-center bg-primary/10 border-r border-primary/20 z-10">
         <Activity className="w-4 h-4 text-primary animate-pulse" />
         <span className="ml-2 font-mono text-[10px] text-primary font-bold hidden md:inline">MARKET FEED</span>
