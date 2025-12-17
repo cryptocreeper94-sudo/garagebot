@@ -484,10 +484,11 @@ export default function Auth() {
                               value={recoveryForm.phone}
                               onChange={(e) => setRecoveryForm({ ...recoveryForm, phone: e.target.value })}
                               className="pl-10"
-                              placeholder="Enter your registered phone"
+                              placeholder="(555) 123-4567"
                               data-testid="input-recovery-phone"
                             />
                           </div>
+                          <p className="text-xs text-muted-foreground mt-1">Enter the phone linked to your account</p>
                         </div>
                         <Button 
                           className="w-full font-tech uppercase"
@@ -538,9 +539,10 @@ export default function Auth() {
                             value={recoveryForm.newPin}
                             onChange={(e) => setRecoveryForm({ ...recoveryForm, newPin: e.target.value })}
                             className="mt-1 font-mono"
-                            placeholder="Min 8 chars, 1 upper, 1 lower, 1 special"
+                            placeholder="Create new PIN"
                             data-testid="input-recovery-newpin"
                           />
+                          <p className="text-xs text-muted-foreground mt-1">8+ chars, upper, lower, special</p>
                         </div>
                         <Button 
                           className="w-full font-tech uppercase"
@@ -594,9 +596,10 @@ export default function Auth() {
                             value={backupForm.newPin}
                             onChange={(e) => setBackupForm({ ...backupForm, newPin: e.target.value })}
                             className="mt-1 font-mono"
-                            placeholder="Min 8 chars, 1 upper, 1 lower, 1 special"
+                            placeholder="Create new PIN"
                             data-testid="input-backup-newpin"
                           />
+                          <p className="text-xs text-muted-foreground mt-1">8+ chars, upper, lower, special</p>
                         </div>
                         <Button 
                           className="w-full font-tech uppercase"
