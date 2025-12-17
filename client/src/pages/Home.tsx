@@ -538,7 +538,7 @@ export default function Home() {
           </motion.div>
           
           {/* DIY Guides CTA */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="min-w-[70vw]">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <Link href="/diy-guides">
               <div className="relative group h-full">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-green-400 to-primary rounded-lg opacity-50 group-hover:opacity-100 blur transition-all animate-pulse" />
@@ -563,7 +563,7 @@ export default function Home() {
           </motion.div>
           
           {/* Vehicle Types + Categories */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="min-w-[80vw] bento-glass rounded-lg p-3">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bento-glass rounded-lg p-3">
             <VehicleTypeSelector />
             <div className="mt-3">
               <CategoryGrid />
@@ -571,7 +571,7 @@ export default function Home() {
           </motion.div>
           
           {/* Search Card */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="min-w-[75vw]">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <Card className="bento-glass border-0 p-3">
               <form onSubmit={handleSearch} className="space-y-3">
                 <div className="grid grid-cols-3 gap-2">
@@ -612,7 +612,7 @@ export default function Home() {
           </motion.div>
           
           {/* Quick Tools */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="min-w-[70vw]">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
             <Card className="bento-glass bento-glow border-primary/20 p-2">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-3 h-3 text-primary" />
@@ -655,7 +655,7 @@ export default function Home() {
           </motion.div>
           
           {/* Buddy AI Card */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="min-w-[65vw]">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <Card className="bento-glass bento-glow border-primary/30 p-3 h-full">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.5)]">
@@ -680,12 +680,12 @@ export default function Home() {
           </motion.div>
           
           {/* Featured Carousel */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="min-w-[80vw]">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
             <FeaturedCarousel />
           </motion.div>
           
           {/* Trusted Retailers */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }} className="bento-glass rounded-lg p-2 overflow-hidden min-w-[60vw]">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }} className="bento-glass rounded-lg p-2 overflow-hidden">
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-2 text-center">Trusted Partners</p>
             <div className="relative">
               <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10" />
@@ -697,7 +697,6 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
-          </div>
         </div>
       </div>
       
