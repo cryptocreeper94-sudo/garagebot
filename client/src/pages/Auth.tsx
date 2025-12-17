@@ -248,16 +248,16 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">8-Digit PIN</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">4-Digit PIN</Label>
                       <div className="relative mt-1">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input 
                           type={showPin ? "text" : "password"}
                           value={loginForm.mainPin}
-                          onChange={(e) => setLoginForm({ ...loginForm, mainPin: e.target.value.replace(/\D/g, '').slice(0, 8) })}
+                          onChange={(e) => setLoginForm({ ...loginForm, mainPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
                           className="pl-10 pr-10 font-mono tracking-widest"
-                          placeholder="••••••••"
-                          maxLength={8}
+                          placeholder="••••"
+                          maxLength={4}
                           data-testid="input-login-pin"
                         />
                         <button 
@@ -295,7 +295,7 @@ export default function Auth() {
                     <Button 
                       className="w-full font-tech uppercase glow-primary"
                       onClick={handleLogin}
-                      disabled={isLoading || !loginForm.username || loginForm.mainPin.length !== 8}
+                      disabled={isLoading || !loginForm.username || loginForm.mainPin.length !== 4}
                       data-testid="button-login"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <KeyRound className="w-4 h-4 mr-2" />}
@@ -344,16 +344,16 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">8-Digit Main PIN *</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">4-Digit PIN *</Label>
                       <div className="relative mt-1">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input 
                           type={showPin ? "text" : "password"}
                           value={signupForm.mainPin}
-                          onChange={(e) => setSignupForm({ ...signupForm, mainPin: e.target.value.replace(/\D/g, '').slice(0, 8) })}
+                          onChange={(e) => setSignupForm({ ...signupForm, mainPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
                           className="pl-10 pr-10 font-mono tracking-widest"
-                          placeholder="Create 8-digit PIN"
-                          maxLength={8}
+                          placeholder="Create 4-digit PIN"
+                          maxLength={4}
                           data-testid="input-signup-mainpin"
                         />
                         <button 
@@ -364,30 +364,7 @@ export default function Auth() {
                           {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">{signupForm.mainPin.length}/8 digits</p>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs uppercase text-muted-foreground">4-Digit Quick PIN (Optional)</Label>
-                      <div className="relative mt-1">
-                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input 
-                          type={showQuickPin ? "text" : "password"}
-                          value={signupForm.quickPin}
-                          onChange={(e) => setSignupForm({ ...signupForm, quickPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                          className="pl-10 pr-10 font-mono tracking-widest"
-                          placeholder="Optional quick unlock"
-                          maxLength={4}
-                          data-testid="input-signup-quickpin"
-                        />
-                        <button 
-                          type="button"
-                          onClick={() => setShowQuickPin(!showQuickPin)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary"
-                        >
-                          {showQuickPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{signupForm.mainPin.length}/4 digits</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -499,7 +476,7 @@ export default function Auth() {
                     <Button 
                       className="w-full font-tech uppercase glow-primary"
                       onClick={handleSignup}
-                      disabled={isLoading || !signupForm.username || signupForm.mainPin.length !== 8 || !signupForm.agreeTerms}
+                      disabled={isLoading || !signupForm.username || signupForm.mainPin.length !== 4 || !signupForm.agreeTerms}
                       data-testid="button-signup"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Shield className="w-4 h-4 mr-2" />}
@@ -576,21 +553,21 @@ export default function Auth() {
                           />
                         </div>
                         <div>
-                          <Label className="text-xs uppercase text-muted-foreground">New 8-Digit PIN</Label>
+                          <Label className="text-xs uppercase text-muted-foreground">New 4-Digit PIN</Label>
                           <Input 
                             type="password"
                             value={recoveryForm.newPin}
-                            onChange={(e) => setRecoveryForm({ ...recoveryForm, newPin: e.target.value.replace(/\D/g, '').slice(0, 8) })}
+                            onChange={(e) => setRecoveryForm({ ...recoveryForm, newPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
                             className="mt-1 font-mono tracking-widest"
                             placeholder="Create new PIN"
-                            maxLength={8}
+                            maxLength={4}
                             data-testid="input-recovery-newpin"
                           />
                         </div>
                         <Button 
                           className="w-full font-tech uppercase"
                           onClick={handleRecoveryVerify}
-                          disabled={isLoading || recoveryForm.code.length !== 6 || recoveryForm.newPin.length !== 8}
+                          disabled={isLoading || recoveryForm.code.length !== 6 || recoveryForm.newPin.length !== 4}
                           data-testid="button-verify-recovery"
                         >
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
@@ -633,21 +610,21 @@ export default function Auth() {
                           <p className="text-xs text-muted-foreground mt-1">Enter one of your saved recovery codes</p>
                         </div>
                         <div>
-                          <Label className="text-xs uppercase text-muted-foreground">New 8-Digit PIN</Label>
+                          <Label className="text-xs uppercase text-muted-foreground">New 4-Digit PIN</Label>
                           <Input 
                             type="password"
                             value={backupForm.newPin}
-                            onChange={(e) => setBackupForm({ ...backupForm, newPin: e.target.value.replace(/\D/g, '').slice(0, 8) })}
+                            onChange={(e) => setBackupForm({ ...backupForm, newPin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
                             className="mt-1 font-mono tracking-widest"
                             placeholder="Create new PIN"
-                            maxLength={8}
+                            maxLength={4}
                             data-testid="input-backup-newpin"
                           />
                         </div>
                         <Button 
                           className="w-full font-tech uppercase"
                           onClick={handleBackupCodeVerify}
-                          disabled={isLoading || !backupForm.username || backupForm.code.length < 9 || backupForm.newPin.length !== 8}
+                          disabled={isLoading || !backupForm.username || backupForm.code.length < 9 || backupForm.newPin.length !== 4}
                           data-testid="button-verify-backup"
                         >
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
