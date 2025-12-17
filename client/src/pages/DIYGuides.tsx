@@ -135,7 +135,7 @@ export default function DIYGuides() {
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
       
-      <div className="w-full px-2 pt-12 pb-16">
+      <div className="w-full px-2 pt-20 lg:pt-16 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
