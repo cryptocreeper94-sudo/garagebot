@@ -79,7 +79,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     icon: "👤",
     color: "purple",
     features: [
-      { id: "multi-auth", name: "Multi-Provider Auth", description: "Sign in with Google, Apple, GitHub, or Email", status: "complete" },
+      { id: "pin-auth", name: "Secure PIN Authentication", description: "Username + 8-digit PIN with quick 4-digit option", status: "complete" },
       { id: "pro-subscription", name: "Pro Subscription (Stripe)", description: "Monthly subscription with Stripe billing", status: "complete", route: "/pro" },
       { id: "founders-circle", name: "Founders Circle Tier", description: "Premium Pro tier with extra features", status: "complete", route: "/pro" },
       { id: "referral-program", name: "Member Referral Program", description: "Earn points for referring friends", status: "complete", route: "/invite" },

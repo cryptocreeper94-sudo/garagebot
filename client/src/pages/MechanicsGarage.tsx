@@ -716,8 +716,8 @@ export default function MechanicsGarage() {
               </Badge>
             ))}
           </div>
-          <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/api/login"} data-testid="button-login">
-            Sign In to Get Started
+          <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/auth"} data-testid="button-login">
+            Sign In with PIN
           </Button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'garagebot-v13';
+const CACHE_NAME = 'garagebot-v14';
 const OFFLINE_URL = '/offline.html';
 
 const STATIC_ASSETS = [

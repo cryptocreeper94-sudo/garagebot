@@ -210,8 +210,8 @@ export default function ShopPortal() {
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
             Register your automotive shop to connect with customers, send service reminders, and grow your business.
           </p>
-          <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/api/login"} data-testid="button-login">
-            Sign In to Get Started
+          <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/auth"} data-testid="button-login">
+            Sign In with PIN
           </Button>
         </div>
       </div>
