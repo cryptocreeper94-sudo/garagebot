@@ -82,8 +82,8 @@ export default function Home() {
       <Nav />
       <MarketTicker />
       
-      {/* Main Content - adjusted for 30px header + 32px ticker */}
-      <div className="pt-16 min-h-screen pb-16">
+      {/* Main Content - adjusted for 30px header */}
+      <div className="pt-12 min-h-screen pb-16">
         
         {/* DESKTOP BENTO LAYOUT - Only visible on lg+ screens */}
         <div className="hidden lg:block w-full px-2 xl:px-4 2xl:px-8">

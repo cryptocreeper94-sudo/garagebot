@@ -1,24 +1,17 @@
 # GarageBot Feature Log & Variable Tracker
 
-**Last Updated: December 16, 2024**
-**Current Version: v1.0.10 (Blockchain Verified)**
-**Solana TX:** `3j9uyTLN2E9HXMoNEu4FssLifNt1KtqcwyqWHGQmGYAf2kRHMCL43AVHMxNRyABkHy9f1Si52Lr2QzxyEMqhvcyZ`
+**Last Updated: December 5, 2024 @ 7:35 PM EST**
+**Current Version: v1.0.3 (Blockchain Verified)**
+**Solana TX:** `DvXsAW8AhxtasuHTv7e7FTJrvWCBF7Lt8VTyNESeWvfS5FHVt1cKKDi6fNS4NtthrF1zkvcuQhU4383L5YsWT4m`
 
 ## Brand Identity
 - **Name:** GarageBot
 - **Tagline:** "Right Part. First Time. Every Engine."
 - **Domain:** garagebot.io (primary), garagebot.net (redirect)
-- **AI Mascot:** Buddy - cube-shaped AI assistant with conversational memory
+- **AI Mascot:** Buddy - gauge-eyed junkyard robot, conversational parts-finding assistant
 
 ## Version History
-- **v1.0.10 (Dec 7):** Partner API system, DarkWave ecosystem integration, enhanced Mechanics Garage
-- **v1.0.9 (Dec 6):** Release version control with blockchain verification
-- **v1.0.8 (Dec 6):** Member referral program, points-based rewards
-- **v1.0.7 (Dec 6):** Weather radar system with NOAA alerts
-- **v1.0.6 (Dec 5):** Dev Portal with analytics dashboard
-- **v1.0.5 (Dec 5):** Mechanics Garage shop management portal
-- **v1.0.4 (Dec 5):** Buddy AI compacted to cube design
-- **v1.0.3 (Dec 5):** UI polish, layout improvements, app hallmark badge
+- **v1.0.3 (Dec 5):** UI polish, layout improvements, app hallmark badge, weather/Buddy repositioning
 - **v1.0.2 (Dec 5):** AI-generated carousel images, Genesis Hallmark visual badges
 - **v1.0.1 (Dec 4):** Bug fixes and polish
 - **v1.0.0 (Dec 3):** Genesis Launch - full feature release
@@ -26,25 +19,23 @@
 ## Active Features (Completed)
 *   **Universal Search Engine:** Aggregates results from 40+ retailers based on Year/Make/Model.
 *   **"My Garage" Fleet Management:** Saves vehicle specs for all vehicle types with VIN decoding.
-*   **AI Assistant "Buddy":** Compact cube design (64px/80px) with conversational memory, smart recommendations, and welcome popup.
+*   **AI Assistant "Buddy":** Conversational search with memory, smart recommendations, and animated mascot (1.5x larger, bottom-right positioning).
 *   **Glossary System:** Interactive definitions with Buddy mascot popups.
-*   **Developer Portal (PIN: 0424):** Mission Control for system monitoring, affiliate tracking, and release management.
+*   **Developer Dashboard:** "Mission Control" for system monitoring and affiliate tracking.
 *   **Shopping Cart:** Multi-vendor cart with Stripe checkout.
 *   **Vehicle Type Selector:** Support for 18+ vehicle categories including cars, trucks, motorcycles, ATVs, boats, RVs, diesel, small engines, Chinese imports.
-*   **Genesis Hallmark:** On-chain vehicle identity with Solana mainnet verification, numbered badges with purple holographic styling ($9.99 free / $1.99 Pro).
+*   **Genesis Hallmark ($2/vehicle):** On-chain vehicle identity with Solana mainnet verification, numbered badges with purple holographic styling.
 *   **App Hallmark Badge:** Clickable GB-000001 badge in header linking to Genesis Hallmark page.
 *   **Vehicle Passport:** VIN-decoded vehicle info with NHTSA recalls integration.
-*   **Pro Subscription (Founders Circle):** $4.99/month or $39.99/year with Stripe integration. Price locks for early adopters.
+*   **Pro Subscription ($2.99/month):** Founders Circle pricing with Stripe integration.
 *   **DIY Repair Guides:** AI-generated step-by-step maintenance instructions with YouTube links.
 *   **Insurance Comparison:** Multi-carrier quotes page with lead generation.
-*   **Mechanics Garage ($29.99/mo):** Full shop management portal for professional mechanics with CRM, orders, appointments, and staff management.
-*   **Partner API System:** B2B RESTful API for Mechanics Garage shops with scoped authentication, rate limiting, and usage analytics.
-*   **Member Referral Program:** Points-based referral system (100 pts/signup, 500 pts/Pro conversion) with tier redemption.
-*   **Weather Radar:** Live weather with RainViewer radar and NOAA storm alerts.
-*   **Release Version Control:** Draft → Publish workflow with automatic Solana blockchain verification.
-*   **DarkWave Developer Hub Integration:** ORBIT Ecosystem connection for staff/contractor sync.
+*   **Mechanics Garage:** Shop management portal for professional mechanics.
+*   **Member Referral Program:** Points-based referral system with signup tracking and Pro conversion bonuses.
+*   **Weather Widget:** Live weather with radar integration and storm alerts (bottom-left positioning).
 *   **Bento Grid Layout:** Consistent max-w-6xl containers across all pages.
-*   **Image Carousels:** AI-generated images for vehicle types and categories.
+*   **Image Carousels:** AI-generated images for vehicle types and categories with horizontal navigation.
+*   **Release Version Control:** Timestamped versions with blockchain verification.
 
 ## Planned Features (Backlog)
 *   **Local Pickup Integration:**
@@ -66,15 +57,13 @@
 
 ## Key Variables & Configuration
 *   **Affiliate Rates:** 5-8% average.
-*   **Genesis Hallmark Price:** $9.99 (free users) / $1.99 (Pro members).
-*   **Pro Subscription (Founders Circle):** $4.99/month or $39.99/year (increases to $9.99/mo post-V2).
-*   **Mechanics Garage:** $29.99/month or $249.99/year (increases to $49.99/mo post-V2).
+*   **Genesis Hallmark Price:** $2 per vehicle.
+*   **Pro Subscription Cost:** $2.99/month.
 *   **Stripe Fees:** 2.9% + $0.30 per transaction.
 *   **Tech Stack:**
     *   Web: React 18, Vite, Tailwind CSS, shadcn/ui.
     *   Backend: Node.js/Express, PostgreSQL, Drizzle ORM.
     *   AI: OpenAI GPT-4 for Buddy assistant.
-    *   Blockchain: Solana via Helius RPC.
     *   Mobile: React Native (Planned).
 
 ## Supported Vehicle Types
