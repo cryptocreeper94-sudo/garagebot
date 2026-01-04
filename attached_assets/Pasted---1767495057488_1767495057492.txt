@@ -1,0 +1,181 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    GARAGEBOT → ORBIT ECOSYSTEM INTEGRATION HANDOFF
+═══════════════════════════════════════════════════════════════════════════════
+
+INFORMATION REQUESTS (GarageBot needs to provide these to ORBIT):
+─────────────────────────────────────────────────────────────────────────────────
+1. GARAGEBOT_WEBHOOK_SECRET - Generate a 64-character hex secret and share it
+   with Jason so ORBIT can verify incoming webhooks from GarageBot.
+   Generate with: crypto.randomBytes(32).toString('hex')
+
+═══════════════════════════════════════════════════════════════════════════════
+
+INFORMATION PROVIDED (Add these secrets to GarageBot's environment):
+─────────────────────────────────────────────────────────────────────────────────
+ORBIT_API_KEY=dw_app_3c88bda688e781b58b2b46144bf6006a49add5c28eed327e
+ORBIT_HUB_URL=https://orbitstaffing.io
+ORBIT_WEBHOOK_SECRET=<use the same secret you generated above>
+
+═══════════════════════════════════════════════════════════════════════════════
+
+API ENDPOINTS (All require authentication headers):
+─────────────────────────────────────────────────────────────────────────────────
+Base: https://orbitstaffing.io/api/ecosystem
+
+POST /sync/workers      - Sync worker/mechanic profiles
+POST /sync/contractors  - Sync 1099 contractors  
+POST /sync/timesheets   - Sync timesheet entries
+POST /sync/1099         - Sync annual 1099 payment totals
+POST /snippets          - Share code snippets across ecosystem
+POST /logs              - Log activity events
+GET  /status            - Check connection status
+
+Financial Hub: https://orbitstaffing.io/api/financial-hub
+POST /events            - Report revenue, expenses, payouts
+
+═══════════════════════════════════════════════════════════════════════════════
+
+REQUIRED HEADERS (Include on all API requests):
+─────────────────────────────────────────────────────────────────────────────────
+Content-Type: application/json
+X-API-Key: <ORBIT_API_KEY from env>
+X-API-Secret: <ORBIT_WEBHOOK_SECRET from env>
+X-App-Name: GarageBot
+
+═══════════════════════════════════════════════════════════════════════════════
+
+ECOSYSTEM CLIENT (Create file: server/services/orbitEcosystem.ts):
+─────────────────────────────────────────────────────────────────────────────────
+
+import crypto from 'crypto';
+
+const ORBIT_HUB_URL = process.env.ORBIT_HUB_URL || 'https://orbitstaffing.io';
+const ORBIT_API_KEY = process.env.ORBIT_API_KEY!;
+const ORBIT_WEBHOOK_SECRET = process.env.ORBIT_WEBHOOK_SECRET!;
+
+export class OrbitEcosystemClient {
+  private async request<T>(endpoint: string, method: string, body?: any): Promise<T> {
+    const response = await fetch(`${ORBIT_HUB_URL}/api/ecosystem${endpoint}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': ORBIT_API_KEY,
+        'X-API-Secret': ORBIT_WEBHOOK_SECRET,
+        'X-App-Name': 'GarageBot',
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!response.ok) throw new Error(`ORBIT API error: ${response.status}`);
+    return response.json();
+  }
+
+  async syncContractors(contractors: Array<{
+    externalId: string; name: string; email: string; phone?: string;
+    skills?: string[]; status: 'active' | 'inactive';
+  }>) {
+    return this.request('/sync/contractors', 'POST', { contractors });
+  }
+
+  async syncTimesheets(timesheets: Array<{
+    externalId: string; workerId: string; date: string;
+    hoursWorked: number; jobType?: string; notes?: string;
+  }>) {
+    return this.request('/sync/timesheets', 'POST', { timesheets });
+  }
+
+  async sync1099Payments(year: number, payments: Array<{
+    contractorId: string; contractorName: string;
+    totalPaid: number; taxWithheld?: number;
+  }>) {
+    return this.request('/sync/1099', 'POST', { year, payments });
+  }
+
+  async reportFinancialEvent(event: {
+    eventType: 'revenue' | 'expense' | 'payout';
+    grossAmount: number; description: string; metadata?: Record<string, any>;
+  }) {
+    return fetch(`${ORBIT_HUB_URL}/api/financial-hub/events`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': ORBIT_API_KEY,
+        'X-API-Secret': ORBIT_WEBHOOK_SECRET,
+      },
+      body: JSON.stringify({
+        sourceSystem: 'garagebot',
+        sourceAppId: 'dw_app_garagebot',
+        ...event,
+      }),
+    }).then(r => r.json());
+  }
+
+  async logActivity(action: string, details?: Record<string, any>) {
+    return this.request('/logs', 'POST', { action, details });
+  }
+
+  async checkStatus() {
+    return this.request('/status', 'GET', null);
+  }
+}
+
+export const orbitClient = new OrbitEcosystemClient();
+
+═══════════════════════════════════════════════════════════════════════════════
+
+INTEGRATION POINTS (Hook these into GarageBot's existing code):
+─────────────────────────────────────────────────────────────────────────────────
+
+// When a mechanic signs up or updates profile:
+await orbitClient.syncContractors([{
+  externalId: mechanic.id,
+  name: mechanic.name,
+  email: mechanic.email,
+  skills: mechanic.certifications,
+  status: 'active'
+}]);
+
+// When a job is completed:
+await orbitClient.syncTimesheets([{
+  externalId: job.id,
+  workerId: mechanic.id,
+  date: job.completedAt,
+  hoursWorked: job.laborHours,
+  jobType: job.serviceType
+}]);
+
+// When subscription payment received:
+await orbitClient.reportFinancialEvent({
+  eventType: 'revenue',
+  grossAmount: 29.99,
+  description: 'GarageBot Pro subscription',
+  metadata: { customerId: customer.id, plan: 'pro' }
+});
+
+// End of year 1099 reporting:
+await orbitClient.sync1099Payments(2025, [{
+  contractorId: mechanic.id,
+  contractorName: mechanic.name,
+  totalPaid: mechanic.yearlyEarnings,
+  taxWithheld: 0
+}]);
+
+═══════════════════════════════════════════════════════════════════════════════
+
+DATA ORBIT EXPECTS FROM GARAGEBOT:
+─────────────────────────────────────────────────────────────────────────────────
+- Contractor/mechanic profiles (name, email, skills, status)
+- Timesheet entries (hours worked per job)
+- 1099 payment summaries (annual totals per contractor)
+- Revenue events (subscriptions, platform fees, etc.)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+NEXT STEPS:
+─────────────────────────────────────────────────────────────────────────────────
+1. Generate GARAGEBOT_WEBHOOK_SECRET and send it to Jason
+2. Add the 3 environment variables to GarageBot
+3. Create the OrbitEcosystemClient service file
+4. Test connection: await orbitClient.checkStatus()
+5. Hook sync calls into mechanic signup, job completion, and payment flows
+
+═══════════════════════════════════════════════════════════════════════════════
