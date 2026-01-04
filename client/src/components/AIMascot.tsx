@@ -461,36 +461,33 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
 
   const ComicSpeechBubble = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
     <div className={`relative ${className}`}>
-      <svg 
-        viewBox="0 0 400 280" 
-        className="w-full h-full absolute inset-0"
-        preserveAspectRatio="none"
-        style={{ filter: 'drop-shadow(0 4px 12px rgba(0, 255, 255, 0.2))' }}
-      >
-        <ellipse 
-          cx="200" 
-          cy="130" 
-          rx="195" 
-          ry="125" 
-          fill="hsl(var(--card))" 
-          stroke="hsl(var(--primary))" 
-          strokeWidth="3"
-        />
-        <path 
-          d="M 320 230 Q 350 260 380 270 Q 340 250 330 240" 
-          fill="hsl(var(--card))" 
-          stroke="hsl(var(--primary))" 
-          strokeWidth="3"
-        />
-        <ellipse 
-          cx="200" 
-          cy="130" 
-          rx="190" 
-          ry="120" 
-          fill="hsl(var(--card))"
-        />
-      </svg>
-      <div className="relative z-10 p-3 sm:p-6">
+      <div 
+        className="absolute inset-0 rounded-[50%] overflow-hidden"
+        style={{
+          background: '#0d1117',
+          border: '3px solid #06b6d4',
+          boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3), inset 0 0 20px rgba(6, 182, 212, 0.1)',
+          borderRadius: '50% 50% 50% 50% / 45% 45% 55% 55%',
+        }}
+      />
+      <div 
+        className="absolute -bottom-2 right-12 w-0 h-0"
+        style={{
+          borderLeft: '15px solid transparent',
+          borderRight: '15px solid transparent',
+          borderTop: '20px solid #06b6d4',
+        }}
+      />
+      <div 
+        className="absolute -bottom-1 right-12 w-0 h-0"
+        style={{
+          borderLeft: '12px solid transparent',
+          borderRight: '12px solid transparent',
+          borderTop: '17px solid #0d1117',
+          marginLeft: '3px',
+        }}
+      />
+      <div className="relative z-10 p-4 sm:p-6 overflow-hidden">
         {children}
       </div>
     </div>
