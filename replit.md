@@ -78,9 +78,23 @@ Preferred communication style: Simple, everyday language.
 ## Release Version Control System
 - **Features**: Draft → Publish workflow, timestamped releases, categorized changelogs. Optional blockchain verification.
 
-## DarkWave Developer Hub Integration
-- **Integration**: GarageBot registered as "garagebot-prod" in ORBIT Staffing Ecosystem Hub at darkwavestudios.io.
-- **Functionality**: Syncs workers, contractors, timesheets, certifications, and code snippets. Full read/write access to various ecosystem data.
+## ORBIT Staffing Ecosystem Integration
+- **Hub URL**: https://orbitstaffing.io
+- **App ID**: GarageBot (registered in ORBIT Staffing Ecosystem Hub)
+- **Service File**: `server/services/orbitEcosystem.ts`
+- **Environment Variables**: 
+  - `ORBIT_HUB_URL` - Hub base URL
+  - `ORBIT_ECOSYSTEM_API_KEY` - API key for authentication
+  - `ORBIT_ECOSYSTEM_API_SECRET` - API secret for authentication  
+  - `GARAGEBOT_WEBHOOK_SECRET` - Secret for verifying incoming webhooks
+- **Integration Points**:
+  - Shop creation → Syncs shop owner as contractor to ORBIT
+  - Repair order completion → Reports job/timesheet to ORBIT
+  - Pro subscription payment → Reports revenue event to ORBIT
+- **API Endpoints**:
+  - `GET /api/orbit/status` - Check ORBIT connection status
+  - `POST /api/orbit/test-sync` - Test contractor sync (authenticated)
+- **Permissions**: read/write for workers, contractors, 1099, timesheets, certifications, and code
 
 ## Partner API System
 - **Purpose**: B2B API access for Mechanics Garage shops.
@@ -106,7 +120,7 @@ Preferred communication style: Simple, everyday language.
 - **AI**: OpenAI GPT-4
 - **Blockchain**: Solana (via Helius API)
 - **Weather Radar**: RainViewer API, NOAA Weather Alerts API
-- **Developer Hub**: ORBIT Staffing Ecosystem Hub (darkwavestudios.io)
+- **ORBIT Ecosystem**: ORBIT Staffing Ecosystem Hub (orbitstaffing.io)
 
 ## Key NPM Packages
 - **UI/Frontend**: `@radix-ui/*`, `tailwindcss`, `framer-motion`, `wouter`, `@tanstack/react-query`, `@stripe/react-stripe-js`, `react-leaflet`, `leaflet`

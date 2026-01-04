@@ -195,15 +195,20 @@ export class OrbitEcosystemClient {
   }
 
   verifyWebhookSignature(payload: string, signature: string): boolean {
-    if (!GARAGEBOT_WEBHOOK_SECRET) return false;
+    if (!GARAGEBOT_WEBHOOK_SECRET || !signature) return false;
     const expectedSignature = crypto
       .createHmac('sha256', GARAGEBOT_WEBHOOK_SECRET)
       .update(payload)
       .digest('hex');
-    return crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature)
-    );
+    if (signature.length !== expectedSignature.length) return false;
+    try {
+      return crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature)
+      );
+    } catch {
+      return false;
+    }
   }
 }
 
