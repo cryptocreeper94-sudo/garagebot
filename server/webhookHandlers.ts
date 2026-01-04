@@ -1,5 +1,6 @@
 import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { storage } from './storage';
+import { orbitClient } from './services/orbitEcosystem';
 
 export class WebhookHandlers {
   static async processWebhook(payload: Buffer, signature: string, uuid: string): Promise<void> {
@@ -63,6 +64,12 @@ export class WebhookHandlers {
       });
       
       console.log('User updated to Pro:', userId, 'Founder:', isFounder);
+      
+      const amount = session.amount_total ? session.amount_total / 100 : 
+        (billingPeriod === 'annual' ? 299 : 29.99);
+      orbitClient.reportSubscriptionRevenue(userId, amount, 'pro').catch(err => {
+        console.error('[ORBIT] Failed to report subscription revenue:', err);
+      });
     }
   }
   

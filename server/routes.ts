@@ -41,6 +41,7 @@ import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClie
 import { nhtsaService } from "./services/nhtsa";
 import { weatherService } from "./services/weather";
 import * as authService from "./services/auth";
+import { orbitClient } from "./services/orbitEcosystem";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -1745,6 +1746,18 @@ export async function registerRoutes(
       const userId = req.user.claims.sub;
       const slug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       const shop = await storage.createShop({ ...req.body, ownerId: userId, slug });
+      
+      const user = await storage.getUser(userId);
+      if (user) {
+        orbitClient.syncWorker({
+          id: userId,
+          name: user.firstName || user.username || 'Unknown',
+          email: user.email || '',
+          phone: user.phone || undefined,
+          skills: req.body.services || [],
+        }).catch(err => console.error('[ORBIT] Failed to sync contractor:', err));
+      }
+      
       res.json(shop);
     } catch (error) {
       res.status(500).json({ error: "Failed to create shop" });
@@ -1971,7 +1984,23 @@ export async function registerRoutes(
         return res.status(403).json({ error: "Unauthorized" });
       }
       
+      const previousOrder = await storage.getRepairOrder(orderId);
       const order = await storage.updateRepairOrder(orderId, req.body);
+      
+      if (req.body.status === 'completed' && previousOrder?.status !== 'completed' && order) {
+        const laborAmount = order.laborTotal ? parseFloat(String(order.laborTotal)) : 0;
+        const estimatedHours = laborAmount > 0 ? Math.ceil(laborAmount / 85) : 1;
+        
+        orbitClient.reportJobCompletion({
+          id: orderId,
+          mechanicId: userId,
+          completedAt: new Date().toISOString(),
+          laborHours: estimatedHours,
+          serviceType: order.description || 'General Repair',
+          notes: order.notes || undefined,
+        }).catch(err => console.error('[ORBIT] Failed to report job completion:', err));
+      }
+      
       res.json(order);
     } catch (error) {
       res.status(500).json({ error: "Failed to update repair order" });
@@ -3253,6 +3282,55 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Delete dev task error:", error);
       res.status(500).json({ error: "Failed to delete task" });
+    }
+  });
+
+  // ============================================
+  // ORBIT ECOSYSTEM INTEGRATION
+  // ============================================
+
+  app.get('/api/orbit/status', async (req, res) => {
+    try {
+      const status = await orbitClient.checkStatus();
+      res.json({
+        connected: !!status,
+        status: status || { message: 'ORBIT client not configured or unreachable' },
+        webhookSecretConfigured: !!process.env.GARAGEBOT_WEBHOOK_SECRET,
+      });
+    } catch (error) {
+      console.error("ORBIT status check error:", error);
+      res.status(500).json({ 
+        connected: false, 
+        error: "Failed to check ORBIT status" 
+      });
+    }
+  });
+
+  app.post('/api/orbit/test-sync', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const result = await orbitClient.syncWorker({
+        id: userId,
+        name: user.firstName || user.username || 'Test User',
+        email: user.email || '',
+        phone: user.phone || undefined,
+        skills: ['GarageBot Test'],
+      });
+      
+      res.json({ 
+        success: !!result, 
+        result,
+        message: result ? 'Successfully synced to ORBIT' : 'ORBIT client not configured'
+      });
+    } catch (error) {
+      console.error("ORBIT test sync error:", error);
+      res.status(500).json({ error: "Failed to test ORBIT sync" });
     }
   });
 
