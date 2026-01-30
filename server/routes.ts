@@ -42,6 +42,7 @@ import { nhtsaService } from "./services/nhtsa";
 import { weatherService } from "./services/weather";
 import * as authService from "./services/auth";
 import { orbitClient } from "./services/orbitEcosystem";
+import { trustLayerClient } from "./services/trustLayer";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -3331,6 +3332,120 @@ export async function registerRoutes(
     } catch (error) {
       console.error("ORBIT test sync error:", error);
       res.status(500).json({ error: "Failed to test ORBIT sync" });
+    }
+  });
+
+  // ============================================
+  // TRUST LAYER GATEWAY INTEGRATION
+  // ============================================
+
+  app.get('/api/trust-layer/status', async (req, res) => {
+    try {
+      res.json({
+        configured: true,
+        baseUrl: trustLayerClient.getBaseUrl(),
+        entryPoint: trustLayerClient.getEntryPoint(),
+      });
+    } catch (error) {
+      console.error("Trust Layer status error:", error);
+      res.status(500).json({ error: "Failed to check Trust Layer status" });
+    }
+  });
+
+  app.post('/api/trust-layer/sync', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      const { firebaseToken } = req.body;
+      
+      if (!firebaseToken || typeof firebaseToken !== 'string' || firebaseToken.length < 10) {
+        return res.status(400).json({ error: "Valid Firebase token required" });
+      }
+      
+      const result = await trustLayerClient.syncFirebaseUser(firebaseToken);
+      
+      if (!result) {
+        return res.status(502).json({ error: "Failed to sync with Trust Layer" });
+      }
+      
+      res.json({
+        success: true,
+        trustLayerId: result.trustLayerId,
+        memberNumber: result.memberNumber,
+      });
+    } catch (error) {
+      console.error("Trust Layer sync error:", error);
+      res.status(500).json({ error: "Failed to sync with Trust Layer" });
+    }
+  });
+
+  app.get('/api/trust-layer/membership', isAuthenticated, async (req: any, res) => {
+    try {
+      const authHeader = req.headers['x-firebase-token'] as string;
+      
+      if (!authHeader || typeof authHeader !== 'string' || authHeader.length < 10) {
+        return res.status(400).json({ error: "Firebase token required in x-firebase-token header" });
+      }
+      
+      const membership = await trustLayerClient.getMembership(authHeader);
+      
+      if (!membership) {
+        return res.status(404).json({ error: "Membership not found" });
+      }
+      
+      res.json(membership);
+    } catch (error) {
+      console.error("Trust Layer membership error:", error);
+      res.status(500).json({ error: "Failed to check membership" });
+    }
+  });
+
+  app.get('/api/trust-layer/domains/resolve/:subdomain', async (req, res) => {
+    try {
+      const { subdomain } = req.params;
+      
+      if (!subdomain || typeof subdomain !== 'string' || subdomain.length < 1 || subdomain.length > 63) {
+        return res.status(400).json({ error: "Invalid subdomain" });
+      }
+      
+      if (!/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(subdomain)) {
+        return res.status(400).json({ error: "Invalid subdomain format" });
+      }
+      
+      const result = await trustLayerClient.resolveDomain(subdomain);
+      
+      if (!result) {
+        return res.status(404).json({ error: "Domain not found" });
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Trust Layer domain resolve error:", error);
+      res.status(500).json({ error: "Failed to resolve domain" });
+    }
+  });
+
+  app.get('/api/trust-layer/domains/check/:name', isAuthenticated, async (req: any, res) => {
+    try {
+      const { name } = req.params;
+      
+      if (!name || typeof name !== 'string' || name.length < 1 || name.length > 63) {
+        return res.status(400).json({ error: "Invalid domain name" });
+      }
+      
+      if (!/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(name)) {
+        return res.status(400).json({ error: "Invalid domain name format" });
+      }
+      
+      const result = await trustLayerClient.checkDomainAvailability(name);
+      
+      if (!result) {
+        return res.status(502).json({ error: "Failed to check domain availability" });
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Trust Layer domain check error:", error);
+      res.status(500).json({ error: "Failed to check domain" });
     }
   });
 
