@@ -96,6 +96,24 @@ Preferred communication style: Simple, everyday language.
   - `POST /api/orbit/test-sync` - Test contractor sync (authenticated)
 - **Permissions**: read/write for workers, contractors, 1099, timesheets, certifications, and code
 
+## Trust Layer Gateway Integration
+- **Gateway URL**: https://tlid.io
+- **Entry Point**: garagebot.io
+- **Service File**: `server/services/trustLayer.ts`
+- **Environment Variables**:
+  - `TRUST_LAYER_URL` - Gateway base URL
+  - `TRUST_LAYER_ENTRY_POINT` - App domain for x-entry-point header
+- **Features**:
+  - Firebase user sync for Trust Layer ID
+  - Membership status checks
+  - .tlid domain resolution and availability checking
+- **API Endpoints**:
+  - `GET /api/trust-layer/status` - Check Trust Layer configuration
+  - `POST /api/trust-layer/sync` - Sync Firebase user to Trust Layer
+  - `GET /api/trust-layer/membership` - Check membership status
+  - `GET /api/trust-layer/domains/resolve/:subdomain` - Resolve .tlid subdomain
+  - `GET /api/trust-layer/domains/check/:name` - Check domain availability
+
 ## Partner API System
 - **Purpose**: B2B API access for Mechanics Garage shops.
 - **Security**: API Key + Secret authentication with SHA-256 hashing, granular scopes, and rate limiting.
