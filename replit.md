@@ -98,19 +98,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Trust Layer Gateway Integration
 - **Gateway URL**: https://tlid.io
-- **Entry Point**: garagebot.io
+- **App Name**: GarageBot
 - **Service File**: `server/services/trustLayer.ts`
 - **Environment Variables**:
   - `TRUST_LAYER_URL` - Gateway base URL
-  - `TRUST_LAYER_ENTRY_POINT` - App domain for x-entry-point header
-- **Features**:
-  - Firebase user sync for Trust Layer ID
-  - Membership status checks
-  - .tlid domain resolution and availability checking
+  - `TRUST_LAYER_ENTRY_POINT` - App name for X-App-Name header
+- **Self-Service Endpoints** (no credentials needed):
+  - `GET /api/ecosystem/connection` - App details, endpoints, headers, sites list
+  - `GET /api/ecosystem/status` - Test connection with X-App-Name header
 - **API Endpoints**:
   - `GET /api/trust-layer/status` - Check Trust Layer configuration
-  - `POST /api/trust-layer/sync` - Sync Firebase user to Trust Layer
-  - `GET /api/trust-layer/membership` - Check membership status
+  - `GET /api/trust-layer/connection` - Fetch ecosystem connection info
   - `GET /api/trust-layer/domains/resolve/:subdomain` - Resolve .tlid subdomain
   - `GET /api/trust-layer/domains/check/:name` - Check domain availability
 

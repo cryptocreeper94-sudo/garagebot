@@ -3337,65 +3337,41 @@ export async function registerRoutes(
 
   // ============================================
   // TRUST LAYER GATEWAY INTEGRATION
+  // Self-service ecosystem connection (no credentials needed)
   // ============================================
 
   app.get('/api/trust-layer/status', async (req, res) => {
     try {
+      const status = await trustLayerClient.checkStatus();
       res.json({
         configured: true,
         baseUrl: trustLayerClient.getBaseUrl(),
-        entryPoint: trustLayerClient.getEntryPoint(),
+        appName: trustLayerClient.getAppName(),
+        ecosystemStatus: status || { connected: false, message: "Gateway not reachable" },
       });
     } catch (error) {
       console.error("Trust Layer status error:", error);
-      res.status(500).json({ error: "Failed to check Trust Layer status" });
-    }
-  });
-
-  app.post('/api/trust-layer/sync', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
-      const { firebaseToken } = req.body;
-      
-      if (!firebaseToken || typeof firebaseToken !== 'string' || firebaseToken.length < 10) {
-        return res.status(400).json({ error: "Valid Firebase token required" });
-      }
-      
-      const result = await trustLayerClient.syncFirebaseUser(firebaseToken);
-      
-      if (!result) {
-        return res.status(502).json({ error: "Failed to sync with Trust Layer" });
-      }
-      
       res.json({
-        success: true,
-        trustLayerId: result.trustLayerId,
-        memberNumber: result.memberNumber,
+        configured: true,
+        baseUrl: trustLayerClient.getBaseUrl(),
+        appName: trustLayerClient.getAppName(),
+        ecosystemStatus: { connected: false, error: "Gateway not reachable" },
       });
-    } catch (error) {
-      console.error("Trust Layer sync error:", error);
-      res.status(500).json({ error: "Failed to sync with Trust Layer" });
     }
   });
 
-  app.get('/api/trust-layer/membership', isAuthenticated, async (req: any, res) => {
+  app.get('/api/trust-layer/connection', async (req, res) => {
     try {
-      const authHeader = req.headers['x-firebase-token'] as string;
+      const connection = await trustLayerClient.getConnection();
       
-      if (!authHeader || typeof authHeader !== 'string' || authHeader.length < 10) {
-        return res.status(400).json({ error: "Firebase token required in x-firebase-token header" });
+      if (!connection) {
+        return res.status(502).json({ error: "Failed to fetch ecosystem connection" });
       }
       
-      const membership = await trustLayerClient.getMembership(authHeader);
-      
-      if (!membership) {
-        return res.status(404).json({ error: "Membership not found" });
-      }
-      
-      res.json(membership);
+      res.json(connection);
     } catch (error) {
-      console.error("Trust Layer membership error:", error);
-      res.status(500).json({ error: "Failed to check membership" });
+      console.error("Trust Layer connection error:", error);
+      res.status(500).json({ error: "Failed to get ecosystem connection" });
     }
   });
 
@@ -3424,7 +3400,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get('/api/trust-layer/domains/check/:name', isAuthenticated, async (req: any, res) => {
+  app.get('/api/trust-layer/domains/check/:name', async (req, res) => {
     try {
       const { name } = req.params;
       
