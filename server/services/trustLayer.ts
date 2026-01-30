@@ -1,18 +1,21 @@
 const TRUST_LAYER_BASE_URL = process.env.TRUST_LAYER_URL || 'https://tlid.io';
-const APP_DOMAIN = process.env.TRUST_LAYER_ENTRY_POINT || 'garagebot.io';
+const APP_NAME = process.env.TRUST_LAYER_ENTRY_POINT || 'GarageBot';
 
-interface TrustLayerUser {
-  trustLayerId: string;
-  memberNumber?: string;
-  email?: string;
-  displayName?: string;
+interface EcosystemConnection {
+  app: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  endpoints: Record<string, string>;
+  headers: Record<string, string>;
+  sites: Array<{ name: string; url: string }>;
 }
 
-interface MembershipStatus {
-  trustLayerId: string;
-  status: 'active' | 'inactive' | 'pending';
-  tier?: string;
-  expiresAt?: string;
+interface EcosystemStatus {
+  connected: boolean;
+  appName: string;
+  timestamp: string;
 }
 
 interface DomainResolution {
@@ -28,29 +31,27 @@ interface DomainAvailability {
 
 export class TrustLayerClient {
   private baseUrl: string;
-  private entryPoint: string;
+  private appName: string;
+  private connectionInfo: EcosystemConnection | null = null;
 
   constructor() {
     this.baseUrl = TRUST_LAYER_BASE_URL;
-    this.entryPoint = APP_DOMAIN;
-    console.log(`[TrustLayer] Client initialized for ${this.entryPoint} → ${this.baseUrl}`);
+    this.appName = APP_NAME;
+    console.log(`[TrustLayer] Client initialized: ${this.appName} → ${this.baseUrl}`);
   }
 
   private async request<T>(
     endpoint: string, 
     method: string = 'GET', 
     body?: any,
-    firebaseToken?: string
+    additionalHeaders?: Record<string, string>
   ): Promise<T | null> {
     try {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        'x-entry-point': this.entryPoint,
+        'X-App-Name': this.appName,
+        ...additionalHeaders,
       };
-
-      if (firebaseToken) {
-        headers['Authorization'] = `Bearer ${firebaseToken}`;
-      }
 
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         method,
@@ -71,57 +72,31 @@ export class TrustLayerClient {
     }
   }
 
-  async syncFirebaseUser(firebaseToken: string): Promise<TrustLayerUser | null> {
-    console.log('[TrustLayer] Syncing Firebase user...');
-    return this.request<TrustLayerUser>(
-      '/api/auth/firebase-sync',
-      'POST',
-      {},
-      firebaseToken
-    );
+  async getConnection(): Promise<EcosystemConnection | null> {
+    console.log('[TrustLayer] Fetching ecosystem connection info...');
+    const result = await this.request<EcosystemConnection>('/api/ecosystem/connection');
+    if (result) {
+      this.connectionInfo = result;
+    }
+    return result;
   }
 
-  async registerUser(email: string, password: string, displayName?: string): Promise<TrustLayerUser | null> {
-    console.log('[TrustLayer] Registering new user...');
-    return this.request<TrustLayerUser>(
-      '/api/auth/register',
-      'POST',
-      { email, password, displayName }
-    );
-  }
-
-  async loginUser(email: string, password: string): Promise<TrustLayerUser | null> {
-    console.log('[TrustLayer] Logging in user...');
-    return this.request<TrustLayerUser>(
-      '/api/auth/login',
-      'POST',
-      { email, password }
-    );
-  }
-
-  async getMembership(firebaseToken: string): Promise<MembershipStatus | null> {
-    console.log('[TrustLayer] Checking membership status...');
-    return this.request<MembershipStatus>(
-      '/api/user/membership',
-      'GET',
-      undefined,
-      firebaseToken
-    );
+  async checkStatus(): Promise<EcosystemStatus | null> {
+    console.log('[TrustLayer] Checking ecosystem status...');
+    return this.request<EcosystemStatus>('/api/ecosystem/status');
   }
 
   async resolveDomain(subdomain: string): Promise<DomainResolution | null> {
     console.log(`[TrustLayer] Resolving domain: ${subdomain}.tlid`);
     return this.request<DomainResolution>(
-      `/api/domains/resolve/${encodeURIComponent(subdomain)}`,
-      'GET'
+      `/api/domains/resolve/${encodeURIComponent(subdomain)}`
     );
   }
 
   async checkDomainAvailability(name: string): Promise<DomainAvailability | null> {
     console.log(`[TrustLayer] Checking domain availability: ${name}`);
     return this.request<DomainAvailability>(
-      `/api/domains/check/${encodeURIComponent(name)}`,
-      'GET'
+      `/api/domains/check/${encodeURIComponent(name)}`
     );
   }
 
@@ -129,8 +104,12 @@ export class TrustLayerClient {
     return this.baseUrl;
   }
 
-  getEntryPoint(): string {
-    return this.entryPoint;
+  getAppName(): string {
+    return this.appName;
+  }
+
+  getCachedConnection(): EcosystemConnection | null {
+    return this.connectionInfo;
   }
 }
 
