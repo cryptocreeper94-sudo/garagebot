@@ -151,6 +151,184 @@ const API_SCOPES = [
   { id: 'staff:write', name: 'Write Staff', description: 'Manage team members' },
 ];
 
+const PARTS_VENDORS = [
+  { id: "amazon", name: "Amazon Automotive", logo: "📦", url: "https://www.amazon.com/s?k=", tag: "garagebot-20", network: "Amazon Associates" },
+  { id: "ebay", name: "eBay Motors", logo: "🛒", url: "https://www.ebay.com/sch/i.html?_nkw=", campid: "5339140935", network: "eBay Partner Network" },
+  { id: "autozone", name: "AutoZone", logo: "🔧", url: "https://www.autozone.com/searchresult?searchText=", network: "Impact" },
+  { id: "advance", name: "Advance Auto Parts", logo: "🚗", url: "https://shop.advanceautoparts.com/web/SearchResults?searchTerm=", network: "CJ Affiliate" },
+  { id: "rockauto", name: "RockAuto", logo: "🪨", url: "https://www.rockauto.com/en/partsearch/?partnum=", network: "Direct" },
+  { id: "oreilly", name: "O'Reilly Auto Parts", logo: "🔩", url: "https://www.oreillyauto.com/shop/b/search?q=", network: "Direct" },
+  { id: "napa", name: "NAPA Auto Parts", logo: "🛠️", url: "https://www.napaonline.com/en/search?q=", network: "Direct" },
+  { id: "partzilla", name: "Partzilla", logo: "🏍️", url: "https://www.partzilla.com/search?q=", network: "ShareASale" },
+];
+
+function PartsOrderingTab() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [vehicleFilter, setVehicleFilter] = useState("");
+
+  const getVehicleKeyword = () => {
+    if (!vehicleFilter) return "";
+    const vehicleKeywords: Record<string, string> = {
+      car: "automotive",
+      truck: "truck",
+      motorcycle: "motorcycle",
+      atv: "atv utv",
+      boat: "marine boat",
+      rv: "rv motorhome",
+      diesel: "diesel heavy duty",
+      small_engine: "small engine",
+      generator: "generator",
+      tractor: "tractor farm",
+      classic: "classic vintage",
+      exotic: "performance"
+    };
+    return vehicleKeywords[vehicleFilter] || "";
+  };
+
+  const handleSearch = (vendor: typeof PARTS_VENDORS[0]) => {
+    const vehicleKeyword = getVehicleKeyword();
+    const fullQuery = vehicleKeyword ? `${searchQuery} ${vehicleKeyword}` : searchQuery;
+    let url = vendor.url + encodeURIComponent(fullQuery);
+    if (vendor.tag) {
+      url += `&tag=${vendor.tag}`;
+    }
+    if (vendor.campid) {
+      url += `&mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=${vendor.campid}&toolid=10001`;
+    }
+    window.open(url, "_blank");
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card className="p-6 bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-teal-500/20 border-green-500/30 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 rounded-xl bg-green-500/20">
+              <Wrench className="w-8 h-8 text-green-500" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-tech font-bold uppercase">Order Parts</h3>
+              <p className="text-muted-foreground">Search across 25+ retailers with affiliate savings</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-4">
+            <div className="flex items-center gap-2 text-sm">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>Compare prices instantly</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <DollarSign className="w-4 h-4 text-yellow-500" />
+              <span>Earn affiliate commissions</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Package className="w-4 h-4 text-blue-500" />
+              <span>Track order history</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 bg-card/50">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              placeholder="Search for parts... (e.g., brake pads, oil filter, spark plugs)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-12 text-lg"
+              data-testid="input-parts-search"
+            />
+          </div>
+          <Select value={vehicleFilter} onValueChange={setVehicleFilter}>
+            <SelectTrigger className="w-48" data-testid="select-vehicle-filter">
+              <SelectValue placeholder="All Vehicles" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Vehicles</SelectItem>
+              {VEHICLE_TYPES.map(vt => (
+                <SelectItem key={vt.id} value={vt.id}>
+                  <span className="flex items-center gap-2">
+                    <vt.icon className="w-4 h-4" />
+                    {vt.name}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {searchQuery ? (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground mb-4">
+              Search results for "<span className="text-primary font-medium">{searchQuery}</span>" across {PARTS_VENDORS.length} retailers:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {PARTS_VENDORS.map((vendor) => (
+                <Card 
+                  key={vendor.id}
+                  className="p-4 bg-muted/20 hover:bg-muted/30 hover:border-primary/50 transition-all cursor-pointer group"
+                  onClick={() => handleSearch(vendor)}
+                  data-testid={`card-vendor-${vendor.id}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{vendor.logo}</span>
+                      <div>
+                        <h4 className="font-tech font-bold">{vendor.name}</h4>
+                        <p className="text-xs text-muted-foreground">{vendor.network}</p>
+                      </div>
+                    </div>
+                    <Button size="sm" className="gap-1 opacity-80 group-hover:opacity-100" data-testid={`button-search-${vendor.id}`}>
+                      Search <ExternalLink className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Search className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+            <p className="text-muted-foreground font-mono">Enter a part name or number to search across all retailers</p>
+          </div>
+        )}
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-4 bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-blue-500/20">
+              <Car className="w-5 h-5 text-blue-500" />
+            </div>
+            <h4 className="font-tech font-bold">Auto Parts</h4>
+          </div>
+          <p className="text-xs text-muted-foreground">Cars, trucks, SUVs - OEM and aftermarket</p>
+        </Card>
+        <Card className="p-4 bg-gradient-to-br from-orange-500/10 to-transparent border-orange-500/20">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-orange-500/20">
+              <Bike className="w-5 h-5 text-orange-500" />
+            </div>
+            <h4 className="font-tech font-bold">Powersports</h4>
+          </div>
+          <p className="text-xs text-muted-foreground">Motorcycles, ATVs, UTVs, dirt bikes</p>
+        </Card>
+        <Card className="p-4 bg-gradient-to-br from-cyan-500/10 to-transparent border-cyan-500/20">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-cyan-500/20">
+              <Anchor className="w-5 h-5 text-cyan-500" />
+            </div>
+            <h4 className="font-tech font-bold">Marine</h4>
+          </div>
+          <p className="text-xs text-muted-foreground">Boats, PWC, outboard motors</p>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
   const queryClient = useQueryClient();
   const [createKeyOpen, setCreateKeyOpen] = useState(false);
@@ -1117,7 +1295,7 @@ export default function MechanicsGarage() {
 
                     {/* Tabs */}
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="p-6">
-                      <TabsList className="grid grid-cols-8 mb-6 h-auto">
+                      <TabsList className="grid grid-cols-9 mb-6 h-auto">
                         <TabsTrigger value="dashboard" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-dashboard">
                           <BarChart3 className="w-4 h-4" />
                           Dashboard
@@ -1125,6 +1303,11 @@ export default function MechanicsGarage() {
                         <TabsTrigger value="orders" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-orders">
                           <ClipboardList className="w-4 h-4" />
                           Orders
+                        </TabsTrigger>
+                        <TabsTrigger value="parts" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto relative" data-testid="tab-parts">
+                          <Wrench className="w-4 h-4" />
+                          Parts
+                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                         </TabsTrigger>
                         <TabsTrigger value="estimates" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-estimates">
                           <FileText className="w-4 h-4" />
@@ -1359,6 +1542,11 @@ export default function MechanicsGarage() {
                             ))}
                           </div>
                         )}
+                      </TabsContent>
+
+                      {/* Parts Ordering Tab */}
+                      <TabsContent value="parts">
+                        <PartsOrderingTab />
                       </TabsContent>
 
                       {/* Estimates Tab */}
