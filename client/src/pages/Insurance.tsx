@@ -38,7 +38,7 @@ const insuranceProviders: InsuranceProvider[] = [
     features: ["Compare 100+ carriers", "Real-time quotes", "No obligation", "Save up to $996/year"],
     avgSavings: "$996",
     quoteTime: "2 min",
-    affiliateUrl: "#", // Replace with actual affiliate link
+    affiliateUrl: "https://www.anrdoezrs.net/click-7860436-5380944", // CJ Affiliate link - Publisher ID 7860436, Advertiser ID 5380944
     commission: "$15/lead",
     highlight: "BEST FOR COMPARISON"
   },
