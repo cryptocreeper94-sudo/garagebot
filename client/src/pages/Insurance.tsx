@@ -38,9 +38,9 @@ const insuranceProviders: InsuranceProvider[] = [
     features: ["Compare 100+ carriers", "Real-time quotes", "No obligation", "Save up to $996/year"],
     avgSavings: "$996",
     quoteTime: "2 min",
-    affiliateUrl: "https://www.anrdoezrs.net/click-7860436-5380944", // CJ Affiliate link - Publisher ID 7860436, Advertiser ID 5380944
+    affiliateUrl: "", // Pending CJ Affiliate approval
     commission: "$15/lead",
-    highlight: "BEST FOR COMPARISON"
+    highlight: "COMING SOON"
   },
   {
     id: "liberty-mutual",
@@ -123,8 +123,8 @@ export default function Insurance() {
   const handleGetQuote = (provider: InsuranceProvider) => {
     // Track click for analytics
     console.log(`Affiliate click: ${provider.name}`);
-    // In production, this would open the affiliate URL
-    if (provider.affiliateUrl !== "#") {
+    // Only open if we have a valid affiliate URL
+    if (provider.affiliateUrl && provider.affiliateUrl !== "#") {
       window.open(provider.affiliateUrl, "_blank");
     }
   };
@@ -323,10 +323,15 @@ export default function Insurance() {
                         <div className="text-lg font-mono text-primary">{provider.quoteTime}</div>
                       </div>
                       <Button 
-                        className="font-tech uppercase gap-1 group-hover:glow-primary"
+                        className={`font-tech uppercase gap-1 ${provider.affiliateUrl ? 'group-hover:glow-primary' : 'opacity-60 cursor-not-allowed'}`}
+                        disabled={!provider.affiliateUrl}
                         data-testid={`button-quote-${provider.id}`}
                       >
-                        Get Quote <ExternalLink className="w-3 h-3" />
+                        {provider.affiliateUrl ? (
+                          <>Get Quote <ExternalLink className="w-3 h-3" /></>
+                        ) : (
+                          <>Coming Soon</>
+                        )}
                       </Button>
                     </div>
                   </div>
