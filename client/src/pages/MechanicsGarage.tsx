@@ -160,6 +160,7 @@ const PARTS_VENDORS = [
   { id: "oreilly", name: "O'Reilly Auto Parts", logo: "🔩", url: "https://www.oreillyauto.com/shop/b/search?q=", network: "Direct" },
   { id: "napa", name: "NAPA Auto Parts", logo: "🛠️", url: "https://www.napaonline.com/en/search?q=", network: "Direct" },
   { id: "partzilla", name: "Partzilla", logo: "🏍️", url: "https://www.partzilla.com/search?q=", network: "ShareASale" },
+  { id: "guta", name: "Guta Auto Parts", logo: "⚙️", url: "https://www.guta.com/search?q=", awinId: "105913", network: "AWIN" },
 ];
 
 function PartsOrderingTab() {
