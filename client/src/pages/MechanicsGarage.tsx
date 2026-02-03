@@ -135,6 +135,33 @@ interface ApiLogStats {
   avgResponseTime: number;
 }
 
+// Demo sample data for mechanics to explore
+const DEMO_ORDERS: RepairOrder[] = [
+  { id: "demo-1", shopId: "demo", orderNumber: "RO-00001", customerName: "John Smith", customerPhone: "(555) 123-4567", vehicleInfo: "2020 Toyota Camry", vehicleType: "car", status: "in_progress", priority: "normal", grandTotal: "485.00", paymentStatus: "pending", promisedDate: new Date(Date.now() + 86400000).toISOString(), createdAt: new Date().toISOString() },
+  { id: "demo-2", shopId: "demo", orderNumber: "RO-00002", customerName: "Sarah Johnson", customerPhone: "(555) 234-5678", vehicleInfo: "2018 Honda Civic", vehicleType: "car", status: "waiting_parts", priority: "high", grandTotal: "1,250.00", paymentStatus: "partial", promisedDate: new Date(Date.now() + 172800000).toISOString(), createdAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: "demo-3", shopId: "demo", orderNumber: "RO-00003", customerName: "Mike Wilson", customerPhone: "(555) 345-6789", vehicleInfo: "2022 Yamaha WaveRunner", vehicleType: "boat", status: "completed", priority: "normal", grandTotal: "320.00", paymentStatus: "paid", promisedDate: new Date().toISOString(), createdAt: new Date(Date.now() - 172800000).toISOString() },
+  { id: "demo-4", shopId: "demo", orderNumber: "RO-00004", customerName: "Lisa Brown", customerPhone: "(555) 456-7890", vehicleInfo: "2019 Harley Davidson Sportster", vehicleType: "motorcycle", status: "pending", priority: "low", grandTotal: "175.00", paymentStatus: "pending", promisedDate: new Date(Date.now() + 259200000).toISOString(), createdAt: new Date().toISOString() },
+];
+
+const DEMO_APPOINTMENTS: Appointment[] = [
+  { id: "apt-1", shopId: "demo", customerName: "Tom Davis", customerPhone: "(555) 567-8901", vehicleInfo: "2021 Ford F-150", serviceType: "Oil Change", scheduledStart: new Date(Date.now() + 3600000).toISOString(), status: "confirmed" },
+  { id: "apt-2", shopId: "demo", customerName: "Emily Chen", customerPhone: "(555) 678-9012", vehicleInfo: "2020 Tesla Model 3", serviceType: "Tire Rotation", scheduledStart: new Date(Date.now() + 7200000).toISOString(), status: "confirmed" },
+  { id: "apt-3", shopId: "demo", customerName: "Robert Garcia", customerPhone: "(555) 789-0123", vehicleInfo: "2017 Polaris RZR", serviceType: "Full Service", scheduledStart: new Date(Date.now() + 86400000).toISOString(), status: "pending" },
+];
+
+const DEMO_ESTIMATES: Estimate[] = [
+  { id: "est-1", shopId: "demo", estimateNumber: "EST-00001", customerName: "Amanda White", vehicleInfo: "2019 Chevy Tahoe", grandTotal: "2,450.00", status: "sent", createdAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: "est-2", shopId: "demo", estimateNumber: "EST-00002", customerName: "David Lee", vehicleInfo: "2021 Sea-Doo Spark", grandTotal: "890.00", status: "approved", createdAt: new Date(Date.now() - 172800000).toISOString() },
+];
+
+const DEMO_INVENTORY = [
+  { id: "inv-1", partNumber: "OIL-5W30", name: "Synthetic Oil 5W-30 (5qt)", quantity: 24, reorderPoint: 10, cost: "28.99", price: "42.99", category: "Fluids" },
+  { id: "inv-2", partNumber: "FLT-OIL-001", name: "Oil Filter (Universal)", quantity: 18, reorderPoint: 12, cost: "8.50", price: "14.99", category: "Filters" },
+  { id: "inv-3", partNumber: "BRK-PAD-FR", name: "Brake Pads (Front Set)", quantity: 6, reorderPoint: 4, cost: "45.00", price: "89.99", category: "Brakes" },
+  { id: "inv-4", partNumber: "SPK-PLG-4PK", name: "Spark Plugs (4-Pack)", quantity: 15, reorderPoint: 8, cost: "18.00", price: "34.99", category: "Ignition" },
+  { id: "inv-5", partNumber: "BELT-SERP", name: "Serpentine Belt", quantity: 8, reorderPoint: 5, cost: "32.00", price: "59.99", category: "Belts" },
+];
+
 const API_SCOPES = [
   { id: 'orders:read', name: 'Read Orders', description: 'View repair orders and their status' },
   { id: 'orders:write', name: 'Write Orders', description: 'Create and update repair orders' },
@@ -716,6 +743,7 @@ export default function MechanicsGarage() {
   const queryClient = useQueryClient();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [demoMode, setDemoMode] = useState(true); // Default to demo mode
   const [createShopOpen, setCreateShopOpen] = useState(false);
   const [createOrderOpen, setCreateOrderOpen] = useState(false);
   const [createAppointmentOpen, setCreateAppointmentOpen] = useState(false);
@@ -806,6 +834,7 @@ export default function MechanicsGarage() {
       setNewShop({ name: "", description: "", address: "", city: "", state: "", zipCode: "", phone: "", email: "", vehicleTypes: [] });
       setSelectedVehicleTypes([]);
       setSelectedShop(shop);
+      setDemoMode(false); // Auto-switch to live mode when shop created
       toast({ title: "Shop Created", description: `${shop.name} is now registered` });
     },
     onError: () => {
@@ -907,6 +936,85 @@ export default function MechanicsGarage() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
+        {/* Demo Mode Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4"
+        >
+          <Card className={`p-4 ${demoMode ? 'bg-gradient-to-r from-amber-500/20 via-orange-500/10 to-yellow-500/20 border-amber-500/30' : 'bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-teal-500/20 border-green-500/30'}`}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${demoMode ? 'bg-amber-500/20' : 'bg-green-500/20'}`}>
+                  {demoMode ? <Play className="w-5 h-5 text-amber-500" /> : <CheckCircle className="w-5 h-5 text-green-500" />}
+                </div>
+                <div>
+                  <h3 className="font-tech font-bold uppercase text-sm">
+                    {demoMode ? 'Demo Mode Active' : 'Live Shop Connected'}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {demoMode ? 'Explore all features with sample data - no account needed' : `Managing: ${selectedShop?.name || 'Your Shop'}`}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1 font-tech text-xs"
+                  onClick={() => setDemoMode(!demoMode)}
+                  data-testid="button-toggle-demo"
+                >
+                  {demoMode ? <><Building2 className="w-3 h-3" /> Switch to Live</> : <><Eye className="w-3 h-3" /> Try Demo</>}
+                </Button>
+                {demoMode && (
+                  <Button
+                    size="sm"
+                    className="gap-1 font-tech text-xs bg-primary"
+                    onClick={() => window.location.href = "/auth"}
+                    data-testid="button-start-free"
+                  >
+                    <Sparkles className="w-3 h-3" /> Start Free
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Integration Messaging Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-6"
+        >
+          <Card className="p-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 border-blue-500/20">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-500/20">
+                  <Database className="w-5 h-5 text-blue-500" />
+                </div>
+                <div>
+                  <h3 className="font-tech font-bold uppercase text-sm flex items-center gap-2">
+                    Sync Your Existing Software
+                    <Badge className="bg-primary/20 text-primary text-[9px]">API READY</Badge>
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Already using shop software? We can integrate with most POS, inventory, and scheduling systems via our Partner API.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <Badge variant="outline" className="gap-1"><CheckCircle className="w-3 h-3 text-green-500" /> Mitchell1</Badge>
+                <Badge variant="outline" className="gap-1"><CheckCircle className="w-3 h-3 text-green-500" /> ShopWare</Badge>
+                <Badge variant="outline" className="gap-1"><CheckCircle className="w-3 h-3 text-green-500" /> Tekmetric</Badge>
+                <Badge variant="outline" className="gap-1"><RefreshCw className="w-3 h-3 text-primary" /> Custom</Badge>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6">
           <div className="md:col-span-8">
             <Card className="bg-card/50 border-primary/20 p-4 h-full">
@@ -1088,7 +1196,7 @@ export default function MechanicsGarage() {
                   >
                     <Card 
                       className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${selectedShop?.id === shop.id ? 'border-primary bg-primary/5' : 'bg-card'}`}
-                      onClick={() => setSelectedShop(shop)}
+                      onClick={() => { setSelectedShop(shop); setDemoMode(false); }}
                       data-testid={`card-shop-${shop.id}`}
                     >
                       <div className="flex items-start gap-3">
@@ -1371,7 +1479,7 @@ export default function MechanicsGarage() {
                                 <ClipboardList className="w-5 h-5 text-primary" />
                               </div>
                               <div>
-                                <p className="text-2xl font-bold">{repairOrders.length}</p>
+                                <p className="text-2xl font-bold">{demoMode ? DEMO_ORDERS.length : repairOrders.length}</p>
                                 <p className="text-xs text-muted-foreground font-mono">Active Orders</p>
                               </div>
                             </div>
@@ -1382,7 +1490,7 @@ export default function MechanicsGarage() {
                                 <FileText className="w-5 h-5 text-yellow-500" />
                               </div>
                               <div>
-                                <p className="text-2xl font-bold">{estimates.filter(e => e.status === 'pending').length}</p>
+                                <p className="text-2xl font-bold">{demoMode ? DEMO_ESTIMATES.length : estimates.filter(e => e.status === 'pending').length}</p>
                                 <p className="text-xs text-muted-foreground font-mono">Pending Estimates</p>
                               </div>
                             </div>
@@ -1393,7 +1501,7 @@ export default function MechanicsGarage() {
                                 <Calendar className="w-5 h-5 text-blue-500" />
                               </div>
                               <div>
-                                <p className="text-2xl font-bold">{appointments.length}</p>
+                                <p className="text-2xl font-bold">{demoMode ? DEMO_APPOINTMENTS.length : appointments.length}</p>
                                 <p className="text-xs text-muted-foreground font-mono">Today's Appts</p>
                               </div>
                             </div>
@@ -1404,7 +1512,7 @@ export default function MechanicsGarage() {
                                 <DollarSign className="w-5 h-5 text-green-500" />
                               </div>
                               <div>
-                                <p className="text-2xl font-bold">$0</p>
+                                <p className="text-2xl font-bold">{demoMode ? '$2,230' : '$0'}</p>
                                 <p className="text-xs text-muted-foreground font-mono">Today's Revenue</p>
                               </div>
                             </div>
@@ -1434,11 +1542,11 @@ export default function MechanicsGarage() {
                         {/* Recent Orders */}
                         <div>
                           <h3 className="font-tech uppercase text-sm text-muted-foreground mb-3">Recent Repair Orders</h3>
-                          {ordersLoading ? (
+                          {!demoMode && ordersLoading ? (
                             <div className="flex items-center justify-center py-8">
                               <Loader2 className="w-6 h-6 animate-spin text-primary" />
                             </div>
-                          ) : repairOrders.length === 0 ? (
+                          ) : (demoMode ? DEMO_ORDERS : repairOrders).length === 0 ? (
                             <Card className="p-8 text-center bg-muted/30 border-dashed">
                               <ClipboardList className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
                               <p className="text-muted-foreground font-mono text-sm">No repair orders yet</p>
@@ -1449,7 +1557,7 @@ export default function MechanicsGarage() {
                           ) : (
                             <ScrollArea className="h-[300px]">
                               <div className="space-y-2">
-                                {repairOrders.slice(0, 10).map(order => (
+                                {(demoMode ? DEMO_ORDERS : repairOrders).slice(0, 10).map(order => (
                                   <Card key={order.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-3">
@@ -1494,11 +1602,11 @@ export default function MechanicsGarage() {
                           </Button>
                         </div>
                         
-                        {ordersLoading ? (
+                        {!demoMode && ordersLoading ? (
                           <div className="flex items-center justify-center py-12">
                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
                           </div>
-                        ) : repairOrders.length === 0 ? (
+                        ) : (demoMode ? DEMO_ORDERS : repairOrders).length === 0 ? (
                           <Card className="p-12 text-center bg-muted/30 border-dashed">
                             <ClipboardList className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                             <h3 className="font-tech uppercase text-lg mb-2">No Repair Orders</h3>
@@ -1509,7 +1617,7 @@ export default function MechanicsGarage() {
                           </Card>
                         ) : (
                           <div className="space-y-3">
-                            {repairOrders.map(order => (
+                            {(demoMode ? DEMO_ORDERS : repairOrders).map(order => (
                               <Card key={order.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-4">
@@ -1558,11 +1666,41 @@ export default function MechanicsGarage() {
                             <Plus className="w-3 h-3" /> New Estimate
                           </Button>
                         </div>
-                        <Card className="p-12 text-center bg-muted/30 border-dashed">
-                          <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
-                          <h3 className="font-tech uppercase text-lg mb-2">No Estimates Yet</h3>
-                          <p className="text-muted-foreground text-sm">Create estimates to send quotes to customers</p>
-                        </Card>
+                        {(demoMode ? DEMO_ESTIMATES : estimates).length === 0 ? (
+                          <Card className="p-12 text-center bg-muted/30 border-dashed">
+                            <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                            <h3 className="font-tech uppercase text-lg mb-2">No Estimates Yet</h3>
+                            <p className="text-muted-foreground text-sm">Create estimates to send quotes to customers</p>
+                          </Card>
+                        ) : (
+                          <div className="space-y-3">
+                            {(demoMode ? DEMO_ESTIMATES : estimates).map(est => (
+                              <Card key={est.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-yellow-500/10">
+                                      <FileText className="w-5 h-5 text-yellow-500" />
+                                    </div>
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-mono font-bold">#{est.estimateNumber}</span>
+                                        <Badge variant="outline" className={est.status === 'approved' ? 'text-green-400' : 'text-yellow-400'}>
+                                          {est.status}
+                                        </Badge>
+                                      </div>
+                                      <p className="font-medium">{est.customerName}</p>
+                                      <p className="text-sm text-muted-foreground">{est.vehicleInfo}</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="font-mono font-bold text-lg">${est.grandTotal}</p>
+                                    <p className="text-xs text-muted-foreground">{new Date(est.createdAt).toLocaleDateString()}</p>
+                                  </div>
+                                </div>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
                       </TabsContent>
 
                       {/* Schedule Tab */}
@@ -1573,7 +1711,7 @@ export default function MechanicsGarage() {
                             <Plus className="w-3 h-3" /> Schedule Appointment
                           </Button>
                         </div>
-                        {appointments.length === 0 ? (
+                        {(demoMode ? DEMO_APPOINTMENTS : appointments).length === 0 ? (
                           <Card className="p-12 text-center bg-muted/30 border-dashed">
                             <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                             <h3 className="font-tech uppercase text-lg mb-2">No Appointments</h3>
@@ -1584,7 +1722,7 @@ export default function MechanicsGarage() {
                           </Card>
                         ) : (
                           <div className="space-y-3">
-                            {appointments.map(apt => (
+                            {(demoMode ? DEMO_APPOINTMENTS : appointments).map(apt => (
                               <Card key={apt.id} className="p-4 bg-muted/20">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-4">
@@ -1615,11 +1753,44 @@ export default function MechanicsGarage() {
                             <Plus className="w-3 h-3" /> Add Part
                           </Button>
                         </div>
-                        <Card className="p-12 text-center bg-muted/30 border-dashed">
-                          <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
-                          <h3 className="font-tech uppercase text-lg mb-2">Inventory Management</h3>
-                          <p className="text-muted-foreground text-sm">Track parts, stock levels, and vendor orders</p>
-                        </Card>
+                        {demoMode ? (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-6 gap-4 p-3 bg-muted/30 rounded-lg font-tech text-xs uppercase text-muted-foreground">
+                              <span>Part #</span>
+                              <span className="col-span-2">Description</span>
+                              <span className="text-center">Qty</span>
+                              <span className="text-right">Cost</span>
+                              <span className="text-right">Price</span>
+                            </div>
+                            {DEMO_INVENTORY.map(item => (
+                              <Card key={item.id} className="p-3 bg-muted/20 hover:bg-muted/30 transition-colors">
+                                <div className="grid grid-cols-6 gap-4 items-center">
+                                  <span className="font-mono text-sm text-primary">{item.partNumber}</span>
+                                  <div className="col-span-2">
+                                    <p className="font-medium text-sm">{item.name}</p>
+                                    <Badge variant="outline" className="text-[10px]">{item.category}</Badge>
+                                  </div>
+                                  <div className="text-center">
+                                    <span className={`font-mono font-bold ${item.quantity <= item.reorderPoint ? 'text-red-400' : 'text-green-400'}`}>
+                                      {item.quantity}
+                                    </span>
+                                    {item.quantity <= item.reorderPoint && (
+                                      <AlertTriangle className="w-3 h-3 text-red-400 inline ml-1" />
+                                    )}
+                                  </div>
+                                  <span className="text-right font-mono text-sm text-muted-foreground">${item.cost}</span>
+                                  <span className="text-right font-mono font-bold">${item.price}</span>
+                                </div>
+                              </Card>
+                            ))}
+                          </div>
+                        ) : (
+                          <Card className="p-12 text-center bg-muted/30 border-dashed">
+                            <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                            <h3 className="font-tech uppercase text-lg mb-2">Inventory Management</h3>
+                            <p className="text-muted-foreground text-sm">Track parts, stock levels, and vendor orders</p>
+                          </Card>
+                        )}
                       </TabsContent>
 
                       {/* Team Tab */}
