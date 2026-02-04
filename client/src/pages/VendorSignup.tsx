@@ -30,14 +30,31 @@ export default function VendorSignup() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setSubmitted(true);
-    setIsSubmitting(false);
-    toast({
-      title: "Application Submitted",
-      description: "We'll review your application and get back to you within 2-3 business days."
-    });
+    try {
+      const response = await fetch("/api/vendor-applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to submit application");
+      }
+      
+      setSubmitted(true);
+      toast({
+        title: "Application Submitted",
+        description: "We'll review your application and get back to you within 2-3 business days."
+      });
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "Please try again or contact us directly.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {

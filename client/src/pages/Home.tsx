@@ -684,6 +684,29 @@ export default function Home() {
             <FeaturedCarousel />
           </motion.div>
           
+          {/* Vendor Spotlight - Become a Vendor CTA */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42 }}>
+            <Link href="/vendor-signup">
+              <Card className="bento-glass p-4 border-amber-500/20 hover:border-amber-500/40 transition-all group cursor-pointer">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 flex items-center justify-center flex-shrink-0">
+                    <Crown className="w-7 h-7 text-amber-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-sm font-tech font-bold uppercase text-amber-400">Become a Vendor</h3>
+                      <span className="px-1.5 py-0.5 text-[9px] font-mono uppercase bg-green-500/20 text-green-400 border border-green-500/30 rounded">FREE</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Join 50+ retailers. Get featured, earn badges, compete for Vendor of the Month!
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                </div>
+              </Card>
+            </Link>
+          </motion.div>
+          
           {/* Trusted Retailers */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }} className="bento-glass rounded-lg p-2 overflow-hidden">
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 mb-2 text-center">Trusted Partners</p>
