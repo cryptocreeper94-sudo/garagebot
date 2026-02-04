@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
+import { Sparkles, Shield, Fingerprint } from "lucide-react";
 
 interface Release {
   id: string;
@@ -8,6 +9,12 @@ interface Release {
   versionType: string;
   publishedAt: string | null;
 }
+
+const ecosystemLinks = [
+  { name: "DarkWave Studios", url: "https://dwsc.io", icon: Sparkles, color: "text-purple-400" },
+  { name: "Trust Layer ID", url: "https://tlid.io", icon: Fingerprint, color: "text-cyan-400" },
+  { name: "TrustShield", url: "https://trustshield.tech", icon: Shield, color: "text-emerald-400" },
+];
 
 export default function Footer() {
   const { data: latestRelease } = useQuery<Release | null>({
@@ -43,6 +50,23 @@ export default function Footer() {
           <Link href="/privacy" className="hover:text-primary transition-colors" data-testid="footer-link-privacy">Privacy</Link>
           <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
           <Link href="/dev" className="hover:text-primary transition-colors" data-testid="footer-link-dev">Dev</Link>
+          
+          {/* Ecosystem Links */}
+          <span className="hidden sm:inline text-border">|</span>
+          <span className="hidden sm:inline text-[9px] text-muted-foreground/60">Ecosystem:</span>
+          {ecosystemLinks.map((site) => (
+            <a
+              key={site.name}
+              href={site.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hidden sm:inline-flex items-center gap-0.5 hover:opacity-100 opacity-70 transition-opacity ${site.color}`}
+              data-testid={`footer-ecosystem-${site.name.toLowerCase().replace(/\s/g, '-')}`}
+            >
+              <site.icon className="w-3 h-3" />
+              <span className="text-[9px]">{site.url.replace('https://', '')}</span>
+            </a>
+          ))}
         </div>
       </div>
     </footer>
