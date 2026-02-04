@@ -1,7 +1,7 @@
 import { db } from "@db";
 import { 
   users, vehicles, deals, hallmarks, carts, cartItems, orders, orderItems, 
-  vendors, searchHistory, waitlist, shops, shopStaff, shopCustomers, shopReviews,
+  vendors, vendorApplications, searchHistory, waitlist, shops, shopStaff, shopCustomers, shopReviews,
   serviceRecords, serviceReminders, messageTemplates, messageLog,
   userPreferences, auditLog, vehicleRecalls, scanHistory, devTasks, vehicleShares,
   affiliateNetworks, affiliatePartners, affiliateClicks, affiliateCommissions, affiliatePayouts,
@@ -48,7 +48,8 @@ import type {
   SeoPage, InsertSeoPage, AnalyticsSession, InsertAnalyticsSession,
   AnalyticsPageView, InsertAnalyticsPageView, AnalyticsEvent, InsertAnalyticsEvent,
   PartnerApiCredential, InsertPartnerApiCredential, PartnerApiLog, InsertPartnerApiLog,
-  ShopLocation, InsertShopLocation
+  ShopLocation, InsertShopLocation,
+  VendorApplication, InsertVendorApplication
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -879,6 +880,46 @@ export class DatabaseStorage implements IStorage {
   async updateVendor(id: string, updates: Partial<Vendor>): Promise<Vendor | undefined> {
     const [vendor] = await db.update(vendors).set(updates).where(eq(vendors.id, id)).returning();
     return vendor;
+  }
+
+  // Vendor Applications
+  async createVendorApplication(application: InsertVendorApplication): Promise<VendorApplication> {
+    const [app] = await db.insert(vendorApplications).values(application).returning();
+    return app;
+  }
+
+  async getVendorApplications(status?: string): Promise<VendorApplication[]> {
+    if (status) {
+      return await db.select().from(vendorApplications)
+        .where(eq(vendorApplications.status, status))
+        .orderBy(desc(vendorApplications.createdAt));
+    }
+    return await db.select().from(vendorApplications).orderBy(desc(vendorApplications.createdAt));
+  }
+
+  async getVendorApplication(id: string): Promise<VendorApplication | undefined> {
+    const [app] = await db.select().from(vendorApplications).where(eq(vendorApplications.id, id));
+    return app;
+  }
+
+  async updateVendorApplication(id: string, updates: Partial<VendorApplication>): Promise<VendorApplication | undefined> {
+    const [app] = await db.update(vendorApplications).set(updates).where(eq(vendorApplications.id, id)).returning();
+    return app;
+  }
+
+  async getVendorOfMonth(): Promise<Vendor | undefined> {
+    const [vendor] = await db.select().from(vendors)
+      .where(and(eq(vendors.isActive, true), eq(vendors.isFeatured, true)))
+      .orderBy(desc(vendors.averageRating), desc(vendors.totalReviews))
+      .limit(1);
+    return vendor;
+  }
+
+  async getFeaturedVendors(limit: number = 5): Promise<Vendor[]> {
+    return await db.select().from(vendors)
+      .where(eq(vendors.isActive, true))
+      .orderBy(desc(vendors.isFeatured), desc(vendors.averageRating), desc(vendors.clickCount))
+      .limit(limit);
   }
 
   // Search History

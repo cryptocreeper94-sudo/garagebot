@@ -331,7 +331,44 @@ export const vendors = pgTable("vendors", {
   isActive: boolean("is_active").default(true),
   priority: integer("priority").default(0),
   createdAt: timestamp("created_at").defaultNow(),
+  // Vendor rewards fields
+  contactName: text("contact_name"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+  location: text("location"),
+  description: text("description"),
+  businessType: text("business_type"),
+  isVerified: boolean("is_verified").default(false),
+  isFeatured: boolean("is_featured").default(false),
+  vendorOfMonthCount: integer("vendor_of_month_count").default(0),
+  lastVendorOfMonth: timestamp("last_vendor_of_month"),
+  totalReviews: integer("total_reviews").default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0"),
+  clickCount: integer("click_count").default(0),
+  badge: text("badge"),
 });
+
+// Vendor Applications (pending approval)
+export const vendorApplications = pgTable("vendor_applications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  businessName: text("business_name").notNull(),
+  contactName: text("contact_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  website: text("website"),
+  businessType: text("business_type"),
+  location: text("location"),
+  description: text("description"),
+  status: text("status").default("pending").notNull(),
+  reviewedBy: varchar("reviewed_by").references(() => users.id, { onDelete: "set null" }),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewNotes: text("review_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertVendorApplicationSchema = createInsertSchema(vendorApplications).omit({ id: true, createdAt: true, status: true, reviewedBy: true, reviewedAt: true, reviewNotes: true });
+export type InsertVendorApplication = z.infer<typeof insertVendorApplicationSchema>;
+export type VendorApplication = typeof vendorApplications.$inferSelect;
 
 // Search history
 export const searchHistory = pgTable("search_history", {

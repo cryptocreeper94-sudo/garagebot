@@ -1547,6 +1547,47 @@ export async function registerRoutes(
     }
   });
 
+  // Vendor Applications API (public submit)
+  app.post("/api/vendor-applications", async (req, res) => {
+    try {
+      const { insertVendorApplicationSchema } = await import("@shared/schema");
+      const parseResult = insertVendorApplicationSchema.safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid application data", 
+          details: parseResult.error.flatten().fieldErrors 
+        });
+      }
+      
+      const application = await storage.createVendorApplication(parseResult.data);
+      res.status(201).json(application);
+    } catch (error: any) {
+      console.error("Vendor application error:", error);
+      res.status(500).json({ error: "Failed to submit application" });
+    }
+  });
+
+  // Featured vendors / Vendor of the Month (public)
+  app.get("/api/vendors/featured", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 5;
+      const vendors = await storage.getFeaturedVendors(limit);
+      res.json(vendors);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch featured vendors" });
+    }
+  });
+
+  app.get("/api/vendors/vendor-of-month", async (req, res) => {
+    try {
+      const vendor = await storage.getVendorOfMonth();
+      res.json(vendor || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch vendor of the month" });
+    }
+  });
+
   // Vendors API (public)
   app.get("/api/vendors", async (req, res) => {
     try {
