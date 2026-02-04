@@ -178,17 +178,86 @@ const API_SCOPES = [
   { id: 'staff:write', name: 'Write Staff', description: 'Manage team members' },
 ];
 
-const PARTS_VENDORS = [
-  { id: "amazon", name: "Amazon Automotive", logo: "📦", url: "https://www.amazon.com/s?k=", tag: "garagebot-20", network: "Amazon Associates" },
-  { id: "ebay", name: "eBay Motors", logo: "🛒", url: "https://www.ebay.com/sch/i.html?_nkw=", campid: "5339140935", network: "eBay Partner Network" },
-  { id: "autozone", name: "AutoZone", logo: "🔧", url: "https://www.autozone.com/searchresult?searchText=", network: "Impact" },
-  { id: "advance", name: "Advance Auto Parts", logo: "🚗", url: "https://shop.advanceautoparts.com/web/SearchResults?searchTerm=", network: "CJ Affiliate" },
-  { id: "rockauto", name: "RockAuto", logo: "🪨", url: "https://www.rockauto.com/en/partsearch/?partnum=", network: "Direct" },
-  { id: "oreilly", name: "O'Reilly Auto Parts", logo: "🔩", url: "https://www.oreillyauto.com/shop/b/search?q=", network: "Direct" },
-  { id: "napa", name: "NAPA Auto Parts", logo: "🛠️", url: "https://www.napaonline.com/en/search?q=", network: "Direct" },
-  { id: "partzilla", name: "Partzilla", logo: "🏍️", url: "https://www.partzilla.com/search?q=", network: "ShareASale" },
-  { id: "guta", name: "Guta Auto Parts", logo: "⚙️", url: "https://www.guta.com/search?q=", awinId: "105913", network: "AWIN" },
+// Affiliate Partners - We earn commission from these
+const AFFILIATE_VENDORS = [
+  { id: "amazon", name: "Amazon Automotive", logo: "📦", url: "https://www.amazon.com/s?k=", tag: "garagebot-20", network: "Amazon Associates", isAffiliate: true },
+  { id: "ebay", name: "eBay Motors", logo: "🛒", url: "https://www.ebay.com/sch/i.html?_nkw=", campid: "5339140935", network: "eBay Partner Network", isAffiliate: true },
+  { id: "advance", name: "Advance Auto Parts", logo: "🚗", url: "https://shop.advanceautoparts.com/web/SearchResults?searchTerm=", network: "CJ Affiliate", isAffiliate: true },
+  { id: "partzilla", name: "Partzilla (Powersports)", logo: "🏍️", url: "https://www.partzilla.com/search?q=", network: "ShareASale", isAffiliate: true },
+  { id: "guta", name: "Guta Auto Parts", logo: "⚙️", url: "https://www.guta.com/search?q=", awinId: "105913", network: "AWIN", isAffiliate: true },
+  { id: "buyautoparts", name: "BuyAutoParts.com", logo: "🔧", url: "https://www.buyautoparts.com/searchresults.html?keywords=", network: "CJ Affiliate", isAffiliate: true },
+  { id: "carparts", name: "CarParts.com", logo: "🚘", url: "https://www.carparts.com/search?q=", network: "CJ Affiliate", isAffiliate: true },
+  { id: "partsgeek", name: "PartsGeek", logo: "🤓", url: "https://www.partsgeek.com/search/?q=", network: "ShareASale", isAffiliate: true },
+  { id: "carid", name: "CARiD", logo: "🏎️", url: "https://www.carid.com/search/?q=", network: "CJ Affiliate", isAffiliate: true },
 ];
+
+// Direct Search Links - No affiliate yet, but comprehensive coverage
+const DIRECT_VENDORS = [
+  // National Auto Parts Chains
+  { id: "autozone", name: "AutoZone", logo: "🔴", url: "https://www.autozone.com/searchresult?searchText=", category: "National Chain", isAffiliate: false },
+  { id: "oreilly", name: "O'Reilly Auto Parts", logo: "🟢", url: "https://www.oreillyauto.com/shop/b/search?q=", category: "National Chain", isAffiliate: false },
+  { id: "napa", name: "NAPA Auto Parts", logo: "🔵", url: "https://www.napaonline.com/en/search?q=", category: "National Chain", isAffiliate: false },
+  { id: "rockauto", name: "RockAuto", logo: "🪨", url: "https://www.rockauto.com/en/partsearch/?partnum=", category: "Online Discount", isAffiliate: false },
+  { id: "pepboys", name: "Pep Boys", logo: "🔶", url: "https://www.pepboys.com/catalogsearch/result/?q=", category: "National Chain", isAffiliate: false },
+  
+  // Performance & Racing
+  { id: "summit", name: "Summit Racing", logo: "🏁", url: "https://www.summitracing.com/search?keyword=", category: "Performance", isAffiliate: false },
+  { id: "jegs", name: "JEGS", logo: "🏆", url: "https://www.jegs.com/webapp/wcs/stores/servlet/SearchDisplay?searchTerm=", category: "Performance", isAffiliate: false },
+  { id: "speedwaymotors", name: "Speedway Motors", logo: "⚡", url: "https://www.speedwaymotors.com/search/?q=", category: "Performance", isAffiliate: false },
+  { id: "holley", name: "Holley Performance", logo: "🔥", url: "https://www.holley.com/search/?q=", category: "Performance", isAffiliate: false },
+  
+  // Off-Road & 4x4
+  { id: "4wheelparts", name: "4 Wheel Parts", logo: "🛻", url: "https://www.4wheelparts.com/search?q=", category: "Off-Road", isAffiliate: false },
+  { id: "extremeterrain", name: "ExtremeTerrain (Jeep)", logo: "🚙", url: "https://www.extremeterrain.com/search/?q=", category: "Off-Road", isAffiliate: false },
+  { id: "americantrucks", name: "AmericanTrucks", logo: "🛞", url: "https://www.americantrucks.com/search/?q=", category: "Trucks", isAffiliate: false },
+  { id: "roughcountry", name: "Rough Country", logo: "🏔️", url: "https://www.roughcountry.com/search?q=", category: "Off-Road", isAffiliate: false },
+  
+  // Motorcycle & Powersports
+  { id: "revzilla", name: "RevZilla (Motorcycle)", logo: "🏍️", url: "https://www.revzilla.com/search?query=", category: "Motorcycle", isAffiliate: false },
+  { id: "denniskirk", name: "Dennis Kirk", logo: "🛵", url: "https://www.denniskirk.com/search?q=", category: "Powersports", isAffiliate: false },
+  { id: "rockymountainatvmc", name: "Rocky Mountain ATV/MC", logo: "🏕️", url: "https://www.rockymountainatvmc.com/search?q=", category: "Powersports", isAffiliate: false },
+  { id: "bikebandit", name: "BikeBandit", logo: "🔩", url: "https://www.bikebandit.com/search?q=", category: "Motorcycle", isAffiliate: false },
+  
+  // Marine & Boat
+  { id: "westmarine", name: "West Marine", logo: "⚓", url: "https://www.westmarine.com/search?q=", category: "Marine", isAffiliate: false },
+  { id: "boatid", name: "BOATiD", logo: "🚤", url: "https://www.boatid.com/search/?q=", category: "Marine", isAffiliate: false },
+  { id: "marineparts", name: "MarineParts.com", logo: "🌊", url: "https://www.marineparts.com/search?q=", category: "Marine", isAffiliate: false },
+  
+  // Heavy Duty & Diesel
+  { id: "fleetpride", name: "FleetPride (Heavy Duty)", logo: "🚚", url: "https://www.fleetpride.com/parts/search?q=", category: "Heavy Duty", isAffiliate: false },
+  { id: "dieselpower", name: "Diesel Power Products", logo: "💨", url: "https://www.dieselpowerproducts.com/catalogsearch/result/?q=", category: "Diesel", isAffiliate: false },
+  { id: "xtremediesel", name: "Xtreme Diesel", logo: "🔋", url: "https://www.xtremeoutfitters.com/search?q=", category: "Diesel", isAffiliate: false },
+  
+  // Tires
+  { id: "tirerack", name: "Tire Rack", logo: "⭕", url: "https://www.tirerack.com/tires/TireSearchResults.jsp?search=", category: "Tires", isAffiliate: false },
+  { id: "discounttire", name: "Discount Tire", logo: "🛞", url: "https://www.discounttire.com/search?q=", category: "Tires", isAffiliate: false },
+  { id: "simpletire", name: "SimpleTire", logo: "🔘", url: "https://simpletire.com/search?q=", category: "Tires", isAffiliate: false },
+  
+  // RV & Trailer
+  { id: "rvpartscountry", name: "RV Parts Country", logo: "🏕️", url: "https://rvpartscountry.com/search?q=", category: "RV", isAffiliate: false },
+  { id: "dyersonline", name: "Dyers (RV/Marine)", logo: "🚐", url: "https://www.dyersonline.com/search?q=", category: "RV", isAffiliate: false },
+  { id: "etrailer", name: "etrailer", logo: "🚛", url: "https://www.etrailer.com/search?q=", category: "Trailer", isAffiliate: false },
+  
+  // European & Import
+  { id: "fcpeuro", name: "FCP Euro", logo: "🇪🇺", url: "https://www.fcpeuro.com/search?q=", category: "European", isAffiliate: false },
+  { id: "pelicanaparts", name: "Pelican Parts", logo: "🐦", url: "https://www.pelicanparts.com/catalog/search.htm?keywords=", category: "European", isAffiliate: false },
+  { id: "bavauto", name: "Bavarian Autosport", logo: "🇩🇪", url: "https://www.bavauto.com/catalogsearch/result/?q=", category: "European", isAffiliate: false },
+  
+  // Classic & Restoration
+  { id: "classicind", name: "Classic Industries", logo: "🚗", url: "https://www.classicindustries.com/search/?q=", category: "Classic", isAffiliate: false },
+  { id: "yearone", name: "Year One", logo: "📅", url: "https://www.yearone.com/Catalog?SearchTerm=", category: "Classic", isAffiliate: false },
+  { id: "opgi", name: "OPGI (GM Restoration)", logo: "🔧", url: "https://www.opgi.com/search/?q=", category: "Classic", isAffiliate: false },
+  
+  // Specialty & OEM
+  { id: "gmpartsdirect", name: "GM Parts Direct", logo: "🔶", url: "https://www.gmpartsdirect.com/search?q=", category: "OEM", isAffiliate: false },
+  { id: "fordparts", name: "Ford Parts", logo: "🔵", url: "https://parts.ford.com/search?q=", category: "OEM", isAffiliate: false },
+  { id: "moparonlineparts", name: "Mopar Online Parts", logo: "⬛", url: "https://www.moparonlineparts.com/search?q=", category: "OEM", isAffiliate: false },
+  { id: "hondapartsonline", name: "Honda Parts Online", logo: "🔴", url: "https://www.hondapartsonline.net/search?q=", category: "OEM", isAffiliate: false },
+  { id: "toyotapartsdeal", name: "Toyota Parts Deal", logo: "🟡", url: "https://www.toyotapartsdeal.com/search?q=", category: "OEM", isAffiliate: false },
+];
+
+// Combined for total count display
+const PARTS_VENDORS = [...AFFILIATE_VENDORS, ...DIRECT_VENDORS];
 
 function PartsOrderingTab() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -217,10 +286,10 @@ function PartsOrderingTab() {
     const vehicleKeyword = getVehicleKeyword();
     const fullQuery = vehicleKeyword ? `${searchQuery} ${vehicleKeyword}` : searchQuery;
     let url = vendor.url + encodeURIComponent(fullQuery);
-    if (vendor.tag) {
+    if ('tag' in vendor && vendor.tag) {
       url += `&tag=${vendor.tag}`;
     }
-    if (vendor.campid) {
+    if ('campid' in vendor && vendor.campid) {
       url += `&mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=${vendor.campid}&toolid=10001`;
     }
     window.open(url, "_blank");
@@ -237,7 +306,7 @@ function PartsOrderingTab() {
             </div>
             <div>
               <h3 className="text-2xl font-tech font-bold uppercase">Order Parts</h3>
-              <p className="text-muted-foreground">Search across 25+ retailers with affiliate savings</p>
+              <p className="text-muted-foreground">Search across {PARTS_VENDORS.length}+ retailers with affiliate savings</p>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4 mt-4">
@@ -288,32 +357,69 @@ function PartsOrderingTab() {
         </div>
 
         {searchQuery ? (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground mb-4">
-              Search results for "<span className="text-primary font-medium">{searchQuery}</span>" across {PARTS_VENDORS.length} retailers:
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {PARTS_VENDORS.map((vendor) => (
-                <Card 
-                  key={vendor.id}
-                  className="p-4 bg-muted/20 hover:bg-muted/30 hover:border-primary/50 transition-all cursor-pointer group"
-                  onClick={() => handleSearch(vendor)}
-                  data-testid={`card-vendor-${vendor.id}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{vendor.logo}</span>
-                      <div>
-                        <h4 className="font-tech font-bold">{vendor.name}</h4>
-                        <p className="text-xs text-muted-foreground">{vendor.network}</p>
+          <div className="space-y-6">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-5 h-5 text-yellow-500" />
+                <h4 className="font-tech font-bold text-lg">AFFILIATE PARTNERS</h4>
+                <Badge variant="outline" className="text-yellow-500 border-yellow-500/50">We Earn Commission</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">
+                Search "<span className="text-primary font-medium">{searchQuery}</span>" at our partner retailers:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {AFFILIATE_VENDORS.map((vendor) => (
+                  <Card 
+                    key={vendor.id}
+                    className="p-3 bg-gradient-to-r from-yellow-500/10 to-amber-500/5 border-yellow-500/30 hover:border-yellow-500/50 transition-all cursor-pointer group"
+                    onClick={() => handleSearch(vendor)}
+                    data-testid={`card-affiliate-${vendor.id}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{vendor.logo}</span>
+                        <div>
+                          <h4 className="font-tech font-bold text-sm">{vendor.name}</h4>
+                          <p className="text-xs text-yellow-500/80">{vendor.network}</p>
+                        </div>
                       </div>
+                      <Button size="sm" variant="outline" className="gap-1 h-7 text-xs border-yellow-500/50 hover:bg-yellow-500/20" data-testid={`button-search-${vendor.id}`}>
+                        Search <ExternalLink className="w-3 h-3" />
+                      </Button>
                     </div>
-                    <Button size="sm" className="gap-1 opacity-80 group-hover:opacity-100" data-testid={`button-search-${vendor.id}`}>
-                      Search <ExternalLink className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Link className="w-5 h-5 text-muted-foreground" />
+                <h4 className="font-tech font-bold text-lg text-muted-foreground">ALSO COMPARE AT</h4>
+                <Badge variant="outline" className="text-muted-foreground">{DIRECT_VENDORS.length} More Retailers</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">
+                Direct search links to additional retailers (affiliate partnerships pending):
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {DIRECT_VENDORS.map((vendor) => (
+                  <Card 
+                    key={vendor.id}
+                    className="p-2 bg-muted/10 hover:bg-muted/20 hover:border-primary/30 transition-all cursor-pointer group"
+                    onClick={() => handleSearch(vendor)}
+                    data-testid={`card-direct-${vendor.id}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{vendor.logo}</span>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-tech font-bold text-xs truncate">{vendor.name}</h4>
+                        <p className="text-xs text-muted-foreground truncate">{vendor.category}</p>
+                      </div>
+                      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    </div>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
