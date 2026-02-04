@@ -394,7 +394,7 @@ function PartsOrderingTab() {
 
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Link className="w-5 h-5 text-muted-foreground" />
+                <Link2 className="w-5 h-5 text-muted-foreground" />
                 <h4 className="font-tech font-bold text-lg text-muted-foreground">ALSO COMPARE AT</h4>
                 <Badge variant="outline" className="text-muted-foreground">{DIRECT_VENDORS.length} More Retailers</Badge>
               </div>
