@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -256,12 +255,80 @@ const DIRECT_VENDORS = [
   { id: "toyotapartsdeal", name: "Toyota Parts Deal", logo: "🟡", url: "https://www.toyotapartsdeal.com/search?q=", category: "OEM", isAffiliate: false },
 ];
 
+// Local Chains with Store Pickup (BOPIS) - Priority when ZIP provided
+const LOCAL_CHAINS = [
+  { 
+    id: "autozone", 
+    name: "AutoZone", 
+    logo: "🔴", 
+    searchUrl: "https://www.autozone.com/searchresult?searchText=",
+    storeLocatorUrl: "https://www.autozone.com/locations?location=",
+    bopisNote: "Free Same Day Pickup",
+    stores: "6,400+"
+  },
+  { 
+    id: "oreilly", 
+    name: "O'Reilly Auto Parts", 
+    logo: "🟢", 
+    searchUrl: "https://www.oreillyauto.com/shop/b/search?q=",
+    storeLocatorUrl: "https://www.oreillyauto.com/store-locator?location=",
+    bopisNote: "Free In-Store Pickup",
+    stores: "6,100+"
+  },
+  { 
+    id: "napa", 
+    name: "NAPA Auto Parts", 
+    logo: "🔵", 
+    searchUrl: "https://www.napaonline.com/en/search?q=",
+    storeLocatorUrl: "https://www.napaonline.com/en/auto-parts-stores-near-me?location=",
+    bopisNote: "Pick Up In Store",
+    stores: "6,000+"
+  },
+  { 
+    id: "advance", 
+    name: "Advance Auto Parts", 
+    logo: "🚗", 
+    searchUrl: "https://shop.advanceautoparts.com/web/SearchResults?searchTerm=",
+    storeLocatorUrl: "https://stores.advanceautoparts.com/search?q=",
+    bopisNote: "Free Same Day Delivery*",
+    stores: "4,700+",
+    isAffiliate: true
+  },
+  { 
+    id: "pepboys", 
+    name: "Pep Boys", 
+    logo: "🔶", 
+    searchUrl: "https://www.pepboys.com/catalogsearch/result/?q=",
+    storeLocatorUrl: "https://www.pepboys.com/stores?location=",
+    bopisNote: "Store Pickup Available",
+    stores: "900+"
+  },
+];
+
 // Combined for total count display
 const PARTS_VENDORS = [...AFFILIATE_VENDORS, ...DIRECT_VENDORS];
+const TOTAL_RETAILERS = AFFILIATE_VENDORS.length + DIRECT_VENDORS.length + LOCAL_CHAINS.length;
 
 function PartsOrderingTab() {
   const [searchQuery, setSearchQuery] = useState("");
   const [vehicleFilter, setVehicleFilter] = useState("");
+  const [zipCode, setZipCode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('garagebot_zip') || "";
+    }
+    return "";
+  });
+  const [showZipInput, setShowZipInput] = useState(false);
+
+  // Save ZIP to localStorage
+  const handleZipChange = (zip: string) => {
+    const cleaned = zip.replace(/\D/g, '').slice(0, 5);
+    setZipCode(cleaned);
+    if (cleaned.length === 5) {
+      localStorage.setItem('garagebot_zip', cleaned);
+      setShowZipInput(false);
+    }
+  };
 
   const getVehicleKeyword = () => {
     if (!vehicleFilter) return "";
@@ -295,6 +362,30 @@ function PartsOrderingTab() {
     window.open(url, "_blank");
   };
 
+  const handleLocalSearch = (chain: typeof LOCAL_CHAINS[0]) => {
+    const vehicleKeyword = getVehicleKeyword();
+    const fullQuery = vehicleKeyword ? `${searchQuery} ${vehicleKeyword}` : searchQuery;
+    // For Advance Auto (affiliate partner), use affiliate link
+    if (chain.id === 'advance' && 'isAffiliate' in chain && chain.isAffiliate) {
+      const affiliateVendor = AFFILIATE_VENDORS.find(v => v.id === 'advance');
+      if (affiliateVendor) {
+        handleSearch(affiliateVendor);
+        return;
+      }
+    }
+    // Otherwise open direct search results
+    const url = chain.searchUrl + encodeURIComponent(fullQuery);
+    window.open(url, "_blank");
+  };
+
+  const handleFindStores = (chain: typeof LOCAL_CHAINS[0]) => {
+    if (zipCode.length === 5) {
+      window.open(chain.storeLocatorUrl + zipCode, "_blank");
+    } else {
+      setShowZipInput(true);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="p-6 bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-teal-500/20 border-green-500/30 relative overflow-hidden">
@@ -306,7 +397,7 @@ function PartsOrderingTab() {
             </div>
             <div>
               <h3 className="text-2xl font-tech font-bold uppercase">Order Parts</h3>
-              <p className="text-muted-foreground">Search across {PARTS_VENDORS.length}+ retailers with affiliate savings</p>
+              <p className="text-muted-foreground">Search across {TOTAL_RETAILERS}+ retailers with affiliate savings</p>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4 mt-4">
@@ -339,7 +430,7 @@ function PartsOrderingTab() {
             />
           </div>
           <Select value={vehicleFilter} onValueChange={setVehicleFilter}>
-            <SelectTrigger className="w-48" data-testid="select-vehicle-filter">
+            <SelectTrigger className="w-40" data-testid="select-vehicle-filter">
               <SelectValue placeholder="All Vehicles" />
             </SelectTrigger>
             <SelectContent>
@@ -354,6 +445,36 @@ function PartsOrderingTab() {
               ))}
             </SelectContent>
           </Select>
+          
+          {/* ZIP Code for Local Stores */}
+          <div className="flex items-center gap-2">
+            {showZipInput ? (
+              <div className="flex items-center gap-1">
+                <Input
+                  placeholder="ZIP"
+                  value={zipCode}
+                  onChange={(e) => handleZipChange(e.target.value)}
+                  className="w-20 h-10 text-center"
+                  maxLength={5}
+                  data-testid="input-zip-code"
+                />
+                <Button size="sm" variant="ghost" onClick={() => setShowZipInput(false)}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1 h-10"
+                onClick={() => setShowZipInput(true)}
+                data-testid="button-set-zip"
+              >
+                <MapPin className="w-4 h-4" />
+                {zipCode ? zipCode : "Set ZIP"}
+              </Button>
+            )}
+          </div>
         </div>
 
         {searchQuery ? (
@@ -385,6 +506,67 @@ function PartsOrderingTab() {
                       </div>
                       <Button size="sm" variant="outline" className="gap-1 h-7 text-xs border-yellow-500/50 hover:bg-yellow-500/20" data-testid={`button-search-${vendor.id}`}>
                         Search <ExternalLink className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Local Pickup Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="w-5 h-5 text-green-500" />
+                <h4 className="font-tech font-bold text-lg">LOCAL PICKUP</h4>
+                <Badge variant="outline" className="text-green-500 border-green-500/50">Same Day Available</Badge>
+                {zipCode && (
+                  <span className="text-xs text-muted-foreground ml-2">Near {zipCode}</span>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">
+                Get parts today from stores near you - search then check local availability:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {LOCAL_CHAINS.map((chain) => (
+                  <Card 
+                    key={chain.id}
+                    className="p-3 bg-gradient-to-r from-green-500/10 to-emerald-500/5 border-green-500/30 hover:border-green-500/50 transition-all"
+                    data-testid={`card-local-${chain.id}`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{chain.logo}</span>
+                        <div>
+                          <h4 className="font-tech font-bold text-sm">{chain.name}</h4>
+                          <p className="text-xs text-green-500/80">{chain.stores} stores</p>
+                        </div>
+                      </div>
+                      {'isAffiliate' in chain && chain.isAffiliate && (
+                        <Badge variant="outline" className="text-yellow-500 border-yellow-500/50 text-xs">Affiliate</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400">
+                        {chain.bopisNote}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        className="flex-1 gap-1 h-7 text-xs bg-green-600 hover:bg-green-700"
+                        onClick={() => handleLocalSearch(chain)}
+                        data-testid={`button-search-local-${chain.id}`}
+                      >
+                        Search Parts <ExternalLink className="w-3 h-3" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="gap-1 h-7 text-xs border-green-500/50 hover:bg-green-500/20"
+                        onClick={() => handleFindStores(chain)}
+                        data-testid={`button-find-stores-${chain.id}`}
+                      >
+                        <MapPin className="w-3 h-3" /> Stores
                       </Button>
                     </div>
                   </Card>
