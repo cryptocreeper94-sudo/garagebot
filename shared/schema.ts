@@ -2010,14 +2010,19 @@ export const insertShopLocationSchema = createInsertSchema(shopLocations).omit({
 export type InsertShopLocation = z.infer<typeof insertShopLocationSchema>;
 export type ShopLocation = typeof shopLocations.$inferSelect;
 
-// Marketing Posts for GarageBot content library
+// Marketing Posts for content library
 export const marketingPosts = pgTable("marketing_posts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull().default("garagebot"),
   content: text("content").notNull(),
   platform: varchar("platform", { length: 20 }).notNull(),
   hashtags: text("hashtags").array().default(sql`ARRAY[]::text[]`),
   targetSite: varchar("target_site", { length: 50 }).default("garagebot"),
   imageId: varchar("image_id", { length: 100 }),
+  category: varchar("category", { length: 50 }),
+  contentType: varchar("content_type", { length: 30 }),
+  tone: varchar("tone", { length: 30 }),
+  cta: varchar("cta", { length: 30 }),
   isActive: boolean("is_active").default(true),
   usageCount: integer("usage_count").default(0),
   lastUsedAt: timestamp("last_used_at"),
@@ -2025,6 +2030,7 @@ export const marketingPosts = pgTable("marketing_posts", {
 }, (table) => [
   index("IDX_marketing_posts_platform").on(table.platform),
   index("IDX_marketing_posts_active").on(table.isActive),
+  index("IDX_marketing_posts_tenant").on(table.tenantId),
 ]);
 
 export const insertMarketingPostSchema = createInsertSchema(marketingPosts).omit({ id: true, createdAt: true });
@@ -2034,10 +2040,16 @@ export type MarketingPost = typeof marketingPosts.$inferSelect;
 // Marketing Images library
 export const marketingImages = pgTable("marketing_images", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull().default("garagebot"),
   filename: varchar("filename", { length: 255 }).notNull(),
   filePath: varchar("file_path", { length: 500 }).notNull(),
   category: varchar("category", { length: 50 }),
+  subject: varchar("subject", { length: 50 }),
+  style: varchar("style", { length: 50 }),
+  season: varchar("season", { length: 20 }),
+  quality: integer("quality").default(5),
   altText: varchar("alt_text", { length: 255 }),
+  tags: text("tags").array().default(sql`ARRAY[]::text[]`),
   isActive: boolean("is_active").default(true),
   usageCount: integer("usage_count").default(0),
   lastUsedAt: timestamp("last_used_at"),
@@ -2045,6 +2057,7 @@ export const marketingImages = pgTable("marketing_images", {
 }, (table) => [
   index("IDX_marketing_images_category").on(table.category),
   index("IDX_marketing_images_active").on(table.isActive),
+  index("IDX_marketing_images_tenant").on(table.tenantId),
 ]);
 
 export const insertMarketingImageSchema = createInsertSchema(marketingImages).omit({ id: true, createdAt: true });
@@ -2054,6 +2067,7 @@ export type MarketingImage = typeof marketingImages.$inferSelect;
 // Social Media Integrations (Facebook/Instagram/X)
 export const socialIntegrations = pgTable("social_integrations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull().default("garagebot").unique(),
   facebookPageId: varchar("facebook_page_id", { length: 100 }),
   facebookPageName: varchar("facebook_page_name", { length: 255 }),
   facebookPageAccessToken: text("facebook_page_access_token"),
@@ -2061,8 +2075,15 @@ export const socialIntegrations = pgTable("social_integrations", {
   instagramAccountId: varchar("instagram_account_id", { length: 100 }),
   instagramUsername: varchar("instagram_username", { length: 100 }),
   instagramConnected: boolean("instagram_connected").default(false),
+  twitterApiKey: varchar("twitter_api_key", { length: 255 }),
+  twitterApiSecret: varchar("twitter_api_secret", { length: 255 }),
+  twitterAccessToken: varchar("twitter_access_token", { length: 255 }),
+  twitterAccessTokenSecret: varchar("twitter_access_token_secret", { length: 255 }),
   twitterUsername: varchar("twitter_username", { length: 100 }),
   twitterConnected: boolean("twitter_connected").default(false),
+  nextdoorConnected: boolean("nextdoor_connected").default(false),
+  linkedinConnected: boolean("linkedin_connected").default(false),
+  googleBusinessConnected: boolean("google_business_connected").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -2072,17 +2093,30 @@ export type SocialIntegration = typeof socialIntegrations.$inferSelect;
 // Scheduled/Posted Marketing entries
 export const scheduledPosts = pgTable("scheduled_posts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull().default("garagebot"),
   marketingPostId: varchar("marketing_post_id", { length: 100 }),
   platform: varchar("platform", { length: 20 }).notNull(),
   content: text("content").notNull(),
   imageUrl: varchar("image_url", { length: 500 }),
+  postType: varchar("post_type", { length: 20 }).default("organic"),
   scheduledFor: timestamp("scheduled_for"),
   postedAt: timestamp("posted_at"),
   externalPostId: varchar("external_post_id", { length: 100 }),
   status: varchar("status", { length: 20 }).default("pending"),
   error: text("error"),
+  impressions: integer("impressions").default(0),
+  reach: integer("reach").default(0),
+  clicks: integer("clicks").default(0),
+  likes: integer("likes").default(0),
+  comments: integer("comments").default(0),
+  shares: integer("shares").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_scheduled_posts_status").on(table.status),
   index("IDX_scheduled_posts_platform").on(table.platform),
+  index("IDX_scheduled_posts_tenant").on(table.tenantId),
 ]);
+
+export const insertScheduledPostSchema = createInsertSchema(scheduledPosts).omit({ id: true, createdAt: true });
+export type InsertScheduledPost = z.infer<typeof insertScheduledPostSchema>;
+export type ScheduledPost = typeof scheduledPosts.$inferSelect;
