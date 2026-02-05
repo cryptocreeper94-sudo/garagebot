@@ -1198,24 +1198,140 @@ export default function MechanicsGarage() {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans">
         <Nav />
-        <div className="max-w-6xl mx-auto px-4 pt-24 text-center">
-          <Wrench className="w-24 h-24 mx-auto mb-6 text-primary/30" />
-          <h1 className="text-3xl font-tech font-bold uppercase text-primary mb-4">Mechanics Garage</h1>
-          <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
-            Professional shop management for ALL vehicle types - cars, trucks, boats, ATVs, motorcycles, small engines, and more.
-          </p>
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {VEHICLE_TYPES.slice(0, 8).map(vt => (
-              <Badge key={vt.id} variant="outline" className="gap-1 text-xs">
-                <vt.icon className="w-3 h-3" />
-                {vt.name}
-              </Badge>
-            ))}
+        <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
+          <div className="text-center mb-12">
+            <Wrench className="w-24 h-24 mx-auto mb-6 text-primary/30" />
+            <h1 className="text-3xl font-tech font-bold uppercase text-primary mb-4">Mechanics Garage</h1>
+            <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
+              Professional shop management for ALL vehicle types - cars, trucks, boats, ATVs, motorcycles, small engines, and more.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {VEHICLE_TYPES.slice(0, 8).map(vt => (
+                <Badge key={vt.id} variant="outline" className="gap-1 text-xs">
+                  <vt.icon className="w-3 h-3" />
+                  {vt.name}
+                </Badge>
+              ))}
+            </div>
+            <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/auth"} data-testid="button-login">
+              Sign In with PIN
+            </Button>
           </div>
-          <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/auth"} data-testid="button-login">
-            Sign In with PIN
-          </Button>
+
+          {/* Competitive Comparison Section */}
+          <Card className="p-6 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 border-primary/20 mb-8">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-tech font-bold uppercase text-primary mb-2">Why Choose Mechanics Garage?</h2>
+              <p className="text-sm text-muted-foreground">Compare us to the industry leaders</p>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-muted">
+                    <th className="text-left py-3 px-4 font-tech uppercase text-xs">Feature</th>
+                    <th className="text-center py-3 px-4 font-tech uppercase text-xs text-primary">GarageBot</th>
+                    <th className="text-center py-3 px-4 font-tech uppercase text-xs text-muted-foreground">AutoLeap</th>
+                    <th className="text-center py-3 px-4 font-tech uppercase text-xs text-muted-foreground">Tekmetric</th>
+                    <th className="text-center py-3 px-4 font-tech uppercase text-xs text-muted-foreground">Shopmonkey</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-muted/30">
+                  <tr>
+                    <td className="py-3 px-4 font-medium">Monthly Price</td>
+                    <td className="py-3 px-4 text-center font-bold text-green-400">$49/mo</td>
+                    <td className="py-3 px-4 text-center text-muted-foreground">$179/mo</td>
+                    <td className="py-3 px-4 text-center text-muted-foreground">$179/mo</td>
+                    <td className="py-3 px-4 text-center text-muted-foreground">$179/mo</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-medium">Parts Vendors Integrated</td>
+                    <td className="py-3 px-4 text-center font-bold text-green-400">40+</td>
+                    <td className="py-3 px-4 text-center text-muted-foreground">Limited</td>
+                    <td className="py-3 px-4 text-center text-muted-foreground">15+</td>
+                    <td className="py-3 px-4 text-center text-muted-foreground">10+</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-medium">Multi-Vehicle Types (Boats, ATVs, RVs)</td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-red-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-red-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-red-400 mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-medium">Digital Vehicle Inspections (DVI)</td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-medium">Integrated Payments</td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-medium">Automated Reminders</td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-medium">Analytics & Reporting</td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-medium">AI-Powered Assistant</td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center text-muted-foreground text-xs">Add-on</td>
+                    <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-red-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-red-400 mx-auto" /></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-medium">Partner API Access</td>
+                    <td className="py-3 px-4 text-center"><CheckCircle className="w-4 h-4 text-green-400 mx-auto" /></td>
+                    <td className="py-3 px-4 text-center text-muted-foreground text-xs">Enterprise</td>
+                    <td className="py-3 px-4 text-center text-muted-foreground text-xs">Enterprise</td>
+                    <td className="py-3 px-4 text-center text-muted-foreground text-xs">Enterprise</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Key Benefits */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card className="p-4 bg-green-500/5 border-green-500/20 text-center">
+              <DollarSign className="w-8 h-8 text-green-400 mx-auto mb-2" />
+              <h3 className="font-tech font-bold uppercase text-sm mb-1">Save $130+/month</h3>
+              <p className="text-xs text-muted-foreground">Same features, fraction of the cost</p>
+            </Card>
+            <Card className="p-4 bg-primary/5 border-primary/20 text-center">
+              <Wrench className="w-8 h-8 text-primary mx-auto mb-2" />
+              <h3 className="font-tech font-bold uppercase text-sm mb-1">40+ Parts Vendors</h3>
+              <p className="text-xs text-muted-foreground">More sources than any competitor</p>
+            </Card>
+            <Card className="p-4 bg-blue-500/5 border-blue-500/20 text-center">
+              <Car className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+              <h3 className="font-tech font-bold uppercase text-sm mb-1">All Vehicle Types</h3>
+              <p className="text-xs text-muted-foreground">Cars, boats, ATVs, RVs & more</p>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <Button size="lg" className="font-tech uppercase" onClick={() => window.location.href = "/auth"} data-testid="button-get-started-free">
+              Get Started Free
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">No credit card required for demo</p>
+          </div>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -1692,7 +1808,7 @@ export default function MechanicsGarage() {
 
                     {/* Tabs */}
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="p-6">
-                      <TabsList className="grid grid-cols-9 mb-6 h-auto">
+                      <TabsList className="grid grid-cols-11 mb-6 h-auto">
                         <TabsTrigger value="dashboard" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-dashboard">
                           <BarChart3 className="w-4 h-4" />
                           Dashboard
@@ -1700,6 +1816,11 @@ export default function MechanicsGarage() {
                         <TabsTrigger value="orders" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-orders">
                           <ClipboardList className="w-4 h-4" />
                           Orders
+                        </TabsTrigger>
+                        <TabsTrigger value="inspections" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto relative" data-testid="tab-inspections">
+                          <Camera className="w-4 h-4" />
+                          DVI
+                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                         </TabsTrigger>
                         <TabsTrigger value="parts" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto relative" data-testid="tab-parts">
                           <Wrench className="w-4 h-4" />
@@ -1717,6 +1838,11 @@ export default function MechanicsGarage() {
                         <TabsTrigger value="inventory" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-inventory">
                           <Package className="w-4 h-4" />
                           Inventory
+                        </TabsTrigger>
+                        <TabsTrigger value="analytics" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto relative" data-testid="tab-analytics">
+                          <Activity className="w-4 h-4" />
+                          Analytics
+                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
                         </TabsTrigger>
                         <TabsTrigger value="team" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto" data-testid="tab-team">
                           <Users className="w-4 h-4" />
@@ -1821,7 +1947,7 @@ export default function MechanicsGarage() {
                             <Calendar className="w-5 h-5" />
                             Schedule Appointment
                           </Button>
-                          <Button variant="outline" className="h-auto py-4 flex-col gap-2 font-tech text-xs">
+                          <Button variant="outline" className="h-auto py-4 flex-col gap-2 font-tech text-xs" onClick={() => setActiveTab("inspections")}>
                             <Camera className="w-5 h-5" />
                             Start Inspection
                           </Button>
@@ -1923,13 +2049,21 @@ export default function MechanicsGarage() {
                                       <p className="text-sm text-muted-foreground">{order.vehicleInfo}</p>
                                     </div>
                                   </div>
-                                  <div className="flex items-center gap-4">
-                                    <div className="text-right">
+                                  <div className="flex items-center gap-3">
+                                    <div className="text-right mr-2">
                                       <p className="font-mono font-bold text-lg">${order.grandTotal || '0.00'}</p>
                                       <Badge variant="outline" className={`text-[10px] ${order.paymentStatus === 'paid' ? 'text-green-400 border-green-400/30' : 'text-yellow-400 border-yellow-400/30'}`}>
                                         {order.paymentStatus || 'unpaid'}
                                       </Badge>
                                     </div>
+                                    {order.paymentStatus !== 'paid' && (
+                                      <Button size="sm" className="gap-1 font-tech text-xs bg-green-600 hover:bg-green-700">
+                                        <CreditCard className="w-3 h-3" /> Collect Payment
+                                      </Button>
+                                    )}
+                                    <Button variant="outline" size="sm" className="gap-1 font-tech text-xs">
+                                      <Send className="w-3 h-3" /> Remind
+                                    </Button>
                                     <Button variant="ghost" size="icon">
                                       <MoreHorizontal className="w-4 h-4" />
                                     </Button>
@@ -1939,6 +2073,118 @@ export default function MechanicsGarage() {
                             ))}
                           </div>
                         )}
+                      </TabsContent>
+
+                      {/* Digital Vehicle Inspection (DVI) Tab */}
+                      <TabsContent value="inspections">
+                        <div className="space-y-6">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-tech uppercase text-lg">Digital Vehicle Inspections</h3>
+                              <p className="text-sm text-muted-foreground">Photo & video documentation for customer transparency</p>
+                            </div>
+                            <Button className="gap-2 font-tech text-xs">
+                              <Camera className="w-3 h-3" /> Start New Inspection
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <Card className="p-4 bg-gradient-to-br from-green-500/10 to-transparent border-green-500/20">
+                              <div className="flex items-center gap-3 mb-2">
+                                <CheckCircle className="w-5 h-5 text-green-500" />
+                                <span className="font-tech uppercase text-xs">Completed Today</span>
+                              </div>
+                              <p className="text-2xl font-bold">{demoMode ? '12' : '0'}</p>
+                            </Card>
+                            <Card className="p-4 bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20">
+                              <div className="flex items-center gap-3 mb-2">
+                                <AlertCircle className="w-5 h-5 text-yellow-500" />
+                                <span className="font-tech uppercase text-xs">Awaiting Approval</span>
+                              </div>
+                              <p className="text-2xl font-bold">{demoMode ? '3' : '0'}</p>
+                            </Card>
+                            <Card className="p-4 bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
+                              <div className="flex items-center gap-3 mb-2">
+                                <Camera className="w-5 h-5 text-primary" />
+                                <span className="font-tech uppercase text-xs">Photos This Week</span>
+                              </div>
+                              <p className="text-2xl font-bold">{demoMode ? '156' : '0'}</p>
+                            </Card>
+                          </div>
+
+                          {demoMode ? (
+                            <div className="space-y-4">
+                              {[
+                                { id: 1, vehicle: "2020 Toyota Camry", customer: "John Smith", items: 24, status: "sent", urgent: 3, date: "Today 9:15 AM" },
+                                { id: 2, vehicle: "2018 Honda Civic", customer: "Sarah Johnson", items: 18, status: "approved", urgent: 1, date: "Today 8:30 AM" },
+                                { id: 3, vehicle: "2022 Ford F-150", customer: "Mike Wilson", items: 31, status: "in_progress", urgent: 5, date: "Today 7:45 AM" },
+                              ].map((inspection) => (
+                                <Card key={inspection.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                      <div className="p-3 rounded-lg bg-primary/10">
+                                        <Camera className="w-5 h-5 text-primary" />
+                                      </div>
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-medium">{inspection.vehicle}</span>
+                                          <Badge variant="outline" className={
+                                            inspection.status === 'approved' ? 'text-green-400 border-green-400/30' :
+                                            inspection.status === 'sent' ? 'text-blue-400 border-blue-400/30' :
+                                            'text-yellow-400 border-yellow-400/30'
+                                          }>
+                                            {inspection.status}
+                                          </Badge>
+                                          {inspection.urgent > 0 && (
+                                            <Badge variant="destructive" className="text-[10px]">
+                                              {inspection.urgent} URGENT
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">{inspection.customer}</p>
+                                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                          <span className="flex items-center gap-1">
+                                            <Camera className="w-3 h-3" /> {inspection.items} items
+                                          </span>
+                                          <span>{inspection.date}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Button variant="outline" size="sm" className="font-tech text-xs">
+                                        <Eye className="w-3 h-3 mr-1" /> View
+                                      </Button>
+                                      <Button variant="outline" size="sm" className="font-tech text-xs">
+                                        <Send className="w-3 h-3 mr-1" /> Send to Customer
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </Card>
+                              ))}
+
+                              <Card className="p-6 border-dashed bg-muted/10">
+                                <h4 className="font-tech uppercase text-sm mb-4">Inspection Checklist Templates</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                  {['Full Vehicle Inspection', 'Oil Change Check', 'Brake Inspection', 'Tire Inspection', 'A/C Service Check', 'Pre-Purchase Inspection', 'Safety Inspection', 'Emissions Check'].map((template) => (
+                                    <Button key={template} variant="outline" className="h-auto py-3 text-xs font-tech justify-start">
+                                      <ClipboardList className="w-3 h-3 mr-2" />
+                                      {template}
+                                    </Button>
+                                  ))}
+                                </div>
+                              </Card>
+                            </div>
+                          ) : (
+                            <Card className="p-12 text-center bg-muted/30 border-dashed">
+                              <Camera className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                              <h3 className="font-tech uppercase text-lg mb-2">Digital Vehicle Inspections</h3>
+                              <p className="text-muted-foreground text-sm mb-4">Document vehicle condition with photos & videos. Send inspection reports directly to customers for transparent approval.</p>
+                              <Button className="font-tech">
+                                <Camera className="w-4 h-4 mr-2" /> Start First Inspection
+                              </Button>
+                            </Card>
+                          )}
+                        </div>
                       </TabsContent>
 
                       {/* Parts Ordering Tab */}
@@ -2031,6 +2277,64 @@ export default function MechanicsGarage() {
                             ))}
                           </div>
                         )}
+
+                        {/* Automated Reminders Configuration */}
+                        <Card className="p-6 mt-6 bg-gradient-to-r from-blue-500/5 to-transparent border-blue-500/20">
+                          <div className="flex items-start gap-4">
+                            <div className="p-3 rounded-xl bg-blue-500/10">
+                              <Mail className="w-8 h-8 text-blue-500" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <h4 className="font-tech font-bold text-lg">Automated Reminders</h4>
+                                  <p className="text-sm text-muted-foreground">Automatically notify customers about upcoming appointments</p>
+                                </div>
+                                <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                                  Active
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                <div className="p-3 bg-muted/20 rounded-lg">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Checkbox id="reminder-24h" defaultChecked />
+                                    <Label htmlFor="reminder-24h" className="text-xs font-tech">24 Hours Before</Label>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground ml-5">Email + SMS</p>
+                                </div>
+                                <div className="p-3 bg-muted/20 rounded-lg">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Checkbox id="reminder-2h" defaultChecked />
+                                    <Label htmlFor="reminder-2h" className="text-xs font-tech">2 Hours Before</Label>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground ml-5">SMS only</p>
+                                </div>
+                                <div className="p-3 bg-muted/20 rounded-lg">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Checkbox id="reminder-ready" defaultChecked />
+                                    <Label htmlFor="reminder-ready" className="text-xs font-tech">Vehicle Ready</Label>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground ml-5">Email + SMS</p>
+                                </div>
+                                <div className="p-3 bg-muted/20 rounded-lg">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Checkbox id="reminder-followup" />
+                                    <Label htmlFor="reminder-followup" className="text-xs font-tech">Follow-up (7 days)</Label>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground ml-5">Email only</p>
+                                </div>
+                              </div>
+                              <div className="flex gap-2 mt-4">
+                                <Button variant="outline" size="sm" className="font-tech text-xs">
+                                  <Settings className="w-3 h-3 mr-2" /> Configure Templates
+                                </Button>
+                                <Button variant="outline" size="sm" className="font-tech text-xs">
+                                  <Phone className="w-3 h-3 mr-2" /> SMS Settings
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
                       </TabsContent>
 
                       {/* Inventory Tab */}
@@ -2079,6 +2383,158 @@ export default function MechanicsGarage() {
                             <p className="text-muted-foreground text-sm">Track parts, stock levels, and vendor orders</p>
                           </Card>
                         )}
+                      </TabsContent>
+
+                      {/* Analytics & Reports Tab */}
+                      <TabsContent value="analytics">
+                        <div className="space-y-6">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-tech uppercase text-lg">Analytics & Reports</h3>
+                              <p className="text-sm text-muted-foreground">Key performance indicators and business insights</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Select defaultValue="month">
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="today">Today</SelectItem>
+                                  <SelectItem value="week">This Week</SelectItem>
+                                  <SelectItem value="month">This Month</SelectItem>
+                                  <SelectItem value="quarter">This Quarter</SelectItem>
+                                  <SelectItem value="year">This Year</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button variant="outline" className="font-tech text-xs">
+                                <FileText className="w-3 h-3 mr-2" /> Export Report
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <Card className="p-4 bg-gradient-to-br from-green-500/10 to-transparent border-green-500/20">
+                              <div className="flex items-center gap-3 mb-2">
+                                <DollarSign className="w-5 h-5 text-green-500" />
+                                <span className="font-tech uppercase text-xs">Total Revenue</span>
+                              </div>
+                              <p className="text-2xl font-bold">${demoMode ? '47,832' : '0'}</p>
+                              <p className="text-xs text-green-400 mt-1">+12.5% from last month</p>
+                            </Card>
+                            <Card className="p-4 bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
+                              <div className="flex items-center gap-3 mb-2">
+                                <ClipboardList className="w-5 h-5 text-primary" />
+                                <span className="font-tech uppercase text-xs">Avg Repair Order</span>
+                              </div>
+                              <p className="text-2xl font-bold">${demoMode ? '485' : '0'}</p>
+                              <p className="text-xs text-primary mt-1">+8.2% from last month</p>
+                            </Card>
+                            <Card className="p-4 bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20">
+                              <div className="flex items-center gap-3 mb-2">
+                                <Timer className="w-5 h-5 text-blue-500" />
+                                <span className="font-tech uppercase text-xs">Bay Utilization</span>
+                              </div>
+                              <p className="text-2xl font-bold">{demoMode ? '78%' : '0%'}</p>
+                              <p className="text-xs text-blue-400 mt-1">Target: 85%</p>
+                            </Card>
+                            <Card className="p-4 bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20">
+                              <div className="flex items-center gap-3 mb-2">
+                                <UserCheck className="w-5 h-5 text-yellow-500" />
+                                <span className="font-tech uppercase text-xs">Customer Retention</span>
+                              </div>
+                              <p className="text-2xl font-bold">{demoMode ? '89%' : '0%'}</p>
+                              <p className="text-xs text-yellow-400 mt-1">Industry avg: 65%</p>
+                            </Card>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Card className="p-6">
+                              <h4 className="font-tech uppercase text-sm mb-4">Revenue Breakdown</h4>
+                              {demoMode ? (
+                                <div className="space-y-3">
+                                  {[
+                                    { label: 'Labor', value: 28500, percent: 60 },
+                                    { label: 'Parts', value: 14350, percent: 30 },
+                                    { label: 'Fluids & Supplies', value: 3500, percent: 7 },
+                                    { label: 'Shop Fees', value: 1482, percent: 3 },
+                                  ].map((item) => (
+                                    <div key={item.label} className="space-y-1">
+                                      <div className="flex justify-between text-sm">
+                                        <span>{item.label}</span>
+                                        <span className="font-mono font-bold">${item.value.toLocaleString()}</span>
+                                      </div>
+                                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                        <div 
+                                          className="h-full bg-primary rounded-full transition-all"
+                                          style={{ width: `${item.percent}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-center py-8 text-muted-foreground text-sm">
+                                  Complete orders to see revenue breakdown
+                                </div>
+                              )}
+                            </Card>
+
+                            <Card className="p-6">
+                              <h4 className="font-tech uppercase text-sm mb-4">Technician Performance</h4>
+                              {demoMode ? (
+                                <div className="space-y-3">
+                                  {[
+                                    { name: 'Mike Johnson', hours: 42, efficiency: 112, jobs: 28 },
+                                    { name: 'Sarah Chen', hours: 38, efficiency: 98, jobs: 24 },
+                                    { name: 'Carlos Rodriguez', hours: 40, efficiency: 105, jobs: 26 },
+                                  ].map((tech) => (
+                                    <div key={tech.name} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                                          <Wrench className="w-4 h-4 text-primary" />
+                                        </div>
+                                        <div>
+                                          <p className="font-medium text-sm">{tech.name}</p>
+                                          <p className="text-xs text-muted-foreground">{tech.jobs} jobs completed</p>
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="font-mono font-bold text-sm">{tech.hours}h</p>
+                                        <Badge variant="outline" className={tech.efficiency >= 100 ? 'text-green-400' : 'text-yellow-400'}>
+                                          {tech.efficiency}% eff
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-center py-8 text-muted-foreground text-sm">
+                                  Add technicians to track performance
+                                </div>
+                              )}
+                            </Card>
+                          </div>
+
+                          <Card className="p-6">
+                            <h4 className="font-tech uppercase text-sm mb-4">Monthly Trends</h4>
+                            <div className="grid grid-cols-6 gap-2">
+                              {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month, i) => {
+                                const heights = demoMode ? [45, 52, 48, 65, 72, 78] : [0, 0, 0, 0, 0, 0];
+                                return (
+                                  <div key={month} className="text-center">
+                                    <div className="h-24 bg-muted/30 rounded-lg relative overflow-hidden">
+                                      <div 
+                                        className="absolute bottom-0 w-full bg-primary/60 rounded-b-lg transition-all"
+                                        style={{ height: `${heights[i]}%` }}
+                                      />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-2">{month}</p>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </Card>
+                        </div>
                       </TabsContent>
 
                       {/* Team Tab */}

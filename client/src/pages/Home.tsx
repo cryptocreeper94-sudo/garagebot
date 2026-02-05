@@ -720,6 +720,53 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
+          
+          {/* Mechanics Garage Competitive Comparison */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+            <Link href="/mechanics-garage" data-testid="link-mechanics-garage-comparison">
+              <Card className="bento-glass p-4 border-primary/20 hover:border-primary/40 transition-all cursor-pointer overflow-hidden relative" data-testid="card-mechanics-comparison">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Wrench className="w-5 h-5 text-primary" />
+                    <h3 className="text-sm font-tech font-bold uppercase text-primary">Mechanics Garage</h3>
+                    <span className="px-1.5 py-0.5 text-[9px] font-mono uppercase bg-primary/20 text-primary border border-primary/30 rounded">PRO</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Professional shop management that rivals AutoLeap, Tekmetric & Shopmonkey at a fraction of the cost.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      <CheckCircle2 className="w-3 h-3 text-green-400" />
+                      <span>Digital Vehicle Inspections</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      <CheckCircle2 className="w-3 h-3 text-green-400" />
+                      <span>40+ Parts Vendors</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      <CheckCircle2 className="w-3 h-3 text-green-400" />
+                      <span>Integrated Payments</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      <CheckCircle2 className="w-3 h-3 text-green-400" />
+                      <span>Multi-Vehicle Types</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground line-through">$179/mo</span>
+                      <span className="text-sm font-bold text-green-400">$49/mo</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-primary text-xs font-tech">
+                      <span>Learn More</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          </motion.div>
         </div>
       </div>
       
