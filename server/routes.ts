@@ -4,9 +4,11 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
@@ -6989,6 +6991,146 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       res.json(post);
     } catch (err) {
       res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
+
+  // ============== MARKETING HUB ROUTES ==============
+  
+  // Get marketing status and stats
+  app.get("/api/marketing/status", isAuthenticated, async (req: any, res) => {
+    try {
+      const { getMarketingStats } = await import('./marketing-scheduler');
+      const { getConnectorStatus } = await import('./social-connectors');
+      const stats = await getMarketingStats();
+      const connectors = getConnectorStatus();
+      res.json({ stats, connectors });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to get marketing status" });
+    }
+  });
+
+  // Get all marketing posts
+  app.get("/api/marketing/posts", isAuthenticated, async (req: any, res) => {
+    try {
+      const posts = await db.select().from(marketingPosts).orderBy(desc(marketingPosts.createdAt));
+      res.json(posts);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to get marketing posts" });
+    }
+  });
+
+  // Create marketing post
+  app.post("/api/marketing/posts", isAuthenticated, async (req: any, res) => {
+    try {
+      const { content, platform, hashtags, targetSite } = req.body;
+      const [post] = await db.insert(marketingPosts).values({
+        content,
+        platform: platform || 'all',
+        hashtags: hashtags || [],
+        targetSite: targetSite || 'garagebot',
+      }).returning();
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to create marketing post" });
+    }
+  });
+
+  // Update marketing post
+  app.put("/api/marketing/posts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { content, platform, hashtags, targetSite, isActive } = req.body;
+      const [post] = await db.update(marketingPosts)
+        .set({ content, platform, hashtags, targetSite, isActive })
+        .where(eq(marketingPosts.id, req.params.id))
+        .returning();
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update marketing post" });
+    }
+  });
+
+  // Delete marketing post
+  app.delete("/api/marketing/posts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      await db.delete(marketingPosts).where(eq(marketingPosts.id, req.params.id));
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to delete marketing post" });
+    }
+  });
+
+  // Get marketing images
+  app.get("/api/marketing/images", isAuthenticated, async (req: any, res) => {
+    try {
+      const images = await db.select().from(marketingImages).orderBy(desc(marketingImages.createdAt));
+      res.json(images);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to get marketing images" });
+    }
+  });
+
+  // Get posting history
+  app.get("/api/marketing/history", isAuthenticated, async (req: any, res) => {
+    try {
+      const { getPostingHistory } = await import('./marketing-scheduler');
+      const history = await getPostingHistory(100);
+      res.json(history);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to get posting history" });
+    }
+  });
+
+  // Get social integration status
+  app.get("/api/marketing/integrations", isAuthenticated, async (req: any, res) => {
+    try {
+      const [integration] = await db.select().from(socialIntegrations).limit(1);
+      const { getConnectorStatus } = await import('./social-connectors');
+      res.json({
+        integration: integration || null,
+        connectors: getConnectorStatus(),
+      });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to get integrations" });
+    }
+  });
+
+  // Manual post trigger (for testing)
+  app.post("/api/marketing/post-now", isAuthenticated, async (req: any, res) => {
+    try {
+      const { postId, platforms } = req.body;
+      const [post] = await db.select().from(marketingPosts).where(eq(marketingPosts.id, postId));
+      if (!post) return res.status(404).json({ error: "Post not found" });
+      
+      const { TwitterConnector, postToFacebook, postToInstagram } = await import('./social-connectors');
+      const [integration] = await db.select().from(socialIntegrations).limit(1);
+      
+      const results: any = {};
+      const message = `${post.content}\n\nhttps://garagebot.io`;
+      
+      if (platforms.includes('x')) {
+        const twitter = new TwitterConnector();
+        if (twitter.isConfigured()) {
+          results.x = await twitter.post(message.length > 280 ? message.substring(0, 277) + '...' : message);
+        } else {
+          results.x = { success: false, error: 'X/Twitter not configured' };
+        }
+      }
+      
+      if (platforms.includes('facebook') && integration?.facebookConnected) {
+        results.facebook = await postToFacebook(
+          integration.facebookPageId!,
+          integration.facebookPageAccessToken!,
+          message
+        );
+      }
+      
+      if (platforms.includes('instagram') && integration?.instagramConnected) {
+        results.instagram = { success: false, error: 'Instagram requires an image' };
+      }
+      
+      res.json({ results });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to post" });
     }
   });
 
