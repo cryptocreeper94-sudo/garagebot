@@ -7329,14 +7329,26 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
         });
       }
       
-      // Seed marketing images
+      // Seed marketing images - includes Hatch Show Print style posters
       const marketingImagesList = [
-        { filename: 'garagebot-mechanic-hero.png', filePath: '/marketing/garagebot-mechanic-hero.png', category: 'hero', subject: 'mechanic', altText: 'Professional mechanic working on car engine' },
-        { filename: 'garagebot-price-compare.png', filePath: '/marketing/garagebot-price-compare.png', category: 'feature', subject: 'comparison', altText: 'Price comparison across 50+ retailers' },
-        { filename: 'garagebot-all-vehicles.png', filePath: '/marketing/garagebot-all-vehicles.png', category: 'vehicles', subject: 'all-types', altText: 'Cars trucks motorcycles ATVs boats RVs lineup' },
-        { filename: 'garagebot-mobile-app.png', filePath: '/marketing/garagebot-mobile-app.png', category: 'app', subject: 'mobile', altText: 'GarageBot mobile app with retailer logos' },
-        { filename: 'garagebot-diy-mechanic.png', filePath: '/marketing/garagebot-diy-mechanic.png', category: 'diy', subject: 'diy', altText: 'Weekend DIY mechanic in home garage' },
-        { filename: 'garagebot-auto-shop.png', filePath: '/marketing/garagebot-auto-shop.png', category: 'shop', subject: 'professional', altText: 'Professional auto repair shop with digital displays' },
+        // Lifestyle/product images
+        { filename: 'garagebot-mechanic-hero.png', filePath: '/marketing/garagebot-mechanic-hero.png', category: 'hero', subject: 'mechanic', style: 'product', altText: 'Professional mechanic working on car engine' },
+        { filename: 'garagebot-price-compare.png', filePath: '/marketing/garagebot-price-compare.png', category: 'feature', subject: 'comparison', style: 'product', altText: 'Price comparison across 50+ retailers' },
+        { filename: 'garagebot-all-vehicles.png', filePath: '/marketing/garagebot-all-vehicles.png', category: 'vehicles', subject: 'all-types', style: 'product', altText: 'Cars trucks motorcycles ATVs boats RVs lineup' },
+        { filename: 'garagebot-mobile-app.png', filePath: '/marketing/garagebot-mobile-app.png', category: 'app', subject: 'mobile', style: 'product', altText: 'GarageBot mobile app with retailer logos' },
+        { filename: 'garagebot-diy-mechanic.png', filePath: '/marketing/garagebot-diy-mechanic.png', category: 'diy', subject: 'diy', style: 'lifestyle', altText: 'Weekend DIY mechanic in home garage' },
+        { filename: 'garagebot-auto-shop.png', filePath: '/marketing/garagebot-auto-shop.png', category: 'shop', subject: 'professional', style: 'product', altText: 'Professional auto repair shop with digital displays' },
+        // Hatch Show Print style posters
+        { filename: 'hatch-garagebot-main.png', filePath: '/marketing/hatch-garagebot-main.png', category: 'brand', subject: 'garagebot', style: 'hatch-print', altText: 'GarageBot vintage letterpress poster' },
+        { filename: 'hatch-garagebot-slogan.png', filePath: '/marketing/hatch-garagebot-slogan.png', category: 'brand', subject: 'slogan', style: 'hatch-print', altText: 'Right Part First Time vintage poster' },
+        { filename: 'hatch-trustlayer-main.png', filePath: '/marketing/hatch-trustlayer-main.png', category: 'brand', subject: 'trustlayer', style: 'hatch-print', altText: 'Trust Layer vintage letterpress poster' },
+        { filename: 'hatch-garagebot-retailers.png', filePath: '/marketing/hatch-garagebot-retailers.png', category: 'feature', subject: 'retailers', style: 'hatch-print', altText: '50+ Retailers vintage poster' },
+        { filename: 'hatch-garagebot-diy.png', filePath: '/marketing/hatch-garagebot-diy.png', category: 'feature', subject: 'diy-guides', style: 'hatch-print', altText: 'DIY Repair Guides vintage poster' },
+        { filename: 'hatch-mechanics-garage.png', filePath: '/marketing/hatch-mechanics-garage.png', category: 'brand', subject: 'mechanics', style: 'hatch-print', altText: 'Mechanics Garage vintage poster' },
+        { filename: 'hatch-darkwave-studios.png', filePath: '/marketing/hatch-darkwave-studios.png', category: 'brand', subject: 'darkwave', style: 'hatch-print', altText: 'DarkWave Studios vintage poster' },
+        { filename: 'hatch-every-engine.png', filePath: '/marketing/hatch-every-engine.png', category: 'feature', subject: 'vehicles', style: 'hatch-print', altText: 'Every Engine vintage poster' },
+        { filename: 'hatch-ai-powered.png', filePath: '/marketing/hatch-ai-powered.png', category: 'feature', subject: 'ai', style: 'hatch-print', altText: 'AI Powered vintage poster' },
+        { filename: 'hatch-blockchain.png', filePath: '/marketing/hatch-blockchain.png', category: 'feature', subject: 'blockchain', style: 'hatch-print', altText: 'Blockchain Verified vintage poster' },
       ];
       
       await db.delete(marketingImages).where(eq(marketingImages.tenantId, 'garagebot'));
@@ -7346,9 +7358,12 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
           filePath: img.filePath,
           category: img.category,
           subject: img.subject,
+          style: img.style,
           altText: img.altText,
           tenantId: 'garagebot',
           isActive: true,
+          quality: 5,
+          season: 'all-year',
         });
       }
       
