@@ -785,57 +785,66 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             style={{ width: '280px' }}
           >
             <div 
-              className="relative rounded-2xl p-5"
+              className="relative rounded-lg p-5"
               style={{
                 background: '#0a0a0f',
-                border: '3px solid hsl(var(--primary))',
-                boxShadow: '0 8px 40px rgba(6, 182, 212, 0.5), 0 0 0 1px rgba(6, 182, 212, 0.2)',
+                border: '2px solid hsl(var(--primary))',
+                boxShadow: '0 4px 24px rgba(6, 182, 212, 0.3), 0 0 0 1px rgba(6, 182, 212, 0.15)',
               }}
             >
               <button 
                 onClick={dismissWelcome}
-                className="absolute -top-3 -right-3 w-7 h-7 rounded-full flex items-center justify-center"
+                className="absolute -top-2 -right-2 w-6 h-6 rounded flex items-center justify-center"
                 style={{
                   background: '#0a0a0f',
                   border: '2px solid hsl(var(--primary))',
                 }}
               >
-                <X className="w-4 h-4 text-primary" />
+                <X className="w-3 h-3 text-primary" />
               </button>
               <div className="flex items-start gap-3">
                 <img 
                   src={buddyCubeIcon} 
                   alt="Buddy" 
-                  className="w-12 h-12 shrink-0"
-                  style={{ filter: 'drop-shadow(0 2px 6px rgba(6, 182, 212, 0.5))' }}
+                  className="w-10 h-10 shrink-0"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(6, 182, 212, 0.4))' }}
                 />
-                <div>
-                  <p className="text-sm font-tech text-primary font-bold mb-1">Hey there!</p>
+                <div className="flex-1">
+                  <p className="text-xs font-tech text-primary font-bold mb-1 uppercase tracking-wide">BUDDY</p>
                   <p className="text-sm leading-relaxed text-foreground">
-                    I'm {mascotName}, your garage assistant. Tap me anytime you need help finding parts or repairs!
+                    Hi! I'm here to help you find the right part, first time. What's your ride?
                   </p>
                 </div>
               </div>
-              {/* Speech bubble tail */}
-              <div 
-                className="absolute -bottom-3 right-8"
-                style={{
-                  width: 0, height: 0,
-                  borderLeft: '12px solid transparent',
-                  borderRight: '12px solid transparent',
-                  borderTop: '12px solid hsl(var(--primary))',
-                }}
-              />
-              <div 
-                className="absolute -bottom-2 right-8"
-                style={{
-                  width: 0, height: 0,
-                  borderLeft: '10px solid transparent',
-                  borderRight: '10px solid transparent',
-                  borderTop: '10px solid #0a0a0f',
-                  marginLeft: '2px',
-                }}
-              />
+              <div className="flex flex-wrap gap-2 mt-3">
+                <button 
+                  onClick={() => { dismissWelcome(); setIsOpen(true); }}
+                  className="text-xs px-3 py-1.5 rounded bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  Find brake pads
+                </button>
+                <button 
+                  onClick={() => { dismissWelcome(); setIsOpen(true); }}
+                  className="text-xs px-3 py-1.5 rounded bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  Oil filter
+                </button>
+                <button 
+                  onClick={() => { dismissWelcome(); setIsOpen(true); }}
+                  className="text-xs px-3 py-1.5 rounded bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  ATV carburetor
+                </button>
+              </div>
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+                <MessageCircle className="w-4 h-4 text-muted-foreground" />
+                <input 
+                  type="text"
+                  placeholder="Describe what you need..."
+                  className="flex-1 bg-transparent text-sm text-muted-foreground placeholder:text-muted-foreground/50 outline-none"
+                  onFocus={() => { dismissWelcome(); setIsOpen(true); }}
+                />
+              </div>
             </div>
           </motion.div>
         )}
