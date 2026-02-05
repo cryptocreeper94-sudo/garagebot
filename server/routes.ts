@@ -67,12 +67,11 @@ export async function registerRoutes(
 
   // Trust Layer SSO Routes
   app.get('/api/auth/sso/login', (req, res) => {
-    const { trustLayerClient } = require('./services/trustLayer');
     const baseUrl = process.env.REPLIT_DEV_DOMAIN 
       ? `https://${process.env.REPLIT_DEV_DOMAIN}`
       : 'https://garagebot.io';
     const callbackUrl = `${baseUrl}/auth/callback`;
-    const state = require('crypto').randomBytes(16).toString('hex');
+    const state = crypto.randomUUID();
     
     // Store state in session for CSRF protection
     (req.session as any).ssoState = state;
@@ -82,7 +81,6 @@ export async function registerRoutes(
   });
 
   app.get('/api/auth/sso/callback', async (req: any, res) => {
-    const { trustLayerClient } = require('./services/trustLayer');
     const { token, state } = req.query;
     
     // Verify CSRF state
