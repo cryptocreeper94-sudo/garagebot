@@ -4,7 +4,7 @@ Use the attached Buddy mascot image (buddy-mascot.png) with these ads.
 
 ---
 
-## FACEBOOK AD (Long Form)
+## FACEBOOK AD (Long Form + Founders Hook)
 
 **Primary Text:**
 Stop wasting time checking 10 different websites for one part.
@@ -19,7 +19,9 @@ What you get:
 - Free DIY repair guides to save you $$$
 - Works for ANY vehicle type
 
-We just launched. Be one of the first to try it.
+FOUNDING MEMBER BONUS: First 500 sign-ups get a FREE Genesis Hallmark NFT - permanent blockchain proof you were here from day one. Plus exclusive Founders Circle perks for LIFE.
+
+We just launched. Claim your spot before they're gone.
 
 **Headline:** Find Any Part. Any Vehicle. One Search.
 
@@ -71,7 +73,76 @@ garagebot.io
 
 ---
 
-## INSTAGRAM AD
+## TWITTER/X (4000 char - Launch Version with Founders Hook)
+
+Tired of spending an hour checking AutoZone, O'Reilly, RockAuto, Amazon, eBay, and 6 other sites just to find one brake pad?
+
+Yeah, we were too. So we built something better.
+
+Meet Buddy - your AI-powered parts hunting sidekick. 
+
+GarageBot searches 40+ retailers in ONE click. No more tabs. No more price comparing spreadsheets. No more "out of stock" surprises after you've already started the job.
+
+What makes us different:
+
+ONE SEARCH = 40+ RETAILERS
+AutoZone, O'Reilly, Advance Auto, RockAuto, Amazon, eBay Motors, CarParts.com, PartsGeek, and 30+ more. All at once. Best prices highlighted.
+
+EVERY VEHICLE TYPE
+Cars. Trucks. Boats. ATVs. Motorcycles. RVs. Jet Skis. Lawn mowers. If it has an engine, we find the parts.
+
+AI THAT ACTUALLY KNOWS CARS
+Buddy doesn't just search - he recommends. Need help with a repair? He'll walk you through it.
+
+FREE DIY REPAIR GUIDES
+Step-by-step instructions with YouTube links and torque specs.
+
+FOUNDING MEMBER BONUS:
+First 500 sign-ups get a FREE Genesis Hallmark NFT - permanent blockchain proof you were here from day one.
+
+Plus: Refer friends, earn rewards. 3 referrals = 1 month Pro FREE. 5 referrals = exclusive NFT. 10 = Founding Member status for life.
+
+Monthly giveaway: Every referral = 1 entry to win a $100 AutoZone gift card.
+
+We just launched. Be one of the first to try it.
+
+Right part. First time. Every engine.
+
+Your move.
+
+garagebot.io
+
+#AutoParts #DIYMechanic #CarRepair #TruckLife #BoatLife #ATVLife #SaveMoney
+
+---
+
+## INSTAGRAM AD (with Founders Hook)
+
+**Caption:**
+Meet Buddy - the AI sidekick who finds auto parts so you don't have to.
+
+One search. 40+ retailers. Best prices. Every time.
+
+Cars. Trucks. Boats. ATVs. Motorcycles. RVs.
+If it has an engine, we find the parts.
+
+FOUNDING MEMBER BONUS:
+First 500 sign-ups get a FREE Genesis Hallmark NFT - permanent blockchain proof you were here from day one.
+
+Refer 3 friends = 1 month Pro FREE
+Refer 5 friends = Exclusive NFT
+Refer 10 = Founding Member status for LIFE
+
+Monthly $100 gift card giveaway. Every referral = 1 entry.
+
+We just launched. Link in bio.
+
+**Hashtags (first comment):**
+#GarageBot #AutoParts #DIYMechanic #CarRepair #TruckLife #BoatLife #ATVLife #AutoRepair #CarMaintenance #MechanicLife #DIYAuto #FixItYourself #PartsSearch #CarParts #TruckParts #BoatParts #SaveMoney #WeekendMechanic #FoundersClub #NFT
+
+---
+
+## OLD INSTAGRAM AD (without Founders Hook - keep for reference)
 
 **Caption:**
 Meet Buddy - the AI sidekick who finds auto parts so you don't have to.
