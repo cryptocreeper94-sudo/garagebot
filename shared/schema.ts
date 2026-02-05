@@ -49,6 +49,9 @@ export const users = pgTable("users", {
   referralCode: text("referral_code").unique(),
   referredByUserId: varchar("referred_by_user_id"),
   referralPointsBalance: integer("referral_points_balance").default(0),
+  trustLayerId: text("trust_layer_id"),
+  trustLayerMemberCard: text("trust_layer_member_card"),
+  membershipTier: text("membership_tier").default("free"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

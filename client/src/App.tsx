@@ -25,6 +25,7 @@ import ShopPortal from "@/pages/ShopPortal";
 import MechanicsGarage from "@/pages/MechanicsGarage";
 import Insurance from "@/pages/Insurance";
 import Auth from "@/pages/Auth";
+import AuthCallback from "@/pages/AuthCallback";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Investors from "@/pages/Investors";
 import DevPortal from "@/pages/DevPortal";
@@ -56,6 +57,7 @@ function Router() {
       <Route path="/mechanics-garage">{() => <MechanicsGarage />}</Route>
       <Route path="/insurance">{() => <Insurance />}</Route>
       <Route path="/auth">{() => <Auth />}</Route>
+      <Route path="/auth/callback">{() => <AuthCallback />}</Route>
       <Route path="/privacy">{() => <PrivacyPolicy />}</Route>
       <Route path="/terms">{() => <TermsOfService />}</Route>
       <Route path="/investors">{() => <Investors />}</Route>
