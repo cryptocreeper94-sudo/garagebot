@@ -152,6 +152,9 @@ export const shops = pgTable("shops", {
   tier: text("tier").default("free"),
   rating: decimal("rating", { precision: 3, scale: 2 }),
   reviewCount: integer("review_count").default(0),
+  stripeAccountId: text("stripe_account_id"),
+  stripeAccountStatus: text("stripe_account_status").default("not_connected"),
+  stripeOnboardingComplete: boolean("stripe_onboarding_complete").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -1498,6 +1498,156 @@ export async function registerRoutes(
     }
   });
 
+  // Stripe Connect - Create connected account for shop
+  app.post("/api/stripe/connect/create-account", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      // Get user's shop
+      const shop = await storage.getShopByOwnerId(userId);
+      if (!shop) {
+        return res.status(400).json({ error: "You need to create a shop first" });
+      }
+
+      // If shop already has a Stripe account, return account link for onboarding refresh
+      if (shop.stripeAccountId) {
+        const stripe = await getUncachableStripeClient();
+        const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+        
+        const accountLink = await stripe.accountLinks.create({
+          account: shop.stripeAccountId,
+          refresh_url: `${baseUrl}/mechanics-garage?tab=settings&stripe_refresh=true`,
+          return_url: `${baseUrl}/mechanics-garage?tab=settings&stripe_success=true`,
+          type: 'account_onboarding',
+        });
+        
+        return res.json({ 
+          accountId: shop.stripeAccountId, 
+          onboardingUrl: accountLink.url,
+          existing: true 
+        });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+
+      // Create Express connected account
+      const account = await stripe.accounts.create({
+        type: 'express',
+        country: 'US',
+        email: user.email || shop.email || undefined,
+        capabilities: {
+          card_payments: { requested: true },
+          transfers: { requested: true },
+        },
+        business_type: 'company',
+        business_profile: {
+          name: shop.name,
+          mcc: '7538', // Auto repair shops
+          url: shop.website || undefined,
+        },
+        metadata: {
+          shopId: shop.id,
+          userId: userId,
+          platform: 'GarageBot',
+        },
+      });
+
+      // Update shop with Stripe account ID
+      await storage.updateShopStripeAccount(shop.id, account.id, 'pending');
+
+      // Create account link for onboarding
+      const accountLink = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: `${baseUrl}/mechanics-garage?tab=settings&stripe_refresh=true`,
+        return_url: `${baseUrl}/mechanics-garage?tab=settings&stripe_success=true`,
+        type: 'account_onboarding',
+      });
+
+      res.json({ 
+        accountId: account.id, 
+        onboardingUrl: accountLink.url,
+        existing: false 
+      });
+    } catch (error: any) {
+      console.error("Stripe Connect error:", error);
+      res.status(500).json({ error: error.message || "Failed to create connected account" });
+    }
+  });
+
+  // Stripe Connect - Get account status
+  app.get("/api/stripe/connect/status", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const shop = await storage.getShopByOwnerId(userId);
+      
+      if (!shop) {
+        return res.json({ connected: false, status: 'no_shop' });
+      }
+
+      if (!shop.stripeAccountId) {
+        return res.json({ connected: false, status: 'not_connected' });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      const account = await stripe.accounts.retrieve(shop.stripeAccountId);
+
+      const status = account.charges_enabled && account.payouts_enabled 
+        ? 'active' 
+        : account.details_submitted 
+          ? 'pending_verification' 
+          : 'onboarding_incomplete';
+
+      // Update shop status if it changed
+      if (shop.stripeAccountStatus !== status) {
+        await storage.updateShopStripeAccount(
+          shop.id, 
+          shop.stripeAccountId, 
+          status,
+          account.charges_enabled && account.payouts_enabled
+        );
+      }
+
+      res.json({
+        connected: true,
+        accountId: shop.stripeAccountId,
+        status,
+        chargesEnabled: account.charges_enabled,
+        payoutsEnabled: account.payouts_enabled,
+        detailsSubmitted: account.details_submitted,
+        email: account.email,
+      });
+    } catch (error: any) {
+      console.error("Stripe Connect status error:", error);
+      res.status(500).json({ error: "Failed to get account status" });
+    }
+  });
+
+  // Stripe Connect - Create dashboard link
+  app.get("/api/stripe/connect/dashboard", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const shop = await storage.getShopByOwnerId(userId);
+      
+      if (!shop?.stripeAccountId) {
+        return res.status(400).json({ error: "No connected Stripe account" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      const loginLink = await stripe.accounts.createLoginLink(shop.stripeAccountId);
+
+      res.json({ url: loginLink.url });
+    } catch (error: any) {
+      console.error("Stripe dashboard link error:", error);
+      res.status(500).json({ error: "Failed to create dashboard link" });
+    }
+  });
+
   // Products (from Stripe)
   app.get("/api/products", async (req, res) => {
     try {

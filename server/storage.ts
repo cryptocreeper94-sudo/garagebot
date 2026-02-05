@@ -89,8 +89,10 @@ export interface IStorage {
   getShop(id: string): Promise<Shop | undefined>;
   getShopBySlug(slug: string): Promise<Shop | undefined>;
   getShopsByOwner(ownerId: string): Promise<Shop[]>;
+  getShopByOwnerId(ownerId: string): Promise<Shop | undefined>;
   createShop(shop: InsertShop): Promise<Shop>;
   updateShop(id: string, updates: Partial<Shop>): Promise<Shop | undefined>;
+  updateShopStripeAccount(shopId: string, stripeAccountId: string, status: string, onboardingComplete?: boolean): Promise<Shop | undefined>;
 
   // Shop Staff
   getShopStaff(shopId: string): Promise<ShopStaff[]>;
@@ -532,6 +534,11 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(shops).where(eq(shops.ownerId, ownerId));
   }
 
+  async getShopByOwnerId(ownerId: string): Promise<Shop | undefined> {
+    const [shop] = await db.select().from(shops).where(eq(shops.ownerId, ownerId)).limit(1);
+    return shop;
+  }
+
   async createShop(shop: InsertShop): Promise<Shop> {
     const [newShop] = await db.insert(shops).values(shop).returning();
     return newShop;
@@ -539,6 +546,16 @@ export class DatabaseStorage implements IStorage {
 
   async updateShop(id: string, updates: Partial<Shop>): Promise<Shop | undefined> {
     const [shop] = await db.update(shops).set({ ...updates, updatedAt: new Date() }).where(eq(shops.id, id)).returning();
+    return shop;
+  }
+
+  async updateShopStripeAccount(shopId: string, stripeAccountId: string, status: string, onboardingComplete: boolean = false): Promise<Shop | undefined> {
+    const [shop] = await db.update(shops).set({
+      stripeAccountId,
+      stripeAccountStatus: status,
+      stripeOnboardingComplete: onboardingComplete,
+      updatedAt: new Date()
+    }).where(eq(shops.id, shopId)).returning();
     return shop;
   }
 
