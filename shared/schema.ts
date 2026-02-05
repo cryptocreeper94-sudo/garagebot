@@ -181,6 +181,58 @@ export const shopCustomers = pgTable("shop_customers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Marketing Hub Subscriptions - tenant-spaced add-on for shops
+export const marketingHubSubscriptions = pgTable("marketing_hub_subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  tier: text("tier").default("basic"), // basic, pro, enterprise
+  status: text("status").default("active"), // active, cancelled, suspended
+  monthlyPrice: integer("monthly_price").default(2900), // $29/mo in cents
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripeCustomerId: text("stripe_customer_id"),
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelledAt: timestamp("cancelled_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Shop Social Media Credentials - store encrypted per-shop
+export const shopSocialCredentials = pgTable("shop_social_credentials", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  platform: text("platform").notNull(), // twitter, facebook, instagram, linkedin, google, nextdoor
+  credentialsEncrypted: text("credentials_encrypted").notNull(), // JSON blob encrypted
+  isActive: boolean("is_active").default(true),
+  lastUsedAt: timestamp("last_used_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Shop Marketing Content - bundles and posts specific to each shop
+export const shopMarketingContent = pgTable("shop_marketing_content", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  type: text("type").default("post"), // post, bundle, template
+  platform: text("platform"),
+  content: text("content"),
+  imageUrl: text("image_url"),
+  hashtags: text("hashtags").array(),
+  scheduledFor: timestamp("scheduled_for"),
+  postedAt: timestamp("posted_at"),
+  status: text("status").default("draft"), // draft, scheduled, posted, failed
+  impressions: integer("impressions").default(0),
+  reach: integer("reach").default(0),
+  clicks: integer("clicks").default(0),
+  likes: integer("likes").default(0),
+  comments: integer("comments").default(0),
+  shares: integer("shares").default(0),
+  externalPostId: text("external_post_id"),
+  error: text("error"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Shop reviews
 export const shopReviews = pgTable("shop_reviews", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
