@@ -23,6 +23,7 @@ import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Footer";
 import TrustLayerReviews from "@/components/TrustLayerReviews";
+import NativeProductRecs from "@/components/NativeProductRecs";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -772,6 +773,12 @@ export default function Home() {
       </div>
       
       {/* Reviews Section */}
+      <section className="py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <NativeProductRecs context="tools" layout="horizontal" title="Top Gear for Your Next Project" maxItems={4} />
+        </div>
+      </section>
+
       <section className="py-16 px-4 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
@@ -779,6 +786,12 @@ export default function Home() {
             <p className="text-zinc-400">Real reviews from real DIYers</p>
           </div>
           <TrustLayerReviews layout="carousel" maxReviews={6} />
+        </div>
+      </section>
+
+      <section className="py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <NativeProductRecs context="outdoor" layout="grid" title="Road Trip Ready" maxItems={4} />
         </div>
       </section>
       

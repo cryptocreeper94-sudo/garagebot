@@ -4,7 +4,7 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import { db } from "@db";
@@ -1616,6 +1616,105 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error adding giveaway entry:", error);
       res.status(500).json({ error: "Failed to add giveaway entry" });
+    }
+  });
+
+  // ============== SPONSORED PRODUCTS & AD MANAGEMENT ==============
+
+  // Get native product recommendations (public)
+  app.get("/api/ads/native", async (req, res) => {
+    try {
+      const { category, vehicleType, placement } = req.query;
+      let query = db.select().from(sponsoredProducts)
+        .where(eq(sponsoredProducts.isActive, true))
+        .orderBy(desc(sponsoredProducts.priority))
+        .limit(8);
+
+      const results = await query;
+
+      let filtered = results;
+      if (category) {
+        filtered = filtered.filter(p => p.category === category);
+      }
+      if (placement) {
+        filtered = filtered.filter(p => p.placement === placement);
+      }
+
+      res.json(filtered);
+    } catch (error) {
+      console.error("Error fetching sponsored products:", error);
+      res.status(500).json({ error: "Failed to fetch sponsored products" });
+    }
+  });
+
+  // Track ad click
+  app.post("/api/ads/click/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const existing = await db.select().from(sponsoredProducts).where(eq(sponsoredProducts.id, id)).limit(1);
+      if (existing.length > 0) {
+        await db.update(sponsoredProducts)
+          .set({ clicks: (existing[0].clicks || 0) + 1 })
+          .where(eq(sponsoredProducts.id, id));
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error tracking click:", error);
+      res.status(500).json({ error: "Failed to track click" });
+    }
+  });
+
+  // Admin: Create sponsored product
+  app.post("/api/ads/sponsored", isAuthenticated, async (req: any, res) => {
+    try {
+      const parsed = insertSponsoredProductSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: fromZodError(parsed.error).message });
+      }
+      const [product] = await db.insert(sponsoredProducts).values(parsed.data).returning();
+      res.json(product);
+    } catch (error) {
+      console.error("Error creating sponsored product:", error);
+      res.status(500).json({ error: "Failed to create sponsored product" });
+    }
+  });
+
+  // Admin: Update sponsored product
+  app.patch("/api/ads/sponsored/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const [product] = await db.update(sponsoredProducts)
+        .set(req.body)
+        .where(eq(sponsoredProducts.id, id))
+        .returning();
+      res.json(product);
+    } catch (error) {
+      console.error("Error updating sponsored product:", error);
+      res.status(500).json({ error: "Failed to update sponsored product" });
+    }
+  });
+
+  // Admin: List all sponsored products
+  app.get("/api/ads/sponsored", isAuthenticated, async (req: any, res) => {
+    try {
+      const products = await db.select().from(sponsoredProducts)
+        .orderBy(desc(sponsoredProducts.createdAt));
+      res.json(products);
+    } catch (error) {
+      console.error("Error fetching sponsored products:", error);
+      res.status(500).json({ error: "Failed to fetch sponsored products" });
+    }
+  });
+
+  // Admin: Delete sponsored product
+  app.delete("/api/ads/sponsored/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await db.delete(sponsoredProducts).where(eq(sponsoredProducts.id, id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting sponsored product:", error);
+      res.status(500).json({ error: "Failed to delete sponsored product" });
     }
   });
 

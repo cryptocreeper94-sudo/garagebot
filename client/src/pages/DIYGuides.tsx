@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import NativeProductRecs from "@/components/NativeProductRecs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -529,6 +530,18 @@ export default function DIYGuides() {
           )}
         </DialogContent>
       </Dialog>
+      <section className="py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <NativeProductRecs context="diy" layout="horizontal" title="Top Tools for This Job" maxItems={4} />
+        </div>
+      </section>
+
+      <section className="py-6 px-4">
+        <div className="max-w-6xl mx-auto">
+          <NativeProductRecs context="safety" layout="grid" title="Recommended Safety Gear" maxItems={3} />
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
