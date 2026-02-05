@@ -19,7 +19,7 @@ What you get:
 - Free DIY repair guides to save you $$$
 - Works for ANY vehicle type
 
-Join 25,000+ smart DIYers who stopped overpaying.
+We just launched. Be one of the first to try it.
 
 **Headline:** Find Any Part. Any Vehicle. One Search.
 
