@@ -702,6 +702,41 @@ export default function Auth() {
               <AlertTriangle className="w-4 h-4 inline mr-2" />
               Store these codes in a safe place. You will not be able to see them again.
             </div>
+
+            {/* Trust Layer Membership Confirmation */}
+            <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-2 text-cyan-400 font-tech uppercase text-sm font-bold">
+                <Shield className="w-5 h-5" />
+                Trust Layer Membership Included
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Your GarageBot account includes free access to the entire DarkWave ecosystem. Use your credentials at:
+              </p>
+              <div className="grid gap-2 text-xs">
+                <a href="https://dwtl.io" target="_blank" rel="noopener noreferrer" 
+                   className="flex items-center gap-2 bg-background/50 rounded px-3 py-2 hover:bg-background/80 transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                  <span className="font-mono text-cyan-300">dwtl.io</span>
+                  <span className="text-muted-foreground ml-auto">Trust Layer Portal</span>
+                </a>
+                <a href="https://dwsc.io" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-2 bg-background/50 rounded px-3 py-2 hover:bg-background/80 transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  <span className="font-mono text-blue-300">dwsc.io</span>
+                  <span className="text-muted-foreground ml-auto">DarkWave Studio</span>
+                </a>
+                <a href="https://garagebot.io" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-2 bg-background/50 rounded px-3 py-2 hover:bg-background/80 transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                  <span className="font-mono text-green-300">garagebot.io</span>
+                  <span className="text-muted-foreground ml-auto">GarageBot (You're here!)</span>
+                </a>
+              </div>
+              <p className="text-[10px] text-muted-foreground text-center">
+                A welcome email with these links has been sent to your inbox
+              </p>
+            </div>
+
             <Button className="w-full font-tech uppercase" onClick={finishSignup}>
               I've Saved My Codes - Continue
             </Button>
