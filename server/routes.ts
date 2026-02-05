@@ -6784,6 +6784,208 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // BLOG SYSTEM (AI-Powered SEO Content)
+  // ============================================
+
+  // Blog Categories
+  const BLOG_CATEGORIES = [
+    'DIY Guides', 'Maintenance Tips', 'Part Reviews', 'Industry News',
+    'Vehicle Spotlights', 'Tech & Tools', 'Safety Tips', 'Money Saving'
+  ] as const;
+
+  // Get all published blog posts
+  app.get("/api/blog/posts", async (req, res) => {
+    try {
+      const { category, limit, all } = req.query;
+      const options: { published?: boolean; category?: string; limit?: number } = {};
+      
+      if (all !== 'true') {
+        options.published = true;
+      }
+      if (category && typeof category === 'string') {
+        options.category = category;
+      }
+      if (limit && typeof limit === 'string') {
+        options.limit = parseInt(limit);
+      }
+      
+      const posts = await storage.getBlogPosts(options);
+      res.json(posts);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
+  // Get featured posts
+  app.get("/api/blog/featured", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 3;
+      const posts = await storage.getFeaturedBlogPosts(limit);
+      res.json(posts);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch featured posts" });
+    }
+  });
+
+  // Get blog categories
+  app.get("/api/blog/categories", async (req, res) => {
+    try {
+      const categories = await storage.getBlogCategories();
+      res.json(categories.length > 0 ? categories : BLOG_CATEGORIES);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+
+  // Get single blog post by slug
+  app.get("/api/blog/posts/:slug", async (req, res) => {
+    try {
+      const post = await storage.getBlogPostBySlug(req.params.slug);
+      if (!post) return res.status(404).json({ error: "Blog post not found" });
+      
+      // Increment view count
+      await storage.incrementBlogPostViews(post.id);
+      
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
+
+  // Generate AI blog post
+  app.post("/api/blog/generate", isAuthenticated, async (req: any, res) => {
+    try {
+      const { topic, category, vehicleTypes } = req.body;
+      
+      if (!topic) {
+        return res.status(400).json({ error: "Topic is required" });
+      }
+
+      const systemPrompt = `You are Buddy, the expert AI assistant for GarageBot - an auto parts aggregator platform. 
+Write engaging, SEO-optimized blog posts about automotive topics including cars, trucks, motorcycles, ATVs, boats, RVs, and all vehicles with engines.
+
+Your writing style should be:
+- Conversational but authoritative
+- Packed with practical, actionable advice
+- Include relevant keywords naturally
+- Use clear headings and bullet points
+- Reference the types of parts or maintenance involved
+
+Format your response as JSON with these fields:
+- title: SEO-optimized title (60 chars max)
+- excerpt: Engaging summary (150 chars max)
+- content: Full article in markdown format
+- metaTitle: SEO meta title (60 chars max)
+- metaDescription: SEO meta description (155 chars max)
+- metaKeywords: Comma-separated keywords
+- tags: Array of relevant tags
+- readTimeMinutes: Estimated read time`;
+
+      const userPrompt = `Write a blog post about: ${topic}
+Category: ${category || 'Maintenance Tips'}
+Vehicle types to focus on: ${vehicleTypes?.join(', ') || 'all vehicles'}
+
+Make it helpful for DIY mechanics and vehicle owners looking for parts and maintenance guidance.`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        response_format: { type: "json_object" },
+        max_tokens: 2500
+      });
+
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error("No content generated");
+      }
+
+      const generated = JSON.parse(content);
+      
+      // Create slug from title
+      const slug = generated.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .substring(0, 100);
+
+      // Save to database
+      const post = await storage.createBlogPost({
+        slug: `${slug}-${Date.now().toString(36)}`,
+        title: generated.title,
+        excerpt: generated.excerpt,
+        content: generated.content,
+        category: category || 'Maintenance Tips',
+        tags: generated.tags || [],
+        metaTitle: generated.metaTitle,
+        metaDescription: generated.metaDescription,
+        metaKeywords: generated.metaKeywords,
+        vehicleTypes: vehicleTypes || [],
+        readTimeMinutes: generated.readTimeMinutes || 5,
+        aiGenerated: true,
+        isPublished: false,
+        author: "Buddy AI"
+      });
+
+      res.json(post);
+    } catch (err: any) {
+      console.error("Blog generation error:", err);
+      res.status(500).json({ error: "Failed to generate blog post" });
+    }
+  });
+
+  // Publish/unpublish blog post
+  app.patch("/api/blog/posts/:id/publish", isAuthenticated, async (req: any, res) => {
+    try {
+      const { publish } = req.body;
+      const post = await storage.updateBlogPost(req.params.id, {
+        isPublished: publish,
+        publishedAt: publish ? new Date() : null
+      });
+      if (!post) return res.status(404).json({ error: "Blog post not found" });
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
+
+  // Update blog post
+  app.put("/api/blog/posts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const post = await storage.updateBlogPost(req.params.id, req.body);
+      if (!post) return res.status(404).json({ error: "Blog post not found" });
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
+
+  // Delete blog post
+  app.delete("/api/blog/posts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const success = await storage.deleteBlogPost(req.params.id);
+      if (!success) return res.status(404).json({ error: "Blog post not found" });
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to delete blog post" });
+    }
+  });
+
+  // Feature/unfeature blog post
+  app.patch("/api/blog/posts/:id/feature", isAuthenticated, async (req: any, res) => {
+    try {
+      const { featured } = req.body;
+      const post = await storage.updateBlogPost(req.params.id, { isFeatured: featured });
+      if (!post) return res.status(404).json({ error: "Blog post not found" });
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
+
   // Analytics Tracking Endpoints
   app.post("/api/analytics/session", async (req, res) => {
     try {
