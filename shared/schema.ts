@@ -1876,6 +1876,40 @@ export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvents).om
 export type InsertAnalyticsEvent = z.infer<typeof insertAnalyticsEventSchema>;
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 
+// Blog Posts for SEO Content
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  excerpt: text("excerpt"),
+  content: text("content").notNull(),
+  coverImage: varchar("cover_image", { length: 500 }),
+  author: varchar("author", { length: 100 }).default("Buddy AI"),
+  category: varchar("category", { length: 100 }).notNull(),
+  tags: text("tags").array().default(sql`ARRAY[]::text[]`),
+  metaTitle: varchar("meta_title", { length: 255 }),
+  metaDescription: varchar("meta_description", { length: 500 }),
+  metaKeywords: text("meta_keywords"),
+  vehicleTypes: text("vehicle_types").array().default(sql`ARRAY[]::text[]`),
+  isPublished: boolean("is_published").default(false),
+  isFeatured: boolean("is_featured").default(false),
+  viewCount: integer("view_count").default(0),
+  readTimeMinutes: integer("read_time_minutes").default(5),
+  aiGenerated: boolean("ai_generated").default(true),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_blog_slug").on(table.slug),
+  index("IDX_blog_category").on(table.category),
+  index("IDX_blog_published").on(table.isPublished),
+  index("IDX_blog_featured").on(table.isFeatured),
+]);
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
+
 // Partner API Scopes
 export const PARTNER_API_SCOPES = [
   'orders:read', 'orders:write',
