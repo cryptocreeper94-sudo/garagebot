@@ -7134,6 +7134,208 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
+  // Seed comprehensive marketing content
+  app.post("/api/marketing/seed", isAuthenticated, async (req: any, res) => {
+    try {
+      // Comprehensive hashtag sets for maximum visibility
+      const ECOSYSTEM_HASHTAGS = ['#GarageBot', '#DWTL', '#DWSC', '#TrustShield', '#DarkWaveStudios'];
+      const AUTO_HASHTAGS = ['#AutoParts', '#CarRepair', '#DIYMechanic', '#AutoRepair', '#CarMaintenance', '#MechanicLife', '#CarParts', '#AutoShop', '#GarageTips', '#CarCare'];
+      const VEHICLE_HASHTAGS = ['#Cars', '#Trucks', '#Motorcycles', '#ATV', '#Boats', '#RV', '#ClassicCars', '#CarEnthusiast', '#Automotive', '#VehicleMaintenance'];
+      const TECH_HASHTAGS = ['#TechStartup', '#AI', '#SaaS', '#SmallBusiness', '#Entrepreneur', '#Innovation', '#TechNews', '#DigitalTransformation'];
+      const DIY_HASHTAGS = ['#DIY', '#Howto', '#Tutorial', '#FixIt', '#SaveMoney', '#WeekendWarrior', '#HomeGarage', '#ProjectCar'];
+      const SHOP_HASHTAGS = ['#AutoShopOwner', '#MechanicsGarage', '#ShopManagement', '#AutoBusiness', '#ShopTech', '#RepairShop', '#AutoService'];
+      
+      const marketingContent = [
+        // GarageBot.io focused posts
+        {
+          content: "Stop overpaying for auto repairs! GarageBot compares prices from 50+ retailers to find you the best deals on parts. Your wallet will thank you.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, ...AUTO_HASHTAGS.slice(0,5), '#SaveMoney', '#SmartShopping'],
+          category: "parts-search",
+          tone: "promotional"
+        },
+        {
+          content: "🔧 DIY mechanic tip: Always check multiple retailers before buying parts. GarageBot searches 50+ stores instantly so you never overpay again!",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, ...DIY_HASHTAGS, ...AUTO_HASHTAGS.slice(0,3)],
+          category: "diy-tips",
+          tone: "educational"
+        },
+        {
+          content: "Your vehicle deserves the best. GarageBot's AI-powered search finds OEM and aftermarket parts with guaranteed fitment for cars, trucks, motorcycles, boats, ATVs & RVs.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, ...VEHICLE_HASHTAGS, '#OEMParts', '#AftermarketParts'],
+          category: "vehicle-types",
+          tone: "professional"
+        },
+        {
+          content: "🚗 Managing a fleet? GarageBot Pro lets you track unlimited vehicles, get AI repair estimates, and access exclusive dealer pricing. Try it free!",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#FleetManagement', '#FleetMaintenance', ...AUTO_HASHTAGS.slice(0,3), ...TECH_HASHTAGS.slice(0,3)],
+          category: "pro-features",
+          tone: "promotional"
+        },
+        {
+          content: "Auto shop owners: Compete with AutoLeap & Shopmonkey at 1/4 the price! GarageBot's Mechanics Garage portal handles estimates, invoicing, scheduling & more. $49/mo.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, ...SHOP_HASHTAGS, '#ShopOwner', '#AutoIndustry', '#BusinessTools'],
+          category: "mechanics-garage",
+          tone: "promotional"
+        },
+        {
+          content: "💡 Did you know? Most people overpay 30-50% on auto parts by only checking one retailer. GarageBot compares 50+ stores in seconds!",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, ...AUTO_HASHTAGS, '#MoneyTips', '#ConsumerTips'],
+          category: "education",
+          tone: "educational"
+        },
+        {
+          content: "VIN decoding + instant parts lookup = never order the wrong part again. GarageBot's Vehicle Passport ensures guaranteed fitment every time.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#VIN', '#VehicleHistory', ...AUTO_HASHTAGS.slice(0,4)],
+          category: "vin-features",
+          tone: "professional"
+        },
+        {
+          content: "🏍️ Motorcycle riders! GarageBot isn't just for cars. Find parts for your bike from 50+ retailers with guaranteed fitment.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#Motorcycles', '#BikerLife', '#MotorcycleParts', '#RideOrDie', '#TwoWheels', '#BikeLife'],
+          category: "motorcycles",
+          tone: "friendly"
+        },
+        {
+          content: "Weekend project? Get AI-generated repair guides with step-by-step instructions, tool lists, and video tutorials. GarageBot makes DIY repairs easy!",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, ...DIY_HASHTAGS, '#WeekendProject', '#GarageTime'],
+          category: "diy-guides",
+          tone: "friendly"
+        },
+        {
+          content: "⛵ Boat owners rejoice! GarageBot searches marine parts from top retailers. Keep your vessel running smooth all season.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#Boating', '#MarineParts', '#BoatLife', '#SailingLife', '#BoatMaintenance', '#MarineRepair'],
+          category: "boats",
+          tone: "friendly"
+        },
+        // DWTL.io focused posts
+        {
+          content: "DWTL.io - The Trust Layer powering secure digital identity across the DarkWave ecosystem. One login. All apps. Zero friction.",
+          platform: "all",
+          targetSite: "dwtl",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#DigitalIdentity', '#SSO', '#CyberSecurity', '#TechInnovation', '#WebSecurity'],
+          category: "identity",
+          tone: "professional"
+        },
+        {
+          content: "🔐 Tired of managing 50 different logins? DWTL.io brings single sign-on to the DarkWave ecosystem. Secure, seamless, simple.",
+          platform: "all",
+          targetSite: "dwtl",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#SSO', '#SingleSignOn', '#PasswordManagement', '#TechLife', '#Security'],
+          category: "sso",
+          tone: "promotional"
+        },
+        // DWSC.io focused posts
+        {
+          content: "DWSC.io - DarkWave Service Cloud. Enterprise-grade infrastructure for the modern web. Reliable. Scalable. Secure.",
+          platform: "all",
+          targetSite: "dwsc",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#CloudComputing', '#CloudServices', '#WebHosting', '#DevOps', '#CloudInfrastructure'],
+          category: "cloud",
+          tone: "professional"
+        },
+        {
+          content: "☁️ Building the next big thing? DWSC.io provides the cloud infrastructure you need to scale. Join the DarkWave ecosystem today!",
+          platform: "all",
+          targetSite: "dwsc",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#Startup', '#CloudNative', '#TechStartup', '#ScaleUp', '#WebDev', '#CloudFirst'],
+          category: "startup",
+          tone: "promotional"
+        },
+        // TrustShield.tech focused posts
+        {
+          content: "TrustShield.tech - Blockchain-verified authenticity for businesses and consumers. Prove what's real in a world of fakes.",
+          platform: "all",
+          targetSite: "trustshield",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#Blockchain', '#Web3', '#Authenticity', '#NFT', '#CryptoTech', '#Verification'],
+          category: "blockchain",
+          tone: "professional"
+        },
+        {
+          content: "🛡️ Fight counterfeits with TrustShield.tech! Blockchain verification ensures your products and documents are the real deal.",
+          platform: "all",
+          targetSite: "trustshield",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#AntiCounterfeit', '#Blockchain', '#ProductAuthenticity', '#BrandProtection', '#Crypto'],
+          category: "verification",
+          tone: "promotional"
+        },
+        // Cross-ecosystem posts
+        {
+          content: "The DarkWave ecosystem: GarageBot for auto parts, DWTL for identity, DWSC for cloud, TrustShield for verification. Building the future, one app at a time.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, ...TECH_HASHTAGS, '#Ecosystem', '#TechPlatform'],
+          category: "ecosystem",
+          tone: "professional"
+        },
+        {
+          content: "🚀 Entrepreneurs: The DarkWave ecosystem has everything you need. Parts aggregation, cloud hosting, secure identity, blockchain verification. All integrated.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#Entrepreneur', '#StartupLife', '#TechEcosystem', '#BuildInPublic', '#FounderLife'],
+          category: "entrepreneurs",
+          tone: "promotional"
+        },
+        // Seasonal/timely posts
+        {
+          content: "🌧️ Rainy season prep: Check your wipers, tires & brakes! GarageBot helps you find the best prices on safety essentials.",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#RainySeason', '#CarSafety', '#WinterPrep', ...AUTO_HASHTAGS.slice(0,4)],
+          category: "seasonal",
+          tone: "friendly"
+        },
+        {
+          content: "Road trip ready? ☀️ Use GarageBot to stock up on filters, fluids & belts before you hit the highway. Compare 50+ retailers instantly!",
+          platform: "all",
+          targetSite: "garagebot",
+          hashtags: [...ECOSYSTEM_HASHTAGS, '#RoadTrip', '#SummerDriving', '#CarPrep', ...VEHICLE_HASHTAGS.slice(0,4)],
+          category: "seasonal",
+          tone: "friendly"
+        }
+      ];
+
+      // Clear existing and insert new
+      await db.delete(marketingPosts);
+      for (const post of marketingContent) {
+        await db.insert(marketingPosts).values({
+          content: post.content,
+          platform: post.platform,
+          targetSite: post.targetSite,
+          hashtags: post.hashtags,
+          category: post.category,
+          tone: post.tone,
+          tenantId: 'garagebot',
+          isActive: true,
+        });
+      }
+      
+      res.json({ success: true, count: marketingContent.length, message: "Marketing content seeded with comprehensive hashtags" });
+    } catch (err) {
+      console.error("Seed error:", err);
+      res.status(500).json({ error: "Failed to seed marketing content" });
+    }
+  });
+
   // Analytics Tracking Endpoints
   app.post("/api/analytics/session", async (req, res) => {
     try {
