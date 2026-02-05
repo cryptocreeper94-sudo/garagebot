@@ -7131,8 +7131,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       
       for (const result of results) {
         await db.insert(scheduledPosts).values({
-          tenantId: 'garagebot',
-          postId: post.id,
+          marketingPostId: post.id,
           platform: result.platform,
           content: post.content,
           status: result.success ? 'posted' : 'failed',

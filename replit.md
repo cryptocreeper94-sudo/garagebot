@@ -122,6 +122,33 @@ Preferred communication style: Simple, everyday language.
 - **Alerts**: NOAA Weather Alerts API for severe weather warnings.
 - **Features**: Animated radar, layer controls, fullscreen mode, mobile-responsive design, ZIP persistence.
 
+## Marketing Hub & Social Media Integration
+- **Service File**: `server/services/socialMedia.ts`
+- **Component**: `client/src/pages/MarketingHub.tsx`
+- **Platforms Supported**: X/Twitter, Facebook, Instagram, LinkedIn, Google Business, Nextdoor
+- **Features**:
+  - DAM (Digital Asset Management) with quality/season/style/subject filtering
+  - Content bundles pairing images with messages
+  - Calendar view for visual scheduling
+  - Analytics dashboard with engagement metrics
+  - Paid ads management with budget ranges and audience targeting
+  - AI content generation via OpenAI GPT-4o
+  - Character limit validation per platform
+- **Environment Variables Required**:
+  - X/Twitter: `TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_ACCESS_TOKEN`, `TWITTER_ACCESS_TOKEN_SECRET`
+  - Facebook: `FACEBOOK_PAGE_ACCESS_TOKEN`, `FACEBOOK_PAGE_ID`
+  - Instagram: `INSTAGRAM_ACCESS_TOKEN`, `INSTAGRAM_USER_ID`
+  - LinkedIn: `LINKEDIN_ACCESS_TOKEN`, `LINKEDIN_ORGANIZATION_ID`
+  - Google Business: `GOOGLE_BUSINESS_ACCESS_TOKEN`, `GOOGLE_BUSINESS_LOCATION_ID`
+  - Nextdoor: `NEXTDOOR_API_KEY`, `NEXTDOOR_AGENCY_ID`
+- **API Endpoints**:
+  - `GET /api/marketing/integrations` - Check connection status for all platforms
+  - `POST /api/marketing/post-now` - Post to selected platforms immediately
+  - `POST /api/marketing/generate` - AI-generate marketing content
+  - `GET /api/marketing/bundles` - List content bundles
+  - `POST /api/marketing/bundles` - Create new bundle
+- **Auto-Schedule**: Posts at 8am, 10am, 12pm, 2pm, 4pm, 6pm, 8pm daily (when credentials configured)
+
 ## Version Constraints
 - **React**: ^18.3.1
 - **framer-motion**: ^11.15.0
