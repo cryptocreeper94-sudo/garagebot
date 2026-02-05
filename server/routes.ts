@@ -7427,7 +7427,6 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       }
       
       // Use OpenAI to generate marketing content
-      const openai = await getOpenAIClient();
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
