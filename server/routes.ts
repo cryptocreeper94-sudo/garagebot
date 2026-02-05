@@ -2290,6 +2290,90 @@ export async function registerRoutes(
     }
   });
 
+  // Collect payment for repair order (Stripe Connect)
+  app.post("/api/shops/:shopId/repair-orders/:orderId/collect-payment", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, orderId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const shop = await storage.getShop(shopId);
+      if (!shop || shop.ownerId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      const order = await storage.getRepairOrder(orderId);
+      if (!order || order.shopId !== shopId) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      if (!order.grandTotal || parseFloat(String(order.grandTotal)) <= 0) {
+        return res.status(400).json({ error: "Order has no amount to collect" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      
+      // Get base URL with fallback for production
+      const replitDomain = process.env.REPLIT_DOMAINS?.split(',')[0];
+      const baseUrl = replitDomain 
+        ? `https://${replitDomain}` 
+        : (process.env.BASE_URL || 'https://garagebot.io');
+      
+      const amountInCents = Math.round(parseFloat(String(order.grandTotal)) * 100);
+
+      // Build line items for the checkout session
+      const lineItems = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `Repair Order ${order.orderNumber}`,
+            description: order.description || `Vehicle: ${order.vehicleInfo || 'N/A'}`,
+          },
+          unit_amount: amountInCents,
+        },
+        quantity: 1,
+      }];
+
+      // Build checkout session options
+      const sessionOptions: any = {
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'payment',
+        success_url: `${baseUrl}/mechanics-garage?payment_success=true&order=${orderId}`,
+        cancel_url: `${baseUrl}/mechanics-garage?payment_cancelled=true&order=${orderId}`,
+        metadata: {
+          orderId,
+          shopId,
+          orderNumber: order.orderNumber,
+          platform: 'GarageBot',
+        },
+      };
+
+      // If shop has connected Stripe account, use Stripe Connect
+      if (shop.stripeAccountId && shop.stripeOnboardingComplete) {
+        // Calculate platform fee (3% of transaction)
+        const platformFee = Math.round(amountInCents * 0.03);
+        
+        sessionOptions.payment_intent_data = {
+          application_fee_amount: platformFee,
+          transfer_data: {
+            destination: shop.stripeAccountId,
+          },
+        };
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionOptions);
+      
+      res.json({ 
+        url: session.url, 
+        sessionId: session.id,
+        connectedAccount: shop.stripeAccountId ? true : false 
+      });
+    } catch (error: any) {
+      console.error("Error creating payment session:", error);
+      res.status(500).json({ error: error.message || "Failed to create payment session" });
+    }
+  });
+
   // ============================================
   // MECHANICS GARAGE - ESTIMATES
   // ============================================

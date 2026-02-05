@@ -15,12 +15,15 @@ export class WebhookHandlers {
 
     const sync = await getStripeSync();
     
-    // Parse the event to handle subscription updates
+    // First, process through stripe-replit-sync which verifies the signature
+    // This will throw if signature is invalid
+    await sync.processWebhook(payload, signature, uuid);
+    
+    // Only after signature verification, parse and handle custom events
     try {
-      const stripe = await getUncachableStripeClient();
       const event = JSON.parse(payload.toString());
       
-      // Handle subscription events
+      // Handle custom events (signature already verified above)
       if (event.type === 'checkout.session.completed') {
         await WebhookHandlers.handleCheckoutComplete(event.data.object);
       } else if (event.type === 'customer.subscription.created' || 
@@ -28,16 +31,54 @@ export class WebhookHandlers {
         await WebhookHandlers.handleSubscriptionUpdate(event.data.object);
       } else if (event.type === 'customer.subscription.deleted') {
         await WebhookHandlers.handleSubscriptionCanceled(event.data.object);
+      } else if (event.type === 'account.updated') {
+        await WebhookHandlers.handleConnectedAccountUpdate(event.data.object);
       }
     } catch (error) {
-      console.error('Error handling webhook event:', error);
+      console.error('Error handling custom webhook event:', error);
     }
-    
-    // Still process through stripe-replit-sync for database sync
-    await sync.processWebhook(payload, signature, uuid);
   }
   
   static async handleCheckoutComplete(session: any) {
+    // Handle repair order payments (Mechanics Garage)
+    const orderId = session.metadata?.orderId;
+    const shopId = session.metadata?.shopId;
+    
+    if (orderId && shopId && session.mode === 'payment' && session.payment_status === 'paid') {
+      console.log('Repair order payment complete:', orderId, 'shopId:', shopId);
+      
+      // Verify the order exists and belongs to the shop (security check)
+      const order = await storage.getRepairOrder(orderId);
+      if (!order || order.shopId !== shopId) {
+        console.error('Payment received for unknown or mismatched order:', orderId, shopId);
+        return;
+      }
+      
+      // Verify amount matches (within tolerance for rounding)
+      const expectedAmount = order.grandTotal ? Math.round(parseFloat(String(order.grandTotal)) * 100) : 0;
+      const paidAmount = session.amount_total || 0;
+      if (Math.abs(expectedAmount - paidAmount) > 1) { // 1 cent tolerance
+        console.error('Payment amount mismatch:', orderId, 'expected:', expectedAmount, 'received:', paidAmount);
+        return;
+      }
+      
+      // Check if already paid (idempotency)
+      if (order.paymentStatus === 'paid') {
+        console.log('Order already marked as paid, skipping:', orderId);
+        return;
+      }
+      
+      await storage.updateRepairOrder(orderId, {
+        paymentStatus: 'paid',
+        paidAt: new Date(),
+        stripePaymentIntentId: session.payment_intent,
+      });
+      
+      console.log('Repair order marked as paid:', orderId);
+      return;
+    }
+    
+    // Handle subscription payments
     const userId = session.metadata?.userId;
     if (!userId) return;
     
@@ -107,5 +148,29 @@ export class WebhookHandlers {
       stripeSubscriptionId: null,
       subscriptionExpiresAt: null,
     });
+  }
+  
+  static async handleConnectedAccountUpdate(account: any) {
+    const shopId = account.metadata?.shopId;
+    if (!shopId) {
+      console.log('Connected account update received but no shopId in metadata:', account.id);
+      return;
+    }
+    
+    const chargesEnabled = account.charges_enabled;
+    const payoutsEnabled = account.payouts_enabled;
+    const detailsSubmitted = account.details_submitted;
+    
+    const status = chargesEnabled && payoutsEnabled 
+      ? 'active' 
+      : detailsSubmitted 
+        ? 'pending_verification' 
+        : 'onboarding_incomplete';
+    
+    const onboardingComplete = chargesEnabled && payoutsEnabled;
+    
+    console.log('Connected account update:', account.id, 'shopId:', shopId, 'status:', status, 'complete:', onboardingComplete);
+    
+    await storage.updateShopStripeAccount(shopId, account.id, status, onboardingComplete);
   }
 }
