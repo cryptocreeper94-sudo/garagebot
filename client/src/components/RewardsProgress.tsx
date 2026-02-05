@@ -43,17 +43,35 @@ interface RewardsProgressProps {
 export default function RewardsProgress({ userId, compact = false }: RewardsProgressProps) {
   const [showAllTiers, setShowAllTiers] = useState(false);
 
-  // Mock data - would fetch from API
+  const { data: rewardsSummary, isLoading } = useQuery({
+    queryKey: ["/api/rewards/summary"],
+    enabled: !!userId,
+  });
+
+  const { data: giveawayData } = useQuery({
+    queryKey: ["/api/rewards/giveaway"],
+    enabled: !!userId,
+  });
+
   const userStats = {
-    referralCount: 2,
-    pointsBalance: 450,
-    totalSavings: 42,
-    partsSearched: 7,
+    referralCount: rewardsSummary?.referralCount ?? 0,
+    pointsBalance: rewardsSummary?.pointsBalance ?? 0,
+    totalSavings: 0,
+    partsSearched: 0,
     guidesCompleted: 0,
     currentTier: 0,
     nextTier: 1,
-    giveawayEntries: 2,
+    giveawayEntries: giveawayData?.entries ?? 0,
   };
+
+  // Calculate current tier index
+  for (let i = REWARD_TIERS.length - 1; i >= 0; i--) {
+    if (userStats.referralCount >= REWARD_TIERS[i].referrals) {
+      userStats.currentTier = i;
+      userStats.nextTier = i + 1 < REWARD_TIERS.length ? i + 1 : i;
+      break;
+    }
+  }
 
   const currentTier = REWARD_TIERS[userStats.currentTier];
   const nextTier = REWARD_TIERS[userStats.nextTier];
@@ -61,7 +79,7 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
 
   if (compact) {
     return (
-      <Card className="p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/20">
+      <Card className="p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/20" data-testid="rewards-compact-card">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
@@ -69,12 +87,12 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
             </div>
             <div>
               <p className="text-sm text-zinc-400">Your Referrals</p>
-              <p className="text-xl font-bold text-white">{userStats.referralCount}</p>
+              <p className="text-xl font-bold text-white" data-testid="text-referral-count">{userStats.referralCount}</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-xs text-zinc-500">Next reward at {nextTier?.referrals}</p>
-            <Progress value={progressToNext} className="w-24 h-2 mt-1" />
+            <Progress value={progressToNext} className="w-24 h-2 mt-1" data-testid="progress-next-tier" />
           </div>
         </div>
       </Card>
@@ -84,39 +102,39 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
   return (
     <div className="space-y-6">
       {/* Header Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4 bg-zinc-900/50 border-zinc-800">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4" data-testid="rewards-stats-grid">
+        <Card className="p-4 bg-zinc-900/50 border-zinc-800" data-testid="card-referrals">
           <div className="flex items-center gap-3">
             <Users className="w-8 h-8 text-cyan-400" />
             <div>
-              <p className="text-2xl font-bold text-white">{userStats.referralCount}</p>
+              <p className="text-2xl font-bold text-white" data-testid="text-total-referrals">{userStats.referralCount}</p>
               <p className="text-xs text-zinc-500">Referrals</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 bg-zinc-900/50 border-zinc-800">
+        <Card className="p-4 bg-zinc-900/50 border-zinc-800" data-testid="card-points">
           <div className="flex items-center gap-3">
             <Zap className="w-8 h-8 text-yellow-400" />
             <div>
-              <p className="text-2xl font-bold text-white">{userStats.pointsBalance}</p>
+              <p className="text-2xl font-bold text-white" data-testid="text-points-balance">{userStats.pointsBalance}</p>
               <p className="text-xs text-zinc-500">Points</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 bg-zinc-900/50 border-zinc-800">
+        <Card className="p-4 bg-zinc-900/50 border-zinc-800" data-testid="card-savings">
           <div className="flex items-center gap-3">
             <TrendingUp className="w-8 h-8 text-green-400" />
             <div>
-              <p className="text-2xl font-bold text-white">${userStats.totalSavings}</p>
+              <p className="text-2xl font-bold text-white" data-testid="text-total-savings">${userStats.totalSavings}</p>
               <p className="text-xs text-zinc-500">Saved</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 bg-zinc-900/50 border-zinc-800">
+        <Card className="p-4 bg-zinc-900/50 border-zinc-800" data-testid="card-giveaway-entries">
           <div className="flex items-center gap-3">
             <Gift className="w-8 h-8 text-purple-400" />
             <div>
-              <p className="text-2xl font-bold text-white">{userStats.giveawayEntries}</p>
+              <p className="text-2xl font-bold text-white" data-testid="text-giveaway-entries">{userStats.giveawayEntries}</p>
               <p className="text-xs text-zinc-500">Giveaway Entries</p>
             </div>
           </div>
@@ -124,13 +142,13 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
       </div>
 
       {/* Referral Tiers Progress */}
-      <Card className="p-6 bg-zinc-900/50 border-zinc-800">
+      <Card className="p-6 bg-zinc-900/50 border-zinc-800" data-testid="card-referral-tiers">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-white flex items-center gap-2">
             <Trophy className="w-5 h-5 text-yellow-400" />
             Referral Rewards
           </h3>
-          <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">
+          <Badge variant="outline" className="border-cyan-500/50 text-cyan-400" data-testid="badge-tier-progress">
             {userStats.referralCount} / {nextTier?.referrals || "MAX"} to next tier
           </Badge>
         </div>
@@ -148,6 +166,7 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
+                data-testid={`tier-row-${tier.referrals}`}
                 className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
                   isCompleted ? "bg-green-500/10 border border-green-500/30" :
                   isNext ? "bg-cyan-500/10 border border-cyan-500/30" :
@@ -188,6 +207,7 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
             variant="ghost"
             className="w-full mt-4 text-zinc-400 hover:text-white"
             onClick={() => setShowAllTiers(true)}
+            data-testid="button-show-all-tiers"
           >
             Show All Tiers
             <ChevronRight className="w-4 h-4 ml-1" />
@@ -196,7 +216,7 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
       </Card>
 
       {/* Badges */}
-      <Card className="p-6 bg-zinc-900/50 border-zinc-800">
+      <Card className="p-6 bg-zinc-900/50 border-zinc-800" data-testid="card-badges">
         <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
           <Medal className="w-5 h-5 text-purple-400" />
           Your Badges
@@ -208,6 +228,7 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
             return (
               <div
                 key={badge.id}
+                data-testid={`badge-${badge.id}`}
                 className={`text-center p-4 rounded-lg border transition-all ${
                   badge.earned
                     ? "bg-purple-500/10 border-purple-500/30"
@@ -236,26 +257,26 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
       </Card>
 
       {/* Monthly Giveaway */}
-      <Card className="p-6 bg-gradient-to-r from-orange-500/10 via-red-500/10 to-pink-500/10 border-orange-500/20">
+      <Card className="p-6 bg-gradient-to-r from-orange-500/10 via-red-500/10 to-pink-500/10 border-orange-500/20" data-testid="card-monthly-giveaway">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <Gift className="w-5 h-5 text-orange-400" />
-              February Giveaway
+              {giveawayData?.month ? new Date(giveawayData.month + "-01").toLocaleString('default', { month: 'long' }) : "February"} Giveaway
             </h3>
             <p className="text-zinc-400 mt-1">
-              Win a <span className="text-orange-400 font-bold">$100 AutoZone Gift Card</span>
+              Win a <span className="text-orange-400 font-bold" data-testid="text-prize">{giveawayData?.prize || "$100 AutoZone Gift Card"}</span>
             </p>
             <p className="text-sm text-zinc-500 mt-2">
-              Every referral = 1 entry. You have <span className="text-white font-bold">{userStats.giveawayEntries} entries</span> this month.
+              Every referral = 1 entry. You have <span className="text-white font-bold" data-testid="text-entries-count">{userStats.giveawayEntries} entries</span> this month.
             </p>
           </div>
           <div className="text-right">
             <div className="flex items-center gap-2 text-zinc-400">
               <Calendar className="w-4 h-4" />
-              <span className="text-sm">Drawing: Feb 28</span>
+              <span className="text-sm" data-testid="text-drawing-date">Drawing: {giveawayData?.drawingDate ? new Date(giveawayData.drawingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : "Feb 28"}</span>
             </div>
-            <Button className="mt-3 bg-orange-500 hover:bg-orange-600 text-black">
+            <Button className="mt-3 bg-orange-500 hover:bg-orange-600 text-black" data-testid="button-get-more-entries">
               Get More Entries
             </Button>
           </div>
