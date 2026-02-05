@@ -131,3 +131,118 @@ export async function sendWelcomeEmail(toEmail: string, username: string) {
     return { success: false, error };
   }
 }
+
+export interface ShopInquiry {
+  shopName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  shopType: string;
+  currentSoftware?: string;
+  employees?: string;
+  message?: string;
+}
+
+export async function sendShopInquiryEmail(inquiry: ShopInquiry) {
+  try {
+    const { client, fromEmail } = await getResendClient();
+    
+    const result = await client.emails.send({
+      from: fromEmail || 'GarageBot <noreply@garagebot.io>',
+      to: 'jason@darkwavestudios.io',
+      replyTo: inquiry.email,
+      subject: `[GarageBot Lead] New Shop Inquiry: ${inquiry.shopName}`,
+      html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <div style="display: inline-block; background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(6,182,212,0.2)); border: 1px solid rgba(34,197,94,0.4); border-radius: 12px; padding: 16px 24px; margin-bottom: 16px;">
+        <span style="font-size: 28px; font-weight: bold; color: #22c55e; text-transform: uppercase; letter-spacing: 2px;">New Lead</span>
+      </div>
+      <h1 style="color: #ffffff; font-size: 24px; margin: 0;">Mechanics Garage Inquiry</h1>
+    </div>
+
+    <div style="background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(6,182,212,0.1)); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <h2 style="color: #22c55e; font-size: 18px; margin: 0 0 20px 0; border-bottom: 1px solid rgba(34,197,94,0.3); padding-bottom: 12px;">Shop Information</h2>
+      
+      <div style="margin-bottom: 16px;">
+        <span style="color: #71717a; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Shop Name</span>
+        <p style="color: #ffffff; font-size: 16px; margin: 4px 0 0 0; font-weight: bold;">${inquiry.shopName}</p>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <span style="color: #71717a; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Shop Type</span>
+        <p style="color: #ffffff; font-size: 16px; margin: 4px 0 0 0;">${inquiry.shopType}</p>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <span style="color: #71717a; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Employees</span>
+        <p style="color: #ffffff; font-size: 16px; margin: 4px 0 0 0;">${inquiry.employees || 'Not specified'}</p>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <span style="color: #71717a; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Current Software</span>
+        <p style="color: #ffffff; font-size: 16px; margin: 4px 0 0 0;">${inquiry.currentSoftware || 'Not specified'}</p>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(59,130,246,0.1)); border: 1px solid rgba(6,182,212,0.3); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <h2 style="color: #06b6d4; font-size: 18px; margin: 0 0 20px 0; border-bottom: 1px solid rgba(6,182,212,0.3); padding-bottom: 12px;">Contact Details</h2>
+      
+      <div style="margin-bottom: 16px;">
+        <span style="color: #71717a; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Contact Name</span>
+        <p style="color: #ffffff; font-size: 16px; margin: 4px 0 0 0; font-weight: bold;">${inquiry.contactName}</p>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <span style="color: #71717a; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Email</span>
+        <p style="color: #06b6d4; font-size: 16px; margin: 4px 0 0 0;">
+          <a href="mailto:${inquiry.email}" style="color: #06b6d4; text-decoration: none;">${inquiry.email}</a>
+        </p>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <span style="color: #71717a; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Phone</span>
+        <p style="color: #ffffff; font-size: 16px; margin: 4px 0 0 0;">
+          <a href="tel:${inquiry.phone}" style="color: #06b6d4; text-decoration: none;">${inquiry.phone}</a>
+        </p>
+      </div>
+    </div>
+
+    ${inquiry.message ? `
+    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <h2 style="color: #ffffff; font-size: 18px; margin: 0 0 16px 0;">Message</h2>
+      <p style="color: #d4d4d8; font-size: 14px; line-height: 1.6; margin: 0; white-space: pre-wrap;">${inquiry.message}</p>
+    </div>
+    ` : ''}
+
+    <div style="text-align: center; padding: 20px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px;">
+      <p style="color: #22c55e; font-size: 14px; margin: 0 0 8px 0; font-weight: bold;">Ready to Follow Up?</p>
+      <a href="mailto:${inquiry.email}?subject=Re: Mechanics Garage - ${inquiry.shopName}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: #000000; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">Reply to ${inquiry.contactName}</a>
+    </div>
+
+    <div style="text-align: center; padding-top: 24px; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+      <p style="color: #71717a; font-size: 11px; margin: 0;">
+        Lead captured via GarageBot Mechanics Garage<br>
+        ${new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+      `
+    });
+
+    console.log('[Email] Shop inquiry email sent:', result);
+    return { success: true, id: result.data?.id };
+  } catch (error) {
+    console.error('[Email] Failed to send shop inquiry email:', error);
+    return { success: false, error };
+  }
+}

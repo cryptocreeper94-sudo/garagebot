@@ -40,6 +40,8 @@ import SharedWishlist from "@/pages/SharedWishlist";
 import Projects from "@/pages/Projects";
 import Blog from "@/pages/Blog";
 import MarketingHub from "@/pages/MarketingHub";
+import MechanicsGarageSales from "@/pages/MechanicsGarageSales";
+import ShadeTreeMechanics from "@/pages/ShadeTreeMechanics";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -57,6 +59,8 @@ function Router() {
       <Route path="/projects">{() => <Projects />}</Route>
       <Route path="/shop-portal">{() => <ShopPortal />}</Route>
       <Route path="/mechanics-garage">{() => <MechanicsGarage />}</Route>
+      <Route path="/mechanics-garage/info">{() => <MechanicsGarageSales />}</Route>
+      <Route path="/shade-tree">{() => <ShadeTreeMechanics />}</Route>
       <Route path="/insurance">{() => <Insurance />}</Route>
       <Route path="/auth">{() => <Auth />}</Route>
       <Route path="/auth/callback">{() => <AuthCallback />}</Route>
