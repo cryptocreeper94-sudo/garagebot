@@ -38,6 +38,7 @@ import VendorSignup from "@/pages/VendorSignup";
 import Wishlists from "@/pages/Wishlists";
 import SharedWishlist from "@/pages/SharedWishlist";
 import Projects from "@/pages/Projects";
+import Blog from "@/pages/Blog";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -72,6 +73,8 @@ function Router() {
       <Route path="/diy-guides">{() => <DIYGuides />}</Route>
       <Route path="/invite">{() => <InviteFriends />}</Route>
       <Route path="/vendor-signup">{() => <VendorSignup />}</Route>
+      <Route path="/blog">{() => <Blog />}</Route>
+      <Route path="/blog/:slug">{() => <Blog />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );
