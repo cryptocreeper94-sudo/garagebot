@@ -2120,3 +2120,102 @@ export const scheduledPosts = pgTable("scheduled_posts", {
 export const insertScheduledPostSchema = createInsertSchema(scheduledPosts).omit({ id: true, createdAt: true });
 export type InsertScheduledPost = z.infer<typeof insertScheduledPostSchema>;
 export type ScheduledPost = typeof scheduledPosts.$inferSelect;
+
+// Content Bundles - pair images with messages for scheduled posting
+export const contentBundles = pgTable("content_bundles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull().default("garagebot"),
+  imageId: varchar("image_id", { length: 100 }),
+  messageId: varchar("message_id", { length: 100 }),
+  imageUrl: varchar("image_url", { length: 500 }),
+  message: text("message"),
+  platform: varchar("platform", { length: 20 }).notNull(),
+  status: varchar("status", { length: 30 }).default("suggested"),
+  postType: varchar("post_type", { length: 20 }).default("organic"),
+  targetAudience: varchar("target_audience", { length: 100 }),
+  budgetRange: varchar("budget_range", { length: 50 }),
+  ctaButton: varchar("cta_button", { length: 30 }),
+  scheduledDate: timestamp("scheduled_date"),
+  postedAt: timestamp("posted_at"),
+  impressions: integer("impressions").default(0),
+  reach: integer("reach").default(0),
+  clicks: integer("clicks").default(0),
+  likes: integer("likes").default(0),
+  comments: integer("comments").default(0),
+  shares: integer("shares").default(0),
+  saves: integer("saves").default(0),
+  leads: integer("leads").default(0),
+  conversions: integer("conversions").default(0),
+  spend: decimal("spend", { precision: 10, scale: 2 }),
+  revenue: decimal("revenue", { precision: 10, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_content_bundles_tenant").on(table.tenantId),
+  index("IDX_content_bundles_status").on(table.status),
+  index("IDX_content_bundles_platform").on(table.platform),
+]);
+
+export const insertContentBundleSchema = createInsertSchema(contentBundles).omit({ id: true, createdAt: true });
+export type InsertContentBundle = z.infer<typeof insertContentBundleSchema>;
+export type ContentBundle = typeof contentBundles.$inferSelect;
+
+// Ad Campaigns for paid advertising
+export const adCampaigns = pgTable("ad_campaigns", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull().default("garagebot"),
+  name: varchar("name", { length: 255 }).notNull(),
+  platform: varchar("platform", { length: 20 }).notNull(),
+  status: varchar("status", { length: 20 }).default("draft"),
+  objective: varchar("objective", { length: 50 }),
+  dailyBudget: decimal("daily_budget", { precision: 10, scale: 2 }),
+  totalBudget: decimal("total_budget", { precision: 10, scale: 2 }),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  targetAudience: jsonb("target_audience"),
+  adImageUrl: varchar("ad_image_url", { length: 500 }),
+  adCopy: text("ad_copy"),
+  ctaButton: varchar("cta_button", { length: 30 }),
+  landingUrl: varchar("landing_url", { length: 500 }),
+  totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
+  impressions: integer("impressions").default(0),
+  reach: integer("reach").default(0),
+  clicks: integer("clicks").default(0),
+  conversions: integer("conversions").default(0),
+  costPerClick: decimal("cost_per_click", { precision: 10, scale: 4 }),
+  costPerConversion: decimal("cost_per_conversion", { precision: 10, scale: 2 }),
+  externalCampaignId: varchar("external_campaign_id", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_ad_campaigns_tenant").on(table.tenantId),
+  index("IDX_ad_campaigns_status").on(table.status),
+  index("IDX_ad_campaigns_platform").on(table.platform),
+]);
+
+export const insertAdCampaignSchema = createInsertSchema(adCampaigns).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertAdCampaign = z.infer<typeof insertAdCampaignSchema>;
+export type AdCampaign = typeof adCampaigns.$inferSelect;
+
+// Marketing Message Templates (different from shop SMS templates)
+export const marketingMessageTemplates = pgTable("marketing_message_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull().default("garagebot"),
+  content: text("content").notNull(),
+  subject: varchar("subject", { length: 50 }),
+  tone: varchar("tone", { length: 30 }),
+  cta: varchar("cta", { length: 30 }),
+  platform: varchar("platform", { length: 20 }),
+  contentType: varchar("content_type", { length: 30 }),
+  hashtags: text("hashtags").array().default(sql`ARRAY[]::text[]`),
+  charCount: integer("char_count"),
+  isActive: boolean("is_active").default(true),
+  usageCount: integer("usage_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_marketing_templates_tenant").on(table.tenantId),
+  index("IDX_marketing_templates_platform").on(table.platform),
+]);
+
+export const insertMarketingMessageTemplateSchema = createInsertSchema(marketingMessageTemplates).omit({ id: true, createdAt: true });
+export type InsertMarketingMessageTemplate = z.infer<typeof insertMarketingMessageTemplateSchema>;
+export type MarketingMessageTemplate = typeof marketingMessageTemplates.$inferSelect;
