@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Footer";
+import TrustLayerReviews from "@/components/TrustLayerReviews";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -769,6 +770,17 @@ export default function Home() {
           </motion.div>
         </div>
       </div>
+      
+      {/* Reviews Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-white mb-2">What People Are Saying</h2>
+            <p className="text-zinc-400">Real reviews from real DIYers</p>
+          </div>
+          <TrustLayerReviews layout="carousel" maxReviews={6} />
+        </div>
+      </section>
       
       {/* Footer - Dynamic Version */}
       <Footer />
