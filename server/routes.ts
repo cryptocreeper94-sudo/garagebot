@@ -43,6 +43,7 @@ import { weatherService } from "./services/weather";
 import * as authService from "./services/auth";
 import { orbitClient } from "./services/orbitEcosystem";
 import { trustLayerClient } from "./services/trustLayer";
+import { sendWelcomeEmail } from "./services/emailService";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -246,6 +247,13 @@ export async function registerRoutes(
         req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
       }
       
+      // Send welcome email with Trust Layer membership info
+      if (email) {
+        sendWelcomeEmail(email, firstName || username).catch(err => {
+          console.error('[Signup] Failed to send welcome email:', err);
+        });
+      }
+
       res.json({ 
         user: { 
           id: user.id, 
