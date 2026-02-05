@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Shield, Lock, Eye, Database, Users, Mail, ChevronLeft } from "lucide-react";
+import { Shield, Lock, Eye, Database, Users, Mail, ChevronLeft, MonitorSmartphone } from "lucide-react";
 
 export default function PrivacyPolicy() {
   return (
@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
             </div>
             <div>
               <h1 className="text-3xl font-tech font-bold uppercase text-primary">Privacy Policy</h1>
-              <p className="text-muted-foreground text-sm font-mono">Last Updated: December 2024</p>
+              <p className="text-muted-foreground text-sm font-mono">Last Updated: February 2026</p>
             </div>
           </div>
           <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
@@ -115,6 +115,26 @@ export default function PrivacyPolicy() {
                     <li>We use secure session management with configurable persistence</li>
                     <li>Regular security audits and vulnerability assessments</li>
                     <li>Recovery codes are provided for account access restoration</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-card/50">
+            <div className="flex items-start gap-4">
+              <div className="p-2 rounded-lg bg-yellow-500/20">
+                <MonitorSmartphone className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-tech uppercase mb-3">Advertising & Cookies</h2>
+                <div className="space-y-3 text-muted-foreground">
+                  <p>GarageBot uses advertising to support our free services. This includes:</p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li><strong>Google AdSense:</strong> We use Google AdSense to display advertisements. Google may use cookies and web beacons to serve ads based on your prior visits to our site or other websites.</li>
+                    <li><strong>Affiliate Links:</strong> We participate in affiliate programs (including CJ Affiliate, Amazon Associates, and others). When you click product links and make purchases, we may earn a commission at no additional cost to you.</li>
+                    <li><strong>Cookies:</strong> Third-party advertising vendors, including Google, use cookies to serve ads based on your browsing activity. You can opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Google Ads Settings</a> or <a href="https://www.aboutads.info/choices/" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">aboutads.info</a>.</li>
+                    <li><strong>Analytics:</strong> We use analytics tools to understand how visitors use our site, helping us improve the experience.</li>
                   </ul>
                 </div>
               </div>
