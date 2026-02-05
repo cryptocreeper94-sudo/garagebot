@@ -1623,6 +1623,58 @@ export type InsertReferralRedemption = z.infer<typeof insertReferralRedemptionSc
 export type ReferralRedemption = typeof referralRedemptions.$inferSelect;
 
 // ============================================
+// GAMIFICATION & REWARDS SYSTEM
+// ============================================
+
+// User badges earned through achievements
+export const userBadges = pgTable("user_badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  badgeType: text("badge_type").notNull(), // 'early_supporter', 'parts_hunter', 'diy_master', etc.
+  badgeTier: text("badge_tier").default("bronze"), // bronze, silver, gold, platinum
+  earnedAt: timestamp("earned_at").defaultNow(),
+  metadata: jsonb("metadata"), // Store progress data, counts, etc.
+}, (table) => [
+  index("IDX_user_badges_user").on(table.userId),
+  index("IDX_user_badges_type").on(table.badgeType),
+]);
+
+// Track user achievements progress
+export const userAchievements = pgTable("user_achievements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  achievementType: text("achievement_type").notNull(), // 'parts_searched', 'guides_completed', 'savings_total', etc.
+  currentValue: integer("current_value").default(0),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+}, (table) => [
+  index("IDX_user_achievements_user").on(table.userId),
+]);
+
+// Monthly giveaway entries (for referral rewards)
+export const giveawayEntries = pgTable("giveaway_entries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  giveawayMonth: text("giveaway_month").notNull(), // '2026-02', '2026-03', etc.
+  entriesCount: integer("entries_count").default(1), // More referrals = more entries
+  source: text("source").default("referral"), // 'referral', 'review', 'social_share'
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_giveaway_user_month").on(table.userId, table.giveawayMonth),
+]);
+
+// Giveaway winners history
+export const giveawayWinners = pgTable("giveaway_winners", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  giveawayMonth: text("giveaway_month").notNull(),
+  prize: text("prize").notNull(), // '$100 AutoZone Gift Card', '3 Months Pro', etc.
+  prizeValue: integer("prize_value"), // Value in cents
+  status: text("status").default("pending"), // 'pending', 'claimed', 'shipped'
+  claimedAt: timestamp("claimed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ============================================
 // RELEASE VERSION CONTROL SYSTEM
 // ============================================
 

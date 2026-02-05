@@ -4,7 +4,7 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import { db } from "@db";
@@ -1493,6 +1493,129 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error validating referral code:", error);
       res.status(500).json({ error: "Failed to validate code" });
+    }
+  });
+
+  // ============== GAMIFICATION & REWARDS ROUTES ==============
+
+  // Get user's badges
+  app.get("/api/rewards/badges", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const badges = await db.select().from(userBadges).where(eq(userBadges.userId, userId));
+      res.json(badges);
+    } catch (error) {
+      console.error("Error fetching badges:", error);
+      res.status(500).json({ error: "Failed to fetch badges" });
+    }
+  });
+
+  // Get user's achievement progress
+  app.get("/api/rewards/achievements", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const achievements = await db.select().from(userAchievements).where(eq(userAchievements.userId, userId));
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching achievements:", error);
+      res.status(500).json({ error: "Failed to fetch achievements" });
+    }
+  });
+
+  // Get user's giveaway entries for current month
+  app.get("/api/rewards/giveaway", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const currentMonth = new Date().toISOString().slice(0, 7); // '2026-02'
+      
+      const entries = await db.select().from(giveawayEntries)
+        .where(and(eq(giveawayEntries.userId, userId), eq(giveawayEntries.giveawayMonth, currentMonth)));
+      
+      const totalEntries = entries.reduce((sum, e) => sum + (e.entriesCount || 1), 0);
+      
+      res.json({
+        month: currentMonth,
+        entries: totalEntries,
+        prize: "$100 AutoZone Gift Card",
+        drawingDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0]
+      });
+    } catch (error) {
+      console.error("Error fetching giveaway:", error);
+      res.status(500).json({ error: "Failed to fetch giveaway info" });
+    }
+  });
+
+  // Get rewards summary (all stats in one call)
+  app.get("/api/rewards/summary", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      
+      // Get referral count
+      const invites = await db.select().from(referralInvites)
+        .where(and(eq(referralInvites.referrerId, userId), eq(referralInvites.status, "converted")));
+      
+      // Get points balance from user
+      const user = await storage.getUser(userId);
+      
+      // Get badges count
+      const badges = await db.select().from(userBadges).where(eq(userBadges.userId, userId));
+      
+      // Get giveaway entries
+      const entries = await db.select().from(giveawayEntries)
+        .where(and(eq(giveawayEntries.userId, userId), eq(giveawayEntries.giveawayMonth, currentMonth)));
+      
+      const totalEntries = entries.reduce((sum, e) => sum + (e.entriesCount || 1), 0);
+      
+      // Calculate tier
+      const referralCount = invites.length;
+      const tiers = [
+        { referrals: 1, name: "Early Supporter" },
+        { referrals: 3, name: "Part Finder" },
+        { referrals: 5, name: "Gear Head" },
+        { referrals: 10, name: "Crew Chief" },
+        { referrals: 25, name: "Shop Foreman" },
+        { referrals: 50, name: "Legend" },
+      ];
+      
+      let currentTier = 0;
+      for (let i = 0; i < tiers.length; i++) {
+        if (referralCount >= tiers[i].referrals) currentTier = i;
+      }
+      
+      res.json({
+        referralCount,
+        pointsBalance: user?.referralPointsBalance || 0,
+        badgesCount: badges.length,
+        giveawayEntries: totalEntries,
+        currentTier: tiers[currentTier]?.name || "New Member",
+        nextTier: tiers[currentTier + 1]?.name || null,
+        referralsToNextTier: tiers[currentTier + 1]?.referrals ? tiers[currentTier + 1].referrals - referralCount : 0
+      });
+    } catch (error) {
+      console.error("Error fetching rewards summary:", error);
+      res.status(500).json({ error: "Failed to fetch rewards summary" });
+    }
+  });
+
+  // Add giveaway entry (called when user refers someone)
+  app.post("/api/rewards/giveaway/enter", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { source } = req.body;
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      
+      await db.insert(giveawayEntries).values({
+        userId,
+        giveawayMonth: currentMonth,
+        entriesCount: 1,
+        source: source || "referral"
+      });
+      
+      res.json({ success: true, message: "Giveaway entry added" });
+    } catch (error) {
+      console.error("Error adding giveaway entry:", error);
+      res.status(500).json({ error: "Failed to add giveaway entry" });
     }
   });
 
