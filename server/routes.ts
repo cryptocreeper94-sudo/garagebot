@@ -4,11 +4,11 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import { db } from "@db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
@@ -7114,7 +7114,194 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
-  // ============== MARKETING HUB ROUTES ==============
+  // ============== SHOP MARKETING HUB ROUTES (TENANT-SPACED) ==============
+  
+  // Check if shop has Marketing Hub subscription
+  app.get("/api/shop/:shopId/marketing/subscription", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user?.claims?.sub;
+      
+      // Verify user has access to this shop
+      const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
+      if (!shop.length) {
+        return res.status(404).json({ error: "Shop not found" });
+      }
+      
+      const isOwner = shop[0].ownerId === userId;
+      const staffMember = await db.select().from(shopStaff)
+        .where(and(eq(shopStaff.shopId, shopId), eq(shopStaff.userId, userId)))
+        .limit(1);
+      
+      if (!isOwner && !staffMember.length) {
+        return res.status(403).json({ error: "Not authorized for this shop" });
+      }
+      
+      // Check for active subscription
+      const subscription = await db.select().from(marketingHubSubscriptions)
+        .where(and(
+          eq(marketingHubSubscriptions.shopId, shopId),
+          eq(marketingHubSubscriptions.status, "active")
+        ))
+        .limit(1);
+      
+      res.json({
+        hasSubscription: subscription.length > 0,
+        subscription: subscription[0] || null,
+        pricing: {
+          basic: { price: 29, features: ["6 platforms", "DAM library", "Basic analytics", "50 posts/month"] },
+          pro: { price: 49, features: ["All Basic features", "AI content generation", "Advanced analytics", "Unlimited posts"] },
+          enterprise: { price: 99, features: ["All Pro features", "White-label", "Dedicated support", "Custom integrations"] }
+        }
+      });
+    } catch (error) {
+      console.error("[Marketing Hub] Subscription check error:", error);
+      res.status(500).json({ error: "Failed to check subscription" });
+    }
+  });
+  
+  // Helper function to verify shop access
+  async function verifyShopAccess(shopId: string, userId: string): Promise<{ authorized: boolean; isOwner: boolean }> {
+    const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
+    if (!shop.length) return { authorized: false, isOwner: false };
+    
+    const isOwner = shop[0].ownerId === userId;
+    if (isOwner) return { authorized: true, isOwner: true };
+    
+    const staffMember = await db.select().from(shopStaff)
+      .where(and(eq(shopStaff.shopId, shopId), eq(shopStaff.userId, userId)))
+      .limit(1);
+    
+    return { authorized: staffMember.length > 0, isOwner: false };
+  }
+  
+  // Get shop's social credentials status
+  app.get("/api/shop/:shopId/marketing/integrations", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user?.claims?.sub;
+      
+      // Verify user has access to this shop
+      const access = await verifyShopAccess(shopId, userId);
+      if (!access.authorized) {
+        return res.status(403).json({ error: "Not authorized for this shop" });
+      }
+      
+      const credentials = await db.select({
+        platform: shopSocialCredentials.platform,
+        isActive: shopSocialCredentials.isActive,
+        lastUsedAt: shopSocialCredentials.lastUsedAt
+      }).from(shopSocialCredentials)
+        .where(eq(shopSocialCredentials.shopId, shopId));
+      
+      const platforms = ["twitter", "facebook", "instagram", "linkedin", "google", "nextdoor"];
+      const status = platforms.map(p => ({
+        platform: p,
+        connected: credentials.some(c => c.platform === p && c.isActive),
+        lastUsed: credentials.find(c => c.platform === p)?.lastUsedAt || null
+      }));
+      
+      res.json(status);
+    } catch (error) {
+      console.error("[Marketing Hub] Integration status error:", error);
+      res.status(500).json({ error: "Failed to get integration status" });
+    }
+  });
+  
+  // Get shop's marketing content
+  app.get("/api/shop/:shopId/marketing/content", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user?.claims?.sub;
+      const { status, platform } = req.query;
+      
+      // Verify user has access to this shop
+      const access = await verifyShopAccess(shopId, userId);
+      if (!access.authorized) {
+        return res.status(403).json({ error: "Not authorized for this shop" });
+      }
+      
+      let query = db.select().from(shopMarketingContent)
+        .where(eq(shopMarketingContent.shopId, shopId))
+        .orderBy(desc(shopMarketingContent.createdAt));
+      
+      const content = await query;
+      
+      let filtered = content;
+      if (status) filtered = filtered.filter(c => c.status === status);
+      if (platform) filtered = filtered.filter(c => c.platform === platform);
+      
+      res.json(filtered);
+    } catch (error) {
+      console.error("[Marketing Hub] Content fetch error:", error);
+      res.status(500).json({ error: "Failed to get marketing content" });
+    }
+  });
+  
+  // Create shop marketing content
+  app.post("/api/shop/:shopId/marketing/content", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user?.claims?.sub;
+      const { type, platform, content, imageUrl, hashtags, scheduledFor } = req.body;
+      
+      // Verify user has access to this shop
+      const access = await verifyShopAccess(shopId, userId);
+      if (!access.authorized) {
+        return res.status(403).json({ error: "Not authorized for this shop" });
+      }
+      
+      const [newContent] = await db.insert(shopMarketingContent).values({
+        shopId,
+        type: type || "post",
+        platform,
+        content,
+        imageUrl,
+        hashtags: hashtags || [],
+        scheduledFor: scheduledFor ? new Date(scheduledFor) : null,
+        status: scheduledFor ? "scheduled" : "draft"
+      }).returning();
+      
+      res.json(newContent);
+    } catch (error) {
+      console.error("[Marketing Hub] Content creation error:", error);
+      res.status(500).json({ error: "Failed to create content" });
+    }
+  });
+  
+  // Subscribe shop to Marketing Hub
+  app.post("/api/shop/:shopId/marketing/subscribe", isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const { tier } = req.body;
+      const userId = req.user?.claims?.sub;
+      
+      // Verify shop ownership
+      const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
+      if (!shop.length || shop[0].ownerId !== userId) {
+        return res.status(403).json({ error: "Only shop owners can subscribe" });
+      }
+      
+      const pricing: Record<string, number> = { basic: 2900, pro: 4900, enterprise: 9900 };
+      
+      // Create subscription (would integrate with Stripe in production)
+      const [subscription] = await db.insert(marketingHubSubscriptions).values({
+        shopId,
+        tier: tier || "basic",
+        monthlyPrice: pricing[tier] || 2900,
+        status: "active",
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      }).returning();
+      
+      res.json({ success: true, subscription });
+    } catch (error) {
+      console.error("[Marketing Hub] Subscribe error:", error);
+      res.status(500).json({ error: "Failed to subscribe" });
+    }
+  });
+
+  // ============== MARKETING HUB ROUTES (PLATFORM-WIDE) ==============
   
   // Get marketing status and stats
   app.get("/api/marketing/status", isAuthenticated, async (req: any, res) => {
