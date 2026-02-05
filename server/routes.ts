@@ -7,7 +7,7 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
-import { db } from "./db";
+import { db } from "@db";
 import { eq, desc } from "drizzle-orm";
 
 const openai = new OpenAI({
