@@ -4,7 +4,7 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import { db } from "@db";
@@ -7371,6 +7371,89 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     } catch (err) {
       console.error("Seed error:", err);
       res.status(500).json({ error: "Failed to seed marketing content" });
+    }
+  });
+
+  // Content Bundles API
+  app.get("/api/marketing/bundles", async (req, res) => {
+    try {
+      const allBundles = await db.select().from(contentBundles)
+        .where(eq(contentBundles.tenantId, 'garagebot'))
+        .orderBy(desc(contentBundles.createdAt));
+      res.json(allBundles);
+    } catch (err) {
+      console.error("Error fetching bundles:", err);
+      res.json([]);
+    }
+  });
+
+  app.post("/api/marketing/bundles", isAuthenticated, async (req: any, res) => {
+    try {
+      const { imageId, messageId, platform, postType, targetAudience, budgetRange, ctaButton, scheduledDate } = req.body;
+      
+      // Get image and message details
+      const [image] = imageId ? await db.select().from(marketingImages).where(eq(marketingImages.id, imageId)) : [null];
+      const [message] = messageId ? await db.select().from(marketingPosts).where(eq(marketingPosts.id, messageId)) : [null];
+      
+      const bundle = await db.insert(contentBundles).values({
+        tenantId: 'garagebot',
+        imageId,
+        messageId,
+        imageUrl: image?.filePath || null,
+        message: message?.content || null,
+        platform: platform || 'all',
+        postType: postType || 'organic',
+        targetAudience: targetAudience || null,
+        budgetRange: budgetRange || null,
+        ctaButton: ctaButton || null,
+        scheduledDate: scheduledDate ? new Date(scheduledDate) : null,
+        status: 'suggested',
+      }).returning();
+      
+      res.json(bundle[0]);
+    } catch (err) {
+      console.error("Error creating bundle:", err);
+      res.status(500).json({ error: "Failed to create bundle" });
+    }
+  });
+
+  // AI Content Generation
+  app.post("/api/marketing/generate", isAuthenticated, async (req: any, res) => {
+    try {
+      const { prompt } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ error: "Prompt is required" });
+      }
+      
+      // Use OpenAI to generate marketing content
+      const openai = await getOpenAIClient();
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are a marketing expert for GarageBot, an auto parts aggregator that searches 50+ retailers. Generate engaging social media posts that:
+- Are concise and attention-grabbing
+- Include relevant hashtags
+- Focus on the benefits (price comparison, time savings, all vehicle types)
+- Use action-oriented language
+- Are optimized for social media engagement
+- Keep posts under 280 characters for X/Twitter compatibility`
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        max_tokens: 500,
+      });
+      
+      const content = completion.choices[0]?.message?.content || '';
+      res.json({ content, success: true });
+    } catch (err) {
+      console.error("Error generating content:", err);
+      res.status(500).json({ error: "Failed to generate content" });
     }
   });
 
