@@ -7084,10 +7084,24 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.get("/api/marketing/integrations", isAuthenticated, async (req: any, res) => {
     try {
       const [integration] = await db.select().from(socialIntegrations).limit(1);
-      const { getConnectorStatus } = await import('./social-connectors');
+      const { socialMediaManager } = await import('./services/socialMedia');
+      const status = socialMediaManager.getStatus();
+      
       res.json({
-        integration: integration || null,
-        connectors: getConnectorStatus(),
+        integration: {
+          ...(integration || {}),
+          linkedinConnected: status.linkedin,
+          nextdoorConnected: status.nextdoor,
+          googleBusinessConnected: status.google,
+        },
+        connectors: {
+          twitter: status.twitter,
+          facebook: status.facebook,
+          instagram: status.instagram,
+          linkedin: status.linkedin,
+          google: status.google,
+          nextdoor: status.nextdoor,
+        },
       });
     } catch (err) {
       res.status(500).json({ error: "Failed to get integrations" });
@@ -7097,39 +7111,52 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   // Manual post trigger (for testing)
   app.post("/api/marketing/post-now", isAuthenticated, async (req: any, res) => {
     try {
-      const { postId, platforms } = req.body;
+      const { postId, platforms, imageUrl } = req.body;
       const [post] = await db.select().from(marketingPosts).where(eq(marketingPosts.id, postId));
       if (!post) return res.status(404).json({ error: "Post not found" });
       
-      const { TwitterConnector, postToFacebook, postToInstagram } = await import('./social-connectors');
-      const [integration] = await db.select().from(socialIntegrations).limit(1);
+      const { socialMediaManager } = await import('./services/socialMedia');
       
-      const results: any = {};
-      const message = `${post.content}\n\nhttps://garagebot.io`;
+      const content = {
+        text: post.content,
+        hashtags: post.hashtags || [],
+        imageUrl: imageUrl || undefined,
+      };
       
-      if (platforms.includes('x')) {
-        const twitter = new TwitterConnector();
-        if (twitter.isConfigured()) {
-          results.x = await twitter.post(message.length > 280 ? message.substring(0, 277) + '...' : message);
-        } else {
-          results.x = { success: false, error: 'X/Twitter not configured' };
+      const targetPlatforms = platforms.includes('all') 
+        ? ['x', 'facebook', 'instagram', 'linkedin', 'google', 'nextdoor']
+        : platforms;
+      
+      const results = await socialMediaManager.postToAll(content, targetPlatforms);
+      
+      for (const result of results) {
+        await db.insert(scheduledPosts).values({
+          tenantId: 'garagebot',
+          postId: post.id,
+          platform: result.platform,
+          content: post.content,
+          status: result.success ? 'posted' : 'failed',
+          externalPostId: result.postId || null,
+          error: result.error || null,
+          postedAt: result.success ? new Date() : null,
+        });
+      }
+      
+      if (results.some(r => r.success)) {
+        await db.update(marketingPosts)
+          .set({ usageCount: (post.usageCount || 0) + 1, lastUsedAt: new Date() })
+          .where(eq(marketingPosts.id, postId));
+      }
+      
+      res.json({ 
+        results: results.reduce((acc, r) => ({ ...acc, [r.platform]: r }), {}),
+        summary: {
+          posted: results.filter(r => r.success).length,
+          failed: results.filter(r => !r.success).length,
         }
-      }
-      
-      if (platforms.includes('facebook') && integration?.facebookConnected) {
-        results.facebook = await postToFacebook(
-          integration.facebookPageId!,
-          integration.facebookPageAccessToken!,
-          message
-        );
-      }
-      
-      if (platforms.includes('instagram') && integration?.instagramConnected) {
-        results.instagram = { success: false, error: 'Instagram requires an image' };
-      }
-      
-      res.json({ results });
+      });
     } catch (err) {
+      console.error("Post-now error:", err);
       res.status(500).json({ error: "Failed to post" });
     }
   });
