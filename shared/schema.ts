@@ -1692,6 +1692,43 @@ export type InsertGiveawayWinner = z.infer<typeof insertGiveawayWinnerSchema>;
 export type GiveawayWinner = typeof giveawayWinners.$inferSelect;
 
 // ============================================
+// SPONSORED PRODUCTS & AD MANAGEMENT
+// ============================================
+
+export const sponsoredProducts = pgTable("sponsored_products", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  brand: text("brand").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  price: text("price"),
+  originalPrice: text("original_price"),
+  rating: decimal("rating"),
+  reviewCount: integer("review_count"),
+  affiliateUrl: text("affiliate_url").notNull(),
+  affiliateNetwork: text("affiliate_network"), // 'cj', 'shareasale', 'amazon', 'adsense', 'direct'
+  tag: text("tag"), // 'Best Seller', 'Top Pick', etc.
+  category: text("category").notNull(), // 'tools', 'safety', 'garage', 'outdoor', 'marine', 'aviation'
+  vehicleTypes: text("vehicle_types").array(), // target specific vehicle types
+  placement: text("placement").default("native"), // 'native', 'sidebar', 'inline', 'banner'
+  isActive: boolean("is_active").default(true),
+  priority: integer("priority").default(50),
+  impressions: integer("impressions").default(0),
+  clicks: integer("clicks").default(0),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_sponsored_category").on(table.category),
+  index("IDX_sponsored_active").on(table.isActive),
+  index("IDX_sponsored_placement").on(table.placement),
+]);
+
+export const insertSponsoredProductSchema = createInsertSchema(sponsoredProducts).omit({ id: true, impressions: true, clicks: true, createdAt: true });
+export type InsertSponsoredProduct = z.infer<typeof insertSponsoredProductSchema>;
+export type SponsoredProduct = typeof sponsoredProducts.$inferSelect;
+
+// ============================================
 // RELEASE VERSION CONTROL SYSTEM
 // ============================================
 

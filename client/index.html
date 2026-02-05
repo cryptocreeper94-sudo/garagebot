@@ -73,6 +73,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Fonts: Rajdhani for tech headers, Inter for body, JetBrains Mono for data -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Google AdSense - loads only when publisher ID is configured -->
+    <script>
+      (function() {
+        var pubId = '__ADSENSE_PUB_ID__';
+        if (pubId && pubId !== '__ADSENSE_PUB_ID__') {
+          var s = document.createElement('script');
+          s.async = true;
+          s.crossOrigin = 'anonymous';
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + pubId;
+          document.head.appendChild(s);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
