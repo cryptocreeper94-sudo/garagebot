@@ -233,6 +233,48 @@ export default function Auth() {
               <TabsContent value="login">
                 <Card className="p-6 bg-card/50 border-primary/20">
                   <div className="space-y-4">
+                    {/* Trust Layer SSO Login */}
+                    <div className="mb-4">
+                      <Button
+                        type="button"
+                        onClick={async () => {
+                          setIsLoading(true);
+                          try {
+                            const res = await fetch("/api/auth/sso/login");
+                            const data = await res.json();
+                            if (data.loginUrl) {
+                              window.location.href = data.loginUrl;
+                            }
+                          } catch (err) {
+                            toast({ title: "Error", description: "Could not connect to Trust Layer", variant: "destructive" });
+                            setIsLoading(false);
+                          }
+                        }}
+                        disabled={isLoading}
+                        className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-tech uppercase"
+                        data-testid="button-sso-login"
+                      >
+                        {isLoading ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Shield className="w-4 h-4 mr-2" />
+                        )}
+                        Sign in with Trust Layer
+                      </Button>
+                      <p className="text-[10px] text-center text-muted-foreground mt-2">
+                        One account for all DarkWave ecosystem apps
+                      </p>
+                    </div>
+
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-border/50" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">Or continue with PIN</span>
+                      </div>
+                    </div>
+
                     <div>
                       <Label className="text-xs uppercase text-muted-foreground">Username</Label>
                       <div className="relative mt-1">

@@ -64,6 +64,91 @@ export async function registerRoutes(
     }
   });
 
+  // Trust Layer SSO Routes
+  app.get('/api/auth/sso/login', (req, res) => {
+    const { trustLayerClient } = require('./services/trustLayer');
+    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+      : 'https://garagebot.io';
+    const callbackUrl = `${baseUrl}/auth/callback`;
+    const state = require('crypto').randomBytes(16).toString('hex');
+    
+    // Store state in session for CSRF protection
+    (req.session as any).ssoState = state;
+    
+    const loginUrl = trustLayerClient.getLoginUrl(callbackUrl, state);
+    res.json({ loginUrl, state });
+  });
+
+  app.get('/api/auth/sso/callback', async (req: any, res) => {
+    const { trustLayerClient } = require('./services/trustLayer');
+    const { token, state } = req.query;
+    
+    // Verify CSRF state
+    const expectedState = (req.session as any)?.ssoState;
+    if (state !== expectedState) {
+      console.error('[SSO] State mismatch - possible CSRF attack');
+      return res.status(400).json({ error: 'Invalid state parameter' });
+    }
+    
+    if (!token) {
+      return res.status(400).json({ error: 'Missing token' });
+    }
+    
+    try {
+      const result = await trustLayerClient.verifySSOToken(token as string);
+      
+      if (!result.success || !result.user) {
+        return res.status(401).json({ error: result.error || 'Token verification failed' });
+      }
+      
+      // Find or create user in GarageBot
+      let user = await storage.getUserByEmail(result.user.email);
+      
+      if (!user) {
+        // Create new user from Trust Layer data
+        user = await storage.upsertUser({
+          id: result.user.id,
+          email: result.user.email,
+          username: result.user.name?.replace(/\s+/g, '_').toLowerCase() || result.user.email.split('@')[0],
+          firstName: result.user.name?.split(' ')[0] || '',
+          lastName: result.user.name?.split(' ').slice(1).join(' ') || '',
+          membershipTier: result.user.memberTier || 'free',
+          trustLayerId: result.user.id,
+          trustLayerMemberCard: result.user.membershipCard,
+        });
+        console.log(`[SSO] Created new user from Trust Layer: ${user.email}`);
+      } else {
+        // Update existing user with Trust Layer data
+        await storage.updateUser(user.id, {
+          trustLayerId: result.user.id,
+          trustLayerMemberCard: result.user.membershipCard,
+          lastLoginAt: new Date(),
+        });
+        console.log(`[SSO] Updated existing user from Trust Layer: ${user.email}`);
+      }
+      
+      // Set session
+      (req.session as any).userId = user.id;
+      (req.session as any).isCustomAuth = true;
+      (req.session as any).ssoState = null;
+      req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+      
+      res.json({ success: true, user: { id: user.id, email: user.email, username: user.username } });
+    } catch (error) {
+      console.error('[SSO] Callback error:', error);
+      res.status(500).json({ error: 'SSO authentication failed' });
+    }
+  });
+
+  app.get('/api/auth/sso/status', (req, res) => {
+    const { trustLayerClient } = require('./services/trustLayer');
+    res.json({ 
+      configured: trustLayerClient.isSSOConfigured(),
+      baseUrl: trustLayerClient.getBaseUrl(),
+    });
+  });
+
   // Custom PIN-based Auth Routes
   app.post('/api/auth/signup', async (req, res) => {
     try {
