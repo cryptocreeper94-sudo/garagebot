@@ -13,7 +13,7 @@ import {
   releases,
   vendorReviews, wishlists, wishlistItems, projects, projectParts, smsPreferences,
   seoPages, analyticsSessions, analyticsPageViews, analyticsEvents,
-  partnerApiCredentials, partnerApiLogs, shopLocations
+  partnerApiCredentials, partnerApiLogs, shopLocations, blogPosts
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -49,7 +49,8 @@ import type {
   AnalyticsPageView, InsertAnalyticsPageView, AnalyticsEvent, InsertAnalyticsEvent,
   PartnerApiCredential, InsertPartnerApiCredential, PartnerApiLog, InsertPartnerApiLog,
   ShopLocation, InsertShopLocation,
-  VendorApplication, InsertVendorApplication
+  VendorApplication, InsertVendorApplication,
+  BlogPost, InsertBlogPost
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -361,6 +362,17 @@ export interface IStorage {
   createSeoPage(page: InsertSeoPage): Promise<SeoPage>;
   updateSeoPage(id: string, updates: Partial<SeoPage>): Promise<SeoPage | undefined>;
   deleteSeoPage(id: string): Promise<boolean>;
+
+  // Blog Posts
+  getBlogPosts(options?: { published?: boolean; category?: string; limit?: number }): Promise<BlogPost[]>;
+  getBlogPost(id: string): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: string, updates: Partial<BlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: string): Promise<boolean>;
+  incrementBlogPostViews(id: string): Promise<void>;
+  getFeaturedBlogPosts(limit?: number): Promise<BlogPost[]>;
+  getBlogCategories(): Promise<string[]>;
 
   // Analytics Sessions
   createAnalyticsSession(session: InsertAnalyticsSession): Promise<AnalyticsSession>;
@@ -2152,6 +2164,79 @@ export class DatabaseStorage implements IStorage {
   async deleteSeoPage(id: string): Promise<boolean> {
     const result = await db.delete(seoPages).where(eq(seoPages.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // Blog Posts
+  async getBlogPosts(options?: { published?: boolean; category?: string; limit?: number }): Promise<BlogPost[]> {
+    let query = db.select().from(blogPosts);
+    const conditions = [];
+    
+    if (options?.published !== undefined) {
+      conditions.push(eq(blogPosts.isPublished, options.published));
+    }
+    if (options?.category) {
+      conditions.push(eq(blogPosts.category, options.category));
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+    
+    query = query.orderBy(desc(blogPosts.publishedAt), desc(blogPosts.createdAt)) as any;
+    
+    if (options?.limit) {
+      query = query.limit(options.limit) as any;
+    }
+    
+    return await query;
+  }
+
+  async getBlogPost(id: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return post;
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post;
+  }
+
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const [newPost] = await db.insert(blogPosts).values(post).returning();
+    return newPost;
+  }
+
+  async updateBlogPost(id: string, updates: Partial<BlogPost>): Promise<BlogPost | undefined> {
+    const [updated] = await db.update(blogPosts)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteBlogPost(id: string): Promise<boolean> {
+    const result = await db.delete(blogPosts).where(eq(blogPosts.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async incrementBlogPostViews(id: string): Promise<void> {
+    await db.update(blogPosts)
+      .set({ viewCount: sql`${blogPosts.viewCount} + 1` })
+      .where(eq(blogPosts.id, id));
+  }
+
+  async getFeaturedBlogPosts(limit: number = 3): Promise<BlogPost[]> {
+    return await db.select().from(blogPosts)
+      .where(and(eq(blogPosts.isPublished, true), eq(blogPosts.isFeatured, true)))
+      .orderBy(desc(blogPosts.publishedAt))
+      .limit(limit);
+  }
+
+  async getBlogCategories(): Promise<string[]> {
+    const results = await db.selectDistinct({ category: blogPosts.category })
+      .from(blogPosts)
+      .where(eq(blogPosts.isPublished, true));
+    return results.map(r => r.category);
   }
 
   // Analytics Sessions
