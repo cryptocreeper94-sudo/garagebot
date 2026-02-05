@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   Megaphone, Plus, Send, Clock, CheckCircle, XCircle, Image, 
-  Twitter, Facebook, Instagram, RefreshCw, Trash2, Eye 
+  Twitter, Facebook, Instagram, RefreshCw, Trash2, Eye, Loader2, Sparkles
 } from "lucide-react";
 
 interface MarketingPost {
@@ -50,8 +50,9 @@ interface PostHistory {
 const ECOSYSTEM_SITES = [
   { value: "garagebot", label: "GarageBot", url: "garagebot.io" },
   { value: "dwtl", label: "DarkWave", url: "dwtl.io" },
+  { value: "dwsc", label: "Service Cloud", url: "dwsc.io" },
   { value: "tlid", label: "Trust Layer", url: "tlid.io" },
-  { value: "trustshield", label: "TrustShield", url: "trustshield.io" },
+  { value: "trustshield", label: "TrustShield", url: "trustshield.tech" },
 ];
 
 export default function MarketingHub() {
@@ -96,6 +97,23 @@ export default function MarketingHub() {
       setNewPost({ content: "", platform: "all", targetSite: "garagebot", hashtags: "" });
       setShowNewPost(false);
       toast({ title: "Post created", description: "Marketing post added to library" });
+    },
+  });
+
+  const seedContentMutation = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/marketing/seed"),
+    onSuccess: async (response) => {
+      const data = await response.json();
+      queryClient.invalidateQueries({ queryKey: ["/api/marketing/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/marketing/images"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/marketing/status"] });
+      toast({ 
+        title: "Content seeded!", 
+        description: `Added ${data.posts} posts and ${data.images} images with comprehensive hashtags` 
+      });
+    },
+    onError: () => {
+      toast({ title: "Seed failed", variant: "destructive" });
     },
   });
 
@@ -148,10 +166,25 @@ export default function MarketingHub() {
             </h1>
             <p className="text-muted-foreground mt-1">Automated social media posting for the DarkWave ecosystem</p>
           </div>
-          <Button onClick={() => setShowNewPost(true)} data-testid="btn-new-post">
-            <Plus className="w-4 h-4 mr-2" />
-            New Post
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => seedContentMutation.mutate()} 
+              disabled={seedContentMutation.isPending}
+              data-testid="btn-seed-content"
+            >
+              {seedContentMutation.isPending ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4 mr-2" />
+              )}
+              Seed Content
+            </Button>
+            <Button onClick={() => setShowNewPost(true)} data-testid="btn-new-post">
+              <Plus className="w-4 h-4 mr-2" />
+              New Post
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

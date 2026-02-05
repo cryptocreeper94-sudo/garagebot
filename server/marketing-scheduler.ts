@@ -7,8 +7,9 @@ const POSTING_HOURS = [8, 10, 12, 14, 16, 18, 20];
 const ECOSYSTEM_URLS = {
   garagebot: 'https://garagebot.io',
   dwtl: 'https://dwtl.io',
+  dwsc: 'https://dwsc.io',
   tlid: 'https://tlid.io',
-  trustshield: 'https://trustshield.io',
+  trustshield: 'https://trustshield.tech',
 };
 
 function getBaseUrl(): string {
