@@ -70,6 +70,9 @@ interface Shop {
   reviewCount?: number;
   isActive: boolean;
   vehicleTypes?: string[];
+  stripeAccountId?: string;
+  stripeAccountStatus?: string;
+  stripeOnboardingComplete?: boolean;
   createdAt: string;
 }
 
@@ -2057,7 +2060,28 @@ export default function MechanicsGarage() {
                                       </Badge>
                                     </div>
                                     {order.paymentStatus !== 'paid' && (
-                                      <Button size="sm" className="gap-1 font-tech text-xs bg-green-600 hover:bg-green-700">
+                                      <Button 
+                                        size="sm" 
+                                        className="gap-1 font-tech text-xs bg-green-600 hover:bg-green-700"
+                                        onClick={async () => {
+                                          try {
+                                            const response = await fetch(`/api/shops/${selectedShop?.id}/repair-orders/${order.id}/collect-payment`, {
+                                              method: 'POST',
+                                              credentials: 'include',
+                                              headers: { 'Content-Type': 'application/json' }
+                                            });
+                                            const data = await response.json();
+                                            if (data.url) {
+                                              window.open(data.url, '_blank');
+                                            } else if (data.error) {
+                                              alert(data.error);
+                                            }
+                                          } catch (error) {
+                                            console.error('Error collecting payment:', error);
+                                          }
+                                        }}
+                                        data-testid={`button-collect-payment-${order.id}`}
+                                      >
                                         <CreditCard className="w-3 h-3" /> Collect Payment
                                       </Button>
                                     )}
@@ -2611,6 +2635,118 @@ export default function MechanicsGarage() {
 
                         {/* Integration Categories */}
                         <div className="space-y-6">
+                          {/* Payment Processing - Stripe Connect */}
+                          <div>
+                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
+                              <CreditCard className="w-4 h-4" /> Payment Processing
+                            </h4>
+                            <Card className="p-5 bg-gradient-to-br from-purple-500/10 to-transparent border-purple-500/30 relative overflow-hidden">
+                              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                              <div className="relative">
+                                <div className="flex items-start justify-between mb-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20">
+                                      <CreditCard className="w-8 h-8 text-purple-400" />
+                                    </div>
+                                    <div>
+                                      <h5 className="font-tech font-bold text-xl mb-1">Stripe Connect</h5>
+                                      <p className="text-sm text-muted-foreground">Receive payments directly to your bank account</p>
+                                    </div>
+                                  </div>
+                                  {selectedShop?.stripeOnboardingComplete ? (
+                                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                                      <CheckCircle className="w-3 h-3 mr-1" /> Connected
+                                    </Badge>
+                                  ) : selectedShop?.stripeAccountId ? (
+                                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                                      <Clock className="w-3 h-3 mr-1" /> Setup Incomplete
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="text-muted-foreground">
+                                      Not Connected
+                                    </Badge>
+                                  )}
+                                </div>
+                                
+                                <div className="grid grid-cols-3 gap-4 mb-4">
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                    <span>Accept card payments</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                    <span>Direct deposit to bank</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                    <span>Automatic invoicing</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                  {selectedShop?.stripeOnboardingComplete ? (
+                                    <>
+                                      <Button 
+                                        variant="outline" 
+                                        className="font-tech"
+                                        onClick={async () => {
+                                          try {
+                                            const response = await fetch('/api/stripe/connect/dashboard', {
+                                              credentials: 'include'
+                                            });
+                                            const data = await response.json();
+                                            if (data.url) {
+                                              window.open(data.url, '_blank');
+                                            }
+                                          } catch (error) {
+                                            console.error('Error opening dashboard:', error);
+                                          }
+                                        }}
+                                        data-testid="button-stripe-dashboard"
+                                      >
+                                        <ExternalLink className="w-4 h-4 mr-2" />
+                                        Open Stripe Dashboard
+                                      </Button>
+                                      <span className="text-xs text-muted-foreground">
+                                        Manage payouts, view transactions, and update settings
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Button 
+                                        className="font-tech bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                                        onClick={async () => {
+                                          try {
+                                            const response = await fetch('/api/stripe/connect/create-account', {
+                                              method: 'POST',
+                                              credentials: 'include',
+                                              headers: { 'Content-Type': 'application/json' }
+                                            });
+                                            const data = await response.json();
+                                            if (data.onboardingUrl) {
+                                              window.location.href = data.onboardingUrl;
+                                            } else if (data.error) {
+                                              alert(data.error);
+                                            }
+                                          } catch (error) {
+                                            console.error('Error connecting Stripe:', error);
+                                          }
+                                        }}
+                                        data-testid="button-connect-stripe"
+                                      >
+                                        <CreditCard className="w-4 h-4 mr-2" />
+                                        {selectedShop?.stripeAccountId ? 'Complete Setup' : 'Connect Stripe Account'}
+                                      </Button>
+                                      <span className="text-xs text-muted-foreground">
+                                        Takes about 5 minutes to set up
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </Card>
+                          </div>
+
                           {/* Accounting & Invoicing */}
                           <div>
                             <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">

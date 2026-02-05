@@ -832,6 +832,7 @@ export const repairOrders = pgTable("repair_orders", {
   paymentStatus: text("payment_status").default("unpaid"),
   paymentMethod: text("payment_method"),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
+  paidAt: timestamp("paid_at"),
   notes: text("notes"),
   internalNotes: text("internal_notes"),
   tags: text("tags").array(),
