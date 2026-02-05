@@ -7314,8 +7314,8 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
         }
       ];
 
-      // Clear existing and insert new
-      await db.delete(marketingPosts);
+      // Clear existing and insert new (scoped to garagebot tenant only)
+      await db.delete(marketingPosts).where(eq(marketingPosts.tenantId, 'garagebot'));
       for (const post of marketingContent) {
         await db.insert(marketingPosts).values({
           content: post.content,
@@ -7339,7 +7339,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
         { filename: 'garagebot-auto-shop.png', filePath: '/marketing/garagebot-auto-shop.png', category: 'shop', subject: 'professional', altText: 'Professional auto repair shop with digital displays' },
       ];
       
-      await db.delete(marketingImages);
+      await db.delete(marketingImages).where(eq(marketingImages.tenantId, 'garagebot'));
       for (const img of marketingImagesList) {
         await db.insert(marketingImages).values({
           filename: img.filename,
