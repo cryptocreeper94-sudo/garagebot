@@ -333,6 +333,14 @@ export default function Nav() {
                       </div>
                     </Link>
                     
+                    <Link href="/blog" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/blog' || location.startsWith('/blog/') ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-blog">
+                        <FileText className="w-5 h-5" />
+                        <span className="font-medium">Blog</span>
+                        <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px] font-mono ml-auto">NEW</Badge>
+                      </div>
+                    </Link>
+                    
                     <Link href="/shop-portal" onClick={() => setIsOpen(false)}>
                       <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/shop-portal' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-shop-portal">
                         <Store className="w-5 h-5" />
