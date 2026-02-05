@@ -2009,3 +2009,80 @@ export const shopLocations = pgTable("shop_locations", {
 export const insertShopLocationSchema = createInsertSchema(shopLocations).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertShopLocation = z.infer<typeof insertShopLocationSchema>;
 export type ShopLocation = typeof shopLocations.$inferSelect;
+
+// Marketing Posts for GarageBot content library
+export const marketingPosts = pgTable("marketing_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  content: text("content").notNull(),
+  platform: varchar("platform", { length: 20 }).notNull(),
+  hashtags: text("hashtags").array().default(sql`ARRAY[]::text[]`),
+  targetSite: varchar("target_site", { length: 50 }).default("garagebot"),
+  imageId: varchar("image_id", { length: 100 }),
+  isActive: boolean("is_active").default(true),
+  usageCount: integer("usage_count").default(0),
+  lastUsedAt: timestamp("last_used_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_marketing_posts_platform").on(table.platform),
+  index("IDX_marketing_posts_active").on(table.isActive),
+]);
+
+export const insertMarketingPostSchema = createInsertSchema(marketingPosts).omit({ id: true, createdAt: true });
+export type InsertMarketingPost = z.infer<typeof insertMarketingPostSchema>;
+export type MarketingPost = typeof marketingPosts.$inferSelect;
+
+// Marketing Images library
+export const marketingImages = pgTable("marketing_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  filename: varchar("filename", { length: 255 }).notNull(),
+  filePath: varchar("file_path", { length: 500 }).notNull(),
+  category: varchar("category", { length: 50 }),
+  altText: varchar("alt_text", { length: 255 }),
+  isActive: boolean("is_active").default(true),
+  usageCount: integer("usage_count").default(0),
+  lastUsedAt: timestamp("last_used_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_marketing_images_category").on(table.category),
+  index("IDX_marketing_images_active").on(table.isActive),
+]);
+
+export const insertMarketingImageSchema = createInsertSchema(marketingImages).omit({ id: true, createdAt: true });
+export type InsertMarketingImage = z.infer<typeof insertMarketingImageSchema>;
+export type MarketingImage = typeof marketingImages.$inferSelect;
+
+// Social Media Integrations (Facebook/Instagram/X)
+export const socialIntegrations = pgTable("social_integrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  facebookPageId: varchar("facebook_page_id", { length: 100 }),
+  facebookPageName: varchar("facebook_page_name", { length: 255 }),
+  facebookPageAccessToken: text("facebook_page_access_token"),
+  facebookConnected: boolean("facebook_connected").default(false),
+  instagramAccountId: varchar("instagram_account_id", { length: 100 }),
+  instagramUsername: varchar("instagram_username", { length: 100 }),
+  instagramConnected: boolean("instagram_connected").default(false),
+  twitterUsername: varchar("twitter_username", { length: 100 }),
+  twitterConnected: boolean("twitter_connected").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type SocialIntegration = typeof socialIntegrations.$inferSelect;
+
+// Scheduled/Posted Marketing entries
+export const scheduledPosts = pgTable("scheduled_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  marketingPostId: varchar("marketing_post_id", { length: 100 }),
+  platform: varchar("platform", { length: 20 }).notNull(),
+  content: text("content").notNull(),
+  imageUrl: varchar("image_url", { length: 500 }),
+  scheduledFor: timestamp("scheduled_for"),
+  postedAt: timestamp("posted_at"),
+  externalPostId: varchar("external_post_id", { length: 100 }),
+  status: varchar("status", { length: 20 }).default("pending"),
+  error: text("error"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_scheduled_posts_status").on(table.status),
+  index("IDX_scheduled_posts_platform").on(table.platform),
+]);
