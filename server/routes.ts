@@ -7329,7 +7329,30 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
         });
       }
       
-      res.json({ success: true, count: marketingContent.length, message: "Marketing content seeded with comprehensive hashtags" });
+      // Seed marketing images
+      const marketingImagesList = [
+        { filename: 'garagebot-mechanic-hero.png', filePath: '/marketing/garagebot-mechanic-hero.png', category: 'hero', subject: 'mechanic', altText: 'Professional mechanic working on car engine' },
+        { filename: 'garagebot-price-compare.png', filePath: '/marketing/garagebot-price-compare.png', category: 'feature', subject: 'comparison', altText: 'Price comparison across 50+ retailers' },
+        { filename: 'garagebot-all-vehicles.png', filePath: '/marketing/garagebot-all-vehicles.png', category: 'vehicles', subject: 'all-types', altText: 'Cars trucks motorcycles ATVs boats RVs lineup' },
+        { filename: 'garagebot-mobile-app.png', filePath: '/marketing/garagebot-mobile-app.png', category: 'app', subject: 'mobile', altText: 'GarageBot mobile app with retailer logos' },
+        { filename: 'garagebot-diy-mechanic.png', filePath: '/marketing/garagebot-diy-mechanic.png', category: 'diy', subject: 'diy', altText: 'Weekend DIY mechanic in home garage' },
+        { filename: 'garagebot-auto-shop.png', filePath: '/marketing/garagebot-auto-shop.png', category: 'shop', subject: 'professional', altText: 'Professional auto repair shop with digital displays' },
+      ];
+      
+      await db.delete(marketingImages);
+      for (const img of marketingImagesList) {
+        await db.insert(marketingImages).values({
+          filename: img.filename,
+          filePath: img.filePath,
+          category: img.category,
+          subject: img.subject,
+          altText: img.altText,
+          tenantId: 'garagebot',
+          isActive: true,
+        });
+      }
+      
+      res.json({ success: true, posts: marketingContent.length, images: marketingImagesList.length, message: "Marketing content and images seeded with comprehensive hashtags" });
     } catch (err) {
       console.error("Seed error:", err);
       res.status(500).json({ error: "Failed to seed marketing content" });

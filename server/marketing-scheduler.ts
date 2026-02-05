@@ -21,15 +21,17 @@ function getBaseUrl(): string {
 let isRunning = false;
 let lastPostHour = -1;
 
-async function getIntegration() {
-  const [integration] = await db.select().from(socialIntegrations).limit(1);
+async function getIntegration(tenantId: string = 'garagebot') {
+  const [integration] = await db.select().from(socialIntegrations)
+    .where(eq(socialIntegrations.tenantId, tenantId)).limit(1);
   return integration;
 }
 
-async function getNextPost(platform: string) {
+async function getNextPost(platform: string, tenantId: string = 'garagebot') {
   const { or } = await import('drizzle-orm');
   const [post] = await db.select().from(marketingPosts)
     .where(and(
+      eq(marketingPosts.tenantId, tenantId),
       or(eq(marketingPosts.platform, platform), eq(marketingPosts.platform, 'all')),
       eq(marketingPosts.isActive, true)
     ))
@@ -38,9 +40,9 @@ async function getNextPost(platform: string) {
   return post;
 }
 
-async function getNextImage() {
+async function getNextImage(tenantId: string = 'garagebot') {
   const [image] = await db.select().from(marketingImages)
-    .where(eq(marketingImages.isActive, true))
+    .where(and(eq(marketingImages.tenantId, tenantId), eq(marketingImages.isActive, true)))
     .orderBy(asc(marketingImages.usageCount), asc(marketingImages.lastUsedAt))
     .limit(1);
   return image;
@@ -58,9 +60,11 @@ async function recordPost(
   status: string,
   externalId?: string,
   error?: string,
-  marketingPostId?: string
+  marketingPostId?: string,
+  tenantId: string = 'garagebot'
 ) {
   await db.insert(scheduledPosts).values({
+    tenantId,
     platform,
     content,
     status,
