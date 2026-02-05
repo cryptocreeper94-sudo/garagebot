@@ -1,4 +1,4 @@
-import { db } from './db';
+import { db } from '@db';
 import { marketingPosts, marketingImages, socialIntegrations, scheduledPosts } from '@shared/schema';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
 import { TwitterConnector, postToFacebook, postToInstagram } from './social-connectors';
@@ -11,6 +11,13 @@ const ECOSYSTEM_URLS = {
   trustshield: 'https://trustshield.io',
 };
 
+function getBaseUrl(): string {
+  if (process.env.REPLIT_DOMAINS) {
+    return `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`;
+  }
+  return process.env.BASE_URL || 'https://garagebot.io';
+}
+
 let isRunning = false;
 let lastPostHour = -1;
 
@@ -20,9 +27,10 @@ async function getIntegration() {
 }
 
 async function getNextPost(platform: string) {
+  const { or } = await import('drizzle-orm');
   const [post] = await db.select().from(marketingPosts)
     .where(and(
-      eq(marketingPosts.platform, platform),
+      or(eq(marketingPosts.platform, platform), eq(marketingPosts.platform, 'all')),
       eq(marketingPosts.isActive, true)
     ))
     .orderBy(asc(marketingPosts.usageCount), asc(marketingPosts.lastUsedAt))
@@ -83,7 +91,7 @@ async function executeScheduledPosts() {
     
     const message = buildMessage(post.content, post.targetSite || 'garagebot', post.hashtags || []);
     const image = await getNextImage();
-    const imageUrl = image ? `https://garagebot.io${image.filePath}` : undefined;
+    const imageUrl = image ? `${getBaseUrl()}${image.filePath}` : undefined;
     
     if (platform === 'all' || platform === 'facebook') {
       if (integration?.facebookConnected && integration.facebookPageId && integration.facebookPageAccessToken) {
