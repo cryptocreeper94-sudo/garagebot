@@ -122,10 +122,29 @@ Preferred communication style: Simple, everyday language.
 - **Alerts**: NOAA Weather Alerts API for severe weather warnings.
 - **Features**: Animated radar, layer controls, fullscreen mode, mobile-responsive design, ZIP persistence.
 
+## Shade Tree Mechanics (DIY Community)
+- **Component**: `client/src/pages/ShadeTreeMechanics.tsx`
+- **Route**: `/shade-tree`
+- **Features**:
+  - DIY repair guides with difficulty levels (beginner, intermediate, advanced)
+  - Vehicle type filters (cars, trucks, boats, ATVs)
+  - Category filters (maintenance, repairs, diagnostics, upgrades, tips)
+  - Community tips section
+  - Estimated time and money savings per guide
+  - Search functionality for guides
+
 ## Marketing Hub & Social Media Integration
 - **Service File**: `server/services/socialMedia.ts`
 - **Component**: `client/src/pages/MarketingHub.tsx`
+- **Tenant-Spaced**: Marketing Hub is a premium add-on for Mechanics Garage shops ($29-99/mo)
 - **Platforms Supported**: X/Twitter, Facebook, Instagram, LinkedIn, Google Business, Nextdoor
+- **Shop-Specific API Endpoints**:
+  - `GET /api/shop/:shopId/marketing/subscription` - Check subscription status
+  - `GET /api/shop/:shopId/marketing/integrations` - Shop's connected platforms
+  - `GET /api/shop/:shopId/marketing/content` - Shop's marketing content
+  - `POST /api/shop/:shopId/marketing/content` - Create content
+  - `POST /api/shop/:shopId/marketing/subscribe` - Subscribe to Marketing Hub
+- **Database Tables**: `marketing_hub_subscriptions`, `shop_social_credentials`, `shop_marketing_content`
 - **Features**:
   - DAM (Digital Asset Management) with quality/season/style/subject filtering
   - Content bundles pairing images with messages
@@ -164,6 +183,34 @@ Preferred communication style: Simple, everyday language.
 - **Blockchain**: Solana (via Helius API)
 - **Weather Radar**: RainViewer API, NOAA Weather Alerts API
 - **ORBIT Ecosystem**: ORBIT Staffing Ecosystem Hub (orbitstaffing.io)
+
+## QuickBooks Integration
+- **Service File**: `server/services/quickbooks.ts`
+- **Features**: OAuth flow for connecting shops to QuickBooks Online
+- **Endpoints**:
+  - `GET /api/quickbooks/status` - Check if integration is configured
+  - `GET /api/quickbooks/connect/:shopId` - Start OAuth flow
+  - `GET /api/quickbooks/callback` - Handle OAuth callback
+- **Environment Variables**: `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`
+- **Capabilities**: Sync repair orders to invoices, customer management
+
+## PartsTech Integration
+- **Service File**: `server/services/partstech.ts`
+- **Features**: Real-time parts ordering from 20,000+ retailers
+- **Endpoints**:
+  - `GET /api/partstech/status` - Check if integration is configured
+  - `POST /api/partstech/search` - Search parts with vehicle fitment
+- **Environment Variables**: `PARTSTECH_API_KEY`
+- **Capabilities**: Parts search, inventory check, VIN decode, order placement
+
+## Mechanics Garage Sales Page
+- **Component**: `client/src/pages/MechanicsGarageSales.tsx`
+- **Route**: `/mechanics-garage/info`
+- **Features**:
+  - Interactive slideshow showcasing features
+  - Feature comparison table vs competitors ($49/mo vs $179/mo)
+  - Customer testimonials
+  - Request information form (emails to jason@darkwavestudios.io)
 
 ## Key NPM Packages
 - **UI/Frontend**: `@radix-ui/*`, `tailwindcss`, `framer-motion`, `wouter`, `@tanstack/react-query`, `@stripe/react-stripe-js`, `react-leaflet`, `leaflet`
