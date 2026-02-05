@@ -1674,6 +1674,23 @@ export const giveawayWinners = pgTable("giveaway_winners", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Schema exports for Gamification System
+export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({ id: true, earnedAt: true });
+export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
+export type UserBadge = typeof userBadges.$inferSelect;
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({ id: true, lastUpdated: true });
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type UserAchievement = typeof userAchievements.$inferSelect;
+
+export const insertGiveawayEntrySchema = createInsertSchema(giveawayEntries).omit({ id: true, createdAt: true });
+export type InsertGiveawayEntry = z.infer<typeof insertGiveawayEntrySchema>;
+export type GiveawayEntry = typeof giveawayEntries.$inferSelect;
+
+export const insertGiveawayWinnerSchema = createInsertSchema(giveawayWinners).omit({ id: true, createdAt: true });
+export type InsertGiveawayWinner = z.infer<typeof insertGiveawayWinnerSchema>;
+export type GiveawayWinner = typeof giveawayWinners.$inferSelect;
+
 // ============================================
 // RELEASE VERSION CONTROL SYSTEM
 // ============================================
