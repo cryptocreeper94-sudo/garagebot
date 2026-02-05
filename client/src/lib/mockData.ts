@@ -453,8 +453,11 @@ export const VEHICLE_TYPES = [
   { id: "powersports", name: "Powersports", icon: Gauge, description: "Dirt, Snow, Go-Karts", image: "/generated_images/powersports_vehicles.png" },
   { id: "rv", name: "RV & Trailer", icon: Truck, description: "Motorhomes, Campers", image: "/generated_images/rv_trailer.png" },
   { id: "diesel", name: "Diesel & Commercial", icon: Cog, description: "Semi, Fleet, Heavy", image: "/generated_images/diesel_commercial_truck.png" },
+  { id: "tractors", name: "Tractors & Farm", icon: Cog, description: "Farm, Agriculture, Implements", image: "/generated_images/tractor_farm.png" },
+  { id: "heavyequip", name: "Heavy Equipment", icon: Hammer, description: "Excavators, Loaders, Dozers", image: "/generated_images/heavy_equipment.png" },
   { id: "generators", name: "Generators", icon: Fan, description: "Portable, Standby, Inverter", image: "/generated_images/generator_power.png" },
   { id: "smallengines", name: "Small Engines", icon: Leaf, description: "Mowers, Chainsaws, Trimmers", image: "/generated_images/small_engines_equipment.png" },
+  { id: "aviation", name: "Aviation", icon: Gauge, description: "Aircraft, Helicopter, Ultralight", image: "/generated_images/aviation_aircraft.png" },
 ];
 
 export const CATEGORIES = [
