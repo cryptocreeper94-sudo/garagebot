@@ -1925,6 +1925,126 @@ export async function registerRoutes(
     }
   });
 
+  // Shop Inquiry API (public - sends email to Jason)
+  app.post("/api/shop-inquiry", async (req, res) => {
+    try {
+      const { shopName, contactName, email, phone, shopType, currentSoftware, employees, message } = req.body;
+      
+      if (!shopName || !contactName || !email || !phone || !shopType) {
+        return res.status(400).json({ error: "Missing required fields: shopName, contactName, email, phone, shopType" });
+      }
+
+      const { sendShopInquiryEmail } = await import("./services/emailService");
+      const result = await sendShopInquiryEmail({
+        shopName,
+        contactName,
+        email,
+        phone,
+        shopType,
+        currentSoftware,
+        employees,
+        message
+      });
+
+      if (result.success) {
+        res.json({ success: true, message: "Your inquiry has been sent! We'll be in touch soon." });
+      } else {
+        res.status(500).json({ error: "Failed to send inquiry. Please try again or contact us directly." });
+      }
+    } catch (error) {
+      console.error("[API] Shop inquiry error:", error);
+      res.status(500).json({ error: "Failed to process inquiry" });
+    }
+  });
+
+  // QuickBooks Integration API
+  app.get("/api/quickbooks/status", async (req, res) => {
+    try {
+      const { quickbooksService } = await import("./services/quickbooks");
+      res.json({
+        configured: quickbooksService.isConfigured(),
+        message: quickbooksService.isConfigured() 
+          ? "QuickBooks integration is ready" 
+          : "Add QUICKBOOKS_CLIENT_ID and QUICKBOOKS_CLIENT_SECRET to enable"
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check QuickBooks status" });
+    }
+  });
+
+  app.get("/api/quickbooks/connect/:shopId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { quickbooksService } = await import("./services/quickbooks");
+      const { shopId } = req.params;
+      
+      if (!quickbooksService.isConfigured()) {
+        return res.status(400).json({ error: "QuickBooks not configured" });
+      }
+
+      const authUrl = quickbooksService.generateAuthUrl(shopId);
+      res.json({ authUrl });
+    } catch (error) {
+      console.error("[QuickBooks] Connect error:", error);
+      res.status(500).json({ error: "Failed to generate auth URL" });
+    }
+  });
+
+  app.get("/api/quickbooks/callback", async (req, res) => {
+    try {
+      const { quickbooksService } = await import("./services/quickbooks");
+      const { code, state, realmId } = req.query;
+      
+      if (!code || !state || !realmId) {
+        return res.redirect("/mechanics-garage?qb_error=missing_params");
+      }
+
+      const shopId = (state as string).split(':')[1];
+      const tokens = await quickbooksService.exchangeCodeForTokens(code as string);
+      tokens.realmId = realmId as string;
+
+      // TODO: Store tokens in database for the shop
+      // await storage.saveQuickBooksTokens(shopId, tokens);
+
+      console.log("[QuickBooks] Successfully connected shop:", shopId);
+      res.redirect(`/mechanics-garage?qb_connected=true&shop=${shopId}`);
+    } catch (error) {
+      console.error("[QuickBooks] Callback error:", error);
+      res.redirect("/mechanics-garage?qb_error=auth_failed");
+    }
+  });
+
+  // PartsTech Integration API
+  app.get("/api/partstech/status", async (req, res) => {
+    try {
+      const { partsTechService } = await import("./services/partstech");
+      res.json({
+        configured: partsTechService.isConfigured(),
+        message: partsTechService.isConfigured()
+          ? "PartsTech integration is ready"
+          : "Add PARTSTECH_API_KEY to enable parts ordering"
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check PartsTech status" });
+    }
+  });
+
+  app.post("/api/partstech/search", isAuthenticated, async (req: any, res) => {
+    try {
+      const { partsTechService } = await import("./services/partstech");
+      const { query, vehicle } = req.body;
+
+      if (!partsTechService.isConfigured()) {
+        return res.status(400).json({ error: "PartsTech not configured" });
+      }
+
+      const results = await partsTechService.searchParts(query, vehicle);
+      res.json({ results });
+    } catch (error) {
+      console.error("[PartsTech] Search error:", error);
+      res.status(500).json({ error: "Parts search failed" });
+    }
+  });
+
   // Search API - aggregates results from multiple vendors
   app.post("/api/search", async (req: any, res) => {
     try {
