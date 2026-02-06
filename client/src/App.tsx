@@ -50,6 +50,7 @@ import TriviaQuiz from "@/pages/TriviaQuiz";
 import BreakRoom from "@/pages/BreakRoom";
 import CDLDirectory from "@/pages/CDLDirectory";
 import Support from "@/pages/Support";
+import SignalChat from "@/pages/SignalChat";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -93,6 +94,7 @@ function Router() {
       <Route path="/break-room">{() => <BreakRoom />}</Route>
       <Route path="/cdl-directory">{() => <CDLDirectory />}</Route>
       <Route path="/support">{() => <Support />}</Route>
+      <Route path="/chat">{() => <SignalChat />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );
