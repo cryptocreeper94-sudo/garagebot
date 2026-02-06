@@ -8969,6 +8969,121 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
+  // ============================================
+  // CDL / TRUCKING COMPANY DIRECTORY
+  // Self-contained feature - portable to other apps
+  // ============================================
+
+  const { cdlDirectoryService, CDL_COMPANY_TYPES, CDL_FREIGHT_TYPES, CDL_EXPERIENCE_LEVELS, CDL_HOME_TIME } = await import("./services/cdlDirectory");
+
+  (async () => {
+    try {
+      const { seedCDLDirectory } = await import("./seeds/cdlDirectory");
+      await seedCDLDirectory();
+    } catch (err: any) {
+      console.error("[CDL Directory] Auto-seed error:", err.message);
+    }
+  })();
+
+  app.get("/api/cdl-directory/search", async (req, res) => {
+    try {
+      const { search, category, companyType, experienceRequired, freightType, state, cdlClass, homeTime, hasTraining, isHiring, limit, offset } = req.query;
+      const results = await cdlDirectoryService.search({
+        search: search as string,
+        category: category as string,
+        companyType: companyType as string,
+        experienceRequired: experienceRequired as string,
+        freightType: freightType as string,
+        state: state as string,
+        cdlClass: cdlClass as string,
+        homeTime: homeTime as string,
+        hasTraining: hasTraining === "true",
+        isHiring: isHiring !== undefined ? isHiring === "true" : undefined,
+        limit: limit ? parseInt(limit as string) : undefined,
+        offset: offset ? parseInt(offset as string) : undefined,
+      });
+      res.json(results);
+    } catch (error) {
+      console.error("CDL directory search error:", error);
+      res.status(500).json({ error: "Failed to search directory" });
+    }
+  });
+
+  app.get("/api/cdl-directory/company/:id", async (req, res) => {
+    try {
+      const company = await cdlDirectoryService.getById(req.params.id);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.json(company);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch company" });
+    }
+  });
+
+  app.get("/api/cdl-directory/featured", async (_req, res) => {
+    try {
+      const featured = await cdlDirectoryService.getFeatured();
+      res.json(featured);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch featured companies" });
+    }
+  });
+
+  app.get("/api/cdl-directory/categories", async (_req, res) => {
+    try {
+      const categories = await cdlDirectoryService.getCategories();
+      res.json({ categories, companyTypes: CDL_COMPANY_TYPES, freightTypes: CDL_FREIGHT_TYPES, experienceLevels: CDL_EXPERIENCE_LEVELS, homeTimeOptions: CDL_HOME_TIME });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+
+  app.get("/api/cdl-directory/stats", async (_req, res) => {
+    try {
+      const stats = await cdlDirectoryService.getStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  app.get("/api/cdl-directory/states", async (_req, res) => {
+    try {
+      const states = await cdlDirectoryService.getStates();
+      res.json(states);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch states" });
+    }
+  });
+
+  const cdlDirectoryRateLimiter = new Map<string, number[]>();
+  app.post("/api/cdl-directory/interest", async (req, res) => {
+    try {
+      const clientIP = req.ip || req.socket.remoteAddress || 'unknown';
+      const ipHash = crypto.createHash('sha256').update(clientIP).digest('hex').substring(0, 16);
+      const now = Date.now();
+      const submissions = cdlDirectoryRateLimiter.get(ipHash) || [];
+      const recent = submissions.filter(t => now - t < 3600000);
+      if (recent.length >= 5) {
+        return res.status(429).json({ error: "Too many submissions. Please try again later." });
+      }
+      cdlDirectoryRateLimiter.set(ipHash, [...recent, now]);
+
+      const result = insertCdlReferralSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      if (!result.data.email || !result.data.fullName || !result.data.programId) {
+        return res.status(400).json({ error: "Name, email, and program selection are required" });
+      }
+      const referral = await cdlDirectoryService.submitInterest(result.data);
+      res.json(referral);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to submit interest form" });
+    }
+  });
+
   return httpServer;
 }
 

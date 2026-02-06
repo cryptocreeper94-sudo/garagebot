@@ -44,6 +44,7 @@ import MechanicsGarageSales from "@/pages/MechanicsGarageSales";
 import ShadeTreeMechanics from "@/pages/ShadeTreeMechanics";
 import TriviaQuiz from "@/pages/TriviaQuiz";
 import BreakRoom from "@/pages/BreakRoom";
+import CDLDirectory from "@/pages/CDLDirectory";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -85,6 +86,7 @@ function Router() {
       <Route path="/marketing">{() => <MarketingHub />}</Route>
       <Route path="/trivia">{() => <TriviaQuiz />}</Route>
       <Route path="/break-room">{() => <BreakRoom />}</Route>
+      <Route path="/cdl-directory">{() => <CDLDirectory />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );
