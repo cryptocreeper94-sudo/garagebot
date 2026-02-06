@@ -5,7 +5,8 @@ import {
   Wrench, BookOpen, Lightbulb, Video, Users, Star,
   Car, Truck, Ship, Cog, ArrowRight, Search, Filter,
   Hammer, Clock, DollarSign, Shield, Heart, Share2,
-  CheckCircle, MessageSquare, ThumbsUp, Bookmark
+  CheckCircle, MessageSquare, ThumbsUp, Bookmark,
+  Gamepad2, Radio, Plane, Trophy, Bike
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,8 +25,13 @@ const CATEGORIES = [
 const VEHICLE_TYPES = [
   { id: "car", label: "Cars", icon: Car },
   { id: "truck", label: "Trucks", icon: Truck },
+  { id: "motorcycle", label: "Motorcycles", icon: Bike },
   { id: "boat", label: "Boats", icon: Ship },
-  { id: "atv", label: "ATVs & Small Engine", icon: Cog }
+  { id: "atv", label: "ATVs & Small Engine", icon: Cog },
+  { id: "rc", label: "RC & Hobby", icon: Gamepad2 },
+  { id: "drones", label: "Drones & FPV", icon: Radio },
+  { id: "modelaircraft", label: "Model Aircraft", icon: Plane },
+  { id: "slotcars", label: "Slot Cars", icon: Trophy }
 ];
 
 const DIFFICULTY_LEVELS = [
@@ -112,6 +118,45 @@ const FEATURED_GUIDES = [
     views: 3892,
     likes: 287,
     image: "/guides/atv-carb.jpg"
+  },
+  {
+    id: "rc-motor-swap",
+    title: "RC Brushless Motor Upgrade",
+    description: "Swap your brushed motor for a brushless setup. Massive speed and runtime improvements for any RC car.",
+    category: "upgrades",
+    vehicleType: "rc",
+    difficulty: "intermediate",
+    duration: "45 min",
+    savings: "$30-60",
+    views: 5123,
+    likes: 467,
+    image: "/guides/rc-motor.jpg"
+  },
+  {
+    id: "fpv-drone-build",
+    title: "Build Your First FPV Drone",
+    description: "Complete build guide for a 5-inch FPV racing drone. Soldering, flashing firmware, and maiden flight tips.",
+    category: "repairs",
+    vehicleType: "drones",
+    difficulty: "advanced",
+    duration: "3-4 hours",
+    savings: "$100-200",
+    views: 7845,
+    likes: 621,
+    image: "/guides/fpv-build.jpg"
+  },
+  {
+    id: "slot-car-tune",
+    title: "Slot Car Motor Tuning",
+    description: "Get faster lap times by tuning your slot car motor, adjusting gear mesh, and optimizing tire grip.",
+    category: "upgrades",
+    vehicleType: "slotcars",
+    difficulty: "beginner",
+    duration: "30 min",
+    savings: "$20-40",
+    views: 2341,
+    likes: 189,
+    image: "/guides/slot-tune.jpg"
   }
 ];
 

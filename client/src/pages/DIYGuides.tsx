@@ -15,7 +15,8 @@ import {
   BookOpen, Search, Car, Wrench, ChevronLeft, ChevronRight, Clock, 
   Gauge, AlertTriangle, CheckCircle2, Play, Pause,
   Lightbulb, ExternalLink, Zap, Anchor, Bike, Truck,
-  Youtube, Snowflake, Crown, Flame, Lock, Sparkles, Ship
+  Youtube, Snowflake, Crown, Flame, Lock, Sparkles, Ship,
+  Gamepad2, Radio, Plane, Trophy
 } from "lucide-react";
 
 interface RepairGuide {
@@ -57,6 +58,10 @@ const EQUIPMENT_CATEGORIES = [
   { id: "rv", name: "RVs & Motorhomes", icon: Truck, color: "from-purple-500/20 to-purple-600/10" },
   { id: "diesel", name: "Diesel & Commercial", icon: Ship, color: "from-slate-500/20 to-slate-600/10" },
   { id: "classic", name: "Classics & Hot Rods", icon: Flame, color: "from-red-500/20 to-red-600/10" },
+  { id: "rc", name: "RC & Hobby", icon: Gamepad2, color: "from-pink-500/20 to-pink-600/10" },
+  { id: "drones", name: "Drones & FPV", icon: Radio, color: "from-indigo-500/20 to-indigo-600/10" },
+  { id: "modelaircraft", name: "Model Aircraft", icon: Plane, color: "from-sky-500/20 to-sky-600/10" },
+  { id: "slotcars", name: "Slot Cars", icon: Trophy, color: "from-yellow-500/20 to-yellow-600/10" },
 ];
 
 const difficultyInfo: Record<string, { label: string; color: string; icon: typeof CheckCircle2 }> = {
