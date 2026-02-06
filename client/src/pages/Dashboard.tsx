@@ -291,7 +291,7 @@ export default function Dashboard() {
                   <Shield className="w-4 h-4" /> Security Status
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  All systems normal. Mock integration keys active. Production keys for Stripe & Coinbase are securely stored in environment variables.
+                  All systems normal. Production keys for Stripe & Coinbase are securely stored in environment variables.
                 </p>
               </div>
             </Card>
