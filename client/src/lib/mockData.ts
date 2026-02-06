@@ -405,7 +405,7 @@ export const VENDORS: VendorInfo[] = [
     id: "rexing",
     name: "Rexing",
     slug: "rexing",
-    searchTemplate: "https://www.rexingusa.com/?s={query}&post_type=product&ref=5357356",
+    searchTemplate: "https://rexing.com/?s={query}&post_type=product&ref=5357356",
     hasLocalPickup: false,
     categories: ["cars", "classics", "diesel", "rv", "motorcycles", "atvs", "boats", "powersports"],
     priority: 80,
