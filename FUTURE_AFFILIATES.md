@@ -20,6 +20,7 @@ This document tracks potential affiliate partnerships, their networks, commissio
 
 | Retailer | Network | Applied | Status | Follow-up Date |
 |----------|---------|---------|--------|----------------|
+| Walmart Auto Parts | Impact Radius | Feb 2026 | ⏳ Pending | Check Feb 20, 2026 |
 | Insurify (Insurance) | CJ Affiliate | Jan 2026 | ⏳ Pending | Check Feb 10, 2026 |
 
 ---
@@ -248,7 +249,7 @@ This document tracks potential affiliate partnerships, their networks, commissio
 ## Next Steps
 
 ### Immediate (This Week):
-1. [ ] Apply to Walmart via Impact Radius (https://affiliates.walmart.com/)
+1. [x] Apply to Walmart via Impact Radius (https://affiliates.walmart.com/) — Applied Feb 2026
 2. [ ] Apply to AutoZone via CJ Affiliate
 3. [ ] Apply to RockAuto direct program
 4. [ ] Apply to NAPA affiliate program
