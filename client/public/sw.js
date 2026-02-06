@@ -1,18 +1,45 @@
-const CACHE_NAME = 'garagebot-v18';
+const CACHE_NAME = 'garagebot-v20';
 const OFFLINE_URL = '/offline.html';
+const STATIC_CACHE = 'garagebot-static-v20';
+const DYNAMIC_CACHE = 'garagebot-dynamic-v20';
+
+const MAX_DYNAMIC_CACHE_ITEMS = 100;
 
 const STATIC_ASSETS = [
   '/favicon.png',
+  '/icon-48.png',
+  '/icon-72.png',
+  '/icon-96.png',
+  '/icon-128.png',
+  '/icon-144.png',
   '/icon-192.png',
+  '/icon-256.png',
+  '/icon-384.png',
   '/icon-512.png',
-  '/splash.png',
+  '/icon-maskable-192.png',
+  '/icon-maskable-512.png',
+  '/apple-touch-icon.png',
   '/manifest.json',
   '/offline.html'
 ];
 
+function trimCache(cacheName, maxItems) {
+  caches.open(cacheName).then((cache) => {
+    cache.keys().then((keys) => {
+      if (keys.length > maxItems) {
+        cache.delete(keys[0]).then(() => {
+          if (keys.length - 1 > maxItems) {
+            trimCache(cacheName, maxItems);
+          }
+        });
+      }
+    });
+  });
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(STATIC_CACHE).then((cache) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
@@ -20,11 +47,12 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
+  const keepCaches = [STATIC_CACHE, DYNAMIC_CACHE];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_NAME)
+          .filter((name) => !keepCaches.includes(name))
           .map((name) => caches.delete(name))
       );
     })
@@ -34,6 +62,10 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  if (url.origin !== self.location.origin) {
+    return;
+  }
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
@@ -62,21 +94,31 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        return response;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
-        }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
+  if (url.pathname.match(/\.(png|jpg|jpeg|webp|svg|gif|ico|woff2?|ttf|eot)$/)) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          if (!response || response.status !== 200) return response;
+          const clone = response.clone();
+          caches.open(DYNAMIC_CACHE).then((cache) => {
+            cache.put(event.request, clone);
+            trimCache(DYNAMIC_CACHE, MAX_DYNAMIC_CACHE_ITEMS);
+          });
+          return response;
+        }).catch(() => {
+          return new Response('', { status: 404 });
         });
-        return networkResponse;
-      });
-    })
-  );
+      })
+    );
+    return;
+  }
+
+  event.respondWith(fetch(event.request));
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

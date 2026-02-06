@@ -48,10 +48,19 @@
   * {
     @apply border-border;
   }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    /* Fallback if image fails, nice gradient */
     background: radial-gradient(circle at top center, hsl(230 30% 15%), hsl(230 25% 10%));
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: contain;
   }
 }
 
@@ -824,4 +833,37 @@
 .bento-scroll > section,
 .bento-scroll > article {
   flex-shrink: 0;
+}
+
+/* PWA Standalone Mode Enhancements */
+@media all and (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: text;
+  }
+}
+
+/* Mobile touch improvements */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* Prevent iOS rubber-banding on fixed overlays */
+.fixed-overlay {
+  overscroll-behavior: contain;
+}
+
+/* iOS input zoom prevention */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="search"],
+  input[type="password"],
+  input[type="url"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }

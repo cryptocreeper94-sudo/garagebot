@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     
     <!-- Primary SEO Meta Tags -->
     <title>GarageBot | Right Part. First Time. Every Engine.</title>
@@ -46,7 +46,9 @@
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
     
     <!-- Structured Data for Search Engines -->
     <script type="application/ld+json">
@@ -71,6 +73,8 @@
     }
     </script>
 
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +102,7 @@
                   if (newWorker.state === 'activated') {
                     caches.keys().then(names => {
                       names.forEach(name => {
-                        if (name !== 'garagebot-v18') caches.delete(name);
+                        if (!name.includes('-v20')) caches.delete(name);
                       });
                     });
                   }
