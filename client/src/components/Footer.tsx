@@ -28,48 +28,49 @@ export default function Footer() {
   });
 
   return (
-    <footer className="sticky-footer border-t border-border/30 bg-card/95 backdrop-blur-md py-2">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
-          <span className="font-medium text-foreground">© {new Date().getFullYear()} DarkWave Studios, LLC</span>
-          <span className="hidden sm:inline text-border">|</span>
+    <footer className="sticky-footer border-t border-border/30 bg-card/95 backdrop-blur-md py-3">
+      <div className="container mx-auto px-4 space-y-2">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-muted-foreground">
+          <Link href="/about" className="hover:text-primary transition-colors" data-testid="footer-link-about">About</Link>
+          <Link href="/contact" className="hover:text-primary transition-colors" data-testid="footer-link-contact">Contact</Link>
+          <Link href="/support" className="hover:text-primary transition-colors" data-testid="footer-link-support">Support</Link>
+          <span className="text-border">|</span>
+          <Link href="/terms" className="hover:text-primary transition-colors" data-testid="footer-link-terms">Terms</Link>
+          <Link href="/privacy" className="hover:text-primary transition-colors" data-testid="footer-link-privacy">Privacy</Link>
+          <Link href="/affiliate-disclosure" className="hover:text-primary transition-colors" data-testid="footer-link-affiliate">Affiliates</Link>
+          <span className="text-border">|</span>
+          <Link href="/investors" className="hover:text-primary transition-colors" data-testid="footer-link-investors">Investors</Link>
+          <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
+          <Link href="/break-room" className="hover:text-primary transition-colors" data-testid="footer-link-breakroom">Break Room</Link>
+          <Link href="/dev" className="hover:text-primary transition-colors" data-testid="footer-link-dev">Dev Portal</Link>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[9px] text-muted-foreground/70">
+          <span className="font-medium text-foreground/80">&copy; {new Date().getFullYear()} DarkWave Studios, LLC</span>
+          <span className="text-border/50">|</span>
           {latestRelease?.version ? (
             <Badge 
               variant="outline" 
-              className="text-[10px] font-mono py-0 px-1.5 border-border/50"
+              className="text-[9px] font-mono py-0 px-1.5 border-border/40"
               data-testid="badge-version"
             >
               {latestRelease.version}
             </Badge>
           ) : (
-            <span className="font-mono text-primary/80">v1.0.0</span>
+            <span className="font-mono text-primary/60">v1.0.0</span>
           )}
-          <span className="hidden sm:inline text-border">|</span>
-          <Link href="/about" className="hover:text-primary transition-colors" data-testid="footer-link-about">About</Link>
-          <Link href="/contact" className="hover:text-primary transition-colors" data-testid="footer-link-contact">Contact</Link>
-          <Link href="/terms" className="hover:text-primary transition-colors" data-testid="footer-link-terms">Terms</Link>
-          <Link href="/privacy" className="hover:text-primary transition-colors" data-testid="footer-link-privacy">Privacy</Link>
-          <Link href="/affiliate-disclosure" className="hover:text-primary transition-colors" data-testid="footer-link-affiliate">Affiliates</Link>
-          <Link href="/investors" className="hover:text-primary transition-colors" data-testid="footer-link-investors">Investors</Link>
-          <Link href="/support" className="hover:text-primary transition-colors" data-testid="footer-link-support">Support</Link>
-          <Link href="/break-room" className="hover:text-primary transition-colors" data-testid="footer-link-breakroom">Break Room</Link>
-          <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
-          <Link href="/dev" className="hover:text-primary transition-colors" data-testid="footer-link-dev">Dev</Link>
-          
-          {/* Ecosystem Links */}
-          <span className="hidden sm:inline text-border">|</span>
-          <span className="hidden sm:inline text-[9px] text-muted-foreground/60">Ecosystem:</span>
+          <span className="hidden sm:inline text-border/50">|</span>
           {ecosystemLinks.map((site) => (
             <a
               key={site.name}
               href={site.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`hidden sm:inline-flex items-center gap-0.5 hover:opacity-100 opacity-70 transition-opacity ${site.color}`}
+              className={`hidden sm:inline-flex items-center gap-0.5 hover:opacity-100 opacity-60 transition-opacity ${site.color}`}
               data-testid={`footer-ecosystem-${site.name.toLowerCase().replace(/\s/g, '-')}`}
             >
-              <site.icon className="w-3 h-3" />
-              <span className="text-[9px]">{site.url.replace('https://', '')}</span>
+              <site.icon className="w-2.5 h-2.5" />
+              <span>{site.url.replace('https://', '')}</span>
             </a>
           ))}
         </div>

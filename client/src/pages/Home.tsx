@@ -29,7 +29,7 @@ import NativeProductRecs from "@/components/NativeProductRecs";
 import DailyFunFact from "@/components/DailyFunFact";
 import VehicleShowcase from "@/components/VehicleShowcase";
 import AchievementBadges from "@/components/AchievementBadges";
-import SpinToWin from "@/components/SpinToWin";
+
 import useSoundEffects from "@/hooks/useSoundEffects";
 import { Volume2, VolumeX } from "lucide-react";
 
@@ -990,8 +990,6 @@ export default function Home() {
         {soundEnabled ? <Volume2 className="w-4 h-4 text-primary" /> : <VolumeX className="w-4 h-4 text-muted-foreground" />}
       </button>
 
-      {/* Spin to Win */}
-      <SpinToWin />
       
       {/* Footer - Dynamic Version */}
       <Footer />
