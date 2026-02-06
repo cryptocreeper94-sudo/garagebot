@@ -48,7 +48,7 @@ export default function Investors() {
             {[
               { icon: DollarSign, value: "$400B+", label: "US Aftermarket Industry" },
               { icon: Users, value: "280M", label: "Vehicles in the US" },
-              { icon: Zap, value: "40+", label: "Integrated Retailers" },
+              { icon: Zap, value: "50+", label: "Integrated Retailers" },
               { icon: Shield, value: "100%", label: "On-Chain Verified" },
             ].map((stat, i) => (
               <motion.div

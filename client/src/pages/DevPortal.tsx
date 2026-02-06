@@ -31,7 +31,8 @@ const AFFILIATE_NETWORKS = [
     commission: "1-10% (4.5% avg for auto)",
     approval: "24-48 hours",
     difficulty: "Easy",
-    retailers: ["Amazon Automotive", "Amazon Tools"],
+    status: "connected" as const,
+    retailers: ["Amazon Automotive", "Amazon Tools", "Amazon RC & Hobby", "Amazon Drones", "Amazon Model Kits"],
     requirements: [
       "Active website or social media",
       "Describe your promotional methods",
@@ -45,7 +46,8 @@ const AFFILIATE_NETWORKS = [
       "Enter your payment/tax info",
       "Get your Associate ID (looks like: garagebot-20)"
     ],
-    integration: "Update vendor records with your Associate tag. Links become: amazon.com/dp/ASIN?tag=YOUR-TAG"
+    integration: "Update vendor records with your Associate tag. Links become: amazon.com/dp/ASIN?tag=YOUR-TAG",
+    hobbyRetailers: ["Hosim RC (via Amazon)", "Bezgar (via Amazon)"]
   },
   {
     id: "cj",
@@ -55,6 +57,7 @@ const AFFILIATE_NETWORKS = [
     commission: "Varies by retailer (2-8%)",
     approval: "1-3 business days for CJ, then apply to each retailer",
     difficulty: "Medium",
+    status: "connected" as const,
     retailers: ["Advance Auto Parts", "Summit Racing", "JEGS", "4 Wheel Parts", "Camping World", "CarParts.com"],
     requirements: [
       "Active website with content",
@@ -69,7 +72,9 @@ const AFFILIATE_NETWORKS = [
       "Wait for each retailer to approve your application",
       "Once approved, generate tracking links in the CJ dashboard"
     ],
-    integration: "CJ provides unique tracking links for each retailer. Use their link generator or Deep Link Automation."
+    integration: "CJ provides unique tracking links for each retailer. Use their link generator or Deep Link Automation.",
+    hobbyRetailers: ["Horizon Hobby"],
+    hobbyAction: "Log into CJ dashboard → Search Advertisers → 'Horizon Hobby' → Apply to program → Once approved, generate tracking links for hobby products"
   },
   {
     id: "shareasale",
@@ -79,6 +84,7 @@ const AFFILIATE_NETWORKS = [
     commission: "Varies by retailer (3-10%)",
     approval: "24-72 hours for network, varies by retailer",
     difficulty: "Easy",
+    status: "pending" as const,
     retailers: ["Partzilla", "Jack's Small Engines", "Classic Industries", "RV Parts Country", "etrailer"],
     requirements: [
       "Active website",
@@ -93,7 +99,9 @@ const AFFILIATE_NETWORKS = [
       "Apply to relevant merchants (Partzilla, Jack's, etc.)",
       "Generate affiliate links from merchant dashboard"
     ],
-    integration: "ShareASale provides tracking links. Use their bookmarklet or API for deep linking."
+    integration: "ShareASale provides tracking links. Use their bookmarklet or API for deep linking.",
+    hobbyRetailers: ["Tower Hobbies", "GetFPV", "Redcat Racing"],
+    hobbyAction: "Sign up for ShareASale network → Once approved → Search Merchants: 'Tower Hobbies', 'GetFPV', 'Redcat Racing' → Apply to each → Generate tracking links"
   },
   {
     id: "avantlink",
@@ -103,6 +111,7 @@ const AFFILIATE_NETWORKS = [
     commission: "3-15% depending on retailer",
     approval: "1-5 business days",
     difficulty: "Medium",
+    status: "pending" as const,
     retailers: ["Rocky Mountain ATV/MC", "Dennis Kirk", "RevZilla", "MotoSport", "Defender Marine"],
     requirements: [
       "Quality website with established content",
@@ -117,7 +126,9 @@ const AFFILIATE_NETWORKS = [
       "Apply to each merchant program",
       "Use their link builder or API for tracking"
     ],
-    integration: "AvantLink has a good API for automated linking. Deep linking supported."
+    integration: "AvantLink has a good API for automated linking. Deep linking supported.",
+    hobbyRetailers: ["AMain Hobbies", "RC Planet"],
+    hobbyAction: "Sign up for AvantLink network → Once approved → Search Merchants: 'AMain Hobbies', 'RC Planet' → Apply to each → Generate tracking links"
   },
   {
     id: "impact",
@@ -127,6 +138,7 @@ const AFFILIATE_NETWORKS = [
     commission: "Varies (2-8%)",
     approval: "2-5 business days",
     difficulty: "Medium",
+    status: "pending" as const,
     retailers: ["AutoZone", "Camping World", "Bass Pro Shops"],
     requirements: [
       "Established website with traffic",
@@ -150,7 +162,8 @@ const AFFILIATE_NETWORKS = [
     commission: "1-4% depending on category",
     approval: "Instant to 24 hours",
     difficulty: "Easy",
-    retailers: ["eBay Motors", "eBay Auto Parts"],
+    status: "connected" as const,
+    retailers: ["eBay Motors", "eBay Auto Parts", "eBay RC & Hobby", "eBay Drones"],
     requirements: [
       "Active website or social presence",
       "Agree to eBay Partner Network terms",
@@ -212,6 +225,22 @@ const DIRECT_RETAILERS = [
     notes: "World's largest recycled auto parts marketplace. Has web services/API for data access. $80B in searches annually.",
     status: "API Partnership",
     letterType: "api_partnership"
+  },
+  {
+    name: "HobbyKing",
+    contact: "affiliates@hobbyking.com",
+    contactUrl: "https://www.hobbyking.com/en_us/affiliate-program",
+    notes: "Massive RC/drone parts retailer with direct affiliate program. 5-8% commission, 30-day cookie. One of the largest hobby retailers globally.",
+    status: "Direct Program",
+    letterType: "hobbyking_affiliate"
+  },
+  {
+    name: "BETAFPV",
+    contact: "marketing@betafpv.com",
+    contactUrl: "https://betafpv.com/pages/affiliate-program",
+    notes: "Leading FPV drone manufacturer and parts supplier. Direct affiliate/ambassador program. 5-10% commission on drone kits, frames, motors, and accessories.",
+    status: "Direct Program",
+    letterType: "betafpv_affiliate"
   }
 ];
 
@@ -338,6 +367,62 @@ Founder, GarageBot.io
 https://garagebot.io
 
 P.S. I'm particularly impressed by your CIECA API Standards work - proper data exchange is crucial for our industry.`
+  },
+  hobbyking_affiliate: {
+    subject: "GarageBot.io Affiliate Partnership - RC & Hobby Parts Platform",
+    body: `Dear HobbyKing Affiliate Team,
+
+I'm Jason, founder of GarageBot.io, a comprehensive parts search aggregator that recently expanded to cover the RC hobby, drone, and model aircraft markets.
+
+**About GarageBot:**
+• Parts search aggregator covering 50+ retailers across automotive AND hobby categories
+• Dedicated sections for RC Cars, Drones/FPV, Model Aircraft, and Slot Cars
+• AI-powered part recommendations and DIY build/upgrade guides
+• Growing community of enthusiasts across all motorized categories
+
+**Why HobbyKing?**
+Your massive selection of RC, drone, and model aircraft parts makes you the go-to retailer for our hobby users. We want to feature HobbyKing prominently in our RC & Hobby, Drones & FPV, and Model Aircraft search results.
+
+**Partnership Proposal:**
+• Feature HobbyKing as a top-tier hobby retailer in all relevant search results
+• Drive qualified traffic from users actively searching for hobby parts
+• Promote HobbyKing in our DIY build guides and upgrade tutorials
+• Include in our "Specialty Retailers" section for hobby categories
+
+I'd love to join your affiliate program and start driving sales your way.
+
+Best regards,
+Jason
+Founder, GarageBot.io
+https://garagebot.io`
+  },
+  betafpv_affiliate: {
+    subject: "GarageBot.io Affiliate/Ambassador Program - FPV Drone Parts Platform",
+    body: `Dear BETAFPV Marketing Team,
+
+I'm Jason, founder of GarageBot.io, a comprehensive parts search aggregator with a dedicated Drones & FPV section.
+
+**About GarageBot:**
+• Parts search aggregator covering 50+ retailers including a dedicated FPV/drone category
+• AI-powered part recommendations for drone builds
+• DIY build guides including "Build Your First FPV Drone" tutorials
+• Growing community of FPV enthusiasts
+
+**Why BETAFPV?**
+Your products are essential for the FPV community - from ready-to-fly kits to individual components. Our drone users specifically search for BETAFPV products, and we want to make sure they can find you easily.
+
+**Partnership Proposal:**
+• Feature BETAFPV as a top drone parts retailer in our FPV search results
+• Promote BETAFPV kits in our beginner FPV build guides
+• Drive qualified traffic from users actively searching for drone parts
+• Create dedicated content highlighting BETAFPV products
+
+I'd love to join your affiliate or ambassador program and help more pilots discover your products.
+
+Best regards,
+Jason
+Founder, GarageBot.io
+https://garagebot.io`
   }
 };
 
@@ -380,6 +465,11 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "affiliates", title: "Dennis Kirk Affiliate", description: "Powersports affiliate program", priority: "medium", status: "pending", dueDate: null, link: "https://www.denniskirk.com", notes: null, sortOrder: 8 },
   { category: "affiliates", title: "West Marine Affiliate", description: "Marine parts affiliate partnership", priority: "medium", status: "pending", dueDate: null, link: "https://www.westmarine.com", notes: null, sortOrder: 9 },
   { category: "affiliates", title: "eBay Partner Network", description: "Set up eBay Motors affiliate links", priority: "medium", status: "pending", dueDate: null, link: "https://partnernetwork.ebay.com", notes: null, sortOrder: 10 },
+  { category: "affiliates", title: "CJ: Add Horizon Hobby Merchant", description: "Log into CJ dashboard → Search Advertisers → 'Horizon Hobby' → Apply to their program", priority: "high", status: "pending", dueDate: null, link: "https://members.cj.com", notes: "CJ account already connected - just need to add this merchant", sortOrder: 11 },
+  { category: "affiliates", title: "ShareASale: Sign Up & Add Hobby Merchants", description: "Sign up for ShareASale network, then apply to Tower Hobbies, GetFPV, and Redcat Racing", priority: "high", status: "pending", dueDate: null, link: "https://www.shareasale.com/info/affiliates/", notes: "3 hobby merchants to add once network is approved", sortOrder: 12 },
+  { category: "affiliates", title: "AvantLink: Sign Up & Add Hobby Merchants", description: "Sign up for AvantLink network, then apply to AMain Hobbies and RC Planet", priority: "high", status: "pending", dueDate: null, link: "https://www.avantlink.com/affiliates/", notes: "2 hobby merchants to add once network is approved", sortOrder: 13 },
+  { category: "affiliates", title: "HobbyKing Direct Affiliate", description: "Apply for HobbyKing's direct affiliate program - email or use website form", priority: "medium", status: "pending", dueDate: null, link: "https://www.hobbyking.com/en_us/affiliate-program", notes: "Direct program - 5-8% commission, 30-day cookie", sortOrder: 14 },
+  { category: "affiliates", title: "BETAFPV Direct Affiliate", description: "Apply for BETAFPV's affiliate/ambassador program - email marketing team", priority: "medium", status: "pending", dueDate: null, link: "https://betafpv.com/pages/affiliate-program", notes: "Direct program - 5-10% commission on FPV products", sortOrder: 15 },
   { category: "apis", title: "NHTSA VIN Decoder API", description: "Integrate NHTSA VIN decoding for vehicle identification", priority: "high", status: "pending", dueDate: null, link: "https://vpic.nhtsa.dot.gov/api/", notes: null, sortOrder: 1 },
   { category: "apis", title: "NHTSA Recalls API", description: "Set up recall alerts using NHTSA recall database", priority: "high", status: "pending", dueDate: null, link: "https://www.nhtsa.gov/recalls", notes: null, sortOrder: 2 },
   { category: "apis", title: "OpenAI Vision API", description: "Enable photo-based part identification", priority: "high", status: "pending", dueDate: null, link: "https://platform.openai.com", notes: null, sortOrder: 3 },
@@ -1361,28 +1451,94 @@ export default function DevPortal() {
             {/* Bento Grid: Intro + Stats */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               <Card className="md:col-span-8 bg-gradient-to-br from-green-500/10 to-primary/5 border-green-500/30 p-4">
-                <h2 className="font-tech text-lg text-green-400 mb-2">How Affiliate Marketing Works</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="font-tech text-lg text-green-400 mb-2">Affiliate Network Status</h2>
+                <p className="text-sm text-muted-foreground mb-3">
                   When users click a link on GarageBot and buy something, you earn a commission (typically 2-10% of the sale).
                 </p>
+                <div className="flex flex-wrap gap-2">
+                  {AFFILIATE_NETWORKS.map(n => (
+                    <Badge 
+                      key={n.id}
+                      className={`text-xs ${
+                        n.status === 'connected' 
+                          ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                          : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                      }`}
+                    >
+                      {n.status === 'connected' ? '✓' : '○'} {n.name}
+                    </Badge>
+                  ))}
+                </div>
               </Card>
               <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4">
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div>
-                    <p className="font-tech text-xl text-primary">{AFFILIATE_NETWORKS.length}</p>
-                    <p className="text-[10px] text-muted-foreground">Networks</p>
+                    <p className="font-tech text-xl text-green-400">{AFFILIATE_NETWORKS.filter(n => n.status === 'connected').length}</p>
+                    <p className="text-[10px] text-muted-foreground">Connected</p>
                   </div>
                   <div>
-                    <p className="font-tech text-xl text-green-400">2-10%</p>
-                    <p className="text-[10px] text-muted-foreground">Commission</p>
+                    <p className="font-tech text-xl text-yellow-400">{AFFILIATE_NETWORKS.filter(n => n.status === 'pending').length}</p>
+                    <p className="text-[10px] text-muted-foreground">Pending</p>
                   </div>
                   <div>
-                    <p className="font-tech text-xl text-yellow-400">1-5d</p>
-                    <p className="text-[10px] text-muted-foreground">Approval</p>
+                    <p className="font-tech text-xl text-primary">{DIRECT_RETAILERS.length}</p>
+                    <p className="text-[10px] text-muted-foreground">Direct</p>
                   </div>
                 </div>
               </Card>
             </div>
+
+            {/* Hobby Affiliate Action Items */}
+            <Card className="bg-gradient-to-br from-pink-500/10 to-indigo-500/5 border-pink-500/30 p-4">
+              <h3 className="font-tech text-sm text-pink-400 mb-3 flex items-center gap-2">
+                <Zap className="w-4 h-4" /> Hobby & RC Affiliate Setup Checklist
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {AFFILIATE_NETWORKS.filter(n => n.hobbyRetailers && n.hobbyRetailers.length > 0).map(network => (
+                  <div key={network.id} className="bg-background/50 rounded-lg p-3 border border-primary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg">{network.logo}</span>
+                      <span className="font-tech text-sm">{network.name}</span>
+                      <Badge className={`text-[10px] ml-auto ${
+                        network.status === 'connected' 
+                          ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                          : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                      }`}>
+                        {network.status === 'connected' ? 'CONNECTED' : 'NEED SIGNUP'}
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      {network.hobbyRetailers?.map(r => (
+                        <div key={r} className="flex items-center gap-2 text-xs">
+                          <Circle className="w-3 h-3 text-muted-foreground" />
+                          <span>{r}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {network.hobbyAction && (
+                      <p className="text-[10px] text-muted-foreground mt-2 p-2 bg-primary/5 rounded">
+                        {network.hobbyAction}
+                      </p>
+                    )}
+                  </div>
+                ))}
+                {DIRECT_RETAILERS.filter(r => r.name === 'HobbyKing' || r.name === 'BETAFPV').map(retailer => (
+                  <div key={retailer.name} className="bg-background/50 rounded-lg p-3 border border-primary/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg">{retailer.name === 'HobbyKing' ? '🎮' : '🚁'}</span>
+                      <span className="font-tech text-sm">{retailer.name}</span>
+                      <Badge className="text-[10px] ml-auto bg-orange-500/20 text-orange-400 border-orange-500/30">
+                        DIRECT APPLY
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{retailer.notes}</p>
+                    <a href={retailer.contactUrl || `mailto:${retailer.contact}`} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1 mt-2">
+                      <ExternalLink className="w-3 h-3" /> Apply Now
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </Card>
 
             {/* 6/6 Grid: Networks + Retailers */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1406,6 +1562,13 @@ export default function DevPortal() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
+                          <Badge className={`text-[10px] ${
+                            network.status === 'connected' 
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                              : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                          }`}>
+                            {network.status === 'connected' ? 'CONNECTED' : 'PENDING'}
+                          </Badge>
                           <Badge variant="outline" className={network.difficulty === "Easy" ? "border-green-500/50 text-green-400" : "border-yellow-500/50 text-yellow-400"}>
                             {network.difficulty}
                           </Badge>
@@ -1457,14 +1620,28 @@ export default function DevPortal() {
                         </ol>
                       </div>
 
+                      {network.hobbyRetailers && network.hobbyRetailers.length > 0 && (
+                        <div className="mb-4 p-3 bg-pink-500/10 border border-pink-500/20 rounded-lg">
+                          <p className="text-xs text-pink-400 font-medium mb-2">Hobby & RC Retailers to Add</p>
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {network.hobbyRetailers.map(r => (
+                              <Badge key={r} className="text-xs bg-pink-500/20 text-pink-300 border-pink-500/30">{r}</Badge>
+                            ))}
+                          </div>
+                          {network.hobbyAction && (
+                            <p className="text-xs text-muted-foreground mt-1">{network.hobbyAction}</p>
+                          )}
+                        </div>
+                      )}
+
                       <div className="p-3 bg-primary/10 rounded-lg mb-4">
                         <p className="text-xs text-muted-foreground mb-1">How to Integrate</p>
                         <p className="text-sm">{network.integration}</p>
                       </div>
 
-                      <Button asChild className="w-full font-tech uppercase">
+                      <Button asChild className={`w-full font-tech uppercase ${network.status === 'connected' ? 'bg-green-600 hover:bg-green-700' : ''}`}>
                         <a href={network.url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-2" /> Sign Up at {network.name}
+                          <ExternalLink className="w-4 h-4 mr-2" /> {network.status === 'connected' ? 'Open Dashboard' : `Sign Up at ${network.name}`}
                         </a>
                       </Button>
                     </AccordionContent>

@@ -52,11 +52,12 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     icon: "🔍",
     color: "green",
     features: [
-      { id: "universal-search", name: "Universal Parts Search", description: "Search 40+ retailers simultaneously", status: "complete", route: "/" },
+      { id: "universal-search", name: "Universal Parts Search", description: "Search 50+ retailers simultaneously", status: "complete", route: "/" },
       { id: "vehicle-selectors", name: "Year/Make/Model Selectors", description: "Filter parts by vehicle fitment", status: "complete", route: "/" },
-      { id: "vehicle-types", name: "12 Vehicle Type Support", description: "Cars, trucks, boats, ATVs, motorcycles, etc.", status: "complete", route: "/" },
-      { id: "category-grid", name: "20 Part Categories", description: "Organized part category navigation", status: "complete", route: "/" },
-      { id: "affiliate-links", name: "Affiliate Search Links", description: "Direct links to retailer search results", status: "complete" },
+      { id: "vehicle-types", name: "16 Vehicle Type Support", description: "Cars, trucks, boats, ATVs, motorcycles, RC, drones, model aircraft, slot cars, & more", status: "complete", route: "/" },
+      { id: "category-grid", name: "24+ Part Categories", description: "Organized part category navigation including hobby categories", status: "complete", route: "/" },
+      { id: "affiliate-links", name: "Affiliate Search Links", description: "Direct links to retailer search results with tracking", status: "complete" },
+      { id: "hobby-section", name: "Motorized Hobby Section", description: "RC cars, drones/FPV, model aircraft, slot cars with 10+ hobby retailers", status: "complete", route: "/" },
       { id: "photo-search", name: "Photo Part Search", description: "Snap photo, AI identifies the part", status: "partial", route: "/" },
       { id: "voice-search", name: "Voice Search (Hey Buddy)", description: "Voice-activated part search", status: "partial", route: "/" },
     ]
