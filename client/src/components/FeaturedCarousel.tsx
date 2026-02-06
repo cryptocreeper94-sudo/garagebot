@@ -1,8 +1,9 @@
+import { useState, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Timer, ExternalLink, Zap, Sparkles } from "lucide-react";
+import { Timer, ExternalLink, Zap, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 
@@ -96,12 +97,35 @@ async function fetchDeals(): Promise<Deal[]> {
 }
 
 export default function FeaturedCarousel() {
-  const [emblaRef] = useEmblaCarousel({ align: "start", loop: true });
-  
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", loop: true, dragFree: true });
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(true);
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
   const { data: deals = FALLBACK_DEALS } = useQuery({
     queryKey: ["deals"],
     queryFn: fetchDeals,
   });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    setScrollSnaps(emblaApi.scrollSnapList());
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+    };
+  }, [emblaApi, onSelect]);
 
   const getDealUrl = (deal: Deal): string => {
     if (deal.vendorUrl && deal.searchQuery) {
@@ -137,7 +161,7 @@ export default function FeaturedCarousel() {
             const dealUrl = getDealUrl(deal);
             return (
               <div className="flex-[0_0_55%] min-w-0 sm:flex-[0_0_32%] md:flex-[0_0_24%] lg:flex-[0_0_18%]" key={deal.id}>
-                <a 
+                <a
                   href={dealUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -145,11 +169,10 @@ export default function FeaturedCarousel() {
                   data-testid={`link-deal-${deal.id}`}
                 >
                   <Card className="h-full bg-card/50 border-white/10 backdrop-blur-sm overflow-hidden group hover:border-primary/50 transition-all relative cursor-pointer">
-                    {/* Compact Image */}
                     <div className="h-20 w-full relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
-                      <img 
-                        src={deal.imageUrl || "https://images.unsplash.com/photo-1635784063748-252802c6c25c?q=80&w=600&auto=format&fit=crop"} 
+                      <img
+                        src={deal.imageUrl || "https://images.unsplash.com/photo-1635784063748-252802c6c25c?q=80&w=600&auto=format&fit=crop"}
                         alt={deal.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70"
                       />
@@ -162,7 +185,6 @@ export default function FeaturedCarousel() {
                       </div>
                     </div>
 
-                    {/* Compact Content */}
                     <div className="p-2">
                       <h3 className="font-bold text-[10px] line-clamp-1 group-hover:text-primary transition-colors">{deal.title}</h3>
                       <p className="text-[8px] text-muted-foreground line-clamp-1 mb-1">{deal.description}</p>
@@ -187,6 +209,47 @@ export default function FeaturedCarousel() {
           })}
         </div>
       </div>
+
+      {scrollSnaps.length > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-3" data-testid="deals-carousel-controls">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => emblaApi?.scrollPrev()}
+            disabled={!canScrollPrev}
+            className={`w-8 h-8 rounded-full bg-background/80 border border-primary/30 hover:bg-primary/10 hover:border-primary transition-all ${!canScrollPrev ? 'opacity-30' : 'opacity-100'}`}
+            data-testid="deals-carousel-left"
+          >
+            <ChevronLeft className="w-4 h-4 text-primary" />
+          </Button>
+
+          <div className="flex items-center gap-1.5" data-testid="deals-carousel-dots">
+            {scrollSnaps.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => emblaApi?.scrollTo(i)}
+                className={`rounded-full transition-all duration-300 ${
+                  i === selectedIndex
+                    ? 'w-6 h-2 bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]'
+                    : 'w-2 h-2 bg-cyan-400/30 hover:bg-cyan-400/50'
+                }`}
+                data-testid={`deals-dot-${i}`}
+              />
+            ))}
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => emblaApi?.scrollNext()}
+            disabled={!canScrollNext}
+            className={`w-8 h-8 rounded-full bg-background/80 border border-primary/30 hover:bg-primary/10 hover:border-primary transition-all ${!canScrollNext ? 'opacity-30' : 'opacity-100'}`}
+            data-testid="deals-carousel-right"
+          >
+            <ChevronRight className="w-4 h-4 text-primary" />
+          </Button>
+        </div>
+      )}
     </section>
   );
 }
