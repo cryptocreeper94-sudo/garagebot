@@ -42,6 +42,7 @@ import Blog from "@/pages/Blog";
 import MarketingHub from "@/pages/MarketingHub";
 import MechanicsGarageSales from "@/pages/MechanicsGarageSales";
 import ShadeTreeMechanics from "@/pages/ShadeTreeMechanics";
+import TriviaQuiz from "@/pages/TriviaQuiz";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -81,6 +82,7 @@ function Router() {
       <Route path="/blog">{() => <Blog />}</Route>
       <Route path="/blog/:slug">{() => <Blog />}</Route>
       <Route path="/marketing">{() => <MarketingHub />}</Route>
+      <Route path="/trivia">{() => <TriviaQuiz />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );

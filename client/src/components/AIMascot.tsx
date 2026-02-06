@@ -9,7 +9,8 @@ import { Card } from "@/components/ui/card";
 import { 
   MessageCircle, X, Send, Loader2, Sparkles, 
   Lightbulb, ChevronDown, Camera, Search,
-  ExternalLink, Car, AlertCircle, CheckCircle2
+  ExternalLink, Car, AlertCircle, CheckCircle2,
+  Palette
 } from "lucide-react";
 
 import mascotWaving from "@assets/mascot_transparent/robot_mascot_waving_hello.png";
@@ -58,6 +59,35 @@ interface Message {
 interface AIMascotProps {
   mascotName?: string;
 }
+
+type BuddyPersonality = 'default' | 'chill' | 'nascar' | 'topgear';
+
+const BUDDY_PERSONALITIES: Record<BuddyPersonality, { label: string; emoji: string; description: string; systemPrompt: string }> = {
+  default: {
+    label: 'Classic Buddy',
+    emoji: '🤖',
+    description: 'Friendly & helpful',
+    systemPrompt: ''
+  },
+  chill: {
+    label: 'Chill Mechanic',
+    emoji: '😎',
+    description: 'Laid-back garage vibes',
+    systemPrompt: 'Respond as a super chill, laid-back mechanic. Use casual slang, say things like "no worries", "easy fix", "piece of cake". Be relaxed and reassuring. Drop in some garage humor.'
+  },
+  nascar: {
+    label: 'NASCAR Pit Crew',
+    emoji: '🏁',
+    description: 'High-energy racing mode',
+    systemPrompt: 'Respond as an excited NASCAR pit crew chief. Be high-energy, use racing terms like "full throttle", "green flag", "in the pits", "checkered flag". Everything is urgent and exciting. Occasional "BOOGITY BOOGITY BOOGITY!"'
+  },
+  topgear: {
+    label: 'British Motoring',
+    emoji: '🎩',
+    description: 'Refined & witty',
+    systemPrompt: 'Respond like a witty British motoring journalist. Be eloquent, slightly sarcastic, use British expressions like "brilliant", "rather", "I dare say", "splendid". Reference horsepower enthusiastically and have strong opinions about cars.'
+  }
+};
 
 // Store search context across sessions
 const searchContext = {
@@ -108,6 +138,18 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
   const [hasSeenWelcome, setHasSeenWelcome] = useState(() => {
     return localStorage.getItem('buddy_welcomed') === 'true';
   });
+  const [personality, setPersonality] = useState<BuddyPersonality>(() => {
+    return (localStorage.getItem('buddyPersonality') as BuddyPersonality) || 'default';
+  });
+  const [showPersonalityPicker, setShowPersonalityPicker] = useState(false);
+
+  const handlePersonalityChange = (mode: BuddyPersonality) => {
+    setPersonality(mode);
+    localStorage.setItem('buddyPersonality', mode);
+    setShowPersonalityPicker(false);
+    setMessages([]);
+    fetchGreeting();
+  };
 
   useEffect(() => {
     if (!hasSeenWelcome) {
@@ -238,7 +280,13 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: [...messages, { role: "user", content: userMessage }]
+            messages: [
+              ...(BUDDY_PERSONALITIES[personality].systemPrompt 
+                ? [{ role: "system" as const, content: BUDDY_PERSONALITIES[personality].systemPrompt }] 
+                : []),
+              ...messages, 
+              { role: "user", content: userMessage }
+            ]
           })
         })
       ]);
@@ -545,9 +593,20 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <h3 className="font-tech font-bold text-sm uppercase text-primary">{mascotName}</h3>
+                      <span className="text-xs" data-testid="buddy-personality-emoji">{BUDDY_PERSONALITIES[personality].emoji}</span>
                       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                     </div>
                     <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6"
+                        onClick={() => setShowPersonalityPicker(!showPersonalityPicker)}
+                        data-testid="buddy-personality-toggle"
+                        title="Change Buddy's personality"
+                      >
+                        <Palette className="w-3 h-3" />
+                      </Button>
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -568,6 +627,35 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                       </Button>
                     </div>
                   </div>
+
+                  {showPersonalityPicker && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mb-2 grid grid-cols-2 gap-1.5"
+                      data-testid="buddy-personality-picker"
+                    >
+                      {(Object.entries(BUDDY_PERSONALITIES) as [BuddyPersonality, typeof BUDDY_PERSONALITIES[BuddyPersonality]][]).map(([key, mode]) => (
+                        <button
+                          key={key}
+                          onClick={() => handlePersonalityChange(key)}
+                          className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-left text-[11px] transition-all ${
+                            personality === key
+                              ? 'bg-primary/20 border border-primary/50 text-primary'
+                              : 'bg-muted/30 border border-transparent hover:bg-muted/50'
+                          }`}
+                          data-testid={`buddy-mode-${key}`}
+                        >
+                          <span className="text-sm">{mode.emoji}</span>
+                          <div className="min-w-0">
+                            <div className="font-medium truncate">{mode.label}</div>
+                            <div className="text-[9px] text-muted-foreground truncate">{mode.description}</div>
+                          </div>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
 
                   <ScrollArea className="h-28 sm:h-36 mb-2" ref={scrollRef}>
                     <div className="space-y-3 pr-2">
