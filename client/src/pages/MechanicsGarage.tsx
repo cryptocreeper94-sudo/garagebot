@@ -648,6 +648,326 @@ function PartsOrderingTab() {
   );
 }
 
+function BusinessIntegrationsTab({ shopId, selectedShop, toast }: { shopId: string; selectedShop: any; toast: any }) {
+  const queryClient = useQueryClient();
+
+  const { data: shopConnections = [] } = useQuery({
+    queryKey: ["/api/shops", shopId, "integrations"],
+    queryFn: async () => {
+      const res = await fetch(`/api/shops/${shopId}/integrations`, { credentials: 'include' });
+      return res.json();
+    },
+  });
+
+  const connectMutation = useMutation({
+    mutationFn: async (service: string) => {
+      const res = await fetch(`/api/shops/${shopId}/integrations/${service}/connect`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to connect');
+      }
+      return res.json();
+    },
+    onSuccess: (data, service) => {
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["/api/shops", shopId, "integrations"] });
+        toast({ title: "Connected!", description: `Successfully connected integration` });
+      }
+    },
+    onError: (err: any) => {
+      toast({ title: "Connection Failed", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const disconnectMutation = useMutation({
+    mutationFn: async (service: string) => {
+      const res = await fetch(`/api/shops/${shopId}/integrations/${service}/disconnect`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to disconnect');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/shops", shopId, "integrations"] });
+      toast({ title: "Disconnected", description: "Integration has been disconnected" });
+    },
+  });
+
+  const getConnectionStatus = (service: string) => {
+    const conn = shopConnections.find((c: any) => c.service === service);
+    return conn?.status === 'connected' ? 'connected' : 'disconnected';
+  };
+
+  const COLOR_MAP: Record<string, { bg: string; bgLight: string; border: string; borderHover: string; borderActive: string; shadow: string; text: string; icon: string; btnGrad: string; btnHover: string }> = {
+    purple: { bg: "bg-purple-500/10", bgLight: "bg-purple-500/5", border: "border-purple-500/20", borderHover: "hover:border-purple-500/40", borderActive: "border-purple-500/40", shadow: "shadow-purple-500/5", text: "text-purple-500", icon: "text-purple-400", btnGrad: "from-purple-500/80 to-purple-600/80", btnHover: "hover:from-purple-500 hover:to-purple-600" },
+    green: { bg: "bg-green-500/10", bgLight: "bg-green-500/5", border: "border-green-500/20", borderHover: "hover:border-green-500/40", borderActive: "border-green-500/40", shadow: "shadow-green-500/5", text: "text-green-500", icon: "text-green-400", btnGrad: "from-green-500/80 to-green-600/80", btnHover: "hover:from-green-500 hover:to-green-600" },
+    blue: { bg: "bg-blue-500/10", bgLight: "bg-blue-500/5", border: "border-blue-500/20", borderHover: "hover:border-blue-500/40", borderActive: "border-blue-500/40", shadow: "shadow-blue-500/5", text: "text-blue-500", icon: "text-blue-400", btnGrad: "from-blue-500/80 to-blue-600/80", btnHover: "hover:from-blue-500 hover:to-blue-600" },
+    orange: { bg: "bg-orange-500/10", bgLight: "bg-orange-500/5", border: "border-orange-500/20", borderHover: "hover:border-orange-500/40", borderActive: "border-orange-500/40", shadow: "shadow-orange-500/5", text: "text-orange-500", icon: "text-orange-400", btnGrad: "from-orange-500/80 to-orange-600/80", btnHover: "hover:from-orange-500 hover:to-orange-600" },
+    cyan: { bg: "bg-cyan-500/10", bgLight: "bg-cyan-500/5", border: "border-cyan-500/20", borderHover: "hover:border-cyan-500/40", borderActive: "border-cyan-500/40", shadow: "shadow-cyan-500/5", text: "text-cyan-500", icon: "text-cyan-400", btnGrad: "from-cyan-500/80 to-cyan-600/80", btnHover: "hover:from-cyan-500 hover:to-cyan-600" },
+    pink: { bg: "bg-pink-500/10", bgLight: "bg-pink-500/5", border: "border-pink-500/20", borderHover: "hover:border-pink-500/40", borderActive: "border-pink-500/40", shadow: "shadow-pink-500/5", text: "text-pink-500", icon: "text-pink-400", btnGrad: "from-pink-500/80 to-pink-600/80", btnHover: "hover:from-pink-500 hover:to-pink-600" },
+    indigo: { bg: "bg-indigo-500/10", bgLight: "bg-indigo-500/5", border: "border-indigo-500/20", borderHover: "hover:border-indigo-500/40", borderActive: "border-indigo-500/40", shadow: "shadow-indigo-500/5", text: "text-indigo-500", icon: "text-indigo-400", btnGrad: "from-indigo-500/80 to-indigo-600/80", btnHover: "hover:from-indigo-500 hover:to-indigo-600" },
+    red: { bg: "bg-red-500/10", bgLight: "bg-red-500/5", border: "border-red-500/20", borderHover: "hover:border-red-500/40", borderActive: "border-red-500/40", shadow: "shadow-red-500/5", text: "text-red-500", icon: "text-red-400", btnGrad: "from-red-500/80 to-red-600/80", btnHover: "hover:from-red-500 hover:to-red-600" },
+    teal: { bg: "bg-teal-500/10", bgLight: "bg-teal-500/5", border: "border-teal-500/20", borderHover: "hover:border-teal-500/40", borderActive: "border-teal-500/40", shadow: "shadow-teal-500/5", text: "text-teal-500", icon: "text-teal-400", btnGrad: "from-teal-500/80 to-teal-600/80", btnHover: "hover:from-teal-500 hover:to-teal-600" },
+    amber: { bg: "bg-amber-500/10", bgLight: "bg-amber-500/5", border: "border-amber-500/20", borderHover: "hover:border-amber-500/40", borderActive: "border-amber-500/40", shadow: "shadow-amber-500/5", text: "text-amber-500", icon: "text-amber-400", btnGrad: "from-amber-500/80 to-amber-600/80", btnHover: "hover:from-amber-500 hover:to-amber-600" },
+    lime: { bg: "bg-lime-500/10", bgLight: "bg-lime-500/5", border: "border-lime-500/20", borderHover: "hover:border-lime-500/40", borderActive: "border-lime-500/40", shadow: "shadow-lime-500/5", text: "text-lime-500", icon: "text-lime-400", btnGrad: "from-lime-500/80 to-lime-600/80", btnHover: "hover:from-lime-500 hover:to-lime-600" },
+    emerald: { bg: "bg-emerald-500/10", bgLight: "bg-emerald-500/5", border: "border-emerald-500/20", borderHover: "hover:border-emerald-500/40", borderActive: "border-emerald-500/40", shadow: "shadow-emerald-500/5", text: "text-emerald-500", icon: "text-emerald-400", btnGrad: "from-emerald-500/80 to-emerald-600/80", btnHover: "hover:from-emerald-500 hover:to-emerald-600" },
+  };
+
+  const INTEGRATION_CATEGORIES = [
+    {
+      title: "Payment Processing",
+      icon: CreditCard,
+      color: "purple",
+      items: [
+        { service: "stripe", name: "Stripe Connect", desc: "Receive payments directly to your bank account", icon: CreditCard, color: "purple", features: ["Accept card payments", "Direct deposit to bank", "Automatic invoicing"], isStripe: true },
+      ],
+    },
+    {
+      title: "Accounting & Invoicing",
+      icon: DollarSign,
+      color: "green",
+      items: [
+        { service: "quickbooks", name: "QuickBooks Online", desc: "Sync invoices, payments, and financial reports", icon: Database, color: "green", features: ["Invoice sync", "Payment tracking", "Financial reports", "Customer management"] },
+        { service: "freshbooks", name: "FreshBooks", desc: "Time tracking, invoicing, and expense management", icon: FileText, color: "blue", features: ["Time tracking", "Invoicing", "Expense management", "Client portal"] },
+        { service: "xero", name: "Xero", desc: "Cloud accounting with powerful reporting", icon: Receipt, color: "purple", features: ["Bank reconciliation", "Invoicing", "Expense claims", "Financial reporting"] },
+        { service: "sage", name: "Sage Business Cloud", desc: "Complete business management and accounting", icon: BarChart3, color: "emerald", features: ["Invoicing", "Cash flow management", "Tax compliance", "Inventory tracking"] },
+        { service: "wave", name: "Wave Accounting", desc: "Free invoicing and accounting for small businesses", icon: Activity, color: "cyan", features: ["Free invoicing", "Receipt scanning", "Financial reports", "Payroll add-on"] },
+      ],
+    },
+    {
+      title: "Workforce & Payroll",
+      icon: Users,
+      color: "orange",
+      items: [
+        { service: "ukg", name: "UKG Pro", desc: "HR, payroll, talent management in one platform", icon: UserCheck, color: "orange", features: ["Payroll processing", "Benefits admin", "Time & attendance", "Talent management"] },
+        { service: "adp", name: "ADP Workforce Now", desc: "Payroll, HR, and workforce management", icon: Timer, color: "cyan", features: ["Payroll processing", "Tax filing", "Benefits admin", "Time tracking"] },
+        { service: "gusto", name: "Gusto", desc: "Modern payroll and benefits for small business", icon: Clock, color: "pink", features: ["Full-service payroll", "Health insurance", "Workers comp", "HR tools"] },
+        { service: "paychex", name: "Paychex Flex", desc: "Payroll, HR, and benefits administration", icon: Shield, color: "indigo", features: ["Payroll processing", "401(k) admin", "Insurance", "HR services"] },
+      ],
+    },
+    {
+      title: "Scheduling & Communication",
+      icon: Calendar,
+      color: "indigo",
+      items: [
+        { service: "google_calendar", name: "Google Calendar", desc: "Sync appointments with your Google account", icon: CalendarDays, color: "indigo", features: ["Appointment sync", "Availability management", "Customer reminders", "Team scheduling"] },
+        { service: "twilio", name: "Twilio", desc: "SMS notifications and customer messaging", icon: MessageSquare, color: "red", features: ["SMS reminders", "Appointment confirmations", "Marketing messages", "Two-way messaging"] },
+        { service: "mailchimp", name: "Mailchimp", desc: "Email marketing and customer outreach", icon: Mail, color: "teal", features: ["Email campaigns", "Audience management", "Automations", "Analytics"] },
+      ],
+    },
+    {
+      title: "Parts & Inventory",
+      icon: Package,
+      color: "amber",
+      items: [
+        { service: "partstech", name: "PartsTech", desc: "Search and order from 20+ parts suppliers", icon: Wrench, color: "amber", features: ["Multi-supplier search", "Real-time pricing", "VIN lookup", "Order management"] },
+        { service: "nexpart", name: "Nexpart", desc: "Catalog data and electronic ordering", icon: Globe, color: "lime", features: ["Electronic catalog", "Parts ordering", "Inventory sync", "Price updates"] },
+      ],
+    },
+  ];
+
+  return (
+    <div>
+      <Card className="p-6 mb-6 bg-gradient-to-r from-primary/20 via-purple-500/10 to-blue-500/20 border-primary/30 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 rounded-xl bg-primary/20">
+              <Link2 className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-tech font-bold uppercase" data-testid="text-integrations-title">Unified Business Hub</h3>
+              <p className="text-muted-foreground">Connect your existing business software - bring your tools with you</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div className="flex items-center gap-2 text-sm">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>Works alongside existing systems</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <RefreshCw className="w-4 h-4 text-blue-500" />
+              <span>Auto-sync data both ways</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Shield className="w-4 h-4 text-purple-500" />
+              <span>Secure OAuth connections</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mt-4">
+            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 font-mono text-[10px]">
+              {shopConnections.filter((c: any) => c.status === 'connected').length} CONNECTED
+            </Badge>
+            <Badge className="bg-muted text-muted-foreground border-muted font-mono text-[10px]">
+              {INTEGRATION_CATEGORIES.reduce((sum, cat) => sum + cat.items.length, 0)} AVAILABLE
+            </Badge>
+          </div>
+        </div>
+      </Card>
+
+      <div className="space-y-6">
+        {INTEGRATION_CATEGORIES.map((category) => (
+          <div key={category.title}>
+            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
+              <category.icon className="w-4 h-4" /> {category.title}
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {category.items.map((item: any) => {
+                const status = item.isStripe
+                  ? (selectedShop?.stripeOnboardingComplete ? 'connected' : 'disconnected')
+                  : getConnectionStatus(item.service);
+                const isConnected = status === 'connected';
+                const Icon = item.icon;
+                const c = COLOR_MAP[item.color] || COLOR_MAP.purple;
+
+                return (
+                  <Card
+                    key={item.service}
+                    className={`p-4 relative overflow-hidden transition-all duration-300 ${
+                      isConnected
+                        ? `bg-gradient-to-br ${c.bg} to-transparent ${c.borderActive} shadow-lg ${c.shadow}`
+                        : `bg-gradient-to-br ${c.bgLight} to-transparent ${c.border} ${c.borderHover}`
+                    }`}
+                    data-testid={`card-integration-${item.service}`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={`p-2 rounded-lg ${c.bg}`}>
+                        <Icon className={`w-6 h-6 ${c.text}`} />
+                      </div>
+                      {isConnected ? (
+                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[9px] font-mono">
+                          <CheckCircle className="w-3 h-3 mr-1" /> CONNECTED
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-muted-foreground text-[9px] font-mono">
+                          READY TO CONNECT
+                        </Badge>
+                      )}
+                    </div>
+                    <h5 className="font-tech font-bold text-lg mb-1">{item.name}</h5>
+                    <p className="text-xs text-muted-foreground mb-3">{item.desc}</p>
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {item.features.slice(0, 3).map((f: string) => (
+                        <span key={f} className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted/50 text-muted-foreground">{f}</span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2 mt-auto">
+                      {item.isStripe ? (
+                        isConnected ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="font-tech text-xs w-full"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch('/api/stripe/connect/dashboard', { credentials: 'include' });
+                                const data = await response.json();
+                                if (data.url) window.open(data.url, '_blank');
+                              } catch (error) {
+                                console.error('Error:', error);
+                              }
+                            }}
+                            data-testid="button-stripe-dashboard"
+                          >
+                            <ExternalLink className="w-3 h-3 mr-1" /> Manage
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            className={`font-tech text-xs w-full bg-gradient-to-r ${c.btnGrad}`}
+                            onClick={async () => {
+                              try {
+                                const response = await fetch('/api/stripe/connect/create-account', {
+                                  method: 'POST', credentials: 'include',
+                                  headers: { 'Content-Type': 'application/json' },
+                                });
+                                const data = await response.json();
+                                if (data.onboardingUrl) window.location.href = data.onboardingUrl;
+                              } catch (error) {
+                                console.error('Error:', error);
+                              }
+                            }}
+                            data-testid="button-connect-stripe"
+                          >
+                            <Link2 className="w-3 h-3 mr-1" /> Connect
+                          </Button>
+                        )
+                      ) : isConnected ? (
+                        <div className="flex gap-2 w-full">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="font-tech text-xs flex-1"
+                            data-testid={`button-manage-${item.service}`}
+                          >
+                            <Settings className="w-3 h-3 mr-1" /> Manage
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="font-tech text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            onClick={() => disconnectMutation.mutate(item.service)}
+                            data-testid={`button-disconnect-${item.service}`}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className={`font-tech text-xs w-full bg-gradient-to-r ${c.btnGrad} ${c.btnHover}`}
+                          onClick={() => connectMutation.mutate(item.service)}
+                          disabled={connectMutation.isPending}
+                          data-testid={`button-connect-${item.service}`}
+                        >
+                          {connectMutation.isPending ? (
+                            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          ) : (
+                            <Link2 className="w-3 h-3 mr-1" />
+                          )}
+                          Connect
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+
+        <Card className="p-6 bg-gradient-to-r from-primary/5 to-transparent border-primary/20">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-xl bg-primary/10">
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-tech font-bold text-lg mb-2">Don't Have These Systems?</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Mechanics Garage includes built-in versions of all these capabilities. Use our integrated tools for invoicing, scheduling, time tracking, and inventory - no additional subscriptions required.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Invoicing</Badge>
+                <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Time Clock</Badge>
+                <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Scheduling</Badge>
+                <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Inventory</Badge>
+                <Badge className="bg-primary/10 text-primary border-primary/30">Built-in CRM</Badge>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 function OrbitStaffingTab({ shopId, shopState, toast }: { shopId: string; shopState?: string; toast: any }) {
   const queryClient = useQueryClient();
   const [addEmployeeOpen, setAddEmployeeOpen] = useState(false);
@@ -3296,396 +3616,7 @@ export default function MechanicsGarage() {
 
                       {/* Integrations Tab */}
                       <TabsContent value="integrations">
-                        {/* Hero Banner */}
-                        <Card className="p-6 mb-6 bg-gradient-to-r from-primary/20 via-purple-500/10 to-blue-500/20 border-primary/30 relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                          <div className="relative">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="p-3 rounded-xl bg-primary/20">
-                                <Link2 className="w-8 h-8 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="text-2xl font-tech font-bold uppercase">Unified Business Hub</h3>
-                                <p className="text-muted-foreground">Connect your existing tools or use our built-in solutions</p>
-                              </div>
-                            </div>
-                            <div className="grid grid-cols-3 gap-4 mt-4">
-                              <div className="flex items-center gap-2 text-sm">
-                                <CheckCircle className="w-4 h-4 text-green-500" />
-                                <span>Coexist with current systems</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-sm">
-                                <RefreshCw className="w-4 h-4 text-blue-500" />
-                                <span>Gradually migrate at your pace</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-sm">
-                                <Sparkles className="w-4 h-4 text-purple-500" />
-                                <span>Full replacement available</span>
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-
-                        {/* Integration Categories */}
-                        <div className="space-y-6">
-                          {/* Payment Processing - Stripe Connect */}
-                          <div>
-                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                              <CreditCard className="w-4 h-4" /> Payment Processing
-                            </h4>
-                            <Card className="p-5 bg-gradient-to-br from-purple-500/10 to-transparent border-purple-500/30 relative overflow-hidden">
-                              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
-                              <div className="relative">
-                                <div className="flex items-start justify-between mb-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20">
-                                      <CreditCard className="w-8 h-8 text-purple-400" />
-                                    </div>
-                                    <div>
-                                      <h5 className="font-tech font-bold text-xl mb-1">Stripe Connect</h5>
-                                      <p className="text-sm text-muted-foreground">Receive payments directly to your bank account</p>
-                                    </div>
-                                  </div>
-                                  {selectedShop?.stripeOnboardingComplete ? (
-                                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                                      <CheckCircle className="w-3 h-3 mr-1" /> Connected
-                                    </Badge>
-                                  ) : selectedShop?.stripeAccountId ? (
-                                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                                      <Clock className="w-3 h-3 mr-1" /> Setup Incomplete
-                                    </Badge>
-                                  ) : (
-                                    <Badge variant="outline" className="text-muted-foreground">
-                                      Not Connected
-                                    </Badge>
-                                  )}
-                                </div>
-                                
-                                <div className="grid grid-cols-3 gap-4 mb-4">
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                    <span>Accept card payments</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                    <span>Direct deposit to bank</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                    <span>Automatic invoicing</span>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                  {selectedShop?.stripeOnboardingComplete ? (
-                                    <>
-                                      <Button 
-                                        variant="outline" 
-                                        className="font-tech"
-                                        onClick={async () => {
-                                          try {
-                                            const response = await fetch('/api/stripe/connect/dashboard', {
-                                              credentials: 'include'
-                                            });
-                                            const data = await response.json();
-                                            if (data.url) {
-                                              window.open(data.url, '_blank');
-                                            }
-                                          } catch (error) {
-                                            console.error('Error opening dashboard:', error);
-                                          }
-                                        }}
-                                        data-testid="button-stripe-dashboard"
-                                      >
-                                        <ExternalLink className="w-4 h-4 mr-2" />
-                                        Open Stripe Dashboard
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        Manage payouts, view transactions, and update settings
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Button 
-                                        className="font-tech bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                                        onClick={async () => {
-                                          try {
-                                            const response = await fetch('/api/stripe/connect/create-account', {
-                                              method: 'POST',
-                                              credentials: 'include',
-                                              headers: { 'Content-Type': 'application/json' }
-                                            });
-                                            const data = await response.json();
-                                            if (data.onboardingUrl) {
-                                              window.location.href = data.onboardingUrl;
-                                            } else if (data.error) {
-                                              alert(data.error);
-                                            }
-                                          } catch (error) {
-                                            console.error('Error connecting Stripe:', error);
-                                          }
-                                        }}
-                                        data-testid="button-connect-stripe"
-                                      >
-                                        <CreditCard className="w-4 h-4 mr-2" />
-                                        {selectedShop?.stripeAccountId ? 'Complete Setup' : 'Connect Stripe Account'}
-                                      </Button>
-                                      <span className="text-xs text-muted-foreground">
-                                        Takes about 5 minutes to set up
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </Card>
-                          </div>
-
-                          {/* Accounting & Invoicing */}
-                          <div>
-                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                              <DollarSign className="w-4 h-4" /> Accounting & Invoicing
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <Card className="p-4 bg-gradient-to-br from-green-500/5 to-transparent border-green-500/20 hover:border-green-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-green-500/10">
-                                    <Database className="w-6 h-6 text-green-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">QuickBooks</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Sync invoices, payments, and financial reports automatically</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-
-                              <Card className="p-4 bg-gradient-to-br from-blue-500/5 to-transparent border-blue-500/20 hover:border-blue-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-blue-500/10">
-                                    <FileText className="w-6 h-6 text-blue-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">FreshBooks</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Time tracking, invoicing, and expense management</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-
-                              <Card className="p-4 bg-gradient-to-br from-purple-500/5 to-transparent border-purple-500/20 hover:border-purple-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-purple-500/10">
-                                    <Receipt className="w-6 h-6 text-purple-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">Xero</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Cloud accounting with powerful reporting</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-                            </div>
-                          </div>
-
-                          {/* Workforce & Payroll */}
-                          <div>
-                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                              <Users className="w-4 h-4" /> Workforce & Payroll
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <Card className="p-4 bg-gradient-to-br from-orange-500/5 to-transparent border-orange-500/20 hover:border-orange-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-orange-500/10">
-                                    <UserCheck className="w-6 h-6 text-orange-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">UKG Pro</h5>
-                                <p className="text-xs text-muted-foreground mb-3">HR, payroll, talent management in one platform</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-
-                              <Card className="p-4 bg-gradient-to-br from-cyan-500/5 to-transparent border-cyan-500/20 hover:border-cyan-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-cyan-500/10">
-                                    <Timer className="w-6 h-6 text-cyan-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">ADP</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Payroll, HR, and workforce management</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-
-                              <Card className="p-4 bg-gradient-to-br from-pink-500/5 to-transparent border-pink-500/20 hover:border-pink-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-pink-500/10">
-                                    <Clock className="w-6 h-6 text-pink-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">Gusto</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Modern payroll and benefits for small business</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-                            </div>
-                          </div>
-
-                          {/* Scheduling & CRM */}
-                          <div>
-                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                              <Calendar className="w-4 h-4" /> Scheduling & Customer Management
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <Card className="p-4 bg-gradient-to-br from-indigo-500/5 to-transparent border-indigo-500/20 hover:border-indigo-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-indigo-500/10">
-                                    <CalendarDays className="w-6 h-6 text-indigo-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">Google Calendar</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Sync appointments with your Google account</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-
-                              <Card className="p-4 bg-gradient-to-br from-red-500/5 to-transparent border-red-500/20 hover:border-red-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-red-500/10">
-                                    <MessageSquare className="w-6 h-6 text-red-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">Twilio</h5>
-                                <p className="text-xs text-muted-foreground mb-3">SMS notifications and customer messaging</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-
-                              <Card className="p-4 bg-gradient-to-br from-teal-500/5 to-transparent border-teal-500/20 hover:border-teal-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-teal-500/10">
-                                    <Mail className="w-6 h-6 text-teal-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">Mailchimp</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Email marketing and customer outreach</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-                            </div>
-                          </div>
-
-                          {/* Parts & Inventory */}
-                          <div>
-                            <h4 className="font-tech uppercase text-sm text-muted-foreground mb-3 flex items-center gap-2">
-                              <Package className="w-4 h-4" /> Parts & Inventory
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <Card className="p-4 bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/20 hover:border-amber-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-amber-500/10">
-                                    <Wrench className="w-6 h-6 text-amber-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">PartsTech</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Search and order from 20+ suppliers</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-
-                              <Card className="p-4 bg-gradient-to-br from-lime-500/5 to-transparent border-lime-500/20 hover:border-lime-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-lime-500/10">
-                                    <Globe className="w-6 h-6 text-lime-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">Nexpart</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Catalog data and electronic ordering</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-
-                              <Card className="p-4 bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/20 hover:border-emerald-500/40 transition-colors group cursor-pointer">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="p-2 rounded-lg bg-emerald-500/10">
-                                    <Shield className="w-6 h-6 text-emerald-500" />
-                                  </div>
-                                  <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[9px] font-mono">
-                                    COMING SOON
-                                  </Badge>
-                                </div>
-                                <h5 className="font-tech font-bold text-lg mb-1">AutoZone Pro</h5>
-                                <p className="text-xs text-muted-foreground mb-3">Commercial account integration</p>
-                                <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                  Connect <ArrowRight className="w-3 h-3" />
-                                </div>
-                              </Card>
-                            </div>
-                          </div>
-
-                          {/* Built-in Features Notice */}
-                          <Card className="p-6 bg-gradient-to-r from-primary/5 to-transparent border-primary/20">
-                            <div className="flex items-start gap-4">
-                              <div className="p-3 rounded-xl bg-primary/10">
-                                <Sparkles className="w-8 h-8 text-primary" />
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="font-tech font-bold text-lg mb-2">Don't Have These Systems?</h4>
-                                <p className="text-sm text-muted-foreground mb-4">
-                                  Mechanics Garage includes built-in versions of all these capabilities. Use our integrated tools for invoicing, scheduling, time tracking, and inventory - no additional subscriptions required.
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Invoicing</Badge>
-                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Time Clock</Badge>
-                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Scheduling</Badge>
-                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Inventory</Badge>
-                                  <Badge className="bg-primary/10 text-primary border-primary/30">Built-in CRM</Badge>
-                                </div>
-                              </div>
-                            </div>
-                          </Card>
-                        </div>
+                        <BusinessIntegrationsTab shopId={selectedShop.id} selectedShop={selectedShop} toast={toast} />
                       </TabsContent>
 
                       {/* ORBIT Staffing Tab */}

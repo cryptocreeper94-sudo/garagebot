@@ -4,7 +4,7 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations } from "@shared/schema";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
@@ -4540,6 +4540,213 @@ export async function registerRoutes(
     } catch (error) {
       console.error("[ORBIT] Run payroll error:", error);
       res.status(500).json({ error: "Failed to run payroll" });
+    }
+  });
+
+  // ============================================
+  // BUSINESS INTEGRATIONS (QuickBooks, UKG, ADP, Gusto, etc.)
+  // Unified OAuth flow for all business software connections
+  // ============================================
+
+  app.get('/api/integrations/available', async (req, res) => {
+    try {
+      const { businessIntegrationService } = await import('./services/businessIntegrations');
+      const all = businessIntegrationService.getAllIntegrations();
+      const result = all.map(i => ({
+        name: i.name,
+        displayName: i.displayName,
+        category: i.category,
+        description: i.description,
+        features: i.features,
+        configured: businessIntegrationService.isConfigured(i.name),
+        authType: i.authUrl ? 'oauth' : 'apikey',
+      }));
+      res.json(result);
+    } catch (error) {
+      console.error("[Integrations] Error listing:", error);
+      res.status(500).json({ error: "Failed to list integrations" });
+    }
+  });
+
+  app.get('/api/shops/:shopId/integrations', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const connections = await db.select().from(businessIntegrations)
+        .where(eq(businessIntegrations.shopId, shopId));
+      res.json(connections.map(c => ({
+        id: c.id,
+        service: c.service,
+        status: c.status,
+        companyName: c.companyName,
+        connectedAt: c.connectedAt,
+        lastSyncAt: c.lastSyncAt,
+      })));
+    } catch (error) {
+      console.error("[Integrations] Error getting shop integrations:", error);
+      res.status(500).json({ error: "Failed to get integrations" });
+    }
+  });
+
+  app.post('/api/shops/:shopId/integrations/:service/connect', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, service } = req.params;
+      const { businessIntegrationService } = await import('./services/businessIntegrations');
+      const userId = req.user?.claims?.sub;
+
+      const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
+      if (!shop.length || shop[0].ownerId !== userId) {
+        return res.status(403).json({ error: "Only the shop owner can connect integrations" });
+      }
+
+      const config = businessIntegrationService.getIntegration(service);
+      if (!config) {
+        return res.status(404).json({ error: `Unknown integration: ${service}` });
+      }
+
+      if (!businessIntegrationService.isConfigured(service)) {
+        return res.status(400).json({
+          error: `${config.displayName} is not configured yet. OAuth credentials needed.`,
+          credentialsNeeded: [config.clientIdEnv, config.clientSecretEnv],
+        });
+      }
+
+      if (!config.authUrl) {
+        const existing = await db.select().from(businessIntegrations)
+          .where(and(
+            eq(businessIntegrations.shopId, shopId),
+            eq(businessIntegrations.service, service)
+          )).limit(1);
+
+        if (existing.length && existing[0].status === 'connected') {
+          return res.json({ alreadyConnected: true, integration: existing[0] });
+        }
+
+        const [connection] = await db.insert(businessIntegrations).values({
+          shopId,
+          service,
+          status: 'connected',
+          connectedAt: new Date(),
+        }).onConflictDoNothing().returning();
+
+        return res.json({ connected: true, integration: connection || existing[0] });
+      }
+
+      const authUrl = businessIntegrationService.generateAuthUrl(service, shopId);
+      res.json({ authUrl });
+    } catch (error: any) {
+      console.error(`[Integrations] Connect error:`, error);
+      res.status(500).json({ error: error.message || "Failed to initiate connection" });
+    }
+  });
+
+  app.get('/api/integrations/:service/callback', async (req, res) => {
+    try {
+      const { service } = req.params;
+      const { code, state, realmId } = req.query;
+      const { businessIntegrationService } = await import('./services/businessIntegrations');
+
+      if (!code || !state) {
+        return res.redirect(`/mechanics-garage?integration_error=missing_params&service=${service}`);
+      }
+
+      const stateParts = (state as string).split(':');
+      const shopId = stateParts[1];
+
+      const tokens = await businessIntegrationService.exchangeCodeForTokens(service, code as string);
+
+      const existing = await db.select().from(businessIntegrations)
+        .where(and(
+          eq(businessIntegrations.shopId, shopId),
+          eq(businessIntegrations.service, service)
+        )).limit(1);
+
+      const connectionData = {
+        shopId,
+        service,
+        status: 'connected' as const,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        tokenExpiresAt: new Date(Date.now() + (tokens.expiresIn * 1000)),
+        externalId: (realmId as string) || tokens.realmId || null,
+        connectedAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      if (existing.length) {
+        await db.update(businessIntegrations)
+          .set(connectionData)
+          .where(eq(businessIntegrations.id, existing[0].id));
+      } else {
+        await db.insert(businessIntegrations).values(connectionData);
+      }
+
+      console.log(`[Integrations] Successfully connected ${service} for shop: ${shopId}`);
+      res.redirect(`/mechanics-garage?integration_connected=${service}&shop=${shopId}`);
+    } catch (error) {
+      const { service } = req.params;
+      console.error(`[Integrations] Callback error for ${service}:`, error);
+      res.redirect(`/mechanics-garage?integration_error=auth_failed&service=${service}`);
+    }
+  });
+
+  app.post('/api/shops/:shopId/integrations/:service/disconnect', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, service } = req.params;
+      const userId = req.user?.claims?.sub;
+
+      const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
+      if (!shop.length || shop[0].ownerId !== userId) {
+        return res.status(403).json({ error: "Only the shop owner can disconnect integrations" });
+      }
+
+      await db.update(businessIntegrations)
+        .set({
+          status: 'disconnected',
+          accessToken: null,
+          refreshToken: null,
+          disconnectedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(and(
+          eq(businessIntegrations.shopId, shopId),
+          eq(businessIntegrations.service, service)
+        ));
+
+      res.json({ disconnected: true });
+    } catch (error) {
+      console.error("[Integrations] Disconnect error:", error);
+      res.status(500).json({ error: "Failed to disconnect integration" });
+    }
+  });
+
+  app.get('/api/shops/:shopId/integrations/:service/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, service } = req.params;
+      const { businessIntegrationService } = await import('./services/businessIntegrations');
+
+      const config = businessIntegrationService.getIntegration(service);
+      if (!config) {
+        return res.status(404).json({ error: `Unknown integration: ${service}` });
+      }
+
+      const connection = await db.select().from(businessIntegrations)
+        .where(and(
+          eq(businessIntegrations.shopId, shopId),
+          eq(businessIntegrations.service, service)
+        )).limit(1);
+
+      res.json({
+        service: config.name,
+        displayName: config.displayName,
+        configured: businessIntegrationService.isConfigured(service),
+        connected: connection.length > 0 && connection[0].status === 'connected',
+        companyName: connection[0]?.companyName || null,
+        connectedAt: connection[0]?.connectedAt || null,
+        lastSyncAt: connection[0]?.lastSyncAt || null,
+      });
+    } catch (error) {
+      console.error("[Integrations] Status error:", error);
+      res.status(500).json({ error: "Failed to get integration status" });
     }
   });
 
