@@ -1,5 +1,6 @@
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { AdSenseHorizontal } from "@/components/AdSense";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -702,6 +703,8 @@ export default function Dashboard() {
             </Card>
           </div>
         </div>
+
+        <AdSenseHorizontal className="my-6" />
 
         {/* Affiliate Tracking Section */}
         <div className="mt-8 mb-8">

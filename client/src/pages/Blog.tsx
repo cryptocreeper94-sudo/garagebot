@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { AdSenseHorizontal } from "@/components/AdSense";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -246,6 +247,9 @@ function BlogList() {
         </div>
       </div>
       
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <AdSenseHorizontal className="my-4" />
+      </div>
       <Footer />
     </div>
   );
@@ -402,6 +406,9 @@ function BlogPost() {
         </article>
       </div>
       
+      <div className="max-w-4xl mx-auto px-4 py-4">
+        <AdSenseHorizontal className="my-4" />
+      </div>
       <Footer />
     </div>
   );

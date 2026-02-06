@@ -84,33 +84,53 @@ export class WebhookHandlers {
     
     const isFounder = session.metadata?.isFounder === 'true';
     const subscriptionId = session.subscription;
+    const subscriptionType = session.metadata?.subscriptionType;
     
     if (session.mode === 'subscription' && subscriptionId) {
-      console.log('Checkout complete for subscription:', subscriptionId, 'userId:', userId, 'isFounder:', isFounder);
-      
-      // Calculate expiration (1 month or 1 year from now depending on billing period)
-      const billingPeriod = session.metadata?.billingPeriod || 'monthly';
-      const expiresAt = new Date();
-      if (billingPeriod === 'annual') {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-      } else {
+      if (subscriptionType === 'ad-free') {
+        console.log('Ad-free checkout complete:', subscriptionId, 'userId:', userId);
+        
+        const expiresAt = new Date();
         expiresAt.setMonth(expiresAt.getMonth() + 1);
+        
+        await storage.updateUser(userId, {
+          adFreeSubscription: true,
+          adFreeExpiresAt: expiresAt,
+          adFreeStripeSubscriptionId: subscriptionId,
+        });
+        
+        console.log('User updated to ad-free:', userId);
+        
+        const amount = session.amount_total ? session.amount_total / 100 : 5;
+        orbitClient.reportSubscriptionRevenue(userId, amount, 'ad-free').catch(err => {
+          console.error('[ORBIT] Failed to report ad-free subscription revenue:', err);
+        });
+      } else {
+        console.log('Checkout complete for subscription:', subscriptionId, 'userId:', userId, 'isFounder:', isFounder);
+        
+        const billingPeriod = session.metadata?.billingPeriod || 'monthly';
+        const expiresAt = new Date();
+        if (billingPeriod === 'annual') {
+          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+        } else {
+          expiresAt.setMonth(expiresAt.getMonth() + 1);
+        }
+        
+        await storage.updateUser(userId, {
+          subscriptionTier: 'pro',
+          stripeSubscriptionId: subscriptionId,
+          subscriptionExpiresAt: expiresAt,
+          isFounder: isFounder,
+        });
+        
+        console.log('User updated to Pro:', userId, 'Founder:', isFounder);
+        
+        const amount = session.amount_total ? session.amount_total / 100 : 
+          (billingPeriod === 'annual' ? 299 : 29.99);
+        orbitClient.reportSubscriptionRevenue(userId, amount, 'pro').catch(err => {
+          console.error('[ORBIT] Failed to report subscription revenue:', err);
+        });
       }
-      
-      await storage.updateUser(userId, {
-        subscriptionTier: 'pro',
-        stripeSubscriptionId: subscriptionId,
-        subscriptionExpiresAt: expiresAt,
-        isFounder: isFounder,
-      });
-      
-      console.log('User updated to Pro:', userId, 'Founder:', isFounder);
-      
-      const amount = session.amount_total ? session.amount_total / 100 : 
-        (billingPeriod === 'annual' ? 299 : 29.99);
-      orbitClient.reportSubscriptionRevenue(userId, amount, 'pro').catch(err => {
-        console.error('[ORBIT] Failed to report subscription revenue:', err);
-      });
     }
   }
   
@@ -120,18 +140,41 @@ export class WebhookHandlers {
     
     const isActive = subscription.status === 'active' || subscription.status === 'trialing';
     const isFounder = subscription.metadata?.isFounder === 'true';
+    const subscriptionType = subscription.metadata?.subscriptionType;
     
-    console.log('Subscription update:', subscription.id, 'status:', subscription.status, 'userId:', userId);
+    console.log('Subscription update:', subscription.id, 'type:', subscriptionType || 'pro', 'status:', subscription.status, 'userId:', userId);
     
     if (isActive) {
       const periodEnd = new Date(subscription.current_period_end * 1000);
       
-      await storage.updateUser(userId, {
-        subscriptionTier: 'pro',
-        stripeSubscriptionId: subscription.id,
-        subscriptionExpiresAt: periodEnd,
-        isFounder: isFounder,
-      });
+      if (subscriptionType === 'ad-free') {
+        await storage.updateUser(userId, {
+          adFreeSubscription: true,
+          adFreeExpiresAt: periodEnd,
+          adFreeStripeSubscriptionId: subscription.id,
+        });
+      } else {
+        await storage.updateUser(userId, {
+          subscriptionTier: 'pro',
+          stripeSubscriptionId: subscription.id,
+          subscriptionExpiresAt: periodEnd,
+          isFounder: isFounder,
+        });
+      }
+    } else {
+      const inactiveStatuses = ['past_due', 'unpaid', 'paused', 'incomplete', 'incomplete_expired'];
+      if (inactiveStatuses.includes(subscription.status)) {
+        console.log('Subscription inactive:', subscription.id, 'status:', subscription.status);
+        if (subscriptionType === 'ad-free') {
+          await storage.updateUser(userId, {
+            adFreeSubscription: false,
+          });
+        } else {
+          await storage.updateUser(userId, {
+            subscriptionTier: 'free',
+          });
+        }
+      }
     }
   }
   
@@ -139,15 +182,22 @@ export class WebhookHandlers {
     const userId = subscription.metadata?.userId;
     if (!userId) return;
     
-    console.log('Subscription canceled:', subscription.id, 'userId:', userId);
+    const subscriptionType = subscription.metadata?.subscriptionType;
+    console.log('Subscription canceled:', subscription.id, 'type:', subscriptionType || 'pro', 'userId:', userId);
     
-    // Keep founder status even if they cancel (grandfathered for future)
-    // But remove active subscription
-    await storage.updateUser(userId, {
-      subscriptionTier: 'free',
-      stripeSubscriptionId: null,
-      subscriptionExpiresAt: null,
-    });
+    if (subscriptionType === 'ad-free') {
+      await storage.updateUser(userId, {
+        adFreeSubscription: false,
+        adFreeStripeSubscriptionId: null,
+        adFreeExpiresAt: null,
+      });
+    } else {
+      await storage.updateUser(userId, {
+        subscriptionTier: 'free',
+        stripeSubscriptionId: null,
+        subscriptionExpiresAt: null,
+      });
+    }
   }
   
   static async handleConnectedAccountUpdate(account: any) {

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Star, ExternalLink, Filter, Check, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, TrendingDown, Award, Globe } from "lucide-react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { AdSenseHorizontal } from "@/components/AdSense";
 import VehicleFunFacts from "@/components/VehicleFunFacts";
 import { PriceAlertButton, PriceAlertsPanel } from "@/components/PriceAlerts";
 import ShareButton from "@/components/ShareButton";
@@ -685,6 +686,9 @@ export default function Results() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <AdSenseHorizontal className="my-4" />
       </div>
       <Footer />
     </div>
