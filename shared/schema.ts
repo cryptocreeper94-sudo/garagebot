@@ -233,6 +233,72 @@ export const shopMarketingContent = pgTable("shop_marketing_content", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// ORBIT Staffing Connections - track which shops have connected to ORBIT
+export const orbitConnections = pgTable("orbit_connections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  status: text("status").default("active"),
+  orbitTenantId: text("orbit_tenant_id"),
+  connectedAt: timestamp("connected_at").defaultNow(),
+  lastSyncAt: timestamp("last_sync_at"),
+  config: jsonb("config"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ORBIT Employees - local cache of workers synced to ORBIT
+export const orbitEmployees = pgTable("orbit_employees", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  orbitWorkerId: text("orbit_worker_id"),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  role: text("role").default("mechanic"),
+  employmentType: text("employment_type").default("w2"),
+  payRate: decimal("pay_rate", { precision: 10, scale: 2 }),
+  payType: text("pay_type").default("hourly"),
+  workState: text("work_state"),
+  startDate: timestamp("start_date"),
+  status: text("status").default("active"),
+  certifications: text("certifications").array(),
+  syncedAt: timestamp("synced_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ORBIT Timesheets - local record of submitted timesheets
+export const orbitTimesheets = pgTable("orbit_timesheets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").notNull().references(() => orbitEmployees.id, { onDelete: "cascade" }),
+  date: timestamp("date").notNull(),
+  hoursWorked: decimal("hours_worked", { precision: 5, scale: 2 }).notNull(),
+  overtimeHours: decimal("overtime_hours", { precision: 5, scale: 2 }).default("0"),
+  jobId: text("job_id"),
+  notes: text("notes"),
+  status: text("status").default("pending"),
+  syncedToOrbit: boolean("synced_to_orbit").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ORBIT Payroll Runs - track payroll history
+export const orbitPayrollRuns = pgTable("orbit_payroll_runs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  payPeriodStart: timestamp("pay_period_start").notNull(),
+  payPeriodEnd: timestamp("pay_period_end").notNull(),
+  status: text("status").default("pending"),
+  totalGross: decimal("total_gross", { precision: 12, scale: 2 }),
+  totalNet: decimal("total_net", { precision: 12, scale: 2 }),
+  totalTaxes: decimal("total_taxes", { precision: 12, scale: 2 }),
+  employeeCount: integer("employee_count"),
+  orbitPayrollId: text("orbit_payroll_id"),
+  processedAt: timestamp("processed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Shop reviews
 export const shopReviews = pgTable("shop_reviews", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

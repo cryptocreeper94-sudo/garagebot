@@ -648,6 +648,694 @@ function PartsOrderingTab() {
   );
 }
 
+function OrbitStaffingTab({ shopId, shopState, toast }: { shopId: string; shopState?: string; toast: any }) {
+  const queryClient = useQueryClient();
+  const [addEmployeeOpen, setAddEmployeeOpen] = useState(false);
+  const [addTimesheetOpen, setAddTimesheetOpen] = useState(false);
+  const [runPayrollOpen, setRunPayrollOpen] = useState(false);
+  const [orbitSubTab, setOrbitSubTab] = useState("overview");
+  const [empRole, setEmpRole] = useState("mechanic");
+  const [empType, setEmpType] = useState("w2");
+  const [empPayType, setEmpPayType] = useState("hourly");
+  const [tsEmployeeId, setTsEmployeeId] = useState("");
+
+  const { data: orbitStatus, isLoading: statusLoading } = useQuery({
+    queryKey: ["/api/shops", shopId, "orbit", "status"],
+    queryFn: async () => {
+      const res = await fetch(`/api/shops/${shopId}/orbit/status`, { credentials: 'include' });
+      return res.json();
+    },
+  });
+
+  const { data: employees = [] } = useQuery({
+    queryKey: ["/api/shops", shopId, "orbit", "employees"],
+    queryFn: async () => {
+      const res = await fetch(`/api/shops/${shopId}/orbit/employees`, { credentials: 'include' });
+      return res.json();
+    },
+    enabled: !!orbitStatus?.connected,
+  });
+
+  const { data: timesheets = [] } = useQuery({
+    queryKey: ["/api/shops", shopId, "orbit", "timesheets"],
+    queryFn: async () => {
+      const res = await fetch(`/api/shops/${shopId}/orbit/timesheets`, { credentials: 'include' });
+      return res.json();
+    },
+    enabled: !!orbitStatus?.connected,
+  });
+
+  const { data: payrollData } = useQuery({
+    queryKey: ["/api/shops", shopId, "orbit", "payroll"],
+    queryFn: async () => {
+      const res = await fetch(`/api/shops/${shopId}/orbit/payroll`, { credentials: 'include' });
+      return res.json();
+    },
+    enabled: !!orbitStatus?.connected,
+  });
+
+  const connectMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/shops/${shopId}/orbit/connect`, {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) throw new Error('Failed to connect');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/shops", shopId, "orbit"] });
+      toast({ title: "ORBIT Connected", description: "Your shop is now connected to ORBIT Staffing" });
+    },
+    onError: () => { toast({ title: "Connection Failed", description: "Could not connect to ORBIT. Please try again.", variant: "destructive" }); },
+  });
+
+  const addEmployeeMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await fetch(`/api/shops/${shopId}/orbit/employees`, {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Failed to add employee');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/shops", shopId, "orbit"] });
+      setAddEmployeeOpen(false);
+      setEmpRole("mechanic");
+      setEmpType("w2");
+      setEmpPayType("hourly");
+      toast({ title: "Employee Added", description: "Employee has been added and synced to ORBIT" });
+    },
+  });
+
+  const addTimesheetMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await fetch(`/api/shops/${shopId}/orbit/timesheets`, {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Failed to submit timesheet');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/shops", shopId, "orbit"] });
+      setAddTimesheetOpen(false);
+      setTsEmployeeId("");
+      toast({ title: "Timesheet Submitted", description: "Hours have been recorded and synced" });
+    },
+  });
+
+  const runPayrollMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await fetch(`/api/shops/${shopId}/orbit/payroll/run`, {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Failed to run payroll');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/shops", shopId, "orbit"] });
+      setRunPayrollOpen(false);
+      toast({ title: "Payroll Processed", description: "Payroll run has been completed successfully" });
+    },
+  });
+
+  if (statusLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!orbitStatus?.connected) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-8 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent border-orange-500/30 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="relative text-center max-w-2xl mx-auto">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+              <Cog className="w-10 h-10 text-orange-400" />
+            </div>
+            <h3 className="text-3xl font-tech font-bold uppercase mb-3" data-testid="text-orbit-title">ORBIT Staffing OS</h3>
+            <p className="text-muted-foreground mb-6 text-lg">
+              Complete payroll, employee management, tax compliance, and HR - all built into your shop dashboard. Never leave GarageBot.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              {[
+                { icon: Users, label: "Employee Management", desc: "Add & manage your team" },
+                { icon: DollarSign, label: "Payroll Processing", desc: "All 50 states supported" },
+                { icon: FileText, label: "Tax Compliance", desc: "W-2, 1099, Form 941" },
+                { icon: Timer, label: "Time Tracking", desc: "Timesheets & overtime" },
+              ].map((f, i) => (
+                <div key={i} className="p-4 rounded-xl bg-background/50 border border-orange-500/10">
+                  <f.icon className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+                  <p className="text-sm font-tech font-bold">{f.label}</p>
+                  <p className="text-xs text-muted-foreground">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8 text-left">
+              {[
+                "Federal & state tax calculations (all 50 states + DC)",
+                "FICA, garnishments, CCPA-compliant deductions",
+                "Direct deposit via Stripe Connect ACH",
+                "W-2 and 1099-NEC generation",
+                "Overtime rules with state-specific calculations",
+                "Form 941, W-3, 1096 year-end filing",
+              ].map((feature, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+            <Button
+              size="lg"
+              className="font-tech text-lg px-8 py-6 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-lg shadow-orange-500/25"
+              onClick={() => connectMutation.mutate()}
+              disabled={connectMutation.isPending}
+              data-testid="button-connect-orbit"
+            >
+              {connectMutation.isPending ? (
+                <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Connecting...</>
+              ) : (
+                <><Zap className="w-5 h-5 mr-2" /> Connect ORBIT Staffing - One Click Setup</>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground mt-3">Instant setup. No external accounts needed.</p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  const activeEmployees = employees.filter((e: any) => e.status === 'active');
+  const payrollRuns = payrollData?.localRuns || [];
+
+  return (
+    <div className="space-y-6">
+      <Card className="p-4 bg-gradient-to-r from-green-500/10 to-transparent border-green-500/30">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-green-500/20">
+              <CheckCircle className="w-6 h-6 text-green-400" />
+            </div>
+            <div>
+              <h4 className="font-tech font-bold uppercase" data-testid="text-orbit-connected">ORBIT Staffing Connected</h4>
+              <p className="text-xs text-muted-foreground">
+                Connected {orbitStatus.connection?.connectedAt ? new Date(orbitStatus.connection.connectedAt).toLocaleDateString() : 'recently'}
+                {' '} | {activeEmployees.length} employees | {payrollRuns.length} payroll runs
+              </p>
+            </div>
+          </div>
+          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Active</Badge>
+        </div>
+      </Card>
+
+      <Tabs value={orbitSubTab} onValueChange={setOrbitSubTab}>
+        <TabsList className="grid grid-cols-4 mb-4">
+          <TabsTrigger value="overview" className="font-tech text-xs" data-testid="tab-orbit-overview">
+            <BarChart3 className="w-3 h-3 mr-1" /> Overview
+          </TabsTrigger>
+          <TabsTrigger value="employees" className="font-tech text-xs" data-testid="tab-orbit-employees">
+            <Users className="w-3 h-3 mr-1" /> Employees
+          </TabsTrigger>
+          <TabsTrigger value="timesheets" className="font-tech text-xs" data-testid="tab-orbit-timesheets">
+            <Timer className="w-3 h-3 mr-1" /> Timesheets
+          </TabsTrigger>
+          <TabsTrigger value="payroll" className="font-tech text-xs" data-testid="tab-orbit-payroll">
+            <DollarSign className="w-3 h-3 mr-1" /> Payroll
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            {[
+              { label: "Active Employees", value: activeEmployees.length, icon: Users, color: "text-cyan-400", bg: "bg-cyan-500/10" },
+              { label: "Timesheets This Period", value: timesheets.length, icon: ClipboardList, color: "text-blue-400", bg: "bg-blue-500/10" },
+              { label: "Payroll Runs", value: payrollRuns.length, icon: DollarSign, color: "text-green-400", bg: "bg-green-500/10" },
+              { label: "Connection Status", value: "Active", icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+            ].map((stat, i) => (
+              <Card key={i} className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${stat.bg}`}>
+                    <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-tech font-bold" data-testid={`text-orbit-stat-${i}`}>{stat.value}</p>
+                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="p-5">
+              <h5 className="font-tech font-bold uppercase text-sm mb-3 flex items-center gap-2">
+                <Users className="w-4 h-4 text-cyan-400" /> Recent Employees
+              </h5>
+              {activeEmployees.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-4 text-center">No employees added yet. Add your first team member!</p>
+              ) : (
+                <div className="space-y-2">
+                  {activeEmployees.slice(0, 5).map((emp: any) => (
+                    <div key={emp.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30" data-testid={`card-orbit-employee-${emp.id}`}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold">
+                          {emp.firstName?.[0]}{emp.lastName?.[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{emp.firstName} {emp.lastName}</p>
+                          <p className="text-xs text-muted-foreground capitalize">{emp.role}</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs">{emp.employmentType?.toUpperCase()}</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+            <Card className="p-5">
+              <h5 className="font-tech font-bold uppercase text-sm mb-3 flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-green-400" /> Recent Payroll
+              </h5>
+              {payrollRuns.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-4 text-center">No payroll runs yet. Run your first payroll!</p>
+              ) : (
+                <div className="space-y-2">
+                  {payrollRuns.slice(0, 5).map((run: any) => (
+                    <div key={run.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30" data-testid={`card-orbit-payroll-${run.id}`}>
+                      <div>
+                        <p className="text-sm font-medium">
+                          {new Date(run.payPeriodStart).toLocaleDateString()} - {new Date(run.payPeriodEnd).toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{run.employeeCount} employees</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-green-400">${Number(run.totalNet || 0).toLocaleString()}</p>
+                        <Badge variant="outline" className={`text-xs ${run.status === 'completed' ? 'text-green-400 border-green-500/30' : 'text-yellow-400 border-yellow-500/30'}`}>
+                          {run.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="employees">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-tech font-bold uppercase">Team Members</h4>
+            <Dialog open={addEmployeeOpen} onOpenChange={setAddEmployeeOpen}>
+              <DialogTrigger asChild>
+                <Button className="font-tech" data-testid="button-add-employee">
+                  <UserPlus className="w-4 h-4 mr-2" /> Add Employee
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="font-tech uppercase">Add New Employee</DialogTitle>
+                  <DialogDescription>Add a team member - they'll be automatically synced to ORBIT for payroll.</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  addEmployeeMutation.mutate({
+                    firstName: fd.get('firstName'),
+                    lastName: fd.get('lastName'),
+                    email: fd.get('email'),
+                    phone: fd.get('phone'),
+                    role: empRole,
+                    employmentType: empType,
+                    payRate: fd.get('payRate') ? Number(fd.get('payRate')) : undefined,
+                    payType: empPayType,
+                    workState: fd.get('workState') || shopState,
+                  });
+                }} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="font-tech text-xs">First Name *</Label>
+                      <Input name="firstName" required placeholder="John" data-testid="input-emp-first-name" />
+                    </div>
+                    <div>
+                      <Label className="font-tech text-xs">Last Name *</Label>
+                      <Input name="lastName" required placeholder="Smith" data-testid="input-emp-last-name" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="font-tech text-xs">Email</Label>
+                      <Input name="email" type="email" placeholder="john@shop.com" data-testid="input-emp-email" />
+                    </div>
+                    <div>
+                      <Label className="font-tech text-xs">Phone</Label>
+                      <Input name="phone" placeholder="(555) 123-4567" data-testid="input-emp-phone" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="font-tech text-xs">Role</Label>
+                      <Select value={empRole} onValueChange={setEmpRole}>
+                        <SelectTrigger data-testid="select-emp-role"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="mechanic">Mechanic</SelectItem>
+                          <SelectItem value="lead_tech">Lead Technician</SelectItem>
+                          <SelectItem value="service_advisor">Service Advisor</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="apprentice">Apprentice</SelectItem>
+                          <SelectItem value="admin">Admin/Office</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="font-tech text-xs">Employment Type</Label>
+                      <Select value={empType} onValueChange={setEmpType}>
+                        <SelectTrigger data-testid="select-emp-type"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="w2">W-2 Employee</SelectItem>
+                          <SelectItem value="1099">1099 Contractor</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label className="font-tech text-xs">Pay Rate ($)</Label>
+                      <Input name="payRate" type="number" step="0.01" placeholder="25.00" data-testid="input-emp-pay-rate" />
+                    </div>
+                    <div>
+                      <Label className="font-tech text-xs">Pay Type</Label>
+                      <Select value={empPayType} onValueChange={setEmpPayType}>
+                        <SelectTrigger data-testid="select-emp-pay-type"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="hourly">Hourly</SelectItem>
+                          <SelectItem value="salary">Salary</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="font-tech text-xs">Work State</Label>
+                      <Input name="workState" placeholder={shopState || "CA"} defaultValue={shopState || ""} data-testid="input-emp-state" />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full font-tech" disabled={addEmployeeMutation.isPending} data-testid="button-submit-employee">
+                    {addEmployeeMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UserPlus className="w-4 h-4 mr-2" />}
+                    Add Employee & Sync to ORBIT
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {activeEmployees.length === 0 ? (
+            <Card className="p-12 text-center border-dashed">
+              <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+              <h5 className="font-tech uppercase text-lg mb-2">No Employees Yet</h5>
+              <p className="text-muted-foreground text-sm mb-4">Add your first team member to start managing payroll</p>
+              <Button onClick={() => setAddEmployeeOpen(true)} className="font-tech" data-testid="button-add-first-employee">
+                <UserPlus className="w-4 h-4 mr-2" /> Add First Employee
+              </Button>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {employees.map((emp: any) => (
+                <Card key={emp.id} className={`p-4 ${emp.status !== 'active' ? 'opacity-50' : ''}`} data-testid={`card-employee-${emp.id}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-cyan-500/20 flex items-center justify-center font-tech font-bold text-sm">
+                        {emp.firstName?.[0]}{emp.lastName?.[0]}
+                      </div>
+                      <div>
+                        <p className="font-medium">{emp.firstName} {emp.lastName}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="capitalize">{emp.role?.replace('_', ' ')}</span>
+                          <span>|</span>
+                          <span>{emp.employmentType?.toUpperCase()}</span>
+                          {emp.payRate && <><span>|</span><span>${Number(emp.payRate).toFixed(2)}/{emp.payType === 'salary' ? 'yr' : 'hr'}</span></>}
+                          {emp.workState && <><span>|</span><span>{emp.workState}</span></>}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {emp.syncedAt && (
+                        <Badge variant="outline" className="text-xs text-green-400 border-green-500/30">
+                          <CheckCircle className="w-3 h-3 mr-1" /> Synced
+                        </Badge>
+                      )}
+                      <Badge variant="outline" className={`text-xs ${emp.status === 'active' ? 'text-green-400 border-green-500/30' : 'text-red-400 border-red-500/30'}`}>
+                        {emp.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="timesheets">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-tech font-bold uppercase">Timesheets</h4>
+            <Dialog open={addTimesheetOpen} onOpenChange={setAddTimesheetOpen}>
+              <DialogTrigger asChild>
+                <Button className="font-tech" disabled={activeEmployees.length === 0} data-testid="button-add-timesheet">
+                  <Clock className="w-4 h-4 mr-2" /> Log Hours
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="font-tech uppercase">Log Work Hours</DialogTitle>
+                  <DialogDescription>Record employee hours - auto-synced to ORBIT for payroll processing.</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  addTimesheetMutation.mutate({
+                    employeeId: tsEmployeeId,
+                    date: fd.get('date'),
+                    hoursWorked: Number(fd.get('hoursWorked')),
+                    overtimeHours: fd.get('overtimeHours') ? Number(fd.get('overtimeHours')) : 0,
+                    jobId: fd.get('jobId') || undefined,
+                    notes: fd.get('notes') || undefined,
+                  });
+                }} className="space-y-4">
+                  <div>
+                    <Label className="font-tech text-xs">Employee *</Label>
+                    <Select value={tsEmployeeId} onValueChange={setTsEmployeeId}>
+                      <SelectTrigger data-testid="select-ts-employee"><SelectValue placeholder="Select employee" /></SelectTrigger>
+                      <SelectContent>
+                        {activeEmployees.map((emp: any) => (
+                          <SelectItem key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label className="font-tech text-xs">Date *</Label>
+                      <Input name="date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} data-testid="input-ts-date" />
+                    </div>
+                    <div>
+                      <Label className="font-tech text-xs">Hours Worked *</Label>
+                      <Input name="hoursWorked" type="number" step="0.25" required placeholder="8" data-testid="input-ts-hours" />
+                    </div>
+                    <div>
+                      <Label className="font-tech text-xs">OT Hours</Label>
+                      <Input name="overtimeHours" type="number" step="0.25" placeholder="0" data-testid="input-ts-overtime" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="font-tech text-xs">Job / Repair Order #</Label>
+                    <Input name="jobId" placeholder="RO-00001 (optional)" data-testid="input-ts-job" />
+                  </div>
+                  <div>
+                    <Label className="font-tech text-xs">Notes</Label>
+                    <Input name="notes" placeholder="Optional notes" data-testid="input-ts-notes" />
+                  </div>
+                  <Button type="submit" className="w-full font-tech" disabled={addTimesheetMutation.isPending} data-testid="button-submit-timesheet">
+                    {addTimesheetMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Clock className="w-4 h-4 mr-2" />}
+                    Submit Timesheet
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {timesheets.length === 0 ? (
+            <Card className="p-12 text-center border-dashed">
+              <Timer className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+              <h5 className="font-tech uppercase text-lg mb-2">No Timesheets Yet</h5>
+              <p className="text-muted-foreground text-sm">Start logging employee hours to track time and prepare for payroll</p>
+            </Card>
+          ) : (
+            <div className="space-y-2">
+              {timesheets.map((ts: any) => {
+                const emp = employees.find((e: any) => e.id === ts.employeeId);
+                return (
+                  <Card key={ts.id} className="p-3" data-testid={`card-timesheet-${ts.id}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-xs font-bold">
+                          {emp ? `${emp.firstName?.[0]}${emp.lastName?.[0]}` : '??'}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{emp ? `${emp.firstName} ${emp.lastName}` : 'Unknown'}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(ts.date).toLocaleDateString()} | {ts.hoursWorked}h
+                            {Number(ts.overtimeHours) > 0 && <span className="text-orange-400"> +{ts.overtimeHours}h OT</span>}
+                            {ts.jobId && <span> | {ts.jobId}</span>}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {ts.syncedToOrbit && (
+                          <Badge variant="outline" className="text-xs text-green-400 border-green-500/30">
+                            <CheckCircle className="w-3 h-3 mr-1" /> Synced
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs">{ts.status}</Badge>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="payroll">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-tech font-bold uppercase">Payroll</h4>
+            <Dialog open={runPayrollOpen} onOpenChange={setRunPayrollOpen}>
+              <DialogTrigger asChild>
+                <Button className="font-tech bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600" disabled={activeEmployees.length === 0} data-testid="button-run-payroll">
+                  <DollarSign className="w-4 h-4 mr-2" /> Run Payroll
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="font-tech uppercase">Run Payroll</DialogTitle>
+                  <DialogDescription>Process payroll for your team. ORBIT handles all tax calculations, deductions, and compliance.</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  runPayrollMutation.mutate({
+                    payPeriodStart: fd.get('payPeriodStart'),
+                    payPeriodEnd: fd.get('payPeriodEnd'),
+                  });
+                }} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="font-tech text-xs">Period Start *</Label>
+                      <Input name="payPeriodStart" type="date" required data-testid="input-payroll-start" />
+                    </div>
+                    <div>
+                      <Label className="font-tech text-xs">Period End *</Label>
+                      <Input name="payPeriodEnd" type="date" required data-testid="input-payroll-end" />
+                    </div>
+                  </div>
+                  <Card className="p-4 bg-muted/30">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Active Employees</span>
+                      <span className="font-bold">{activeEmployees.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-1">
+                      <span className="text-muted-foreground">Tax Processing</span>
+                      <span className="text-green-400 font-medium">Automatic (all 50 states)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-1">
+                      <span className="text-muted-foreground">Compliance</span>
+                      <span className="text-green-400 font-medium">FICA + State + Local</span>
+                    </div>
+                  </Card>
+                  <Button type="submit" className="w-full font-tech bg-gradient-to-r from-green-500 to-emerald-500" disabled={runPayrollMutation.isPending} data-testid="button-submit-payroll">
+                    {runPayrollMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <DollarSign className="w-4 h-4 mr-2" />}
+                    Process Payroll
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {payrollRuns.length === 0 ? (
+            <Card className="p-12 text-center border-dashed">
+              <DollarSign className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+              <h5 className="font-tech uppercase text-lg mb-2">No Payroll History</h5>
+              <p className="text-muted-foreground text-sm">Add employees and log hours, then run your first payroll</p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {payrollRuns.map((run: any) => (
+                <Card key={run.id} className="p-4" data-testid={`card-payroll-run-${run.id}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-tech font-bold">
+                        {new Date(run.payPeriodStart).toLocaleDateString()} - {new Date(run.payPeriodEnd).toLocaleDateString()}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{run.employeeCount} employees | Processed {run.processedAt ? new Date(run.processedAt).toLocaleDateString() : 'pending'}</p>
+                    </div>
+                    <div className="text-right space-y-1">
+                      <div className="flex items-center gap-4 text-sm">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Gross</p>
+                          <p className="font-bold">${Number(run.totalGross || 0).toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Taxes</p>
+                          <p className="font-bold text-red-400">${Number(run.totalTaxes || 0).toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Net</p>
+                          <p className="font-bold text-green-400">${Number(run.totalNet || 0).toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <Badge className={`text-xs ${run.status === 'completed' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                        {run.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          <Card className="p-5 mt-6 bg-gradient-to-r from-blue-500/5 to-transparent border-blue-500/20">
+            <h5 className="font-tech font-bold uppercase text-sm mb-3 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-blue-400" /> Tax & Compliance
+            </h5>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {[
+                { label: "W-2 Forms", desc: "Year-end employee tax forms", icon: FileText },
+                { label: "1099-NEC", desc: "Contractor payment reporting", icon: FileText },
+                { label: "Form 941", desc: "Quarterly federal tax return", icon: FileText },
+                { label: "W-3 Summary", desc: "Transmittal of W-2 forms", icon: FileText },
+                { label: "State Filings", desc: "State-specific tax compliance", icon: Shield },
+                { label: "FICA Reports", desc: "Social Security & Medicare", icon: FileText },
+              ].map((doc, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                  <doc.icon className="w-5 h-5 text-blue-400 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium">{doc.label}</p>
+                    <p className="text-xs text-muted-foreground">{doc.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-3">
+              All tax forms are generated automatically by ORBIT at year-end. You'll be notified when they're ready.
+            </p>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
 function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
   const queryClient = useQueryClient();
   const [createKeyOpen, setCreateKeyOpen] = useState(false);
@@ -1851,6 +2539,11 @@ export default function MechanicsGarage() {
                           <Users className="w-4 h-4" />
                           Team
                         </TabsTrigger>
+                        <TabsTrigger value="orbit-staffing" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto relative" data-testid="tab-orbit-staffing">
+                          <Cog className="w-4 h-4" />
+                          ORBIT
+                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                        </TabsTrigger>
                         <TabsTrigger value="integrations" className="font-tech uppercase text-[10px] py-2 gap-1 flex-col h-auto relative" data-testid="tab-integrations">
                           <Link2 className="w-4 h-4" />
                           Integrations
@@ -2993,6 +3686,11 @@ export default function MechanicsGarage() {
                             </div>
                           </Card>
                         </div>
+                      </TabsContent>
+
+                      {/* ORBIT Staffing Tab */}
+                      <TabsContent value="orbit-staffing">
+                        <OrbitStaffingTab shopId={selectedShop.id} shopState={selectedShop.state} toast={toast} />
                       </TabsContent>
 
                       {/* Partner API Tab */}
