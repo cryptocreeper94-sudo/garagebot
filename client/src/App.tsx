@@ -8,7 +8,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { useAuth } from "@/hooks/useAuth";
 import WelcomeGate from "@/components/WelcomeGate";
 import AIMascot from "@/components/AIMascot";
-import FloatingHelp from "@/components/FloatingHelp";
+
 import RatingPrompt from "@/components/RatingPrompt";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
@@ -139,7 +139,7 @@ function App() {
           <Router />
           <AIMascot mascotName="Buddy" />
           <RatingPrompt />
-          <FloatingHelp />
+
           <CookieConsent />
           <AuthAwareExtras />
         </TooltipProvider>
