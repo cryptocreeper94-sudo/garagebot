@@ -279,7 +279,7 @@ export default function TriviaQuiz() {
                   />
                 </div>
 
-                <Card className="bento-glass border-primary/20 p-6 mb-6" data-testid="card-question">
+                <Card className="glass-ultra border-primary/20 p-6 mb-6" data-testid="card-question">
                   <p className="text-lg font-medium text-foreground leading-relaxed" data-testid="text-question">
                     {currentQ.question}
                   </p>
@@ -288,7 +288,7 @@ export default function TriviaQuiz() {
                 <div className="grid gap-3">
                   {currentQ.answers.map((answer, idx) => {
                     let borderClass = "border-zinc-700/50 hover:border-primary/50";
-                    let bgClass = "bg-zinc-900/50 hover:bg-primary/5";
+                    let bgClass = "glass-card hover:bg-primary/5";
 
                     if (answered) {
                       if (idx === currentQ.correct) {
@@ -299,7 +299,7 @@ export default function TriviaQuiz() {
                         bgClass = "bg-red-500/10";
                       } else {
                         borderClass = "border-zinc-800/30";
-                        bgClass = "bg-zinc-900/30 opacity-50";
+                        bgClass = "glass-card opacity-50";
                       }
                     }
 

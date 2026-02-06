@@ -100,7 +100,7 @@ function VendorCard({ result, index, displayQuery }: { result: EnhancedVendorRes
       className="flex-shrink-0 w-[280px]"
     >
       <Card 
-        className="bg-card border-border hover:border-primary/50 transition-all group overflow-hidden cursor-pointer h-full"
+        className="glass-card card-3d border-border hover:border-primary/50 transition-all group overflow-hidden cursor-pointer h-full"
         onClick={() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer')}
         data-testid={`card-vendor-${result.vendor.slug}`}
       >
@@ -344,7 +344,7 @@ export default function Results() {
             </div>
 
             <Accordion type="multiple" defaultValue={["filters", "location"]} className="space-y-2">
-              <AccordionItem value="location" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+              <AccordionItem value="location" className="border border-white/10 rounded-lg overflow-hidden glass-ultra">
                 <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-green-400" />
@@ -380,7 +380,7 @@ export default function Results() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="filters" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+              <AccordionItem value="filters" className="border border-white/10 rounded-lg overflow-hidden glass-ultra">
                 <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
                   <div className="flex items-center gap-2">
                     <Filter className="w-4 h-4 text-primary" />
@@ -432,7 +432,7 @@ export default function Results() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="retailers" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+              <AccordionItem value="retailers" className="border border-white/10 rounded-lg overflow-hidden glass-ultra">
                 <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
                   <div className="flex items-center gap-2">
                     <Store className="w-4 h-4 text-amber-400" />
@@ -460,7 +460,7 @@ export default function Results() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="alerts" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+              <AccordionItem value="alerts" className="border border-white/10 rounded-lg overflow-hidden glass-ultra">
                 <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
                   <div className="flex items-center gap-2">
                     <Bell className="w-4 h-4 text-yellow-400" />
@@ -473,7 +473,7 @@ export default function Results() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="howit" className="border border-white/10 rounded-lg overflow-hidden bg-card/30">
+              <AccordionItem value="howit" className="border border-white/10 rounded-lg overflow-hidden glass-ultra">
                 <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-white/5 text-sm">
                   <div className="flex items-center gap-2">
                     <Info className="w-4 h-4 text-blue-400" />
@@ -555,7 +555,7 @@ export default function Results() {
                 </div>
                 <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" : "space-y-3"}>
                   {[1,2,3,4,5,6].map(i => (
-                    <div key={i} className="h-32 bg-card/30 rounded border border-white/5 animate-pulse" />
+                    <div key={i} className="h-32 glass-card rounded border border-white/5 animate-pulse" />
                   ))}
                 </div>
               </div>
@@ -616,7 +616,7 @@ export default function Results() {
                       transition={{ delay: index * 0.02 }}
                     >
                       <Card 
-                        className="bg-card border-border hover:border-primary/50 transition-all group cursor-pointer"
+                        className="glass-card card-3d border-border hover:border-primary/50 transition-all group cursor-pointer"
                         onClick={() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer')}
                         data-testid={`list-vendor-${result.vendor.slug}`}
                       >

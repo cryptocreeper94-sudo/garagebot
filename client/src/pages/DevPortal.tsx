@@ -249,12 +249,12 @@ const OUTREACH_LETTERS = {
     subject: "GarageBot.io Partnership Inquiry - Auto Parts Search Platform",
     body: `Dear RockAuto Team,
 
-I'm Jason, the founder of GarageBot.io, a comprehensive auto parts search aggregator that helps vehicle owners find the right parts across 40+ retailers.
+I'm Jason, the founder of GarageBot.io, a comprehensive auto parts search aggregator that helps vehicle owners find the right parts across 50+ retailers.
 
 I understand RockAuto works with automotive communities through discount code partnerships rather than traditional affiliate programs. I'd love to explore a similar arrangement.
 
 **About GarageBot:**
-• Unified search across 40+ auto parts retailers
+• Unified search across 50+ auto parts retailers
 • Covers all vehicle types: cars, trucks, boats, ATVs, motorcycles, RVs, and more
 • AI-powered part recommendations and DIY repair guides
 • Growing community of DIY enthusiasts and professional mechanics
@@ -281,7 +281,7 @@ https://garagebot.io`
 I'm reaching out regarding potential partnership opportunities between O'Reilly Auto Parts and GarageBot.io.
 
 **About GarageBot:**
-GarageBot.io is a comprehensive auto parts search aggregator that unifies inventory from 40+ retailers into a single searchable interface. We serve DIY enthusiasts, professional mechanics, and fleet managers.
+GarageBot.io is a comprehensive auto parts search aggregator that unifies inventory from 50+ retailers into a single searchable interface. We serve DIY enthusiasts, professional mechanics, and fleet managers.
 
 **Key Features:**
 • VIN-based vehicle identification and part matching
@@ -315,7 +315,7 @@ I'm Jason, founder of GarageBot.io, and I'm reaching out about a potential refer
 Your specialization in Chinese-built ATV, UTV, scooter, go-kart, and dirt bike parts fills an important niche that major retailers don't serve well. Our users often struggle to find parts for these vehicles.
 
 **About GarageBot:**
-• Auto parts search aggregator covering 40+ retailers
+• Auto parts search aggregator covering 50+ retailers
 • Strong focus on ALL vehicle types including ATVs, UTVs, scooters, and motorcycles
 • AI-powered part identification and recommendations
 • Growing user base of powersports enthusiasts
@@ -345,7 +345,7 @@ I'm Jason, founder of GarageBot.io, a comprehensive auto parts search aggregator
 Your marketplace represents the gold standard for recycled/used auto parts - a category our users frequently request but we currently can't serve well. With $80 billion in annual part searches, your data would add tremendous value to our platform.
 
 **About GarageBot:**
-• Unified search across 40+ auto parts retailers (new parts focus currently)
+• Unified search across 50+ auto parts retailers (new parts focus currently)
 • VIN decoding and vehicle-specific part matching
 • AI-powered recommendations and DIY repair guides
 • "Mechanics Garage" portal for professional shops
@@ -917,7 +917,7 @@ export default function DevPortal() {
             animate={{ opacity: 1, scale: 1 }}
             className="w-full max-w-sm"
           >
-            <Card className="bg-card border-primary/30 p-8">
+            <Card className="glass-ultra border-primary/30 p-8">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
                   <Lock className="w-8 h-8 text-primary" />
@@ -965,7 +965,7 @@ export default function DevPortal() {
             animate={{ opacity: 1, y: 0 }}
             className="md:col-span-8"
           >
-            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+            <Card className="glass-card border-primary/20 p-4 h-full">
               <h1 className="font-tech text-2xl uppercase text-primary mb-1">Dev Portal</h1>
               <p className="text-sm text-muted-foreground">Your daily checklist for building GarageBot</p>
             </Card>
@@ -978,7 +978,7 @@ export default function DevPortal() {
             transition={{ delay: 0.1 }}
             className="md:col-span-4"
           >
-            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center gap-4">
+            <Card className="glass-card border-primary/20 p-4 h-full flex items-center justify-center gap-4">
               <div className="w-16 h-16 relative">
                 <svg className="w-full h-full -rotate-90">
                   <circle cx="32" cy="32" r="26" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
@@ -1052,7 +1052,7 @@ export default function DevPortal() {
               </Card>
               
               {/* Actions - 4 cols */}
-              <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4 flex flex-col justify-center gap-2">
+              <Card className="md:col-span-4 glass-card border-primary/20 p-4 flex flex-col justify-center gap-2">
                 <Button 
                   onClick={() => setShowNewRelease(true)} 
                   className="font-tech uppercase text-xs w-full"
@@ -1076,7 +1076,7 @@ export default function DevPortal() {
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                 >
-                  <Card className="bg-card border-primary/30 p-6">
+                  <Card className="glass-ultra border-primary/30 p-6">
                     <h3 className="font-tech text-lg text-primary mb-4">Create New Release</h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -1199,7 +1199,7 @@ export default function DevPortal() {
               <h3 className="font-tech text-sm text-primary mb-3">Release History</h3>
               
               {releases.length === 0 && (
-                <Card className="bg-card/50 border-border p-6 text-center">
+                <Card className="glass-card border-border p-6 text-center">
                   <Archive className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground">No releases yet. Create your first release above!</p>
                 </Card>
@@ -1209,7 +1209,7 @@ export default function DevPortal() {
               {releases.map((release) => (
                 <Card 
                   key={release.id} 
-                  className={`bg-card border-border p-3 ${
+                  className={`glass-card border-border p-3 ${
                     release.status === 'published' ? 'border-l-4 border-l-green-500' : 'border-l-4 border-l-yellow-500'
                   }`}
                 >
@@ -1328,7 +1328,7 @@ export default function DevPortal() {
               </Card>
               
               {/* Stats - 4 cols */}
-              <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4 flex flex-col justify-center gap-2">
+              <Card className="md:col-span-4 glass-card border-primary/20 p-4 flex flex-col justify-center gap-2">
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div>
                     <p className="text-lg font-bold text-primary">{blockchainAssets.filter(a => a.entityType === 'hallmark').length}</p>
@@ -1347,7 +1347,7 @@ export default function DevPortal() {
             </div>
 
             {/* Assets List */}
-            <Card className="bg-card/50 border-primary/20 p-4">
+            <Card className="glass-card border-primary/20 p-4">
               <h3 className="font-tech text-sm text-primary mb-4 flex items-center gap-2">
                 <Blocks className="w-4 h-4" />
                 All Blockchain-Verified Assets ({blockchainAssets.length})
@@ -1470,7 +1470,7 @@ export default function DevPortal() {
                   ))}
                 </div>
               </Card>
-              <Card className="md:col-span-4 bg-card/50 border-primary/20 p-4">
+              <Card className="md:col-span-4 glass-card border-primary/20 p-4">
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div>
                     <p className="font-tech text-xl text-green-400">{AFFILIATE_NETWORKS.filter(n => n.status === 'connected').length}</p>
@@ -1550,7 +1550,7 @@ export default function DevPortal() {
                   <AccordionItem 
                     key={network.id} 
                     value={network.id}
-                    className="border border-primary/20 rounded-lg overflow-hidden bg-card/30"
+                    className="border border-primary/20 rounded-lg overflow-hidden glass-card"
                   >
                     <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5">
                       <div className="flex items-center gap-3 w-full">
@@ -1658,7 +1658,7 @@ export default function DevPortal() {
                   <AccordionItem 
                     key={retailer.name} 
                     value={`retailer-${index}`}
-                    className="border border-primary/20 rounded-lg overflow-hidden bg-card/30"
+                    className="border border-primary/20 rounded-lg overflow-hidden glass-card"
                   >
                     <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5">
                       <div className="flex items-center gap-3 w-full">
@@ -1844,22 +1844,22 @@ export default function DevPortal() {
 
             {/* Bottom: Recommended Order as 2x2 grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <Card className="bg-card/50 border-green-500/30 p-3 text-center">
+              <Card className="glass-card border-green-500/30 p-3 text-center">
                 <span className="w-8 h-8 rounded-full bg-green-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">1</span>
                 <p className="text-xs font-medium">Amazon + eBay</p>
                 <p className="text-[10px] text-muted-foreground">Easiest approval</p>
               </Card>
-              <Card className="bg-card/50 border-yellow-500/30 p-3 text-center">
+              <Card className="glass-card border-yellow-500/30 p-3 text-center">
                 <span className="w-8 h-8 rounded-full bg-yellow-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">2</span>
                 <p className="text-xs font-medium">CJ + ShareASale</p>
                 <p className="text-[10px] text-muted-foreground">Major retailers</p>
               </Card>
-              <Card className="bg-card/50 border-primary/30 p-3 text-center">
+              <Card className="glass-card border-primary/30 p-3 text-center">
                 <span className="w-8 h-8 rounded-full bg-primary text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">3</span>
                 <p className="text-xs font-medium">AvantLink + Impact</p>
                 <p className="text-[10px] text-muted-foreground">Powersports</p>
               </Card>
-              <Card className="bg-card/50 border-purple-500/30 p-3 text-center">
+              <Card className="glass-card border-purple-500/30 p-3 text-center">
                 <span className="w-8 h-8 rounded-full bg-purple-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">4</span>
                 <p className="text-xs font-medium">Direct Outreach</p>
                 <p className="text-[10px] text-muted-foreground">Custom deals</p>
@@ -1927,7 +1927,7 @@ export default function DevPortal() {
               </div>
             </Card>
             
-            <Card className="bg-card/50 border-border p-4">
+            <Card className="glass-card border-border p-4">
               <h4 className="font-tech text-sm text-primary mb-2">Quick Commands</h4>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -1954,7 +1954,7 @@ export default function DevPortal() {
 
           <TabsContent value="tasks">
             {tasks.length === 0 && !isLoading && (
-              <Card className="bg-card border-primary/30 p-8 text-center mb-8">
+              <Card className="glass-ultra border-primary/30 p-8 text-center mb-8">
                 <AlertTriangle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
                 <h3 className="font-tech text-xl mb-2">No Tasks Found</h3>
                 <p className="text-muted-foreground mb-4">Initialize your checklist with default tasks to get started</p>
@@ -1983,7 +1983,7 @@ export default function DevPortal() {
                   exit={{ opacity: 0, height: 0 }}
                   className="mb-4"
                 >
-                  <Card className="bg-card border-primary/30 p-4">
+                  <Card className="glass-card border-primary/30 p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                       <Select value={newTask.category} onValueChange={(v) => setNewTask(prev => ({ ...prev, category: v }))}>
                         <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
@@ -2030,7 +2030,7 @@ export default function DevPortal() {
                 const IconComponent = category.icon;
 
                 return (
-                  <Card key={category.id} className="bg-card border-border overflow-hidden h-fit">
+                  <Card key={category.id} className="glass-card border-border overflow-hidden h-fit">
                     <button
                       onClick={() => toggleCategory(category.id)}
                       className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition-colors"

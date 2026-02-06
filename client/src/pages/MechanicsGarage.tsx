@@ -420,7 +420,7 @@ function PartsOrderingTab() {
         </div>
       </Card>
 
-      <Card className="p-6 bg-card/50">
+      <Card className="p-6 glass-card">
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -778,11 +778,11 @@ function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
       {/* Stats */}
       {logsData?.stats && (
         <div className="grid grid-cols-4 gap-4">
-          <Card className="p-4 bg-card/50">
+          <Card className="p-4 glass-card">
             <div className="text-sm text-muted-foreground mb-1">Total Requests (30d)</div>
             <div className="text-2xl font-tech font-bold">{logsData.stats.totalRequests.toLocaleString()}</div>
           </Card>
-          <Card className="p-4 bg-card/50">
+          <Card className="p-4 glass-card">
             <div className="text-sm text-muted-foreground mb-1">Success Rate</div>
             <div className="text-2xl font-tech font-bold text-green-500">
               {logsData.stats.totalRequests > 0 
@@ -790,11 +790,11 @@ function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
                 : 100}%
             </div>
           </Card>
-          <Card className="p-4 bg-card/50">
+          <Card className="p-4 glass-card">
             <div className="text-sm text-muted-foreground mb-1">Errors (30d)</div>
             <div className="text-2xl font-tech font-bold text-red-500">{logsData.stats.errorRequests}</div>
           </Card>
-          <Card className="p-4 bg-card/50">
+          <Card className="p-4 glass-card">
             <div className="text-sm text-muted-foreground mb-1">Avg Response</div>
             <div className="text-2xl font-tech font-bold">{logsData.stats.avgResponseTime}ms</div>
           </Card>
@@ -838,7 +838,7 @@ function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
       )}
 
       {/* API Keys */}
-      <Card className="p-6 bg-card/50">
+      <Card className="p-6 glass-card">
         <div className="flex items-center justify-between mb-6">
           <h4 className="font-tech font-bold text-lg uppercase">API Keys</h4>
           <Dialog open={createKeyOpen} onOpenChange={setCreateKeyOpen}>
@@ -886,7 +886,7 @@ function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
                         className={`p-3 rounded border cursor-pointer transition-colors ${
                           newKeyForm.scopes.includes(scope.id)
                             ? 'bg-primary/10 border-primary/50'
-                            : 'bg-card/50 border-border hover:border-primary/30'
+                            : 'glass-card border-border hover:border-primary/30'
                         }`}
                         onClick={() => toggleScope(scope.id)}
                         data-testid={`scope-${scope.id}`}
@@ -940,7 +940,7 @@ function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
         ) : (
           <div className="space-y-3">
             {credentials?.map(cred => (
-              <Card key={cred.id} className={`p-4 ${cred.isActive ? 'bg-card/50' : 'bg-card/20 opacity-60'}`} data-testid={`api-credential-${cred.id}`}>
+              <Card key={cred.id} className={`p-4 ${cred.isActive ? 'glass-card' : 'glass-card opacity-60'}`} data-testid={`api-credential-${cred.id}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${cred.isActive ? 'bg-green-500/10' : 'bg-gray-500/10'}`}>
@@ -1004,19 +1004,19 @@ function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
               Access your shop data programmatically. Base URL: <code className="bg-black/30 px-2 py-1 rounded text-primary">/api/partner/v1</code>
             </p>
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded bg-card/50 border">
+              <div className="p-3 rounded glass-card border">
                 <div className="font-mono text-xs text-muted-foreground">GET</div>
                 <div className="font-mono text-sm">/shop</div>
               </div>
-              <div className="p-3 rounded bg-card/50 border">
+              <div className="p-3 rounded glass-card border">
                 <div className="font-mono text-xs text-muted-foreground">GET</div>
                 <div className="font-mono text-sm">/orders</div>
               </div>
-              <div className="p-3 rounded bg-card/50 border">
+              <div className="p-3 rounded glass-card border">
                 <div className="font-mono text-xs text-muted-foreground">GET</div>
                 <div className="font-mono text-sm">/appointments</div>
               </div>
-              <div className="p-3 rounded bg-card/50 border">
+              <div className="p-3 rounded glass-card border">
                 <div className="font-mono text-xs text-muted-foreground">GET</div>
                 <div className="font-mono text-sm">/analytics</div>
               </div>
@@ -1424,7 +1424,7 @@ export default function MechanicsGarage() {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6">
           <div className="md:col-span-8">
-            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+            <Card className="glass-card border-primary/20 p-4 h-full">
               <h1 className="text-2xl font-tech font-bold uppercase text-primary flex items-center gap-2" data-testid="text-page-title">
                 <Wrench className="w-5 h-5" />
                 Mechanics Garage
@@ -1435,7 +1435,7 @@ export default function MechanicsGarage() {
             </Card>
           </div>
           <div className="md:col-span-4">
-            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center">
+            <Card className="glass-card border-primary/20 p-4 h-full flex items-center justify-center">
               <Dialog open={createShopOpen} onOpenChange={setCreateShopOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2 font-tech uppercase text-xs" data-testid="button-register-shop">
@@ -1476,7 +1476,7 @@ export default function MechanicsGarage() {
                           className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-all ${
                             selectedVehicleTypes.includes(vt.id) 
                               ? 'bg-primary/20 border-primary' 
-                              : 'bg-muted/30 border-muted hover:border-primary/50'
+                              : 'glass-card border-muted hover:border-primary/50'
                           }`}
                           onClick={() => {
                             if (selectedVehicleTypes.includes(vt.id)) {
@@ -1572,13 +1572,13 @@ export default function MechanicsGarage() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : myShops.length === 0 ? (
-          <Card className="bg-card/50 border-dashed border-2 border-muted p-12 text-center">
+          <Card className="glass-card border-dashed border-2 border-muted p-12 text-center">
             <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
             <h3 className="text-xl font-tech uppercase text-muted-foreground mb-2">No Shops Registered</h3>
             <p className="text-sm text-muted-foreground mb-4">Register your shop to start managing repairs, estimates, and appointments</p>
             <div className="flex flex-wrap justify-center gap-2 mb-6">
               {VEHICLE_TYPES.map(vt => (
-                <Badge key={vt.id} variant="outline" className="gap-1 text-xs bg-muted/30">
+                <Badge key={vt.id} variant="outline" className="gap-1 text-xs bg-white/5">
                   <vt.icon className="w-3 h-3" />
                   {vt.name}
                 </Badge>
@@ -1602,7 +1602,7 @@ export default function MechanicsGarage() {
                     transition={{ delay: index * 0.1 }}
                   >
                     <Card 
-                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${selectedShop?.id === shop.id ? 'border-primary bg-primary/5' : 'bg-card'}`}
+                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${selectedShop?.id === shop.id ? 'border-primary bg-primary/5' : 'glass-card'}`}
                       onClick={() => { setSelectedShop(shop); setDemoMode(false); }}
                       data-testid={`card-shop-${shop.id}`}
                     >
@@ -1634,7 +1634,7 @@ export default function MechanicsGarage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <Card className="bg-card border-primary/30 overflow-hidden">
+                  <Card className="glass-ultra border-primary/30 overflow-hidden">
                     {/* Shop Header */}
                     <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b border-primary/20">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -1964,7 +1964,7 @@ export default function MechanicsGarage() {
                               <Loader2 className="w-6 h-6 animate-spin text-primary" />
                             </div>
                           ) : (demoMode ? DEMO_ORDERS : repairOrders).length === 0 ? (
-                            <Card className="p-8 text-center bg-muted/30 border-dashed">
+                            <Card className="p-8 text-center glass-card border-dashed">
                               <ClipboardList className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
                               <p className="text-muted-foreground font-mono text-sm">No repair orders yet</p>
                               <Button className="mt-4 font-tech text-xs" onClick={() => setCreateOrderOpen(true)}>
@@ -1975,7 +1975,7 @@ export default function MechanicsGarage() {
                             <ScrollArea className="h-[300px]">
                               <div className="space-y-2">
                                 {(demoMode ? DEMO_ORDERS : repairOrders).slice(0, 10).map(order => (
-                                  <Card key={order.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer">
+                                  <Card key={order.id} className="p-4 glass-card transition-colors cursor-pointer">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-3">
                                         <div className="p-2 rounded-lg bg-primary/10">
@@ -2024,7 +2024,7 @@ export default function MechanicsGarage() {
                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
                           </div>
                         ) : (demoMode ? DEMO_ORDERS : repairOrders).length === 0 ? (
-                          <Card className="p-12 text-center bg-muted/30 border-dashed">
+                          <Card className="p-12 text-center glass-card border-dashed">
                             <ClipboardList className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                             <h3 className="font-tech uppercase text-lg mb-2">No Repair Orders</h3>
                             <p className="text-muted-foreground text-sm mb-4">Create your first repair order to get started</p>
@@ -2035,7 +2035,7 @@ export default function MechanicsGarage() {
                         ) : (
                           <div className="space-y-3">
                             {(demoMode ? DEMO_ORDERS : repairOrders).map(order => (
-                              <Card key={order.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors">
+                              <Card key={order.id} className="p-4 glass-card transition-colors">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-lg bg-primary/10">
@@ -2143,7 +2143,7 @@ export default function MechanicsGarage() {
                                 { id: 2, vehicle: "2018 Honda Civic", customer: "Sarah Johnson", items: 18, status: "approved", urgent: 1, date: "Today 8:30 AM" },
                                 { id: 3, vehicle: "2022 Ford F-150", customer: "Mike Wilson", items: 31, status: "in_progress", urgent: 5, date: "Today 7:45 AM" },
                               ].map((inspection) => (
-                                <Card key={inspection.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors">
+                                <Card key={inspection.id} className="p-4 glass-card transition-colors">
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
                                       <div className="p-3 rounded-lg bg-primary/10">
@@ -2199,7 +2199,7 @@ export default function MechanicsGarage() {
                               </Card>
                             </div>
                           ) : (
-                            <Card className="p-12 text-center bg-muted/30 border-dashed">
+                            <Card className="p-12 text-center glass-card border-dashed">
                               <Camera className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                               <h3 className="font-tech uppercase text-lg mb-2">Digital Vehicle Inspections</h3>
                               <p className="text-muted-foreground text-sm mb-4">Document vehicle condition with photos & videos. Send inspection reports directly to customers for transparent approval.</p>
@@ -2225,7 +2225,7 @@ export default function MechanicsGarage() {
                           </Button>
                         </div>
                         {(demoMode ? DEMO_ESTIMATES : estimates).length === 0 ? (
-                          <Card className="p-12 text-center bg-muted/30 border-dashed">
+                          <Card className="p-12 text-center glass-card border-dashed">
                             <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                             <h3 className="font-tech uppercase text-lg mb-2">No Estimates Yet</h3>
                             <p className="text-muted-foreground text-sm">Create estimates to send quotes to customers</p>
@@ -2233,7 +2233,7 @@ export default function MechanicsGarage() {
                         ) : (
                           <div className="space-y-3">
                             {(demoMode ? DEMO_ESTIMATES : estimates).map(est => (
-                              <Card key={est.id} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors">
+                              <Card key={est.id} className="p-4 glass-card transition-colors">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-lg bg-yellow-500/10">
@@ -2270,7 +2270,7 @@ export default function MechanicsGarage() {
                           </Button>
                         </div>
                         {(demoMode ? DEMO_APPOINTMENTS : appointments).length === 0 ? (
-                          <Card className="p-12 text-center bg-muted/30 border-dashed">
+                          <Card className="p-12 text-center glass-card border-dashed">
                             <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                             <h3 className="font-tech uppercase text-lg mb-2">No Appointments</h3>
                             <p className="text-muted-foreground text-sm mb-4">Schedule appointments to manage your workflow</p>
@@ -2281,7 +2281,7 @@ export default function MechanicsGarage() {
                         ) : (
                           <div className="space-y-3">
                             {(demoMode ? DEMO_APPOINTMENTS : appointments).map(apt => (
-                              <Card key={apt.id} className="p-4 bg-muted/20">
+                              <Card key={apt.id} className="p-4 glass-card">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-lg bg-blue-500/10">
@@ -2319,28 +2319,28 @@ export default function MechanicsGarage() {
                                 </Badge>
                               </div>
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                                <div className="p-3 bg-muted/20 rounded-lg">
+                                <div className="p-3 glass-card rounded-lg">
                                   <div className="flex items-center gap-2 mb-1">
                                     <Checkbox id="reminder-24h" defaultChecked />
                                     <Label htmlFor="reminder-24h" className="text-xs font-tech">24 Hours Before</Label>
                                   </div>
                                   <p className="text-xs text-muted-foreground ml-5">Email + SMS</p>
                                 </div>
-                                <div className="p-3 bg-muted/20 rounded-lg">
+                                <div className="p-3 glass-card rounded-lg">
                                   <div className="flex items-center gap-2 mb-1">
                                     <Checkbox id="reminder-2h" defaultChecked />
                                     <Label htmlFor="reminder-2h" className="text-xs font-tech">2 Hours Before</Label>
                                   </div>
                                   <p className="text-xs text-muted-foreground ml-5">SMS only</p>
                                 </div>
-                                <div className="p-3 bg-muted/20 rounded-lg">
+                                <div className="p-3 glass-card rounded-lg">
                                   <div className="flex items-center gap-2 mb-1">
                                     <Checkbox id="reminder-ready" defaultChecked />
                                     <Label htmlFor="reminder-ready" className="text-xs font-tech">Vehicle Ready</Label>
                                   </div>
                                   <p className="text-xs text-muted-foreground ml-5">Email + SMS</p>
                                 </div>
-                                <div className="p-3 bg-muted/20 rounded-lg">
+                                <div className="p-3 glass-card rounded-lg">
                                   <div className="flex items-center gap-2 mb-1">
                                     <Checkbox id="reminder-followup" />
                                     <Label htmlFor="reminder-followup" className="text-xs font-tech">Follow-up (7 days)</Label>
@@ -2371,7 +2371,7 @@ export default function MechanicsGarage() {
                         </div>
                         {demoMode ? (
                           <div className="space-y-3">
-                            <div className="grid grid-cols-6 gap-4 p-3 bg-muted/30 rounded-lg font-tech text-xs uppercase text-muted-foreground">
+                            <div className="grid grid-cols-6 gap-4 p-3 glass-card rounded-lg font-tech text-xs uppercase text-muted-foreground">
                               <span>Part #</span>
                               <span className="col-span-2">Description</span>
                               <span className="text-center">Qty</span>
@@ -2379,7 +2379,7 @@ export default function MechanicsGarage() {
                               <span className="text-right">Price</span>
                             </div>
                             {DEMO_INVENTORY.map(item => (
-                              <Card key={item.id} className="p-3 bg-muted/20 hover:bg-muted/30 transition-colors">
+                              <Card key={item.id} className="p-3 glass-card transition-colors">
                                 <div className="grid grid-cols-6 gap-4 items-center">
                                   <span className="font-mono text-sm text-primary">{item.partNumber}</span>
                                   <div className="col-span-2">
@@ -2401,7 +2401,7 @@ export default function MechanicsGarage() {
                             ))}
                           </div>
                         ) : (
-                          <Card className="p-12 text-center bg-muted/30 border-dashed">
+                          <Card className="p-12 text-center glass-card border-dashed">
                             <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                             <h3 className="font-tech uppercase text-lg mb-2">Inventory Management</h3>
                             <p className="text-muted-foreground text-sm">Track parts, stock levels, and vendor orders</p>
@@ -2512,7 +2512,7 @@ export default function MechanicsGarage() {
                                     { name: 'Sarah Chen', hours: 38, efficiency: 98, jobs: 24 },
                                     { name: 'Carlos Rodriguez', hours: 40, efficiency: 105, jobs: 26 },
                                   ].map((tech) => (
-                                    <div key={tech.name} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                                    <div key={tech.name} className="flex items-center justify-between p-3 glass-card rounded-lg">
                                       <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                                           <Wrench className="w-4 h-4 text-primary" />
@@ -2546,7 +2546,7 @@ export default function MechanicsGarage() {
                                 const heights = demoMode ? [45, 52, 48, 65, 72, 78] : [0, 0, 0, 0, 0, 0];
                                 return (
                                   <div key={month} className="text-center">
-                                    <div className="h-24 bg-muted/30 rounded-lg relative overflow-hidden">
+                                    <div className="h-24 glass-card rounded-lg relative overflow-hidden">
                                       <div 
                                         className="absolute bottom-0 w-full bg-primary/60 rounded-b-lg transition-all"
                                         style={{ height: `${heights[i]}%` }}
@@ -2570,7 +2570,7 @@ export default function MechanicsGarage() {
                           </Button>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <Card className="p-6 bg-muted/30 border-dashed">
+                          <Card className="p-6 glass-card border-dashed">
                             <div className="flex items-center gap-4 mb-4">
                               <div className="p-3 rounded-lg bg-primary/10">
                                 <Timer className="w-6 h-6 text-primary" />
@@ -2584,7 +2584,7 @@ export default function MechanicsGarage() {
                               <Play className="w-3 h-3 mr-2" /> Clock In/Out
                             </Button>
                           </Card>
-                          <Card className="p-6 bg-muted/30 border-dashed">
+                          <Card className="p-6 glass-card border-dashed">
                             <div className="flex items-center gap-4 mb-4">
                               <div className="p-3 rounded-lg bg-green-500/10">
                                 <UserCheck className="w-6 h-6 text-green-500" />
@@ -3003,7 +3003,7 @@ export default function MechanicsGarage() {
                   </Card>
                 </motion.div>
               ) : (
-                <Card className="p-12 text-center bg-card/50 border-dashed">
+                <Card className="p-12 text-center glass-card border-dashed">
                   <Store className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                   <h3 className="font-tech uppercase text-xl mb-2">Select a Shop</h3>
                   <p className="text-muted-foreground">Choose a shop from the sidebar to view its dashboard</p>

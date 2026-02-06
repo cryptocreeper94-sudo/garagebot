@@ -248,7 +248,7 @@ export default function ShadeTreeMechanics() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search guides... (e.g., 'oil change', 'brake pads')"
-                  className="pl-12 h-14 bg-zinc-900/80 border-zinc-700 text-lg"
+                  className="pl-12 h-14 bg-black/30 border-white/10 focus:border-primary/50 text-lg"
                   data-testid="input-search-guides"
                 />
               </div>
@@ -268,7 +268,7 @@ export default function ShadeTreeMechanics() {
               { value: "25K+", label: "Community Members", icon: Users },
               { value: "4.8★", label: "Average Rating", icon: Star }
             ].map((stat, i) => (
-              <div key={i} className="text-center p-4 bg-white/5 rounded-xl border border-white/10">
+              <div key={i} className="text-center p-4 glass-ultra rounded-xl">
                 <stat.icon className="w-6 h-6 text-orange-400 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-white">{stat.value}</div>
                 <div className="text-xs text-zinc-500">{stat.label}</div>
@@ -278,8 +278,10 @@ export default function ShadeTreeMechanics() {
         </div>
       </section>
 
+      <div className="divider-gradient" />
+
       {/* Filters */}
-      <section className="py-8 px-4 border-b border-zinc-800">
+      <section className="py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-wrap gap-4 items-center justify-between">
             {/* Category Filters */}
@@ -291,8 +293,8 @@ export default function ShadeTreeMechanics() {
                   size="sm"
                   onClick={() => setSelectedCategory(cat.id)}
                   className={selectedCategory === cat.id 
-                    ? "bg-orange-500 hover:bg-orange-600 text-black" 
-                    : "border-zinc-700 text-zinc-400 hover:text-white"
+                    ? "glass-card-accent bg-orange-500 hover:bg-orange-600 text-black" 
+                    : "glass-card border-zinc-700 text-zinc-400 hover:text-white"
                   }
                   data-testid={`filter-category-${cat.id}`}
                 >
@@ -311,8 +313,8 @@ export default function ShadeTreeMechanics() {
                   size="sm"
                   onClick={() => setSelectedVehicle(selectedVehicle === type.id ? null : type.id)}
                   className={selectedVehicle === type.id 
-                    ? "bg-amber-500/10 text-amber-400 border border-amber-500/30" 
-                    : "text-zinc-500 hover:text-white"
+                    ? "glass-card-accent bg-amber-500/10 text-amber-400 border border-amber-500/30" 
+                    : "glass-card text-zinc-500 hover:text-white"
                   }
                   data-testid={`filter-vehicle-${type.id}`}
                 >
@@ -324,6 +326,8 @@ export default function ShadeTreeMechanics() {
           </div>
         </div>
       </section>
+
+      <div className="divider-gradient" />
 
       {/* Guides Grid */}
       <section className="py-12 px-4">
@@ -363,7 +367,7 @@ export default function ShadeTreeMechanics() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
                   >
-                    <Card className="bg-zinc-900/50 border-zinc-800 hover:border-orange-500/30 transition-all overflow-hidden group cursor-pointer h-full">
+                    <Card className="glass-card card-3d hover:border-orange-500/30 transition-all overflow-hidden group cursor-pointer h-full">
                       {/* Image Placeholder */}
                       <div className="aspect-video bg-gradient-to-br from-orange-500/10 to-amber-500/10 flex items-center justify-center relative">
                         <Wrench className="w-12 h-12 text-orange-400/50" />
@@ -410,7 +414,7 @@ export default function ShadeTreeMechanics() {
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
+                        <div className="flex items-center justify-between pt-4 border-t border-white/10">
                           <div className="flex items-center gap-4 text-xs text-zinc-500">
                             <span className="flex items-center gap-1">
                               <ThumbsUp className="w-3 h-3" />
@@ -433,6 +437,8 @@ export default function ShadeTreeMechanics() {
         </div>
       </section>
 
+      <div className="divider-gradient" />
+
       {/* Community Tips */}
       <section className="py-12 px-4 bg-gradient-to-b from-transparent via-orange-500/5 to-transparent">
         <div className="max-w-7xl mx-auto">
@@ -450,7 +456,7 @@ export default function ShadeTreeMechanics() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="p-6 bg-zinc-900/50 border-zinc-800 h-full">
+                <Card className="p-6 glass-card h-full">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
                       <Users className="w-5 h-5 text-orange-400" />
@@ -472,11 +478,13 @@ export default function ShadeTreeMechanics() {
         </div>
       </section>
 
+      <div className="divider-gradient" />
+
       {/* Tool Recommendations */}
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
-            <Card className="p-8 bg-gradient-to-br from-zinc-900/80 to-zinc-800/50 border-zinc-700">
+            <Card className="p-8 glass-card">
               <div className="flex items-start gap-4">
                 <div className="w-14 h-14 rounded-xl bg-orange-500/20 flex items-center justify-center">
                   <Hammer className="w-7 h-7 text-orange-400" />
@@ -496,7 +504,7 @@ export default function ShadeTreeMechanics() {
               </div>
             </Card>
 
-            <Card className="p-8 bg-gradient-to-br from-zinc-900/80 to-zinc-800/50 border-zinc-700">
+            <Card className="p-8 glass-card">
               <div className="flex items-start gap-4">
                 <div className="w-14 h-14 rounded-xl bg-cyan-500/20 flex items-center justify-center">
                   <Search className="w-7 h-7 text-cyan-400" />
@@ -504,7 +512,7 @@ export default function ShadeTreeMechanics() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2">Find the Right Part</h3>
                   <p className="text-zinc-400 mb-4">
-                    Search 40+ retailers at once. Compare prices, check availability, and get the best deal on quality parts.
+                    Search 50+ retailers at once. Compare prices, check availability, and get the best deal on quality parts.
                   </p>
                   <Link href="/">
                     <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-black">
@@ -518,6 +526,8 @@ export default function ShadeTreeMechanics() {
           </div>
         </div>
       </section>
+
+      <div className="divider-gradient" />
 
       {/* CTA */}
       <section className="py-16 px-4 bg-gradient-to-t from-orange-500/10 to-transparent">

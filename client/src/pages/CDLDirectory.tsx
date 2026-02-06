@@ -147,7 +147,7 @@ function FilterSidebar({
           value={filters.companyType}
           onValueChange={(v) => setFilters((f) => ({ ...f, companyType: v === "all" ? "" : v, page: 1 }))}
         >
-          <SelectTrigger className="bg-gray-900/50 border-gray-700" data-testid="select-company-type">
+          <SelectTrigger className="bg-black/30 border-white/10" data-testid="select-company-type">
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
@@ -165,7 +165,7 @@ function FilterSidebar({
           value={filters.experienceRequired}
           onValueChange={(v) => setFilters((f) => ({ ...f, experienceRequired: v === "all" ? "" : v, page: 1 }))}
         >
-          <SelectTrigger className="bg-gray-900/50 border-gray-700" data-testid="select-experience">
+          <SelectTrigger className="bg-black/30 border-white/10" data-testid="select-experience">
             <SelectValue placeholder="Any Experience" />
           </SelectTrigger>
           <SelectContent>
@@ -183,7 +183,7 @@ function FilterSidebar({
           value={filters.homeTime}
           onValueChange={(v) => setFilters((f) => ({ ...f, homeTime: v === "all" ? "" : v, page: 1 }))}
         >
-          <SelectTrigger className="bg-gray-900/50 border-gray-700" data-testid="select-home-time">
+          <SelectTrigger className="bg-black/30 border-white/10" data-testid="select-home-time">
             <SelectValue placeholder="Any Home Time" />
           </SelectTrigger>
           <SelectContent>
@@ -201,7 +201,7 @@ function FilterSidebar({
           value={filters.freightType}
           onValueChange={(v) => setFilters((f) => ({ ...f, freightType: v === "all" ? "" : v, page: 1 }))}
         >
-          <SelectTrigger className="bg-gray-900/50 border-gray-700" data-testid="select-freight-type">
+          <SelectTrigger className="bg-black/30 border-white/10" data-testid="select-freight-type">
             <SelectValue placeholder="All Freight" />
           </SelectTrigger>
           <SelectContent>
@@ -219,7 +219,7 @@ function FilterSidebar({
           value={filters.state}
           onValueChange={(v) => setFilters((f) => ({ ...f, state: v === "all" ? "" : v, page: 1 }))}
         >
-          <SelectTrigger className="bg-gray-900/50 border-gray-700" data-testid="select-state">
+          <SelectTrigger className="bg-black/30 border-white/10" data-testid="select-state">
             <SelectValue placeholder="All States" />
           </SelectTrigger>
           <SelectContent>
@@ -283,7 +283,7 @@ function CompanyCard({
       layout
     >
       <Card
-        className="bg-gray-900/50 backdrop-blur border-gray-800 hover:border-[#00D9FF]/40 transition-all duration-300 overflow-hidden group h-full flex flex-col"
+        className="glass-card card-3d hover:border-[#00D9FF]/40 transition-all duration-300 overflow-hidden group h-full flex flex-col"
         data-testid={`card-company-${company.id}`}
       >
         <div className="p-5 flex-1 flex flex-col">
@@ -427,7 +427,7 @@ function CompanyDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-2xl bg-gray-950 border-gray-800" data-testid="modal-company-detail">
+      <DialogContent className="max-w-2xl glass-ultra border-white/10" data-testid="modal-company-detail">
         <DialogHeader>
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-[#00D9FF]/10 border border-[#00D9FF]/20 flex items-center justify-center">
@@ -461,37 +461,37 @@ function CompanyDetailModal({
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {company.payRange && (
-              <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+              <div className="glass-card rounded-lg p-3">
                 <div className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1">Pay Range</div>
                 <div className="text-sm font-semibold text-green-400" data-testid="text-detail-pay">{company.payRange}</div>
               </div>
             )}
             {company.averageCpm && (
-              <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+              <div className="glass-card rounded-lg p-3">
                 <div className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1">Avg CPM</div>
                 <div className="text-sm font-semibold text-white">{company.averageCpm}</div>
               </div>
             )}
             {company.homeTime && (
-              <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+              <div className="glass-card rounded-lg p-3">
                 <div className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1">Home Time</div>
                 <div className="text-sm font-semibold text-white">{getHomeTimeLabel(company.homeTime)}</div>
               </div>
             )}
             {company.experienceRequired && (
-              <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+              <div className="glass-card rounded-lg p-3">
                 <div className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1">Experience</div>
                 <div className="text-sm font-semibold text-white">{getExperienceLabel(company.experienceRequired)}</div>
               </div>
             )}
-            {company.fleetSize > 0 && (
-              <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+            {Number(company.fleetSize) > 0 && (
+              <div className="glass-card rounded-lg p-3">
                 <div className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1">Fleet Size</div>
                 <div className="text-sm font-semibold text-white">{company.fleetSize.toLocaleString()}</div>
               </div>
             )}
-            {company.yearFounded > 0 && (
-              <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800">
+            {Number(company.yearFounded) > 0 && (
+              <div className="glass-card rounded-lg p-3">
                 <div className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1">Founded</div>
                 <div className="text-sm font-semibold text-white">{company.yearFounded}</div>
               </div>
@@ -687,7 +687,7 @@ function InterestFormModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-md bg-gray-950 border-gray-800" data-testid="modal-interest-form">
+      <DialogContent className="max-w-md glass-ultra border-white/10" data-testid="modal-interest-form">
         <DialogHeader>
           <DialogTitle className="text-white">Express Interest</DialogTitle>
           <p className="text-sm text-zinc-400 mt-1">
@@ -702,7 +702,7 @@ function InterestFormModal({
               value={form.fullName}
               onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))}
               placeholder="John Doe"
-              className="bg-gray-900/50 border-gray-700 mt-1"
+              className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
               required
               data-testid="input-interest-name"
             />
@@ -714,7 +714,7 @@ function InterestFormModal({
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
               placeholder="john@example.com"
-              className="bg-gray-900/50 border-gray-700 mt-1"
+              className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
               required
               data-testid="input-interest-email"
             />
@@ -725,7 +725,7 @@ function InterestFormModal({
               value={form.phone}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
               placeholder="(555) 123-4567"
-              className="bg-gray-900/50 border-gray-700 mt-1"
+              className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
               data-testid="input-interest-phone"
             />
           </div>
@@ -735,7 +735,7 @@ function InterestFormModal({
               value={form.location}
               onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
               placeholder="City, State"
-              className="bg-gray-900/50 border-gray-700 mt-1"
+              className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
               data-testid="input-interest-location"
             />
           </div>
@@ -746,7 +746,7 @@ function InterestFormModal({
                 value={form.cdlClassInterest}
                 onValueChange={(v) => setForm((f) => ({ ...f, cdlClassInterest: v }))}
               >
-                <SelectTrigger className="bg-gray-900/50 border-gray-700 mt-1" data-testid="select-interest-cdl-class">
+                <SelectTrigger className="bg-black/30 border-white/10 mt-1" data-testid="select-interest-cdl-class">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
@@ -761,7 +761,7 @@ function InterestFormModal({
                 value={form.experience}
                 onValueChange={(v) => setForm((f) => ({ ...f, experience: v }))}
               >
-                <SelectTrigger className="bg-gray-900/50 border-gray-700 mt-1" data-testid="select-interest-experience">
+                <SelectTrigger className="bg-black/30 border-white/10 mt-1" data-testid="select-interest-experience">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
@@ -778,7 +778,7 @@ function InterestFormModal({
               value={form.message}
               onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
               placeholder="Tell us about yourself and your interest..."
-              className="bg-gray-900/50 border-gray-700 mt-1 min-h-[80px]"
+              className="bg-black/30 border-white/10 focus:border-primary/50 mt-1 min-h-[80px]"
               data-testid="textarea-interest-message"
             />
           </div>
@@ -1012,28 +1012,28 @@ export default function CDLDirectory() {
               transition={{ delay: 0.3 }}
               className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto"
             >
-              <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+              <div className="text-center p-3 glass-card rounded-xl">
                 <Building2 className="w-5 h-5 text-[#00D9FF] mx-auto mb-1" />
                 <div className="text-xl font-bold text-white" data-testid="text-stat-total-companies">
                   {stats?.totalCompanies ?? "—"}
                 </div>
                 <div className="text-[10px] text-zinc-500">Total Companies</div>
               </div>
-              <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+              <div className="text-center p-3 glass-card rounded-xl">
                 <Briefcase className="w-5 h-5 text-green-400 mx-auto mb-1" />
                 <div className="text-xl font-bold text-green-400" data-testid="text-stat-hiring">
                   {stats?.totalHiring ?? "—"}
                 </div>
                 <div className="text-[10px] text-zinc-500">Currently Hiring</div>
               </div>
-              <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+              <div className="text-center p-3 glass-card rounded-xl">
                 <GraduationCap className="w-5 h-5 text-amber-400 mx-auto mb-1" />
                 <div className="text-xl font-bold text-amber-400" data-testid="text-stat-schools">
                   {stats?.companyTypeCounts?.cdl_school ?? "—"}
                 </div>
                 <div className="text-[10px] text-zinc-500">CDL Schools</div>
               </div>
-              <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+              <div className="text-center p-3 glass-card rounded-xl">
                 <MapPin className="w-5 h-5 text-purple-400 mx-auto mb-1" />
                 <div className="text-xl font-bold text-purple-400" data-testid="text-stat-states">
                   {states.length || "—"}
@@ -1057,7 +1057,7 @@ export default function CDLDirectory() {
             value={filters.search}
             onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value, page: 1 }))}
             placeholder="Search companies, CDL schools, freight types..."
-            className="pl-12 h-12 bg-gray-900/60 border-gray-700 text-base backdrop-blur"
+            className="pl-12 h-12 bg-black/30 border-white/10 focus:border-primary/50 text-base backdrop-blur"
             data-testid="input-search"
           />
           {filters.search && (
@@ -1075,7 +1075,7 @@ export default function CDLDirectory() {
       <section className="max-w-7xl mx-auto px-4 pb-16">
         <div className="flex gap-6">
           <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-4 bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-5">
+            <div className="sticky top-4 glass-ultra rounded-xl p-5">
               <div className="flex items-center gap-2 mb-5">
                 <Filter className="w-4 h-4 text-[#00D9FF]" />
                 <h3 className="text-sm font-semibold text-white">Filters</h3>
@@ -1112,7 +1112,7 @@ export default function CDLDirectory() {
                     )}
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="bg-gray-950 border-gray-800 overflow-y-auto">
+                <SheetContent side="left" className="glass-ultra border-white/10 overflow-y-auto">
                   <SheetHeader>
                     <SheetTitle className="text-white flex items-center gap-2">
                       <Filter className="w-4 h-4 text-[#00D9FF]" />
@@ -1143,7 +1143,7 @@ export default function CDLDirectory() {
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 animate-pulse">
+                  <div key={i} className="glass-card rounded-xl p-5 animate-pulse">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 bg-gray-800 rounded-lg" />
                       <div className="flex-1">
@@ -1167,7 +1167,7 @@ export default function CDLDirectory() {
                 className="text-center py-20"
                 data-testid="empty-state"
               >
-                <div className="w-20 h-20 rounded-full bg-gray-900/50 border border-gray-800 flex items-center justify-center mx-auto mb-4">
+                <div className="w-20 h-20 rounded-full glass-card flex items-center justify-center mx-auto mb-4">
                   <AlertCircle className="w-10 h-10 text-zinc-600" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">No Companies Found</h3>

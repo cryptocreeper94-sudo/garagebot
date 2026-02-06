@@ -178,7 +178,7 @@ export default function GenesisHallmark() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="bg-gradient-to-b from-purple-500/10 to-transparent border-purple-500/30 p-6">
+            <Card className="glass-ultra border-purple-500/30 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
                   <Award className="w-6 h-6 text-purple-400" />
@@ -355,7 +355,7 @@ export default function GenesisHallmark() {
             </Card>
 
             {/* Benefits */}
-            <Card className="mt-6 p-6 bg-card border-border/40">
+            <Card className="mt-6 p-6 glass-card card-3d border-border/40">
               <h3 className="font-tech uppercase text-primary mb-4">Hallmark Benefits</h3>
               <div className="space-y-3">
                 {[
@@ -390,8 +390,8 @@ export default function GenesisHallmark() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="bg-card border-border/40 overflow-hidden">
-              <div className="p-4 border-b border-border/40 bg-muted/30">
+            <Card className="glass-ultra border-border/40 overflow-hidden">
+              <div className="p-4 border-b border-border/40 glass-card">
                 <h3 className="font-tech uppercase text-primary flex items-center gap-2">
                   <Hash className="w-4 h-4" /> Genesis Ledger
                 </h3>
@@ -438,24 +438,24 @@ export default function GenesisHallmark() {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3 mt-6">
-              <Card className="p-4 text-center bg-card border-border/40">
+              <Card className="p-4 text-center stat-card-premium border-border/40">
                 <p className="text-2xl font-bold text-primary" data-testid="text-total-minted">{allHallmarks.length || 0}</p>
                 <p className="text-xs text-muted-foreground">Total Minted</p>
               </Card>
-              <Card className="p-4 text-center bg-card border-border/40">
+              <Card className="p-4 text-center stat-card-premium border-border/40">
                 <div className="flex flex-col">
                   <p className="text-2xl font-bold text-green-400">${HALLMARK_PRICING.pro}</p>
                   <p className="text-xs text-muted-foreground">Pro Price</p>
                 </div>
               </Card>
-              <Card className="p-4 text-center bg-card border-border/40">
+              <Card className="p-4 text-center stat-card-premium border-border/40">
                 <p className="text-2xl font-bold text-purple-400">∞</p>
                 <p className="text-xs text-muted-foreground">Validity</p>
               </Card>
             </div>
 
             {/* Pricing Comparison */}
-            <Card className="mt-6 p-4 bg-gradient-to-r from-yellow-500/5 to-amber-500/5 border-yellow-500/20">
+            <Card className="mt-6 p-4 glass-card border-yellow-500/20">
               <h3 className="font-tech uppercase text-sm text-yellow-500 mb-3 flex items-center gap-2">
                 <Crown className="w-4 h-4" /> Hallmark Pricing
               </h3>
@@ -479,7 +479,7 @@ export default function GenesisHallmark() {
             </Card>
 
             {/* How it Works */}
-            <Card className="mt-6 p-6 bg-muted/20 border-border/40">
+            <Card className="mt-6 p-6 glass-card border-border/40">
               <h3 className="font-tech uppercase text-sm text-muted-foreground mb-4">How It Works</h3>
               <div className="space-y-4">
                 {[

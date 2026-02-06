@@ -224,13 +224,13 @@ export default function ShopPortal() {
       <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6">
           <div className="md:col-span-8">
-            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+            <Card className="glass-ultra border-primary/20 p-4 h-full">
               <h1 className="text-2xl font-tech font-bold uppercase text-primary" data-testid="text-page-title">Shop Portal</h1>
               <p className="text-muted-foreground text-xs font-mono">CUSTOMERS • REMINDERS • MESSAGING</p>
             </Card>
           </div>
           <div className="md:col-span-4">
-            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center">
+            <Card className="glass-ultra border-primary/20 p-4 h-full flex items-center justify-center">
               <Dialog open={createShopOpen} onOpenChange={setCreateShopOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2 font-tech uppercase text-xs glow-primary" data-testid="button-register-shop">
@@ -300,7 +300,7 @@ export default function ShopPortal() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : myShops.length === 0 ? (
-          <Card className="bg-card/50 border-dashed border-2 border-muted p-12 text-center">
+          <Card className="glass-card border-dashed border-2 border-muted p-12 text-center">
             <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
             <h3 className="text-xl font-tech uppercase text-muted-foreground mb-2">No Shops Registered</h3>
             <p className="text-sm text-muted-foreground mb-6">Register your shop to start managing customers and sending reminders</p>
@@ -322,7 +322,7 @@ export default function ShopPortal() {
                     transition={{ delay: index * 0.1 }}
                   >
                     <Card 
-                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${selectedShop?.id === shop.id ? 'border-primary bg-primary/5' : 'bg-card'}`}
+                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${selectedShop?.id === shop.id ? 'border-primary bg-primary/5' : 'glass-card'}`}
                       onClick={() => setSelectedShop(shop)}
                       data-testid={`card-shop-${shop.id}`}
                     >
@@ -358,7 +358,7 @@ export default function ShopPortal() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <Card className="bg-card border-primary/30 overflow-hidden">
+                  <Card className="glass-ultra border-primary/30 overflow-hidden">
                     <div className="h-24 bg-gradient-to-r from-primary/10 to-transparent flex items-center p-6">
                       <div className="flex-1">
                         <h2 className="text-2xl font-tech font-bold uppercase">{selectedShop.name}</h2>
@@ -435,7 +435,7 @@ export default function ShopPortal() {
                             <Loader2 className="w-6 h-6 animate-spin text-primary" />
                           </div>
                         ) : customers.length === 0 ? (
-                          <div className="text-center py-8 bg-muted/30 border border-dashed rounded-lg">
+                          <div className="text-center py-8 glass-card border border-dashed rounded-lg">
                             <Users className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
                             <h4 className="font-tech uppercase text-muted-foreground">No Customers Yet</h4>
                             <p className="text-sm text-muted-foreground mt-1">Add customers to send service reminders</p>
@@ -444,7 +444,7 @@ export default function ShopPortal() {
                           <ScrollArea className="h-[400px]">
                             <div className="space-y-3">
                               {customers.map((customer) => (
-                                <Card key={customer.id} className="p-4 bg-muted/30" data-testid={`card-customer-${customer.id}`}>
+                                <Card key={customer.id} className="p-4 glass-card" data-testid={`card-customer-${customer.id}`}>
                                   <div className="flex items-start justify-between">
                                     <div className="flex items-start gap-3">
                                       <div className="p-2 rounded-full bg-primary/10">
@@ -561,7 +561,7 @@ export default function ShopPortal() {
                           </Dialog>
                         </div>
                         {messageHistory.length === 0 ? (
-                          <div className="text-center py-8 bg-muted/30 border border-dashed rounded-lg">
+                          <div className="text-center py-8 glass-card border border-dashed rounded-lg">
                             <MessageSquare className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
                             <h4 className="font-tech uppercase text-muted-foreground">No Messages Yet</h4>
                             <p className="text-sm text-muted-foreground mt-1">Send your first reminder to get started</p>
@@ -570,7 +570,7 @@ export default function ShopPortal() {
                           <ScrollArea className="h-[400px]">
                             <div className="space-y-3">
                               {messageHistory.map((msg) => (
-                                <Card key={msg.id} className="p-4 bg-muted/30" data-testid={`card-message-${msg.id}`}>
+                                <Card key={msg.id} className="p-4 glass-card" data-testid={`card-message-${msg.id}`}>
                                   <div className="flex items-start justify-between">
                                     <div>
                                       <div className="flex items-center gap-2 mb-1">
@@ -595,15 +595,15 @@ export default function ShopPortal() {
                       <TabsContent value="settings">
                         <div className="space-y-6">
                           <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-muted/30 rounded-lg p-4">
+                            <div className="glass-card rounded-lg p-4">
                               <Label className="text-xs text-muted-foreground uppercase">Phone</Label>
                               <p className="font-mono">{selectedShop.phone || 'Not set'}</p>
                             </div>
-                            <div className="bg-muted/30 rounded-lg p-4">
+                            <div className="glass-card rounded-lg p-4">
                               <Label className="text-xs text-muted-foreground uppercase">Email</Label>
                               <p className="font-mono">{selectedShop.email || 'Not set'}</p>
                             </div>
-                            <div className="col-span-2 bg-muted/30 rounded-lg p-4">
+                            <div className="col-span-2 glass-card rounded-lg p-4">
                               <Label className="text-xs text-muted-foreground uppercase">Address</Label>
                               <p className="font-mono">
                                 {selectedShop.address ? `${selectedShop.address}, ${selectedShop.city}, ${selectedShop.state} ${selectedShop.zipCode}` : 'Not set'}
@@ -611,7 +611,7 @@ export default function ShopPortal() {
                             </div>
                           </div>
                           {selectedShop.description && (
-                            <div className="bg-muted/30 rounded-lg p-4">
+                            <div className="glass-card rounded-lg p-4">
                               <Label className="text-xs text-muted-foreground uppercase">Description</Label>
                               <p className="text-sm mt-1">{selectedShop.description}</p>
                             </div>
@@ -625,7 +625,7 @@ export default function ShopPortal() {
                   </Card>
                 </motion.div>
               ) : (
-                <Card className="bg-card/50 border-dashed border-2 h-full min-h-[400px] flex items-center justify-center">
+                <Card className="glass-card border-dashed border-2 h-full min-h-[400px] flex items-center justify-center">
                   <div className="text-center">
                     <ChevronRight className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30 rotate-180" />
                     <h3 className="font-tech uppercase text-muted-foreground">Select a Shop</h3>

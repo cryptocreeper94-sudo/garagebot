@@ -147,7 +147,7 @@ export default function DIYGuides() {
           animate={{ opacity: 1, y: 0 }}
           className="flex overflow-x-auto md:grid md:grid-cols-12 gap-0 mb-0 scrollbar-hide"
         >
-          <Card className="md:col-span-8 bento-glass border-primary/20 p-3 min-w-[85vw] md:min-w-0 flex-shrink-0">
+          <Card className="md:col-span-8 glass-ultra rounded-xl border-primary/20 p-3 min-w-[85vw] md:min-w-0 flex-shrink-0">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-mono tracking-wider mb-2">
               <BookOpen className="w-3 h-3" />
               DIY REPAIR GUIDES
@@ -159,7 +159,7 @@ export default function DIYGuides() {
               Go at your own pace. Detailed steps, pro tips, and video links.
             </p>
           </Card>
-          <Card className="md:col-span-4 bento-glass bento-glow border-primary/20 p-3 flex items-center justify-center gap-4">
+          <Card className="md:col-span-4 glass-ultra rounded-xl bento-glow border-primary/20 p-3 flex items-center justify-center gap-4">
             <div className="text-center">
               <p className="text-lg font-bold text-green-400">{guides.filter(g => !g.isPremium).length}</p>
               <p className="text-[10px] text-muted-foreground">Free</p>
@@ -183,7 +183,7 @@ export default function DIYGuides() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search all repairs..."
-              className="pl-10 bento-glass border-primary/20 focus:border-primary/50"
+              className="pl-10 bg-black/30 border-white/10 focus:border-primary/50"
               data-testid="input-search-guides"
             />
           </div>
@@ -216,7 +216,7 @@ export default function DIYGuides() {
                   <AccordionItem 
                     key={category.id} 
                     value={category.id}
-                    className="border border-primary/20 rounded-lg overflow-hidden bento-glass"
+                    className="border border-primary/20 rounded-lg overflow-hidden glass-card"
                   >
                     <AccordionTrigger 
                       className={`px-4 py-3 hover:no-underline hover:bg-primary/5 transition-all group bg-gradient-to-r ${category.color}`}
@@ -261,7 +261,7 @@ export default function DIYGuides() {
                                 className="min-w-[75vw] md:min-w-0 flex-shrink-0"
                               >
                                 <Card 
-                                  className={`p-4 bg-card/50 border-primary/20 transition-all cursor-pointer group relative overflow-hidden ${
+                                  className={`p-4 glass-card card-3d border-primary/20 transition-all cursor-pointer group relative overflow-hidden ${
                                     isLocked 
                                       ? 'opacity-75 hover:opacity-90' 
                                       : 'hover:border-primary/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]'
@@ -271,7 +271,7 @@ export default function DIYGuides() {
                                 >
                                   {isLocked && (
                                     <div className="absolute top-2 right-2 z-10">
-                                      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/20 border border-primary/40">
+                                      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/20 border border-primary/40 shadow-[0_0_8px_rgba(234,179,8,0.3)]">
                                         <Lock className="w-3 h-3 text-primary" />
                                         <span className="text-[10px] font-mono text-primary">PRO</span>
                                       </div>
@@ -351,7 +351,7 @@ export default function DIYGuides() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="mt-8 p-6 rounded-lg border border-primary/30 bg-gradient-to-r from-primary/10 to-purple-500/10"
+            className="mt-8 p-6 rounded-lg border border-primary/30 glass-ultra bg-gradient-to-r from-primary/10 to-purple-500/10"
           >
             <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
               <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
@@ -377,7 +377,7 @@ export default function DIYGuides() {
       </div>
 
       <Dialog open={!!selectedGuide} onOpenChange={(open) => !open && setSelectedGuide(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col glass-ultra">
           {selectedGuide && (
             <>
               <DialogHeader>
@@ -450,7 +450,7 @@ export default function DIYGuides() {
                     </div>
 
                     {selectedGuide.steps[currentStep].proTips && selectedGuide.steps[currentStep].proTips!.length > 0 && (
-                      <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+                      <div className="p-4 rounded-lg glass-card bg-green-500/10 border border-green-500/30">
                         <div className="flex items-center gap-2 mb-2">
                           <Lightbulb className="w-4 h-4 text-green-400" />
                           <span className="font-tech text-sm uppercase text-green-400">Pro Tips</span>
@@ -467,7 +467,7 @@ export default function DIYGuides() {
                     )}
 
                     {selectedGuide.steps[currentStep].warnings && selectedGuide.steps[currentStep].warnings!.length > 0 && (
-                      <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+                      <div className="p-4 rounded-lg glass-card bg-red-500/10 border border-red-500/30">
                         <div className="flex items-center gap-2 mb-2">
                           <AlertTriangle className="w-4 h-4 text-red-400" />
                           <span className="font-tech text-sm uppercase text-red-400">Warnings</span>

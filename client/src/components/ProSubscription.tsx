@@ -132,7 +132,7 @@ export default function ProSubscription() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto"
       >
-        <Card className="p-4 bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-yellow-500/30">
+        <Card className="p-4 glass-ultra border-yellow-500/30">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
@@ -255,7 +255,7 @@ export default function ProSubscription() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
           >
-            <Card className="p-4 bg-card border-border/40 hover:border-primary/30 transition-colors h-full">
+            <Card className="p-4 glass-card card-3d border-border/40 hover:border-primary/30 transition-colors h-full">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 shrink-0 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
                   {feature.icon}
@@ -280,7 +280,7 @@ export default function ProSubscription() {
 
       {/* Comparison Table */}
       <Card className="max-w-2xl mx-auto overflow-hidden">
-        <div className="p-4 border-b border-border/40 bg-muted/30">
+        <div className="p-4 border-b border-border/40 glass-card">
           <h3 className="font-tech text-lg uppercase text-center">Free vs Pro</h3>
         </div>
         <div className="p-4">
@@ -363,7 +363,7 @@ export default function ProSubscription() {
       </div>
 
       {/* FAQ Preview */}
-      <Card className="max-w-xl mx-auto p-6 bg-muted/20 border-border/40">
+      <Card className="max-w-xl mx-auto p-6 glass-card border-border/40">
         <h4 className="font-tech uppercase text-primary mb-4">Common Questions</h4>
         <div className="space-y-4 text-sm">
           <div>

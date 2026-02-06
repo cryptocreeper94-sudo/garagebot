@@ -194,7 +194,7 @@ export default function Wishlists() {
                 New Wishlist
               </Button>
             </DialogTrigger>
-            <DialogContent className="glass-dark border-primary/30">
+            <DialogContent className="glass-ultra border-primary/30">
               <DialogHeader>
                 <DialogTitle>Create Wishlist</DialogTitle>
                 <DialogDescription>Create a new wishlist to save parts you want</DialogDescription>
@@ -245,7 +245,7 @@ export default function Wishlists() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
-            <Card className="glass-dark border-primary/20 p-4">
+            <Card className="glass-ultra border-primary/20 p-4">
               <h2 className="text-lg font-semibold mb-4">Your Wishlists</h2>
               {wishlistsLoading ? (
                 <div className="flex items-center justify-center py-8">
@@ -273,7 +273,7 @@ export default function Wishlists() {
                       className={`p-3 rounded-lg cursor-pointer transition-all ${
                         selectedWishlist === wishlist.id 
                           ? "bg-primary/20 border border-primary/40" 
-                          : "bg-card/50 hover:bg-card/80 border border-transparent"
+                          : "glass-card hover:bg-card/80 border border-transparent"
                       }`}
                       onClick={() => setSelectedWishlist(wishlist.id)}
                       data-testid={`card-wishlist-${wishlist.id}`}
@@ -303,22 +303,22 @@ export default function Wishlists() {
 
           <div className="lg:col-span-2">
             {!selectedWishlist ? (
-              <Card className="glass-dark border-primary/20 p-8 text-center">
+              <Card className="glass-ultra border-primary/20 p-8 text-center">
                 <Heart className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-muted-foreground">Select a wishlist to view items</p>
               </Card>
             ) : detailsLoading ? (
-              <Card className="glass-dark border-primary/20 p-8 flex items-center justify-center">
+              <Card className="glass-ultra border-primary/20 p-8 flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </Card>
             ) : wishlistError ? (
-              <Card className="glass-dark border-destructive/20 p-8 text-center">
+              <Card className="glass-ultra border-destructive/20 p-8 text-center">
                 <Package className="w-12 h-12 mx-auto mb-4 text-destructive" />
                 <p className="text-destructive font-medium">Failed to load wishlist</p>
                 <p className="text-sm text-muted-foreground mt-2">Please try again later</p>
               </Card>
             ) : wishlistDetails ? (
-              <Card className="glass-dark border-primary/20 p-6">
+              <Card className="glass-ultra border-primary/20 p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h2 className="text-2xl font-bold">{wishlistDetails.wishlist.name}</h2>
@@ -345,7 +345,7 @@ export default function Wishlists() {
                           Add Item
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="glass-dark border-primary/30">
+                      <DialogContent className="glass-ultra border-primary/30">
                         <DialogHeader>
                           <DialogTitle>Add Item to Wishlist</DialogTitle>
                           <DialogDescription>Add a part to your wishlist</DialogDescription>
@@ -437,7 +437,7 @@ export default function Wishlists() {
                         key={item.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center justify-between p-4 rounded-lg bg-card/50 border border-border/50"
+                        className="flex items-center justify-between p-4 rounded-lg glass-card border border-border/50"
                         data-testid={`row-item-${item.id}`}
                       >
                         <div className="flex-1">

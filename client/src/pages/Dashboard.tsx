@@ -110,11 +110,11 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-white">
       <Nav />
       
-      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-4 pt-24 pb-12">
         {/* Bento Header Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-6">
           <div className="md:col-span-8">
-            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+            <Card className="glass-ultra rounded-xl shimmer p-4 h-full">
               <h1 className="text-2xl font-tech font-bold uppercase tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">
                 Mission Control
               </h1>
@@ -125,7 +125,7 @@ export default function Dashboard() {
             </Card>
           </div>
           <div className="md:col-span-4">
-            <Card className="bg-card/50 border-primary/20 p-4 h-full flex items-center justify-center gap-3">
+            <Card className="glass-card-accent rounded-xl p-4 h-full flex items-center justify-center gap-3">
               <Badge variant="outline" className="font-mono border-green-500/30 text-green-400 bg-green-500/10 animate-pulse">
                 <div className="w-2 h-2 rounded-full bg-green-400 mr-2" />
                 LIVE
@@ -140,8 +140,8 @@ export default function Dashboard() {
 
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <Card className="bg-card/50 border-primary/20 backdrop-blur-sm p-6 relative overflow-hidden group hover:border-primary/50 transition-all">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <Card className="stat-card-premium card-3d p-6 relative overflow-hidden group transition-all" style={{ '--stat-color': 'hsl(190 90% 50%)' } as React.CSSProperties}>
+            <div className="absolute top-0 right-0 p-4 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity">
               <Users className="w-24 h-24 text-primary" />
             </div>
             <div className="relative z-10">
@@ -155,8 +155,8 @@ export default function Dashboard() {
             </div>
           </Card>
 
-          <Card className="bg-card/50 border-primary/20 backdrop-blur-sm p-6 relative overflow-hidden group hover:border-primary/50 transition-all">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <Card className="stat-card-premium card-3d p-6 relative overflow-hidden group transition-all" style={{ '--stat-color': 'hsl(190 90% 60%)' } as React.CSSProperties}>
+            <div className="absolute top-0 right-0 p-4 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity">
               <Zap className="w-24 h-24 text-primary" />
             </div>
             <div className="relative z-10">
@@ -170,8 +170,8 @@ export default function Dashboard() {
             </div>
           </Card>
 
-          <Card className="bg-card/50 border-primary/20 backdrop-blur-sm p-6 relative overflow-hidden group hover:border-primary/50 transition-all">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <Card className="stat-card-premium card-3d p-6 relative overflow-hidden group transition-all" style={{ '--stat-color': 'hsl(142 70% 45%)' } as React.CSSProperties}>
+            <div className="absolute top-0 right-0 p-4 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity">
               <DollarSign className="w-24 h-24 text-primary" />
             </div>
             <div className="relative z-10">
@@ -185,8 +185,8 @@ export default function Dashboard() {
             </div>
           </Card>
 
-          <Card className="bg-card/50 border-primary/20 backdrop-blur-sm p-6 relative overflow-hidden group hover:border-primary/50 transition-all">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <Card className="stat-card-premium card-3d p-6 relative overflow-hidden group transition-all" style={{ '--stat-color': 'hsl(250 60% 60%)' } as React.CSSProperties}>
+            <div className="absolute top-0 right-0 p-4 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity">
               <Database className="w-24 h-24 text-primary" />
             </div>
             <div className="relative z-10">
@@ -201,10 +201,12 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        <div className="divider-gradient" />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Traffic Chart */}
           <div className="lg:col-span-2">
-            <Card className="bg-card/30 border-white/10 backdrop-blur-md p-6 h-full">
+            <Card className="glass-ultra rounded-xl p-6 h-full">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-tech font-bold text-xl uppercase flex items-center gap-2">
                   <Activity className="w-5 h-5 text-primary" /> Network Traffic
@@ -221,8 +223,8 @@ export default function Dashboard() {
                   <AreaChart data={DATA_TRAFFIC}>
                     <defs>
                       <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(25 95% 53%)" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="hsl(25 95% 53%)" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="hsl(190 90% 50%)" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(190 90% 50%)" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
@@ -248,7 +250,7 @@ export default function Dashboard() {
                     <Area 
                       type="monotone" 
                       dataKey="requests" 
-                      stroke="hsl(25 95% 53%)" 
+                      stroke="hsl(190 90% 50%)" 
                       strokeWidth={2}
                       fillOpacity={1} 
                       fill="url(#colorRequests)" 
@@ -261,14 +263,14 @@ export default function Dashboard() {
 
           {/* System Health Panel */}
           <div className="lg:col-span-1">
-            <Card className="bg-card/30 border-white/10 backdrop-blur-md p-6 h-full">
+            <Card className="glass-ultra rounded-xl p-6 h-full">
               <h3 className="font-tech font-bold text-xl uppercase flex items-center gap-2 mb-6">
                 <Server className="w-5 h-5 text-primary" /> Integrations
               </h3>
 
               <div className="space-y-4">
                 {SYSTEM_HEALTH.map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 rounded bg-white/5 border border-white/5 hover:border-primary/30 transition-colors group">
+                  <div key={idx} className="flex items-center justify-between p-3 glass-card rounded-lg transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${item.color === 'text-green-400' ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]' : 'bg-yellow-400'}`} />
                       <span className="font-bold font-tech text-sm tracking-wide group-hover:text-white transition-colors">{item.name}</span>
@@ -295,9 +297,11 @@ export default function Dashboard() {
           </div>
         </div>
 
+        <div className="divider-gradient" />
+
         {/* Coming Soon Features Section */}
         <div className="mt-12">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="section-header-premium">
             <h2 className="text-2xl font-tech font-bold uppercase tracking-wide">
               Upcoming <span className="text-yellow-400">Features</span>
             </h2>
@@ -357,9 +361,11 @@ export default function Dashboard() {
           </div>
         </div>
 
+        <div className="divider-gradient" />
+
         {/* Genesis Hallmark Section */}
         <div className="mt-12 mb-8">
-          <Card className="relative overflow-hidden bg-gradient-to-r from-secondary/10 via-primary/5 to-secondary/10 border-secondary/30 p-8">
+          <Card className="card-3d relative overflow-hidden bg-gradient-to-r from-secondary/10 via-primary/5 to-secondary/10 border-secondary/30 p-8">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
             
             <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8">
@@ -392,6 +398,8 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        <div className="divider-gradient" />
+
         {/* My Blockchain Assets Section */}
         {user && (
           <div className="mt-8 mb-8">
@@ -410,7 +418,7 @@ export default function Dashboard() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               {/* Stats */}
-              <Card className="bg-card/50 border-primary/20 p-4">
+              <Card className="stat-card-premium card-3d p-4" style={{ '--stat-color': 'hsl(190 90% 50%)' } as React.CSSProperties}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
                     <Shield className="w-5 h-5 text-primary" />
@@ -421,7 +429,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </Card>
-              <Card className="bg-card/50 border-cyan-500/20 p-4">
+              <Card className="stat-card-premium card-3d p-4" style={{ '--stat-color': 'hsl(190 90% 60%)' } as React.CSSProperties}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
                     <Car className="w-5 h-5 text-cyan-400" />
@@ -432,7 +440,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </Card>
-              <Card className="bg-card/50 border-green-500/20 p-4">
+              <Card className="stat-card-premium card-3d p-4" style={{ '--stat-color': 'hsl(142 70% 45%)' } as React.CSSProperties}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
                     <Tag className="w-5 h-5 text-green-400" />
@@ -547,7 +555,7 @@ export default function Dashboard() {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Tasks */}
-            <Card className="bg-card/30 border-white/10 backdrop-blur-md p-6">
+            <Card className="glass-ultra rounded-xl p-6">
               <div className="space-y-4">
                 {/* High Priority */}
                 <div>
@@ -635,7 +643,7 @@ export default function Dashboard() {
             </Card>
 
             {/* Right Column - Partner Outreach Info */}
-            <Card className="bg-card/30 border-white/10 backdrop-blur-md p-6">
+            <Card className="glass-ultra rounded-xl p-6">
               <h4 className="font-mono text-xs text-primary uppercase mb-4 flex items-center gap-2">
                 <Link2 className="w-3 h-3" /> Partner Outreach Contacts
               </h4>
