@@ -2639,3 +2639,192 @@ export const scannedDocuments = pgTable("scanned_documents", {
 export const insertScannedDocumentSchema = createInsertSchema(scannedDocuments).omit({ id: true, createdAt: true });
 export type InsertScannedDocument = z.infer<typeof insertScannedDocumentSchema>;
 export type ScannedDocument = typeof scannedDocuments.$inferSelect;
+
+// ============================================
+// COMPREHENSIVE DRIVER FEATURES
+// ============================================
+
+// Warranty Management
+export const warranties = pgTable("warranties", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "cascade" }),
+  warrantyType: text("warranty_type").notNull(),
+  provider: text("provider").notNull(),
+  policyNumber: text("policy_number"),
+  coverageDetails: text("coverage_details"),
+  deductible: decimal("deductible", { precision: 10, scale: 2 }),
+  maxCoverage: decimal("max_coverage", { precision: 10, scale: 2 }),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  startMileage: integer("start_mileage"),
+  endMileage: integer("end_mileage"),
+  contactPhone: text("contact_phone"),
+  contactEmail: text("contact_email"),
+  contactWebsite: text("contact_website"),
+  status: text("status").default("active"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_warranties_user").on(table.userId),
+  index("IDX_warranties_vehicle").on(table.vehicleId),
+  index("IDX_warranties_status").on(table.status),
+]);
+
+export const insertWarrantySchema = createInsertSchema(warranties).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertWarranty = z.infer<typeof insertWarrantySchema>;
+export type Warranty = typeof warranties.$inferSelect;
+
+// Warranty Claims
+export const warrantyClaims = pgTable("warranty_claims", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  warrantyId: varchar("warranty_id").notNull().references(() => warranties.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  claimDate: timestamp("claim_date").notNull(),
+  description: text("description").notNull(),
+  repairShop: text("repair_shop"),
+  claimAmount: decimal("claim_amount", { precision: 10, scale: 2 }),
+  approvedAmount: decimal("approved_amount", { precision: 10, scale: 2 }),
+  status: text("status").default("submitted"),
+  referenceNumber: text("reference_number"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_warranty_claims_warranty").on(table.warrantyId),
+]);
+
+export const insertWarrantyClaimSchema = createInsertSchema(warrantyClaims).omit({ id: true, createdAt: true });
+export type InsertWarrantyClaim = z.infer<typeof insertWarrantyClaimSchema>;
+export type WarrantyClaim = typeof warrantyClaims.$inferSelect;
+
+// Fuel Logs
+export const fuelLogs = pgTable("fuel_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  fillDate: timestamp("fill_date").notNull(),
+  odometer: integer("odometer").notNull(),
+  gallons: decimal("gallons", { precision: 8, scale: 3 }).notNull(),
+  pricePerGallon: decimal("price_per_gallon", { precision: 6, scale: 3 }).notNull(),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }).notNull(),
+  fuelType: text("fuel_type").default("regular"),
+  station: text("station"),
+  location: text("location"),
+  fullTank: boolean("full_tank").default(true),
+  missedFillUp: boolean("missed_fill_up").default(false),
+  mpg: decimal("mpg", { precision: 6, scale: 2 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_fuel_logs_user").on(table.userId),
+  index("IDX_fuel_logs_vehicle").on(table.vehicleId),
+  index("IDX_fuel_logs_date").on(table.fillDate),
+]);
+
+export const insertFuelLogSchema = createInsertSchema(fuelLogs).omit({ id: true, createdAt: true });
+export type InsertFuelLog = z.infer<typeof insertFuelLogSchema>;
+export type FuelLog = typeof fuelLogs.$inferSelect;
+
+// Vehicle Expenses (comprehensive cost tracking)
+export const vehicleExpenses = pgTable("vehicle_expenses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  category: text("category").notNull(),
+  description: text("description").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  expenseDate: timestamp("expense_date").notNull(),
+  vendor: text("vendor"),
+  odometer: integer("odometer"),
+  isRecurring: boolean("is_recurring").default(false),
+  recurringFrequency: text("recurring_frequency"),
+  receiptUrl: text("receipt_url"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_vehicle_expenses_user").on(table.userId),
+  index("IDX_vehicle_expenses_vehicle").on(table.vehicleId),
+  index("IDX_vehicle_expenses_category").on(table.category),
+  index("IDX_vehicle_expenses_date").on(table.expenseDate),
+]);
+
+export const insertVehicleExpenseSchema = createInsertSchema(vehicleExpenses).omit({ id: true, createdAt: true });
+export type InsertVehicleExpense = z.infer<typeof insertVehicleExpenseSchema>;
+export type VehicleExpense = typeof vehicleExpenses.$inferSelect;
+
+// Price History (tracking price changes over time)
+export const priceHistory = pgTable("price_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  alertId: varchar("alert_id").references(() => priceAlerts.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  partName: text("part_name").notNull(),
+  partNumber: text("part_number"),
+  vendorSlug: text("vendor_slug"),
+  vendorName: text("vendor_name"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  previousPrice: decimal("previous_price", { precision: 10, scale: 2 }),
+  priceChange: decimal("price_change", { precision: 10, scale: 2 }),
+  url: text("url"),
+  checkedAt: timestamp("checked_at").defaultNow(),
+}, (table) => [
+  index("IDX_price_history_alert").on(table.alertId),
+  index("IDX_price_history_user").on(table.userId),
+  index("IDX_price_history_part").on(table.partName),
+  index("IDX_price_history_date").on(table.checkedAt),
+]);
+
+export const insertPriceHistorySchema = createInsertSchema(priceHistory).omit({ id: true });
+export type InsertPriceHistory = z.infer<typeof insertPriceHistorySchema>;
+export type PriceHistory = typeof priceHistory.$inferSelect;
+
+// Emergency Contacts & Roadside Info
+export const emergencyContacts = pgTable("emergency_contacts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "cascade" }),
+  contactType: text("contact_type").notNull(),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  policyNumber: text("policy_number"),
+  membershipId: text("membership_id"),
+  notes: text("notes"),
+  isPrimary: boolean("is_primary").default(false),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_emergency_contacts_user").on(table.userId),
+  index("IDX_emergency_contacts_vehicle").on(table.vehicleId),
+]);
+
+export const insertEmergencyContactSchema = createInsertSchema(emergencyContacts).omit({ id: true, createdAt: true });
+export type InsertEmergencyContact = z.infer<typeof insertEmergencyContactSchema>;
+export type EmergencyContact = typeof emergencyContacts.$inferSelect;
+
+// Maintenance Schedules (predefined maintenance intervals)
+export const maintenanceSchedules = pgTable("maintenance_schedules", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").notNull().references(() => vehicles.id, { onDelete: "cascade" }),
+  taskName: text("task_name").notNull(),
+  intervalMiles: integer("interval_miles"),
+  intervalMonths: integer("interval_months"),
+  lastCompletedDate: timestamp("last_completed_date"),
+  lastCompletedMileage: integer("last_completed_mileage"),
+  nextDueDate: timestamp("next_due_date"),
+  nextDueMileage: integer("next_due_mileage"),
+  estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+  priority: text("priority").default("normal"),
+  status: text("status").default("upcoming"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_maint_schedules_user").on(table.userId),
+  index("IDX_maint_schedules_vehicle").on(table.vehicleId),
+  index("IDX_maint_schedules_due").on(table.nextDueDate),
+]);
+
+export const insertMaintenanceScheduleSchema = createInsertSchema(maintenanceSchedules).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertMaintenanceSchedule = z.infer<typeof insertMaintenanceScheduleSchema>;
+export type MaintenanceSchedule = typeof maintenanceSchedules.$inferSelect;

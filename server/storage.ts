@@ -13,7 +13,8 @@ import {
   releases,
   vendorReviews, wishlists, wishlistItems, projects, projectParts, smsPreferences,
   seoPages, analyticsSessions, analyticsPageViews, analyticsEvents,
-  partnerApiCredentials, partnerApiLogs, shopLocations, blogPosts
+  partnerApiCredentials, partnerApiLogs, shopLocations, blogPosts,
+  warranties, warrantyClaims, fuelLogs, vehicleExpenses, priceHistory, emergencyContacts, maintenanceSchedules
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -50,7 +51,13 @@ import type {
   PartnerApiCredential, InsertPartnerApiCredential, PartnerApiLog, InsertPartnerApiLog,
   ShopLocation, InsertShopLocation,
   VendorApplication, InsertVendorApplication,
-  BlogPost, InsertBlogPost
+  BlogPost, InsertBlogPost,
+  Warranty, InsertWarranty, WarrantyClaim, InsertWarrantyClaim,
+  FuelLog, InsertFuelLog,
+  VehicleExpense, InsertVehicleExpense,
+  PriceHistory, InsertPriceHistory,
+  EmergencyContact, InsertEmergencyContact,
+  MaintenanceSchedule, InsertMaintenanceSchedule
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -404,6 +411,53 @@ export interface IStorage {
   getDeviceBreakdown(): Promise<{ device: string; count: number }[]>;
   getBrowserBreakdown(): Promise<{ browser: string; count: number }[]>;
   getGeoBreakdown(): Promise<{ country: string; count: number }[]>;
+
+  // Warranties
+  getWarrantiesByUser(userId: string): Promise<Warranty[]>;
+  getWarrantiesByVehicle(vehicleId: string): Promise<Warranty[]>;
+  getWarranty(id: string): Promise<Warranty | undefined>;
+  createWarranty(warranty: InsertWarranty): Promise<Warranty>;
+  updateWarranty(id: string, updates: Partial<Warranty>): Promise<Warranty | undefined>;
+  deleteWarranty(id: string): Promise<boolean>;
+
+  // Warranty Claims
+  getWarrantyClaimsByWarranty(warrantyId: string): Promise<WarrantyClaim[]>;
+  createWarrantyClaim(claim: InsertWarrantyClaim): Promise<WarrantyClaim>;
+  updateWarrantyClaim(id: string, updates: Partial<WarrantyClaim>): Promise<WarrantyClaim | undefined>;
+
+  // Fuel Logs
+  getFuelLogsByVehicle(vehicleId: string): Promise<FuelLog[]>;
+  getFuelLogsByUser(userId: string): Promise<FuelLog[]>;
+  createFuelLog(log: InsertFuelLog): Promise<FuelLog>;
+  deleteFuelLog(id: string): Promise<boolean>;
+
+  // Vehicle Expenses
+  getExpensesByVehicle(vehicleId: string): Promise<VehicleExpense[]>;
+  getExpensesByUser(userId: string): Promise<VehicleExpense[]>;
+  getExpenseSummaryByVehicle(vehicleId: string): Promise<{ category: string; total: string }[]>;
+  createExpense(expense: InsertVehicleExpense): Promise<VehicleExpense>;
+  deleteExpense(id: string): Promise<boolean>;
+
+  // Price History
+  getPriceHistoryByAlert(alertId: string): Promise<PriceHistory[]>;
+  getPriceHistoryByUser(userId: string): Promise<PriceHistory[]>;
+  createPriceHistory(entry: InsertPriceHistory): Promise<PriceHistory>;
+
+  // Emergency Contacts
+  getEmergencyContactsByUser(userId: string): Promise<EmergencyContact[]>;
+  getEmergencyContactsByVehicle(vehicleId: string): Promise<EmergencyContact[]>;
+  createEmergencyContact(contact: InsertEmergencyContact): Promise<EmergencyContact>;
+  updateEmergencyContact(id: string, updates: Partial<EmergencyContact>): Promise<EmergencyContact | undefined>;
+  deleteEmergencyContact(id: string): Promise<boolean>;
+
+  // Maintenance Schedules
+  getMaintenanceSchedulesByVehicle(vehicleId: string): Promise<MaintenanceSchedule[]>;
+  getMaintenanceSchedulesByUser(userId: string): Promise<MaintenanceSchedule[]>;
+  getOverdueMaintenanceByUser(userId: string): Promise<MaintenanceSchedule[]>;
+  createMaintenanceSchedule(schedule: InsertMaintenanceSchedule): Promise<MaintenanceSchedule>;
+  updateMaintenanceSchedule(id: string, updates: Partial<MaintenanceSchedule>): Promise<MaintenanceSchedule | undefined>;
+  completeMaintenanceTask(id: string, completedMileage: number): Promise<MaintenanceSchedule | undefined>;
+  deleteMaintenanceSchedule(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2618,6 +2672,195 @@ export class DatabaseStorage implements IStorage {
       totalAppointments: Number(appointmentCount?.count || 0),
       avgOrderValue: Math.round(Number(orderStats?.avgOrderValue || 0) * 100) / 100
     };
+  }
+
+  // Warranties
+  async getWarrantiesByUser(userId: string): Promise<Warranty[]> {
+    return await db.select().from(warranties).where(eq(warranties.userId, userId)).orderBy(desc(warranties.createdAt));
+  }
+
+  async getWarrantiesByVehicle(vehicleId: string): Promise<Warranty[]> {
+    return await db.select().from(warranties).where(eq(warranties.vehicleId, vehicleId)).orderBy(desc(warranties.createdAt));
+  }
+
+  async getWarranty(id: string): Promise<Warranty | undefined> {
+    const [result] = await db.select().from(warranties).where(eq(warranties.id, id));
+    return result;
+  }
+
+  async createWarranty(warranty: InsertWarranty): Promise<Warranty> {
+    const [result] = await db.insert(warranties).values(warranty).returning();
+    return result;
+  }
+
+  async updateWarranty(id: string, updates: Partial<Warranty>): Promise<Warranty | undefined> {
+    const [result] = await db.update(warranties).set({ ...updates, updatedAt: new Date() }).where(eq(warranties.id, id)).returning();
+    return result;
+  }
+
+  async deleteWarranty(id: string): Promise<boolean> {
+    const result = await db.delete(warranties).where(eq(warranties.id, id));
+    return (result?.rowCount ?? 0) > 0;
+  }
+
+  // Warranty Claims
+  async getWarrantyClaimsByWarranty(warrantyId: string): Promise<WarrantyClaim[]> {
+    return await db.select().from(warrantyClaims).where(eq(warrantyClaims.warrantyId, warrantyId)).orderBy(desc(warrantyClaims.createdAt));
+  }
+
+  async createWarrantyClaim(claim: InsertWarrantyClaim): Promise<WarrantyClaim> {
+    const [result] = await db.insert(warrantyClaims).values(claim).returning();
+    return result;
+  }
+
+  async updateWarrantyClaim(id: string, updates: Partial<WarrantyClaim>): Promise<WarrantyClaim | undefined> {
+    const [result] = await db.update(warrantyClaims).set(updates).where(eq(warrantyClaims.id, id)).returning();
+    return result;
+  }
+
+  // Fuel Logs
+  async getFuelLogsByVehicle(vehicleId: string): Promise<FuelLog[]> {
+    return await db.select().from(fuelLogs).where(eq(fuelLogs.vehicleId, vehicleId)).orderBy(desc(fuelLogs.createdAt));
+  }
+
+  async getFuelLogsByUser(userId: string): Promise<FuelLog[]> {
+    return await db.select().from(fuelLogs).where(eq(fuelLogs.userId, userId)).orderBy(desc(fuelLogs.createdAt));
+  }
+
+  async createFuelLog(log: InsertFuelLog): Promise<FuelLog> {
+    const [result] = await db.insert(fuelLogs).values(log).returning();
+    return result;
+  }
+
+  async deleteFuelLog(id: string): Promise<boolean> {
+    const result = await db.delete(fuelLogs).where(eq(fuelLogs.id, id));
+    return (result?.rowCount ?? 0) > 0;
+  }
+
+  // Vehicle Expenses
+  async getExpensesByVehicle(vehicleId: string): Promise<VehicleExpense[]> {
+    return await db.select().from(vehicleExpenses).where(eq(vehicleExpenses.vehicleId, vehicleId)).orderBy(desc(vehicleExpenses.createdAt));
+  }
+
+  async getExpensesByUser(userId: string): Promise<VehicleExpense[]> {
+    return await db.select().from(vehicleExpenses).where(eq(vehicleExpenses.userId, userId)).orderBy(desc(vehicleExpenses.createdAt));
+  }
+
+  async getExpenseSummaryByVehicle(vehicleId: string): Promise<{ category: string; total: string }[]> {
+    const results = await db
+      .select({
+        category: vehicleExpenses.category,
+        total: sql<string>`COALESCE(SUM(${vehicleExpenses.amount}), '0')`,
+      })
+      .from(vehicleExpenses)
+      .where(eq(vehicleExpenses.vehicleId, vehicleId))
+      .groupBy(vehicleExpenses.category);
+    return results;
+  }
+
+  async createExpense(expense: InsertVehicleExpense): Promise<VehicleExpense> {
+    const [result] = await db.insert(vehicleExpenses).values(expense).returning();
+    return result;
+  }
+
+  async deleteExpense(id: string): Promise<boolean> {
+    const result = await db.delete(vehicleExpenses).where(eq(vehicleExpenses.id, id));
+    return (result?.rowCount ?? 0) > 0;
+  }
+
+  // Price History
+  async getPriceHistoryByAlert(alertId: string): Promise<PriceHistory[]> {
+    return await db.select().from(priceHistory).where(eq(priceHistory.alertId, alertId)).orderBy(desc(priceHistory.checkedAt));
+  }
+
+  async getPriceHistoryByUser(userId: string): Promise<PriceHistory[]> {
+    return await db.select().from(priceHistory).where(eq(priceHistory.userId, userId)).orderBy(desc(priceHistory.checkedAt));
+  }
+
+  async createPriceHistory(entry: InsertPriceHistory): Promise<PriceHistory> {
+    const [result] = await db.insert(priceHistory).values(entry).returning();
+    return result;
+  }
+
+  // Emergency Contacts
+  async getEmergencyContactsByUser(userId: string): Promise<EmergencyContact[]> {
+    return await db.select().from(emergencyContacts).where(eq(emergencyContacts.userId, userId)).orderBy(desc(emergencyContacts.createdAt));
+  }
+
+  async getEmergencyContactsByVehicle(vehicleId: string): Promise<EmergencyContact[]> {
+    return await db.select().from(emergencyContacts).where(eq(emergencyContacts.vehicleId, vehicleId)).orderBy(desc(emergencyContacts.createdAt));
+  }
+
+  async createEmergencyContact(contact: InsertEmergencyContact): Promise<EmergencyContact> {
+    const [result] = await db.insert(emergencyContacts).values(contact).returning();
+    return result;
+  }
+
+  async updateEmergencyContact(id: string, updates: Partial<EmergencyContact>): Promise<EmergencyContact | undefined> {
+    const [result] = await db.update(emergencyContacts).set(updates).where(eq(emergencyContacts.id, id)).returning();
+    return result;
+  }
+
+  async deleteEmergencyContact(id: string): Promise<boolean> {
+    const result = await db.delete(emergencyContacts).where(eq(emergencyContacts.id, id));
+    return (result?.rowCount ?? 0) > 0;
+  }
+
+  // Maintenance Schedules
+  async getMaintenanceSchedulesByVehicle(vehicleId: string): Promise<MaintenanceSchedule[]> {
+    return await db.select().from(maintenanceSchedules).where(eq(maintenanceSchedules.vehicleId, vehicleId)).orderBy(desc(maintenanceSchedules.createdAt));
+  }
+
+  async getMaintenanceSchedulesByUser(userId: string): Promise<MaintenanceSchedule[]> {
+    return await db.select().from(maintenanceSchedules).where(eq(maintenanceSchedules.userId, userId)).orderBy(desc(maintenanceSchedules.createdAt));
+  }
+
+  async getOverdueMaintenanceByUser(userId: string): Promise<MaintenanceSchedule[]> {
+    return await db.select().from(maintenanceSchedules)
+      .where(and(
+        eq(maintenanceSchedules.userId, userId),
+        eq(maintenanceSchedules.status, 'upcoming'),
+        lte(maintenanceSchedules.nextDueDate, new Date())
+      ))
+      .orderBy(asc(maintenanceSchedules.nextDueDate));
+  }
+
+  async createMaintenanceSchedule(schedule: InsertMaintenanceSchedule): Promise<MaintenanceSchedule> {
+    const [result] = await db.insert(maintenanceSchedules).values(schedule).returning();
+    return result;
+  }
+
+  async updateMaintenanceSchedule(id: string, updates: Partial<MaintenanceSchedule>): Promise<MaintenanceSchedule | undefined> {
+    const [result] = await db.update(maintenanceSchedules).set({ ...updates, updatedAt: new Date() }).where(eq(maintenanceSchedules.id, id)).returning();
+    return result;
+  }
+
+  async completeMaintenanceTask(id: string, completedMileage: number): Promise<MaintenanceSchedule | undefined> {
+    const [schedule] = await db.select().from(maintenanceSchedules).where(eq(maintenanceSchedules.id, id));
+    if (!schedule) return undefined;
+
+    const now = new Date();
+    const nextDueDate = schedule.intervalMonths
+      ? new Date(now.getTime() + schedule.intervalMonths * 30 * 24 * 60 * 60 * 1000)
+      : null;
+    const nextDueMileage = schedule.intervalMiles
+      ? completedMileage + schedule.intervalMiles
+      : null;
+
+    const [updated] = await db.update(maintenanceSchedules).set({
+      lastCompletedDate: now,
+      lastCompletedMileage: completedMileage,
+      nextDueDate: nextDueDate,
+      nextDueMileage: nextDueMileage,
+      status: 'upcoming',
+      updatedAt: now,
+    }).where(eq(maintenanceSchedules.id, id)).returning();
+    return updated;
+  }
+
+  async deleteMaintenanceSchedule(id: string): Promise<boolean> {
+    const result = await db.delete(maintenanceSchedules).where(eq(maintenanceSchedules.id, id));
+    return (result?.rowCount ?? 0) > 0;
   }
 }
 
