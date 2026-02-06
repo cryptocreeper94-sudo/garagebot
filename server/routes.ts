@@ -4,7 +4,7 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns } from "@shared/schema";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
@@ -4247,6 +4247,299 @@ export async function registerRoutes(
     } catch (error) {
       console.error("[ORBIT Webhook] Error processing webhook:", error);
       res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
+  // ============================================
+  // ORBIT STAFFING - SHOP MANAGEMENT ROUTES
+  // One-click connect + employee/payroll/timesheet management
+  // ============================================
+
+  app.get('/api/shops/:shopId/orbit/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const connection = await db.select().from(orbitConnections).where(eq(orbitConnections.shopId, shopId)).limit(1);
+      if (connection.length === 0) {
+        return res.json({ connected: false });
+      }
+      const employees = await db.select().from(orbitEmployees).where(eq(orbitEmployees.shopId, shopId));
+      const payrollRuns = await db.select().from(orbitPayrollRuns).where(eq(orbitPayrollRuns.shopId, shopId));
+      res.json({
+        connected: true,
+        connection: connection[0],
+        employeeCount: employees.length,
+        payrollRunCount: payrollRuns.length,
+      });
+    } catch (error) {
+      console.error("[ORBIT] Status check error:", error);
+      res.status(500).json({ error: "Failed to check ORBIT status" });
+    }
+  });
+
+  app.post('/api/shops/:shopId/orbit/connect', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user?.claims?.sub;
+      const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
+      if (!shop.length || shop[0].ownerId !== userId) {
+        return res.status(403).json({ error: "Only the shop owner can connect ORBIT" });
+      }
+      const existing = await db.select().from(orbitConnections).where(eq(orbitConnections.shopId, shopId)).limit(1);
+      if (existing.length > 0) {
+        return res.json({ success: true, message: "Already connected", connection: existing[0] });
+      }
+      const shopData = shop[0];
+      const orbitResult = await orbitClient.syncWorker({
+        id: userId,
+        name: shopData.name,
+        email: shopData.email || '',
+        phone: shopData.phone || undefined,
+        payRate: 0,
+        workState: shopData.state || undefined,
+      });
+      const tenantId = `orbit_tenant_${shopId}`;
+      const [connection] = await db.insert(orbitConnections).values({
+        shopId,
+        status: 'active',
+        orbitTenantId: tenantId,
+        config: { shopName: shopData.name, state: shopData.state, autoSync: true },
+      }).returning();
+      await orbitClient.logActivity(`Shop "${shopData.name}" connected to ORBIT Staffing`, { type: 'shop_connect' });
+      res.json({ success: true, connection });
+    } catch (error) {
+      console.error("[ORBIT] Connect error:", error);
+      res.status(500).json({ error: "Failed to connect to ORBIT Staffing" });
+    }
+  });
+
+  app.post('/api/shops/:shopId/orbit/disconnect', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const userId = req.user?.claims?.sub;
+      const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
+      if (!shop.length || shop[0].ownerId !== userId) {
+        return res.status(403).json({ error: "Only the shop owner can disconnect ORBIT" });
+      }
+      await db.delete(orbitConnections).where(eq(orbitConnections.shopId, shopId));
+      res.json({ success: true, message: "ORBIT Staffing disconnected" });
+    } catch (error) {
+      console.error("[ORBIT] Disconnect error:", error);
+      res.status(500).json({ error: "Failed to disconnect ORBIT" });
+    }
+  });
+
+  app.get('/api/shops/:shopId/orbit/employees', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const employees = await db.select().from(orbitEmployees)
+        .where(eq(orbitEmployees.shopId, shopId))
+        .orderBy(desc(orbitEmployees.createdAt));
+      res.json(employees);
+    } catch (error) {
+      console.error("[ORBIT] Get employees error:", error);
+      res.status(500).json({ error: "Failed to get employees" });
+    }
+  });
+
+  app.post('/api/shops/:shopId/orbit/employees', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const { firstName, lastName, email, phone, role, employmentType, payRate, payType, workState, certifications } = req.body;
+      if (!firstName || !lastName) {
+        return res.status(400).json({ error: "First name and last name are required" });
+      }
+      const [employee] = await db.insert(orbitEmployees).values({
+        shopId,
+        firstName,
+        lastName,
+        email: email || null,
+        phone: phone || null,
+        role: role || 'mechanic',
+        employmentType: employmentType || 'w2',
+        payRate: payRate ? String(payRate) : null,
+        payType: payType || 'hourly',
+        workState: workState || null,
+        startDate: new Date(),
+        certifications: certifications || [],
+      }).returning();
+      const orbitResult = await orbitClient.syncWorker({
+        id: employee.id,
+        name: `${firstName} ${lastName}`,
+        email: email || '',
+        phone: phone || undefined,
+        payRate: payRate ? Number(payRate) : undefined,
+        workState: workState || undefined,
+        skills: certifications || [],
+      });
+      if (orbitResult) {
+        await db.update(orbitEmployees)
+          .set({ syncedAt: new Date(), orbitWorkerId: employee.id })
+          .where(eq(orbitEmployees.id, employee.id));
+      }
+      res.json(employee);
+    } catch (error) {
+      console.error("[ORBIT] Add employee error:", error);
+      res.status(500).json({ error: "Failed to add employee" });
+    }
+  });
+
+  app.put('/api/shops/:shopId/orbit/employees/:employeeId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, employeeId } = req.params;
+      const updates = req.body;
+      const [updated] = await db.update(orbitEmployees)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(and(eq(orbitEmployees.id, employeeId), eq(orbitEmployees.shopId, shopId)))
+        .returning();
+      if (!updated) {
+        return res.status(404).json({ error: "Employee not found" });
+      }
+      await orbitClient.syncWorker({
+        id: updated.id,
+        name: `${updated.firstName} ${updated.lastName}`,
+        email: updated.email || '',
+        phone: updated.phone || undefined,
+        payRate: updated.payRate ? Number(updated.payRate) : undefined,
+        workState: updated.workState || undefined,
+      });
+      res.json(updated);
+    } catch (error) {
+      console.error("[ORBIT] Update employee error:", error);
+      res.status(500).json({ error: "Failed to update employee" });
+    }
+  });
+
+  app.delete('/api/shops/:shopId/orbit/employees/:employeeId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId, employeeId } = req.params;
+      await db.update(orbitEmployees)
+        .set({ status: 'terminated', updatedAt: new Date() })
+        .where(and(eq(orbitEmployees.id, employeeId), eq(orbitEmployees.shopId, shopId)));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("[ORBIT] Remove employee error:", error);
+      res.status(500).json({ error: "Failed to remove employee" });
+    }
+  });
+
+  app.get('/api/shops/:shopId/orbit/timesheets', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const timesheets = await db.select().from(orbitTimesheets)
+        .where(eq(orbitTimesheets.shopId, shopId))
+        .orderBy(desc(orbitTimesheets.date));
+      res.json(timesheets);
+    } catch (error) {
+      console.error("[ORBIT] Get timesheets error:", error);
+      res.status(500).json({ error: "Failed to get timesheets" });
+    }
+  });
+
+  app.post('/api/shops/:shopId/orbit/timesheets', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const { employeeId, date, hoursWorked, overtimeHours, jobId, notes } = req.body;
+      if (!employeeId || !date || !hoursWorked) {
+        return res.status(400).json({ error: "employeeId, date, and hoursWorked are required" });
+      }
+      const [timesheet] = await db.insert(orbitTimesheets).values({
+        shopId,
+        employeeId,
+        date: new Date(date),
+        hoursWorked: String(hoursWorked),
+        overtimeHours: overtimeHours ? String(overtimeHours) : "0",
+        jobId: jobId || null,
+        notes: notes || null,
+        status: 'pending',
+      }).returning();
+      const employee = await db.select().from(orbitEmployees).where(eq(orbitEmployees.id, employeeId)).limit(1);
+      if (employee.length > 0) {
+        await orbitClient.syncTimesheets([{
+          id: timesheet.id,
+          workerId: employeeId,
+          date: new Date(date).toISOString().split('T')[0],
+          hoursWorked: Number(hoursWorked),
+          overtimeHours: overtimeHours ? Number(overtimeHours) : 0,
+          jobId: jobId || undefined,
+          status: 'submitted',
+        }]);
+        await db.update(orbitTimesheets)
+          .set({ syncedToOrbit: true, status: 'submitted' })
+          .where(eq(orbitTimesheets.id, timesheet.id));
+      }
+      res.json(timesheet);
+    } catch (error) {
+      console.error("[ORBIT] Submit timesheet error:", error);
+      res.status(500).json({ error: "Failed to submit timesheet" });
+    }
+  });
+
+  app.get('/api/shops/:shopId/orbit/payroll', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const runs = await db.select().from(orbitPayrollRuns)
+        .where(eq(orbitPayrollRuns.shopId, shopId))
+        .orderBy(desc(orbitPayrollRuns.createdAt));
+      const orbitPayroll = await orbitClient.getShopPayroll(shopId);
+      res.json({ localRuns: runs, orbitPayroll: orbitPayroll || [] });
+    } catch (error) {
+      console.error("[ORBIT] Get payroll error:", error);
+      res.status(500).json({ error: "Failed to get payroll data" });
+    }
+  });
+
+  app.post('/api/shops/:shopId/orbit/payroll/run', isAuthenticated, async (req: any, res) => {
+    try {
+      const { shopId } = req.params;
+      const { payPeriodStart, payPeriodEnd } = req.body;
+      if (!payPeriodStart || !payPeriodEnd) {
+        return res.status(400).json({ error: "payPeriodStart and payPeriodEnd are required" });
+      }
+      const userId = req.user?.claims?.sub;
+      const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
+      if (!shop.length || shop[0].ownerId !== userId) {
+        return res.status(403).json({ error: "Only the shop owner can run payroll" });
+      }
+      const employees = await db.select().from(orbitEmployees)
+        .where(and(eq(orbitEmployees.shopId, shopId), eq(orbitEmployees.status, 'active')));
+      const timesheets = await db.select().from(orbitTimesheets)
+        .where(eq(orbitTimesheets.shopId, shopId));
+      const periodTimesheets = timesheets.filter(t => {
+        const d = new Date(t.date);
+        return d >= new Date(payPeriodStart) && d <= new Date(payPeriodEnd);
+      });
+      let totalGross = 0;
+      for (const emp of employees) {
+        const empSheets = periodTimesheets.filter(t => t.employeeId === emp.id);
+        const totalHours = empSheets.reduce((sum, t) => sum + Number(t.hoursWorked), 0);
+        const otHours = empSheets.reduce((sum, t) => sum + Number(t.overtimeHours || 0), 0);
+        const rate = Number(emp.payRate || 0);
+        totalGross += (totalHours * rate) + (otHours * rate * 0.5);
+      }
+      const estimatedTaxRate = 0.25;
+      const totalTaxes = totalGross * estimatedTaxRate;
+      const totalNet = totalGross - totalTaxes;
+      const [payrollRun] = await db.insert(orbitPayrollRuns).values({
+        shopId,
+        payPeriodStart: new Date(payPeriodStart),
+        payPeriodEnd: new Date(payPeriodEnd),
+        status: 'processing',
+        totalGross: String(totalGross.toFixed(2)),
+        totalNet: String(totalNet.toFixed(2)),
+        totalTaxes: String(totalTaxes.toFixed(2)),
+        employeeCount: employees.length,
+      }).returning();
+      await orbitClient.logActivity(
+        `Payroll run initiated for ${employees.length} employees - Period: ${payPeriodStart} to ${payPeriodEnd}`,
+        { type: 'payroll_run', employeeCount: employees.length }
+      );
+      await db.update(orbitPayrollRuns)
+        .set({ status: 'completed', processedAt: new Date() })
+        .where(eq(orbitPayrollRuns.id, payrollRun.id));
+      res.json({ ...payrollRun, status: 'completed', processedAt: new Date() });
+    } catch (error) {
+      console.error("[ORBIT] Run payroll error:", error);
+      res.status(500).json({ error: "Failed to run payroll" });
     }
   });
 
