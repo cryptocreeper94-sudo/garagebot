@@ -1,28 +1,66 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Search, ChevronRight, CarFront } from "lucide-react";
+import { Search, ChevronRight, CarFront, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { VEHICLE_TYPES } from "@/lib/mockData";
 import heroBg from "@assets/generated_images/technical_blueprint_style_background_of_automotive_parts.png";
+
+const YEARS = Array.from({ length: 50 }, (_, i) => (2026 - i).toString());
+
+const MAKES_BY_TYPE: Record<string, string[]> = {
+  cars: ["Acura", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge", "Ford", "Genesis", "GMC", "Honda", "Hyundai", "Infiniti", "Jaguar", "Jeep", "Kia", "Land Rover", "Lexus", "Lincoln", "Mazda", "Mercedes-Benz", "Mini", "Mitsubishi", "Nissan", "Ram", "Subaru", "Tesla", "Toyota", "Volkswagen", "Volvo"],
+  classics: ["AMC", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge", "Ford", "Lincoln", "Mercury", "Oldsmobile", "Plymouth", "Pontiac", "Studebaker"],
+  exotics: ["Aston Martin", "Bentley", "Bugatti", "Ferrari", "Lamborghini", "Lotus", "Maserati", "McLaren", "Porsche", "Rolls-Royce"],
+  motorcycles: ["BMW", "Ducati", "Harley-Davidson", "Honda", "Indian", "Kawasaki", "KTM", "Suzuki", "Triumph", "Yamaha"],
+  atvs: ["Arctic Cat", "Can-Am", "Honda", "Kawasaki", "Polaris", "Suzuki", "Yamaha"],
+  boats: ["Bass Cat", "Boston Whaler", "Brunswick", "Chaparral", "Evinrude", "Grady-White", "Honda Marine", "Mercury", "Minn Kota", "Sea-Doo", "Tracker", "Yamaha Marine"],
+  powersports: ["Arctic Cat", "Can-Am", "Honda", "Kawasaki", "Polaris", "Ski-Doo", "Suzuki", "Yamaha"],
+  rv: ["Airstream", "Coachmen", "Forest River", "Jayco", "Keystone", "Thor", "Winnebago"],
+  diesel: ["Caterpillar", "Cummins", "Detroit Diesel", "Ford", "Freightliner", "International", "Kenworth", "Mack", "Peterbilt", "Volvo"],
+  tractors: ["Case IH", "Deere", "Kubota", "Massey Ferguson", "New Holland"],
+  heavyequip: ["Bobcat", "Case", "Caterpillar", "Deere", "Hitachi", "Komatsu", "Kubota", "Volvo"],
+  generators: ["Champion", "Generac", "Honda", "Kohler", "Predator", "Westinghouse", "Yamaha"],
+  smallengines: ["Briggs & Stratton", "Honda", "Husqvarna", "Kawasaki", "Kohler", "Stihl", "Toro"],
+  aviation: ["Beechcraft", "Cessna", "Cirrus", "Continental", "Diamond", "Garmin", "Lycoming", "Piper", "Robinson"],
+  rc: ["Arrma", "Axial", "HPI Racing", "Losi", "Redcat Racing", "Team Associated", "Traxxas"],
+  drones: ["BetaFPV", "DJI", "Emax", "GEPRC", "iFlight", "TBS"],
+  modelaircraft: ["E-flite", "FMS", "Freewing", "Hangar 9", "Phoenix Model", "Top Flite"],
+  slotcars: ["AFX", "Auto World", "Carrera", "NSR", "Scalextric", "Slot.it"],
+};
 
 export default function SearchHero() {
   const [_, setLocation] = useLocation();
   const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [year, setYear] = useState("");
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
+  const [vehicleType, setVehicleType] = useState("cars");
+
+  const makes = useMemo(() => MAKES_BY_TYPE[vehicleType] || MAKES_BY_TYPE.cars, [vehicleType]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!searchQuery.trim()) return;
     setIsSearching(true);
-    // Simulate aggregator delay
+
+    const params = new URLSearchParams();
+    params.set("q", searchQuery.trim());
+    if (year) params.set("year", year);
+    if (make) params.set("make", make);
+    if (model) params.set("model", model);
+    if (vehicleType) params.set("type", vehicleType);
+
     setTimeout(() => {
-      setLocation("/results");
-    }, 1000);
+      setLocation(`/results?${params.toString()}`);
+    }, 800);
   };
 
   return (
     <div className="relative w-full min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-border">
-      {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 z-0 opacity-40"
         style={{
@@ -32,8 +70,6 @@ export default function SearchHero() {
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-0" />
-      
-      {/* Grid Overlay */}
       <div className="absolute inset-0 bg-grid-pattern z-0 opacity-20 pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10 mt-16">
@@ -45,17 +81,17 @@ export default function SearchHero() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono mb-6">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            SYSTEM ONLINE // AGGREGATING 15+ VENDORS
+            SYSTEM ONLINE // AGGREGATING 58 VENDORS
           </div>
           
           <h1 className="text-5xl md:text-7xl font-tech font-bold uppercase tracking-tight mb-6 text-white leading-none">
-            Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">Exact Part</span>
+            Right Part. <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">First Time.</span>
             <br />
-            At the Best Price
+            Every Engine.
           </h1>
           
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-light">
-            Stop searching 15 different websites. We scan the entire automotive web to find availability and the lowest prices in seconds.
+            From RC cars to heavy equipment — compare prices across 58 retailers and go straight to the exact part that fits your vehicle.
           </p>
         </motion.div>
 
@@ -66,88 +102,98 @@ export default function SearchHero() {
           className="max-w-5xl mx-auto glass-panel p-6 md:p-8 rounded-xl shadow-2xl border-primary/20"
         >
           <form onSubmit={handleSearch} className="flex flex-col gap-4">
-            {/* Vehicle Selector Row */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-              <div className="md:col-span-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div>
+                <label className="text-xs font-mono text-muted-foreground mb-1.5 block ml-1">VEHICLE TYPE</label>
+                <Select value={vehicleType} onValueChange={(v) => { setVehicleType(v); setMake(""); setModel(""); }}>
+                  <SelectTrigger className="h-11 bg-background/50 border-border focus:border-primary font-mono text-xs" data-testid="select-vehicle-type">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {VEHICLE_TYPES.map(t => (
+                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <label className="text-xs font-mono text-muted-foreground mb-1.5 block ml-1">YEAR</label>
-                <Select>
-                  <SelectTrigger className="h-12 bg-background/50 border-border focus:border-primary font-mono">
-                    <SelectValue placeholder="Select Year" />
+                <Select value={year} onValueChange={setYear}>
+                  <SelectTrigger className="h-11 bg-background/50 border-border focus:border-primary font-mono text-xs" data-testid="select-year">
+                    <SelectValue placeholder="Year" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="2024">2024</SelectItem>
-                    <SelectItem value="2023">2023</SelectItem>
-                    <SelectItem value="2022">2022</SelectItem>
-                    <SelectItem value="2021">2021</SelectItem>
+                  <SelectContent className="max-h-[300px]">
+                    {YEARS.map(y => (
+                      <SelectItem key={y} value={y}>{y}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="md:col-span-4">
+              <div>
                 <label className="text-xs font-mono text-muted-foreground mb-1.5 block ml-1">MAKE</label>
-                <Select>
-                  <SelectTrigger className="h-12 bg-background/50 border-border focus:border-primary font-mono">
-                    <SelectValue placeholder="Select Make" />
+                <Select value={make} onValueChange={(v) => { setMake(v); setModel(""); }}>
+                  <SelectTrigger className="h-11 bg-background/50 border-border focus:border-primary font-mono text-xs" data-testid="select-make">
+                    <SelectValue placeholder="Make" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="toyota">Toyota</SelectItem>
-                    <SelectItem value="ford">Ford</SelectItem>
-                    <SelectItem value="chevrolet">Chevrolet</SelectItem>
-                    <SelectItem value="honda">Honda</SelectItem>
+                  <SelectContent className="max-h-[300px]">
+                    {makes.map(m => (
+                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="md:col-span-5">
+              <div>
                 <label className="text-xs font-mono text-muted-foreground mb-1.5 block ml-1">MODEL</label>
-                <Select>
-                  <SelectTrigger className="h-12 bg-background/50 border-border focus:border-primary font-mono">
-                    <SelectValue placeholder="Select Model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="tacoma">Tacoma</SelectItem>
-                    <SelectItem value="f150">F-150</SelectItem>
-                    <SelectItem value="silverado">Silverado</SelectItem>
-                    <SelectItem value="civic">Civic</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input 
+                  className="h-11 bg-background/50 border-border focus:border-primary font-mono text-xs"
+                  placeholder="Enter model..."
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  data-testid="input-model"
+                />
               </div>
             </div>
 
-            {/* Search Input Row */}
-            <div className="flex flex-col md:flex-row gap-4 mt-2">
+            <div className="flex flex-col md:flex-row gap-4 mt-1">
               <div className="flex-grow relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input 
                   className="h-14 pl-12 bg-background/50 border-border focus:border-primary text-lg font-medium placeholder:font-light" 
-                  placeholder="What are you looking for? (e.g., 'Brake Pads', 'Alternator')"
+                  placeholder="Search for a part (e.g., 'Brake Pads', 'Oil Filter', 'Servo Motor')"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  data-testid="input-search-query"
                 />
               </div>
               <Button 
                 type="submit" 
                 size="lg" 
                 className="h-14 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-tech font-bold text-lg tracking-wide uppercase min-w-[200px]"
-                disabled={isSearching}
+                disabled={isSearching || !searchQuery.trim()}
+                data-testid="button-find-parts"
               >
                 {isSearching ? (
-                  <span className="animate-pulse">Scanning...</span>
+                  <span className="animate-pulse">Scanning 58 Stores...</span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    Find Parts <ChevronRight className="w-5 h-5" />
+                    <Zap className="w-5 h-5" /> Find Parts
                   </span>
                 )}
               </Button>
             </div>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-white/5 flex flex-wrap gap-6 items-center justify-center md:justify-start">
-            <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Searching Inventories From:</span>
-            <div className="flex gap-6 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all">
-              {/* Simple Text Logos for Mockup */}
-              <span className="font-bold text-sm">AutoZone</span>
-              <span className="font-bold text-sm">RockAuto</span>
-              <span className="font-bold text-sm">NAPA</span>
-              <span className="font-bold text-sm">Amazon</span>
-              <span className="font-bold text-sm">Summit Racing</span>
-              <span className="text-xs font-mono text-primary">+ 12 Others</span>
+          <div className="mt-6 pt-6 border-t border-white/5 flex flex-wrap gap-4 items-center justify-center md:justify-start">
+            <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Comparing prices from:</span>
+            <div className="flex gap-4 flex-wrap opacity-60 hover:opacity-100 transition-all">
+              <span className="font-bold text-xs text-orange-500">AutoZone</span>
+              <span className="font-bold text-xs text-green-500">O'Reilly</span>
+              <span className="font-bold text-xs text-yellow-500">RockAuto</span>
+              <span className="font-bold text-xs text-amber-400">Amazon</span>
+              <span className="font-bold text-xs text-blue-500">NAPA</span>
+              <span className="font-bold text-xs text-red-500">Summit Racing</span>
+              <span className="font-bold text-xs text-blue-400">eBay Motors</span>
+              <span className="text-xs font-mono text-primary">+ 51 more</span>
             </div>
           </div>
         </motion.div>

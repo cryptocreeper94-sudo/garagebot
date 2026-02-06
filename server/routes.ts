@@ -2371,20 +2371,21 @@ export async function registerRoutes(
       // Get all active vendors
       const vendors = await storage.getActiveVendors();
       
-      // Build search results with vendor links
-      // For now, return vendor redirect URLs - actual product data would come from APIs
-      const vendorResults = vendors.map(vendor => ({
-        vendor: {
-          id: vendor.id,
-          name: vendor.name,
-          slug: vendor.slug,
-          logoUrl: vendor.logoUrl,
-          hasLocalPickup: vendor.hasLocalPickup,
-          hasAffiliateProgram: vendor.hasAffiliateProgram,
-        },
-        searchUrl: `/api/vendors/${vendor.slug}/redirect?query=${encodeURIComponent(query || partNumber || '')}&partNumber=${encodeURIComponent(partNumber || '')}&year=${year || ''}&make=${encodeURIComponent(make || '')}&model=${encodeURIComponent(model || '')}`,
-        directUrl: buildVendorSearchUrlWithVehicle(vendor.websiteUrl, vendor.slug, query, partNumber, year, make, model),
-      }));
+      const vendorResults = vendors.map(vendor => {
+        const directUrl = buildVendorSearchUrlWithVehicle(vendor.websiteUrl, vendor.slug, query, partNumber, year, make, model);
+        return {
+          vendor: {
+            id: vendor.id,
+            name: vendor.name,
+            slug: vendor.slug,
+            logoUrl: vendor.logoUrl,
+            hasLocalPickup: vendor.hasLocalPickup,
+            hasAffiliateProgram: vendor.hasAffiliateProgram,
+          },
+          searchUrl: directUrl,
+          directUrl,
+        };
+      });
       
       res.json({
         query: query || partNumber,
