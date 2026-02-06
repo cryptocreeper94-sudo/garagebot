@@ -3683,13 +3683,18 @@ export async function registerRoutes(
       
       const isPro = user?.subscriptionTier === 'pro' && 
         (!user?.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
+      const isAdFree = isPro || (user?.adFreeSubscription === true && 
+        (!user?.adFreeExpiresAt || new Date(user.adFreeExpiresAt) > new Date()));
       
       res.json({
         isPro,
+        isAdFree,
         tier: user?.subscriptionTier || 'free',
         status: isPro ? 'active' : 'inactive',
         expiresAt: user?.subscriptionExpiresAt || null,
         isFounder: user?.isFounder || false,
+        adFreeSubscription: user?.adFreeSubscription || false,
+        adFreeExpiresAt: user?.adFreeExpiresAt || null,
       });
     } catch (error) {
       console.error("Subscription status error:", error);
@@ -3754,6 +3759,67 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Subscription checkout error:", error);
       res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  app.post('/api/subscription/ad-free/checkout', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const user = await storage.getUser(userId);
+
+      if (!user) {
+        return res.status(400).json({ error: "User not found" });
+      }
+
+      if (user.subscriptionTier === 'pro') {
+        return res.status(400).json({ error: "Pro subscribers are already ad-free" });
+      }
+
+      if (user.adFreeSubscription) {
+        return res.status(400).json({ error: "Already subscribed to ad-free" });
+      }
+
+      const priceId = process.env.STRIPE_AD_FREE_PRICE_ID;
+      if (!priceId) {
+        return res.status(500).json({ error: "Ad-free price not configured" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          metadata: { userId, username: user.username }
+        });
+        customerId = customer.id;
+        await storage.updateUser(userId, { stripeCustomerId: customerId });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: 'subscription',
+        success_url: `${baseUrl}/pro?ad_free_success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/pro?canceled=true`,
+        metadata: {
+          userId,
+          subscriptionType: 'ad-free',
+        },
+        subscription_data: {
+          metadata: {
+            userId,
+            subscriptionType: 'ad-free',
+          }
+        }
+      });
+
+      res.json({ checkoutUrl: session.url });
+    } catch (error) {
+      console.error("Ad-free checkout error:", error);
+      res.status(500).json({ error: "Failed to create ad-free checkout session" });
     }
   });
 

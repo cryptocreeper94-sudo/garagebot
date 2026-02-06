@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { AdSenseHorizontal } from "@/components/AdSense";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Coffee, Newspaper, Wrench, Users, Briefcase, Camera, Gauge, AlertTriangle,
@@ -962,6 +963,9 @@ export default function BreakRoom() {
           </AnimatePresence>
         </div>
       </section>
+      </div>
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <AdSenseHorizontal className="my-4" />
       </div>
       <Footer />
     </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { AdSenseHorizontal } from "@/components/AdSense";
 import NativeProductRecs from "@/components/NativeProductRecs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -535,6 +536,10 @@ export default function DIYGuides() {
           )}
         </DialogContent>
       </Dialog>
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <AdSenseHorizontal className="my-4" />
+      </div>
+
       <section className="py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <NativeProductRecs context="diy" layout="horizontal" title="Top Tools for This Job" maxItems={4} />
