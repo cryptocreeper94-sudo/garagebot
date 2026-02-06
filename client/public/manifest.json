@@ -1,19 +1,58 @@
 {
+  "id": "/",
   "name": "GarageBot - Auto Parts Search",
   "short_name": "GarageBot",
   "description": "Search 15M+ auto parts from 40+ retailers. AI-powered Buddy helps find parts for cars, trucks, motorcycles, ATVs, boats, RVs, and all vehicles with engines.",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0f172a",
   "theme_color": "#00D9FF",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "scope": "/",
   "categories": ["shopping", "automotive", "utilities"],
   "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
+      "src": "/icon-16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-144.png",
+      "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
@@ -21,7 +60,19 @@
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icon-512.png",
@@ -30,16 +81,16 @@
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/favicon.png",
-      "sizes": "any",
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable"
     }
   ],
   "screenshots": [
@@ -48,23 +99,37 @@
       "sizes": "1024x1792",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "GarageBot Splash"
+      "label": "GarageBot - Search Auto Parts"
     }
   ],
   "shortcuts": [
     {
       "name": "Search Parts",
       "short_name": "Search",
-      "description": "Search for auto parts",
+      "description": "Search for auto parts across 40+ retailers",
       "url": "/",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96" }]
     },
     {
       "name": "My Garage",
       "short_name": "Garage",
-      "description": "View your saved vehicles",
+      "description": "View your saved vehicles and fleet",
       "url": "/garage",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "DIY Repair Guides",
+      "short_name": "DIY Guides",
+      "description": "Step-by-step repair guides for all vehicles",
+      "url": "/diy-guides",
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Break Room",
+      "short_name": "Break Room",
+      "description": "News, tools, community, and opportunities",
+      "url": "/break-room",
+      "icons": [{ "src": "/icon-96.png", "sizes": "96x96" }]
     }
   ],
   "related_applications": [],
