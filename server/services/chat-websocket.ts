@@ -3,11 +3,15 @@ import type { Server } from "http";
 import { parse as parseCookie } from "cookie";
 import pg from "pg";
 import { communityHubService } from "./community-hub-service";
+import { verifyToken, getChatUserFromToken } from "../trustlayer-sso";
 
 interface AuthenticatedSocket extends WebSocket {
   userId: string;
   username: string;
+  avatarColor: string;
+  role: string;
   isAlive: boolean;
+  isJwtAuth: boolean;
 }
 
 interface ChannelSubscription {
@@ -68,31 +72,42 @@ export function setupChatWebSocket(httpServer: Server) {
     try {
       const cookies = parseCookie(request.headers.cookie || "");
       const sid = cookies["connect.sid"];
-      if (!sid) {
-        socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
-        socket.destroy();
-        return;
+
+      if (sid) {
+        const rawSid = decodeURIComponent(sid);
+        const sessionId = rawSid.startsWith("s:") ? rawSid.slice(2).split(".")[0] : rawSid;
+        
+        const sessionUser = await getSessionUser(sessionId);
+        if (!sessionUser) {
+          socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+          socket.destroy();
+          return;
+        }
+
+        wss.handleUpgrade(request, socket, head, (ws) => {
+          const authedWs = ws as AuthenticatedSocket;
+          authedWs.userId = sessionUser.userId;
+          authedWs.username = sessionUser.username;
+          authedWs.avatarColor = "#06b6d4";
+          authedWs.role = "member";
+          authedWs.isAlive = true;
+          authedWs.isJwtAuth = false;
+
+          wss.emit("connection", authedWs, request);
+        });
+      } else {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+          const pendingWs = ws as AuthenticatedSocket;
+          pendingWs.userId = "";
+          pendingWs.username = "";
+          pendingWs.avatarColor = "#06b6d4";
+          pendingWs.role = "member";
+          pendingWs.isAlive = true;
+          pendingWs.isJwtAuth = true;
+
+          wss.emit("connection", pendingWs, request);
+        });
       }
-
-      // Parse the session ID (remove s: prefix and signature)
-      const rawSid = decodeURIComponent(sid);
-      const sessionId = rawSid.startsWith("s:") ? rawSid.slice(2).split(".")[0] : rawSid;
-      
-      const sessionUser = await getSessionUser(sessionId);
-      if (!sessionUser) {
-        socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
-        socket.destroy();
-        return;
-      }
-
-      wss.handleUpgrade(request, socket, head, (ws) => {
-        const authedWs = ws as AuthenticatedSocket;
-        authedWs.userId = sessionUser.userId;
-        authedWs.username = sessionUser.username;
-        authedWs.isAlive = true;
-
-        wss.emit("connection", authedWs, request);
-      });
     } catch (err) {
       console.error("[ChatWS] Upgrade error:", err);
       socket.write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
@@ -101,19 +116,74 @@ export function setupChatWebSocket(httpServer: Server) {
   });
 
   wss.on("connection", (ws: AuthenticatedSocket) => {
-    console.log(`[ChatWS] Connected: ${ws.userId} (${ws.username})`);
-
-    // Track user sockets
-    if (!userSockets.has(ws.userId)) {
-      userSockets.set(ws.userId, new Set());
+    if (ws.isJwtAuth && !ws.userId) {
+      console.log(`[ChatWS] Pending JWT connection - awaiting join message`);
+    } else {
+      console.log(`[ChatWS] Connected (session): ${ws.userId} (${ws.username})`);
+      if (!userSockets.has(ws.userId)) {
+        userSockets.set(ws.userId, new Set());
+      }
+      userSockets.get(ws.userId)!.add(ws);
     }
-    userSockets.get(ws.userId)!.add(ws);
 
     ws.on("pong", () => { ws.isAlive = true; });
 
     ws.on("message", async (raw) => {
       try {
         const msg = JSON.parse(raw.toString());
+
+        if (msg.type === "join" && ws.isJwtAuth && !ws.userId) {
+          const token = msg.token;
+          if (!token) {
+            ws.send(JSON.stringify({ type: "error", message: "Token required for JWT auth" }));
+            ws.close();
+            return;
+          }
+          const result = await getChatUserFromToken(token);
+          if (!result.success || !result.user) {
+            ws.send(JSON.stringify({ type: "error", message: "Invalid or expired token" }));
+            ws.close();
+            return;
+          }
+          ws.userId = result.user.id;
+          ws.username = result.user.username;
+          ws.avatarColor = result.user.avatarColor || "#06b6d4";
+          ws.role = result.user.role || "member";
+          console.log(`[ChatWS] JWT authenticated: ${ws.userId} (${ws.username})`);
+
+          if (!userSockets.has(ws.userId)) {
+            userSockets.set(ws.userId, new Set());
+          }
+          userSockets.get(ws.userId)!.add(ws);
+
+          ws.send(JSON.stringify({
+            type: "auth_success",
+            userId: ws.userId,
+            username: ws.username,
+            avatarColor: ws.avatarColor,
+            role: ws.role,
+          }));
+
+          if (msg.channelId) {
+            if (!channels.has(msg.channelId)) channels.set(msg.channelId, new Set());
+            channels.get(msg.channelId)!.add(ws);
+            broadcastToChannel(msg.channelId, {
+              type: "user_joined",
+              userId: ws.userId,
+              username: ws.username,
+            });
+
+            const history = await communityHubService.getMessages(msg.channelId, 50);
+            ws.send(JSON.stringify({ type: "history", messages: history }));
+          }
+          return;
+        }
+
+        if (ws.isJwtAuth && !ws.userId) {
+          ws.send(JSON.stringify({ type: "error", message: "Must send join message with token first" }));
+          return;
+        }
+
         await handleMessage(ws, msg);
       } catch (err) {
         console.error("[ChatWS] Message error:", err);
@@ -123,20 +193,17 @@ export function setupChatWebSocket(httpServer: Server) {
 
     ws.on("close", () => {
       console.log(`[ChatWS] Disconnected: ${ws.userId}`);
-      // Remove from all channels
       Array.from(channels.entries()).forEach(([channelId, sockets]) => {
         if (sockets.has(ws)) {
           sockets.delete(ws);
           if (sockets.size === 0) channels.delete(channelId);
           broadcastToChannel(channelId, {
-            type: "presence_update",
+            type: "user_left",
             userId: ws.userId,
             username: ws.username,
-            status: "offline",
           });
         }
       });
-      // Remove from user sockets
       const uSockets = userSockets.get(ws.userId);
       if (uSockets) {
         uSockets.delete(ws);
@@ -144,12 +211,15 @@ export function setupChatWebSocket(httpServer: Server) {
       }
     });
 
-    // Send auth confirmation
-    ws.send(JSON.stringify({
-      type: "auth_success",
-      userId: ws.userId,
-      username: ws.username,
-    }));
+    if (!ws.isJwtAuth && ws.userId) {
+      ws.send(JSON.stringify({
+        type: "auth_success",
+        userId: ws.userId,
+        username: ws.username,
+        avatarColor: ws.avatarColor,
+        role: ws.role,
+      }));
+    }
   });
 
   // Heartbeat
@@ -302,11 +372,66 @@ async function handleMessage(ws: AuthenticatedSocket, msg: any) {
       const { channelId } = msg;
       if (!channelId) return;
       broadcastToChannel(channelId, {
-        type: "user_typing",
+        type: "typing",
         userId: ws.userId,
         username: ws.username,
-        channelId,
       }, ws);
+      break;
+    }
+
+    case "switch_channel": {
+      const { channelId } = msg;
+      if (!channelId) return;
+      Array.from(channels.entries()).forEach(([cId, sockets]) => {
+        if (sockets.has(ws)) {
+          sockets.delete(ws);
+          if (sockets.size === 0) channels.delete(cId);
+        }
+      });
+      if (!channels.has(channelId)) channels.set(channelId, new Set());
+      channels.get(channelId)!.add(ws);
+
+      const switchHistory = await communityHubService.getMessages(channelId, 50);
+      ws.send(JSON.stringify({ type: "history", messages: switchHistory }));
+
+      broadcastToChannel(channelId, {
+        type: "user_joined",
+        userId: ws.userId,
+        username: ws.username,
+      });
+      break;
+    }
+
+    case "message": {
+      const { content, replyToId } = msg;
+      if (!content) return;
+      const trimmed = content.trim().substring(0, 2000);
+      if (!trimmed) return;
+      let targetChannelId: string | null = null;
+      Array.from(channels.entries()).forEach(([cId, sockets]) => {
+        if (sockets.has(ws)) targetChannelId = cId;
+      });
+      if (!targetChannelId) return;
+      const sentMsg = await communityHubService.sendMessage({
+        channelId: targetChannelId,
+        userId: ws.userId,
+        username: ws.username,
+        content: trimmed,
+        isBot: false,
+        replyToId: replyToId || null,
+      });
+      broadcastToChannel(targetChannelId, {
+        type: "message",
+        id: sentMsg.id,
+        channelId: targetChannelId,
+        userId: ws.userId,
+        username: ws.username,
+        avatarColor: ws.avatarColor,
+        role: ws.role,
+        content: trimmed,
+        replyToId: replyToId || null,
+        createdAt: sentMsg.createdAt,
+      });
       break;
     }
 

@@ -83,12 +83,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Signal Chat (Community Messaging)
 - **Route**: `/chat` — Full-featured community chat integrated into GarageBot.
-- **Backend**: 17 database tables (communities, channels, members, messages, bots, reactions, attachments, DMs, polls, roles, threads, pins, etc.), CommunityHubService with 36 CRUD methods, 24 REST API endpoints, WebSocket layer at `/ws/chat` with session-based auth.
+- **Backend**: 17+ database tables (communities, channels, members, messages, bots, reactions, attachments, DMs, polls, roles, threads, pins, etc.), CommunityHubService with 36 CRUD methods, 24+ REST API endpoints, WebSocket layer at `/ws/chat` with dual auth (session-based + JWT cross-app SSO).
+- **Trust Layer SSO**: Cross-app identity via `chat_users`, `chat_channels`, `chat_messages` tables matching DarkWave Studios format. JWT tokens (HS256, 7-day expiry, `iss: "trust-layer-sso"`), Trust Layer IDs (`tl-{base36}-{random}`), bcryptjs password hashing (12 salt rounds).
+- **SSO Auth Endpoints**: `POST /api/chat/auth/register`, `POST /api/chat/auth/login`, `GET /api/chat/auth/me` — all matching DarkWave Studios API format exactly.
+- **WebSocket JWT Auth**: Supports `{ type: "join", token: "<jwt>", channelId: "<id>" }` for cross-app SSO alongside session cookie auth. Also supports `switch_channel` and `message` types matching DarkWave protocol.
 - **Frontend**: SignalChat page with real-time messaging via `useSignalChat` hook, Deep Space themed UI with glassmorphism and cyan accents.
 - **Buddy AI Bot**: Auto-responds in `#garagebot-support` channel using OpenAI GPT-4o-mini, flags messages for human escalation when needed (billing, refund, security, etc.).
-- **Auto-Seeding**: GarageBot community with `#general`, `#garagebot-support`, and `#announcements` channels created automatically on startup.
+- **Auto-Seeding**: GarageBot community seeded on startup. Trust Layer SSO channels (general, announcements, darkwavestudios-support, garagebot-support, tlid-marketing, guardian-ai) seeded via `server/seedChat.ts`.
 - **Auth Gating**: Unauthenticated users see a login prompt; authenticated users auto-join the GarageBot community.
-- **Key Files**: `server/services/community-hub-service.ts`, `server/services/chat-websocket.ts`, `server/services/buddy-chat-bot.ts`, `server/chat-routes.ts`, `client/src/pages/SignalChat.tsx`, `client/src/hooks/useSignalChat.ts`, `shared/chat-types.ts`.
+- **Key Files**: `server/trustlayer-sso.ts`, `server/seedChat.ts`, `server/services/community-hub-service.ts`, `server/services/chat-websocket.ts`, `server/services/buddy-chat-bot.ts`, `server/chat-routes.ts`, `client/src/pages/SignalChat.tsx`, `client/src/hooks/useSignalChat.ts`, `shared/chat-types.ts`.
+- **Handoff Doc**: `attached_assets/GARAGEBOT-SSO-HANDOFF.txt` — full handoff document for dwtl.io agent with schema, endpoints, WebSocket protocol, and cross-app SSO flow.
 
 ## Shade Tree Mechanics (DIY Community)
 - **Purpose**: A community hub (`/shade-tree`) for DIY enthusiasts, providing categorized repair guides, community tips, and estimated savings.

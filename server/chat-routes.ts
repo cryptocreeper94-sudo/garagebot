@@ -3,9 +3,71 @@ import { communityHubService } from "./services/community-hub-service";
 import { handleSupportMessage, getSupportChannelId } from "./services/buddy-chat-bot";
 import { z } from "zod";
 import { storage } from "./storage";
+import { registerChatUser, loginChatUser, getChatUserFromToken } from "./trustlayer-sso";
 
 export function createChatRouter(): Router {
   const router = Router();
+
+  // ============================================
+  // Trust Layer SSO Auth Endpoints
+  // Matches DarkWave Studios format exactly
+  // ============================================
+
+  router.post("/api/chat/auth/register", async (req, res) => {
+    try {
+      const { username, email, password, displayName } = req.body;
+      if (!username || !email || !password || !displayName) {
+        return res.status(400).json({ success: false, error: "Missing required fields: username, email, password, displayName" });
+      }
+      const result = await registerChatUser({ username, email, password, displayName });
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      res.json(result);
+    } catch (error: any) {
+      console.error("[SSO] Registration error:", error);
+      res.status(500).json({ success: false, error: "Registration failed" });
+    }
+  });
+
+  router.post("/api/chat/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      if (!username || !password) {
+        return res.status(400).json({ success: false, error: "Missing required fields: username, password" });
+      }
+      const result = await loginChatUser({ username, password });
+      if (!result.success) {
+        return res.status(401).json(result);
+      }
+      res.json(result);
+    } catch (error: any) {
+      console.error("[SSO] Login error:", error);
+      res.status(500).json({ success: false, error: "Login failed" });
+    }
+  });
+
+  router.get("/api/chat/auth/me", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ success: false, error: "Missing or invalid authorization header" });
+      }
+      const token = authHeader.substring(7);
+      const result = await getChatUserFromToken(token);
+      if (!result.success) {
+        return res.status(401).json(result);
+      }
+      res.json(result);
+    } catch (error: any) {
+      console.error("[SSO] Token verification error:", error);
+      res.status(500).json({ success: false, error: "Token verification failed" });
+    }
+  });
+
+  // ============================================
+  // Community Hub Endpoints (existing)
+  // ============================================
 
   router.get("/api/chat/communities", async (req, res) => {
     try {

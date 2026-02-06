@@ -9,6 +9,7 @@ import { setupChatWebSocket } from "./services/chat-websocket";
 import { createChatRouter } from "./chat-routes";
 import { communityHubService } from "./services/community-hub-service";
 import { initBuddyBot } from "./services/buddy-chat-bot";
+import { seedChatChannels } from "./seedChat";
 
 const app = express();
 const httpServer = createServer(app);
@@ -142,6 +143,8 @@ async function initStripe() {
   try {
     await communityHubService.seedGarageBotCommunity();
     log("GarageBot community seeded", "chat");
+    await seedChatChannels();
+    log("Trust Layer SSO chat channels seeded", "chat");
     await initBuddyBot();
     log("Buddy AI bot initialized", "chat");
   } catch (err: any) {
