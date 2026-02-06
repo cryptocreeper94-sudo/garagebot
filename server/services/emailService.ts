@@ -246,3 +246,67 @@ export async function sendShopInquiryEmail(inquiry: ShopInquiry) {
     return { success: false, error };
   }
 }
+
+export async function sendPasswordResetEmail(toEmail: string, resetToken: string, firstName: string) {
+  try {
+    const { client, fromEmail } = await getResendClient();
+    
+    const baseUrl = process.env.REPLIT_DEV_DOMAIN
+      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+      : 'https://garagebot.io';
+    const resetUrl = `${baseUrl}/auth?reset=${resetToken}`;
+    
+    const result = await client.emails.send({
+      from: fromEmail || 'GarageBot <noreply@garagebot.io>',
+      to: toEmail,
+      subject: 'Reset Your GarageBot Password',
+      html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <div style="display: inline-block; background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.2)); border: 1px solid rgba(6,182,212,0.4); border-radius: 12px; padding: 16px 24px; margin-bottom: 16px;">
+        <span style="font-size: 28px; font-weight: bold; color: #06b6d4; text-transform: uppercase; letter-spacing: 2px;">GarageBot</span>
+      </div>
+      <h1 style="color: #ffffff; font-size: 24px; margin: 0;">Password Reset</h1>
+    </div>
+
+    <div style="background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(59,130,246,0.1)); border: 1px solid rgba(6,182,212,0.3); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <p style="color: #d4d4d8; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0;">
+        Hi ${firstName},
+      </p>
+      <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
+        We received a request to reset your GarageBot password. Click the button below to create a new password. This link expires in 1 hour.
+      </p>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #000000; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;">Reset Password</a>
+      </div>
+      <p style="color: #71717a; font-size: 12px; text-align: center; margin: 0;">
+        If you didn't request this, you can safely ignore this email.
+      </p>
+    </div>
+
+    <div style="text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+      <p style="color: #71717a; font-size: 11px; margin: 0;">
+        Right Part. First Time. Every Engine.<br>
+        &copy; ${new Date().getFullYear()} GarageBot - Part of the DarkWave Ecosystem
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+      `
+    });
+
+    console.log('[Email] Password reset email sent to:', toEmail, result);
+    return { success: true, id: result.data?.id };
+  } catch (error) {
+    console.error('[Email] Failed to send password reset email:', error);
+    return { success: false, error };
+  }
+}

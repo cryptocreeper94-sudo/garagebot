@@ -275,7 +275,7 @@ export default function Nav() {
                   </DrawerClose>
                 </div>
                 
-                {/* User Profile Section */}
+                {/* User Profile Section with Time-of-Day Greeting */}
                 {isAuthenticated && user && (
                   <div className="flex items-center gap-3 pb-4 border-b border-white/10">
                     {user.profileImageUrl ? (
@@ -286,6 +286,12 @@ export default function Nav() {
                       </div>
                     )}
                     <div className="flex-1">
+                      <p className="text-xs text-primary font-mono" data-testid="text-greeting">
+                        {(() => {
+                          const h = new Date().getHours();
+                          return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+                        })()}, {user.firstName || user.username || 'there'}!
+                      </p>
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-foreground">{user.firstName || 'User'}</p>
                         {isPro && (
