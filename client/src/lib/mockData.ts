@@ -414,6 +414,20 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "Rexing Affiliate",
     logoColor: "#1A1A2E"
   },
+  // Automotive Coatings & Detailing
+  {
+    id: "silazane50",
+    name: "SILAZANE50",
+    slug: "silazane50",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7675405?url=https%3A%2F%2Fsilazane50usa.com%2Fcollections%2Fall%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "exotics", "motorcycles", "boats", "rv", "diesel", "atvs"],
+    priority: 75,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#C4A35A"
+  },
   // ============================================
   // MOTORIZED HOBBY - RC, Drones, Model, Slot Cars
   // ============================================
