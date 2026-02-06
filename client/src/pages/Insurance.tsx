@@ -140,7 +140,7 @@ export default function Insurance() {
             animate={{ opacity: 1, y: 0 }}
             className="md:col-span-8"
           >
-            <Card className="bg-card/50 border-primary/20 p-4 h-full">
+            <Card className="glass-ultra border-primary/20 p-4 h-full">
               <Badge className="mb-2 bg-green-500/20 text-green-400 border-green-500/30 font-mono text-[10px]">
                 COMPARE & SAVE
               </Badge>
@@ -154,7 +154,7 @@ export default function Insurance() {
             transition={{ delay: 0.1 }}
             className="md:col-span-4"
           >
-            <Card className="bg-gradient-to-br from-green-500/20 to-primary/10 border-green-500/30 p-4 h-full flex items-center justify-center gap-3">
+            <Card className="glass-card card-3d border-green-500/30 p-4 h-full flex items-center justify-center gap-3">
               <DollarSign className="w-8 h-8 text-green-400" />
               <div className="text-center">
                 <p className="text-xl font-bold text-green-400">$996</p>
@@ -165,7 +165,7 @@ export default function Insurance() {
         </div>
 
         {/* Quick Quote Form */}
-        <Card className="max-w-4xl mx-auto mb-12 p-6 md:p-8 bg-gradient-to-br from-card to-primary/5 border-primary/30">
+        <Card className="max-w-4xl mx-auto mb-12 p-6 md:p-8 glass-ultra border-primary/30">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-3 rounded-lg bg-primary/20">
               <Zap className="w-6 h-6 text-primary" />
@@ -251,7 +251,7 @@ export default function Insurance() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
             >
-              <Card className="p-4 text-center bg-card/50 border-muted">
+              <Card className="p-4 text-center stat-card-premium border-muted">
                 <stat.icon className="w-6 h-6 mx-auto mb-2 text-primary" />
                 <div className="text-2xl font-tech font-bold text-primary">{stat.value}</div>
                 <div className="text-xs text-muted-foreground uppercase">{stat.label}</div>
@@ -276,7 +276,7 @@ export default function Insurance() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card 
-                  className={`p-4 md:p-6 bg-card hover:border-primary/50 transition-all cursor-pointer group ${provider.highlight ? 'border-primary/30 bg-gradient-to-r from-primary/5 to-transparent' : ''}`}
+                  className={`p-4 md:p-6 glass-card hover:border-primary/50 transition-all cursor-pointer group ${provider.highlight ? 'border-primary/30' : ''}`}
                   onClick={() => handleGetQuote(provider)}
                   data-testid={`card-insurance-${provider.id}`}
                 >
@@ -351,7 +351,7 @@ export default function Insurance() {
               { icon: Anchor, label: "Boat & PWC", desc: "Watercraft protection" },
               { icon: Truck, label: "Commercial", desc: "Business vehicles" },
             ].map((type, i) => (
-              <Card key={i} className="p-4 text-center hover:border-primary/50 cursor-pointer transition-all group" data-testid={`card-coverage-${type.label.toLowerCase().replace(' ', '-')}`}>
+              <Card key={i} className="p-4 text-center glass-card card-3d hover:border-primary/50 cursor-pointer transition-all group" data-testid={`card-coverage-${type.label.toLowerCase().replace(' ', '-')}`}>
                 <div className="p-3 rounded-lg bg-primary/10 w-fit mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
                   <type.icon className="w-6 h-6 text-primary" />
                 </div>

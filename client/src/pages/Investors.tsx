@@ -29,7 +29,7 @@ export default function Investors() {
     <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
       <Nav />
       <main className="flex-1">
-        <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
+        <div className="max-w-7xl mx-auto px-4 pt-24 pb-12">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-green-500/20 text-green-400 border-green-500/30 font-mono">
               INVESTMENT OPPORTUNITY
@@ -57,7 +57,7 @@ export default function Investors() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="p-6 text-center bg-card/50 border-primary/20">
+                <Card className="p-6 text-center stat-card-premium card-3d" style={{ '--stat-color': '190 90% 50%' } as React.CSSProperties}>
                   <stat.icon className="w-8 h-8 mx-auto mb-3 text-primary" />
                   <div className="text-3xl font-tech font-bold text-primary">{stat.value}</div>
                   <div className="text-xs text-muted-foreground uppercase mt-1">{stat.label}</div>
@@ -67,7 +67,7 @@ export default function Investors() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-            <Card className="p-8 bg-gradient-to-br from-card to-primary/5 border-primary/30">
+            <Card className="p-8 glass-ultra card-3d border-primary/30">
               <h2 className="text-2xl font-tech uppercase mb-6 flex items-center gap-2">
                 <Target className="w-6 h-6 text-primary" /> The Problem
               </h2>
@@ -91,7 +91,7 @@ export default function Investors() {
               </ul>
             </Card>
 
-            <Card className="p-8 bg-gradient-to-br from-card to-green-500/5 border-green-500/30">
+            <Card className="p-8 glass-ultra card-3d border-green-500/30">
               <h2 className="text-2xl font-tech uppercase mb-6 flex items-center gap-2">
                 <Rocket className="w-6 h-6 text-green-400" /> Our Solution
               </h2>
@@ -117,10 +117,12 @@ export default function Investors() {
           </div>
 
           <div className="mb-16">
-            <h2 className="text-2xl font-tech uppercase mb-8 text-center">
-              <BarChart3 className="w-6 h-6 inline mr-2 text-primary" />
-              Revenue Streams
-            </h2>
+            <div className="section-header-premium">
+              <h2 className="text-2xl font-tech uppercase mb-8 text-center">
+                <BarChart3 className="w-6 h-6 inline mr-2 text-primary" />
+                Revenue Streams
+              </h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 { 
@@ -154,7 +156,7 @@ export default function Investors() {
                   projected: "At scale, significant revenue"
                 },
               ].map((stream, i) => (
-                <Card key={i} className="p-6 bg-card/50">
+                <Card key={i} className="p-6 glass-card card-3d">
                   <h3 className="font-tech uppercase text-lg mb-2">{stream.title}</h3>
                   <p className="text-sm text-muted-foreground mb-3">{stream.desc}</p>
                   <Badge variant="outline" className="text-xs">{stream.projected}</Badge>
@@ -164,10 +166,12 @@ export default function Investors() {
           </div>
 
           <div className="mb-16">
-            <h2 className="text-2xl font-tech uppercase mb-8 text-center">
-              <Globe className="w-6 h-6 inline mr-2 text-primary" />
-              All Vehicle Types
-            </h2>
+            <div className="section-header-premium">
+              <h2 className="text-2xl font-tech uppercase mb-8 text-center">
+                <Globe className="w-6 h-6 inline mr-2 text-primary" />
+                All Vehicle Types
+              </h2>
+            </div>
             <div className="flex flex-wrap justify-center gap-6">
               {[
                 { icon: Car, label: "Cars & Trucks" },
@@ -177,7 +181,7 @@ export default function Investors() {
                 { icon: Truck, label: "RVs & Motorhomes" },
                 { icon: Wrench, label: "ATVs & UTVs" },
               ].map((type, i) => (
-                <div key={i} className="flex items-center gap-2 bg-muted/30 px-4 py-2 rounded-full">
+                <div key={i} className="flex items-center gap-2 glass-card px-4 py-2 rounded-full">
                   <type.icon className="w-5 h-5 text-primary" />
                   <span className="font-tech">{type.label}</span>
                 </div>
@@ -187,7 +191,7 @@ export default function Investors() {
 
           {/* Comprehensive Roadmap Section */}
           <div className="mb-16">
-            <div className="text-center mb-12">
+            <div className="text-center mb-12 section-header-premium">
               <Badge className="mb-4 bg-purple-500/20 text-purple-400 border-purple-500/30 font-mono">
                 <Calendar className="w-3 h-3 inline mr-1" /> PRODUCT ROADMAP
               </Badge>
@@ -220,11 +224,11 @@ export default function Investors() {
                     <p className="text-sm text-muted-foreground">Q4 2024</p>
                   </div>
                 </div>
-                <Card className="ml-20 md:ml-0 md:mr-[calc(50%+30px)] p-6 bg-green-500/5 border-green-500/20">
+                <Card className="ml-20 md:ml-0 md:mr-[calc(50%+30px)] p-6 glass-card border-green-500/20">
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                      <span><strong>Parts Aggregator MVP:</strong> 40+ retailers integrated with unified search</span>
+                      <span><strong>Parts Aggregator MVP:</strong> 50+ retailers integrated with unified search</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
@@ -271,7 +275,7 @@ export default function Investors() {
                     <p className="text-sm text-muted-foreground">Q1-Q2 2025</p>
                   </div>
                 </div>
-                <Card className="ml-20 md:ml-[calc(50%+30px)] p-6 bg-primary/5 border-primary/20">
+                <Card className="ml-20 md:ml-[calc(50%+30px)] p-6 glass-card border-primary/20">
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-start gap-2">
                       <Star className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -318,7 +322,7 @@ export default function Investors() {
                     <p className="text-sm text-muted-foreground">Data & Partnerships</p>
                   </div>
                 </div>
-                <Card className="ml-20 md:ml-0 md:mr-[calc(50%+30px)] p-6 bg-yellow-500/5 border-yellow-500/20">
+                <Card className="ml-20 md:ml-0 md:mr-[calc(50%+30px)] p-6 glass-card border-yellow-500/20">
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-start gap-2">
                       <Flag className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
@@ -365,7 +369,7 @@ export default function Investors() {
                     <p className="text-sm text-muted-foreground">AI & Marketplace</p>
                   </div>
                 </div>
-                <Card className="ml-20 md:ml-[calc(50%+30px)] p-6 bg-purple-500/5 border-purple-500/20">
+                <Card className="ml-20 md:ml-[calc(50%+30px)] p-6 glass-card border-purple-500/20">
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-start gap-2">
                       <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
@@ -407,7 +411,7 @@ export default function Investors() {
                     <Award className="w-10 h-10 text-white" />
                   </div>
                 </div>
-                <Card className="max-w-2xl mx-auto p-8 bg-gradient-to-br from-primary/10 via-purple-500/10 to-green-500/10 border-primary/30 text-center">
+                <Card className="max-w-2xl mx-auto p-8 glass-ultra border-primary/30 text-center">
                   <h3 className="text-2xl font-tech uppercase mb-4 text-primary">The Vision</h3>
                   <p className="text-lg text-muted-foreground mb-6">
                     By 2027, GarageBot will be the <strong className="text-foreground">definitive platform</strong> for 
@@ -433,7 +437,7 @@ export default function Investors() {
             </div>
           </div>
 
-          <Card className="max-w-2xl mx-auto p-8 bg-gradient-to-br from-card to-primary/5 border-primary/30">
+          <Card className="max-w-2xl mx-auto p-8 glass-ultra rounded-xl border-primary/30">
             <h2 className="text-2xl font-tech uppercase mb-6 text-center">
               <Mail className="w-6 h-6 inline mr-2 text-primary" />
               Get in Touch
@@ -445,7 +449,7 @@ export default function Investors() {
                   <Input 
                     value={contactForm.name}
                     onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                    className="mt-1"
+                    className="mt-1 bg-black/30 border-white/10 focus:border-primary/50"
                     data-testid="input-investor-name"
                   />
                 </div>
@@ -455,7 +459,7 @@ export default function Investors() {
                     type="email"
                     value={contactForm.email}
                     onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    className="mt-1"
+                    className="mt-1 bg-black/30 border-white/10 focus:border-primary/50"
                     data-testid="input-investor-email"
                   />
                 </div>
@@ -465,7 +469,7 @@ export default function Investors() {
                 <Input 
                   value={contactForm.company}
                   onChange={(e) => setContactForm({ ...contactForm, company: e.target.value })}
-                  className="mt-1"
+                  className="mt-1 bg-black/30 border-white/10 focus:border-primary/50"
                   data-testid="input-investor-company"
                 />
               </div>
@@ -474,7 +478,7 @@ export default function Investors() {
                 <Textarea 
                   value={contactForm.message}
                   onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className="mt-1"
+                  className="mt-1 bg-black/30 border-white/10 focus:border-primary/50"
                   rows={4}
                   placeholder="Tell us about your interest in GarageBot..."
                   data-testid="input-investor-message"

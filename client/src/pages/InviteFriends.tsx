@@ -195,7 +195,7 @@ export default function InviteFriends() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <Card className="p-6 bg-gradient-to-br from-primary/20 to-primary/5 border-primary/30 text-center">
+              <Card className="p-6 glass-card card-3d border-primary/30 text-center">
                 <Coins className="w-8 h-8 text-primary mx-auto mb-2" />
                 <div className="text-3xl font-bold text-primary" data-testid="text-points-balance">
                   {summary?.pointsBalance || 0}
@@ -209,7 +209,7 @@ export default function InviteFriends() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="p-6 bg-gradient-to-br from-green-500/20 to-green-500/5 border-green-500/30 text-center">
+              <Card className="p-6 glass-card card-3d border-green-500/30 text-center">
                 <Users className="w-8 h-8 text-green-400 mx-auto mb-2" />
                 <div className="text-3xl font-bold text-green-400" data-testid="text-total-signups">
                   {summary?.signedUp || 0}
@@ -223,7 +223,7 @@ export default function InviteFriends() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <Card className="p-6 bg-gradient-to-br from-purple-500/20 to-purple-500/5 border-purple-500/30 text-center">
+              <Card className="p-6 glass-card card-3d border-purple-500/30 text-center">
                 <Trophy className="w-8 h-8 text-purple-400 mx-auto mb-2" />
                 <div className="text-3xl font-bold text-purple-400" data-testid="text-pro-conversions">
                   {summary?.convertedToPro || 0}
@@ -238,7 +238,7 @@ export default function InviteFriends() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="p-6 mb-8 border-primary/30">
+            <Card className="p-6 mb-8 glass-ultra border-primary/30">
               <h2 className="font-tech text-lg mb-4 flex items-center gap-2">
                 <Share2 className="w-5 h-5 text-primary" />
                 Your Referral Link
@@ -319,11 +319,11 @@ export default function InviteFriends() {
                 return (
                   <Card
                     key={reward.id}
-                    className={`p-6 border-2 transition-all ${
+                    className={`p-6 border-2 transition-all glass-card card-3d ${
                       canAfford 
                         ? 'border-primary/50 hover:border-primary cursor-pointer hover:scale-[1.02]' 
                         : 'border-white/10 opacity-60'
-                    } bg-gradient-to-br ${reward.bgColor}`}
+                    }`}
                     onClick={() => canAfford && handleRedeem(reward)}
                     data-testid={`card-reward-${reward.id}`}
                   >
@@ -361,7 +361,7 @@ export default function InviteFriends() {
                 Points History
               </h2>
               
-              <Card className="border-white/10 overflow-hidden">
+              <Card className="glass-card border-white/10 overflow-hidden">
                 <div className="divide-y divide-white/10">
                   {transactions.slice(0, 10).map((tx) => (
                     <div key={tx.id} className="p-4 flex items-center justify-between">

@@ -318,7 +318,7 @@ export default function Projects() {
                       className={`p-3 rounded-lg cursor-pointer transition-all ${
                         selectedProject === project.id 
                           ? "bg-primary/20 border border-primary/40" 
-                          : "bg-card/50 hover:bg-card/80 border border-transparent"
+                          : "glass-card border border-transparent"
                       }`}
                       onClick={() => setSelectedProject(project.id)}
                       data-testid={`card-project-${project.id}`}
@@ -442,15 +442,15 @@ export default function Projects() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="bg-card/50 rounded-lg p-3 text-center">
+                  <div className="glass-card rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold">{projectDetails.parts.length}</p>
                     <p className="text-xs text-muted-foreground">Parts</p>
                   </div>
-                  <div className="bg-card/50 rounded-lg p-3 text-center">
+                  <div className="glass-card rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold">${calculateTotalCost(projectDetails.parts).toFixed(0)}</p>
                     <p className="text-xs text-muted-foreground">Total Cost</p>
                   </div>
-                  <div className="bg-card/50 rounded-lg p-3 text-center">
+                  <div className="glass-card rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold">{calculateProgress(projectDetails.parts)}%</p>
                     <p className="text-xs text-muted-foreground">Complete</p>
                   </div>
@@ -471,7 +471,7 @@ export default function Projects() {
                         key={part.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center justify-between p-4 rounded-lg bg-card/50 border border-border/50"
+                        className="flex items-center justify-between p-4 rounded-lg glass-card border border-border/50"
                         data-testid={`row-part-${part.id}`}
                       >
                         <div className="flex-1">

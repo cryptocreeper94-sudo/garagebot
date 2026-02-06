@@ -136,8 +136,8 @@ function NewsTab() {
                     transition={{ delay: idx * 0.05 }}
                     className="snap-start"
                   >
-                    <Card className="min-w-[280px] max-w-[300px] bg-zinc-900/60 border-zinc-800 hover:border-primary/30 transition-all overflow-hidden group">
-                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-cyan-500/5 flex items-center justify-center relative">
+                    <Card className="min-w-[280px] max-w-[300px] glass-card card-3d hover:border-primary/30 transition-all overflow-hidden group">
+                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-cyan-500/10 flex items-center justify-center relative">
                         {article.imageUrl ? (
                           <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
                         ) : (
@@ -215,7 +215,7 @@ function ReceiptScannerTool() {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       <div
-        className="border-2 border-dashed border-zinc-700 hover:border-primary/50 rounded-xl p-8 text-center cursor-pointer transition-colors"
+        className="border-2 border-dashed border-primary/20 hover:border-primary/50 glass-card rounded-xl p-8 text-center cursor-pointer transition-colors"
         onClick={() => fileRef.current?.click()}
         data-testid="receipt-upload-area"
       >
@@ -229,7 +229,7 @@ function ReceiptScannerTool() {
         {scanMutation.isPending ? "Processing..." : "Open Camera"}
       </Button>
       {scanResult && (
-        <Card className="bg-zinc-900/60 border-primary/20 p-4">
+        <Card className="glass-card border-primary/20 p-4">
           <div className="flex items-center gap-2 mb-3">
             <CheckCircle className="w-4 h-4 text-green-400" />
             <span className="text-sm font-medium text-white">Extracted Data</span>
@@ -281,19 +281,19 @@ function MileageTrackerTool() {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-mileage-date" />
+        <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-mileage-date" />
         <Select value={form.purpose} onValueChange={(v) => setForm({ ...form, purpose: v })}>
-          <SelectTrigger className="bg-zinc-900 border-zinc-700" data-testid="select-mileage-purpose"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="select-mileage-purpose"><SelectValue /></SelectTrigger>
           <SelectContent>
             {["Business", "Personal", "Medical", "Moving"].map((p) => (
               <SelectItem key={p} value={p}>{p}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Input type="number" placeholder="Start Odometer" value={form.startOdometer} onChange={(e) => setForm({ ...form, startOdometer: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-start-odometer" />
-        <Input type="number" placeholder="End Odometer" value={form.endOdometer} onChange={(e) => setForm({ ...form, endOdometer: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-end-odometer" />
+        <Input type="number" placeholder="Start Odometer" value={form.startOdometer} onChange={(e) => setForm({ ...form, startOdometer: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-start-odometer" />
+        <Input type="number" placeholder="End Odometer" value={form.endOdometer} onChange={(e) => setForm({ ...form, endOdometer: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-end-odometer" />
       </div>
-      <Input placeholder="Notes (optional)" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-mileage-notes" />
+      <Input placeholder="Notes (optional)" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-mileage-notes" />
       <Button className="w-full bg-primary hover:bg-primary/80 text-black font-medium" onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !form.date || !form.startOdometer || !form.endOdometer} data-testid="button-add-mileage">
         {addMutation.isPending ? "Saving..." : "Add Entry"}
       </Button>
@@ -301,7 +301,7 @@ function MileageTrackerTool() {
         <div className="space-y-2 mt-4">
           <h4 className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Recent Entries</h4>
           {entries.slice(0, 5).map((entry: any, i: number) => (
-            <Card key={i} className="bg-zinc-900/40 border-zinc-800 p-3 flex items-center justify-between">
+            <Card key={i} className="glass-card p-3 flex items-center justify-between">
               <div>
                 <span className="text-sm text-white">{entry.date}</span>
                 <span className="text-xs text-zinc-500 ml-2">{entry.purpose}</span>
@@ -342,10 +342,10 @@ function RecallCheckerTool() {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Input placeholder="Make (e.g. Toyota)" value={make} onChange={(e) => setMake(e.target.value)} className="bg-zinc-900 border-zinc-700" data-testid="input-recall-make" />
-        <Input placeholder="Model (e.g. Camry)" value={model} onChange={(e) => setModel(e.target.value)} className="bg-zinc-900 border-zinc-700" data-testid="input-recall-model" />
+        <Input placeholder="Make (e.g. Toyota)" value={make} onChange={(e) => setMake(e.target.value)} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-recall-make" />
+        <Input placeholder="Model (e.g. Camry)" value={model} onChange={(e) => setModel(e.target.value)} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-recall-model" />
         <Select value={year} onValueChange={setYear}>
-          <SelectTrigger className="bg-zinc-900 border-zinc-700" data-testid="select-recall-year"><SelectValue placeholder="Year" /></SelectTrigger>
+          <SelectTrigger className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="select-recall-year"><SelectValue placeholder="Year" /></SelectTrigger>
           <SelectContent>
             {years.map((y) => (
               <SelectItem key={y} value={y}>{y}</SelectItem>
@@ -360,13 +360,13 @@ function RecallCheckerTool() {
       {searched && recalls && (
         <div className="space-y-2">
           {recalls.length === 0 ? (
-            <Card className="bg-zinc-900/40 border-green-500/20 p-4 text-center">
+            <Card className="glass-card border-green-500/20 p-4 text-center">
               <CheckCircle className="w-6 h-6 text-green-400 mx-auto mb-2" />
               <p className="text-sm text-green-400">No open recalls found!</p>
             </Card>
           ) : (
             recalls.map((r: any, i: number) => (
-              <Card key={i} className="bg-zinc-900/40 border-amber-500/20 p-4" data-testid={`recall-result-${i}`}>
+              <Card key={i} className="glass-card border-amber-500/20 p-4" data-testid={`recall-result-${i}`}>
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
                   <div>
@@ -400,7 +400,7 @@ function ToolsTab() {
         {tools.map((tool, i) => (
           <motion.div key={tool.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
             <Card
-              className={`bg-zinc-900/60 border-zinc-800 p-5 hover:border-primary/30 transition-all cursor-pointer ${activeTool === tool.id ? "border-primary/50 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : ""}`}
+              className={`glass-card card-3d p-5 hover:border-primary/30 transition-all cursor-pointer ${activeTool === tool.id ? "border-primary/50 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : ""}`}
               onClick={() => tool.link ? undefined : setActiveTool(activeTool === tool.id ? null : tool.id)}
               data-testid={`tool-card-${tool.id}`}
             >
@@ -438,7 +438,7 @@ function ToolsTab() {
       <AnimatePresence mode="wait">
         {activeTool === "scanner" && (
           <motion.div key="scanner" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-            <Card className="bg-zinc-900/40 border-zinc-800 p-5">
+            <Card className="glass-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-primary flex items-center gap-2"><Camera className="w-4 h-4" /> Receipt Scanner</h3>
                 <Button variant="ghost" size="icon" className="w-6 h-6" onClick={() => setActiveTool(null)}><X className="w-4 h-4" /></Button>
@@ -449,7 +449,7 @@ function ToolsTab() {
         )}
         {activeTool === "mileage" && (
           <motion.div key="mileage" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-            <Card className="bg-zinc-900/40 border-zinc-800 p-5">
+            <Card className="glass-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-primary flex items-center gap-2"><Gauge className="w-4 h-4" /> Mileage Tracker</h3>
                 <Button variant="ghost" size="icon" className="w-6 h-6" onClick={() => setActiveTool(null)}><X className="w-4 h-4" /></Button>
@@ -460,7 +460,7 @@ function ToolsTab() {
         )}
         {activeTool === "recalls" && (
           <motion.div key="recalls" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-            <Card className="bg-zinc-900/40 border-zinc-800 p-5">
+            <Card className="glass-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-primary flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> Recall Checker</h3>
                 <Button variant="ghost" size="icon" className="w-6 h-6" onClick={() => setActiveTool(null)}><X className="w-4 h-4" /></Button>
@@ -575,7 +575,7 @@ function CommunityTab() {
       {sections.map((section, i) => (
         <motion.div key={section.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
           <Card
-            className={`bg-zinc-900/60 border-zinc-800 overflow-hidden transition-all ${expandedSection === section.id ? "border-primary/30" : "hover:border-zinc-700"}`}
+            className={`glass-card overflow-hidden transition-all ${expandedSection === section.id ? "border-primary/30" : "hover:border-zinc-700"}`}
             data-testid={`community-card-${section.id}`}
           >
             <div
@@ -599,10 +599,10 @@ function CommunityTab() {
                     {section.id === "speed-traps" && (
                       <>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                          <Input placeholder="Description" value={speedTrapForm.description} onChange={(e) => setSpeedTrapForm({ ...speedTrapForm, description: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-speed-trap-desc" />
-                          <Input placeholder="City" value={speedTrapForm.city} onChange={(e) => setSpeedTrapForm({ ...speedTrapForm, city: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-speed-trap-city" />
+                          <Input placeholder="Description" value={speedTrapForm.description} onChange={(e) => setSpeedTrapForm({ ...speedTrapForm, description: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-speed-trap-desc" />
+                          <Input placeholder="City" value={speedTrapForm.city} onChange={(e) => setSpeedTrapForm({ ...speedTrapForm, city: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-speed-trap-city" />
                           <Select value={speedTrapForm.state} onValueChange={(v) => setSpeedTrapForm({ ...speedTrapForm, state: v })}>
-                            <SelectTrigger className="bg-zinc-900 border-zinc-700" data-testid="select-speed-trap-state"><SelectValue placeholder="State" /></SelectTrigger>
+                            <SelectTrigger className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="select-speed-trap-state"><SelectValue placeholder="State" /></SelectTrigger>
                             <SelectContent>{US_STATES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                           </Select>
                         </div>
@@ -611,7 +611,7 @@ function CommunityTab() {
                         </Button>
                         <div className="flex gap-2 items-center mt-2">
                           <Select value={speedTrapState} onValueChange={setSpeedTrapState}>
-                            <SelectTrigger className="bg-zinc-900 border-zinc-700 w-24" data-testid="select-view-speed-trap-state"><SelectValue placeholder="State" /></SelectTrigger>
+                            <SelectTrigger className="bg-black/30 border-white/10 focus:border-primary/50 w-24" data-testid="select-view-speed-trap-state"><SelectValue placeholder="State" /></SelectTrigger>
                             <SelectContent>{US_STATES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                           </Select>
                           <span className="text-xs text-zinc-500">Browse reports</span>
@@ -619,7 +619,7 @@ function CommunityTab() {
                         {speedTraps && speedTraps.length > 0 && (
                           <div className="space-y-2">
                             {speedTraps.slice(0, 5).map((t: any, i: number) => (
-                              <div key={i} className="flex items-center gap-2 text-xs text-zinc-400 bg-zinc-900/40 rounded p-2">
+                              <div key={i} className="flex items-center gap-2 text-xs text-zinc-400 glass-card rounded p-2">
                                 <MapPin className="w-3 h-3 text-red-400 shrink-0" />
                                 <span className="text-white">{t.city}, {t.state}</span> - {t.description}
                               </div>
@@ -632,23 +632,23 @@ function CommunityTab() {
                     {section.id === "fuel" && (
                       <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <Input placeholder="Station Name" value={fuelForm.stationName} onChange={(e) => setFuelForm({ ...fuelForm, stationName: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-fuel-station" />
-                          <Input placeholder="Brand" value={fuelForm.brand} onChange={(e) => setFuelForm({ ...fuelForm, brand: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-fuel-brand" />
-                          <Input type="number" step="0.01" placeholder="Regular $/gal" value={fuelForm.regularPrice} onChange={(e) => setFuelForm({ ...fuelForm, regularPrice: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-fuel-regular" />
-                          <Input type="number" step="0.01" placeholder="Diesel $/gal" value={fuelForm.dieselPrice} onChange={(e) => setFuelForm({ ...fuelForm, dieselPrice: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-fuel-diesel" />
+                          <Input placeholder="Station Name" value={fuelForm.stationName} onChange={(e) => setFuelForm({ ...fuelForm, stationName: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-fuel-station" />
+                          <Input placeholder="Brand" value={fuelForm.brand} onChange={(e) => setFuelForm({ ...fuelForm, brand: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-fuel-brand" />
+                          <Input type="number" step="0.01" placeholder="Regular $/gal" value={fuelForm.regularPrice} onChange={(e) => setFuelForm({ ...fuelForm, regularPrice: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-fuel-regular" />
+                          <Input type="number" step="0.01" placeholder="Diesel $/gal" value={fuelForm.dieselPrice} onChange={(e) => setFuelForm({ ...fuelForm, dieselPrice: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-fuel-diesel" />
                         </div>
-                        <Input placeholder="Zip Code" value={fuelForm.zipCode} onChange={(e) => setFuelForm({ ...fuelForm, zipCode: e.target.value })} className="bg-zinc-900 border-zinc-700 w-32" data-testid="input-fuel-zip" />
+                        <Input placeholder="Zip Code" value={fuelForm.zipCode} onChange={(e) => setFuelForm({ ...fuelForm, zipCode: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50 w-32" data-testid="input-fuel-zip" />
                         <Button size="sm" className="bg-green-500 hover:bg-green-600 text-black" onClick={() => fuelMutation.mutate()} disabled={fuelMutation.isPending || !fuelForm.stationName || !fuelForm.zipCode} data-testid="button-report-fuel">
                           <Fuel className="w-3 h-3 mr-1" /> Report Price
                         </Button>
                         <div className="flex gap-2 items-center mt-2">
-                          <Input placeholder="Search by ZIP" value={fuelZip} onChange={(e) => setFuelZip(e.target.value)} className="bg-zinc-900 border-zinc-700 w-32" data-testid="input-fuel-search-zip" />
+                          <Input placeholder="Search by ZIP" value={fuelZip} onChange={(e) => setFuelZip(e.target.value)} className="bg-black/30 border-white/10 focus:border-primary/50 w-32" data-testid="input-fuel-search-zip" />
                           <span className="text-xs text-zinc-500">Browse prices</span>
                         </div>
                         {fuelPrices && fuelPrices.length > 0 && (
                           <div className="space-y-2">
                             {fuelPrices.slice(0, 5).map((f: any, i: number) => (
-                              <div key={i} className="flex items-center justify-between text-xs bg-zinc-900/40 rounded p-2">
+                              <div key={i} className="flex items-center justify-between text-xs glass-card rounded p-2">
                                 <div className="text-white">{f.stationName} <span className="text-zinc-500">({f.brand})</span></div>
                                 <div className="flex gap-3">
                                   {f.regularPrice && <span className="text-green-400">${f.regularPrice} reg</span>}
@@ -664,13 +664,13 @@ function CommunityTab() {
                     {section.id === "shops" && (
                       <>
                         <Select value={shopState} onValueChange={setShopState}>
-                          <SelectTrigger className="bg-zinc-900 border-zinc-700 w-32" data-testid="select-shop-state"><SelectValue placeholder="State" /></SelectTrigger>
+                          <SelectTrigger className="bg-black/30 border-white/10 focus:border-primary/50 w-32" data-testid="select-shop-state"><SelectValue placeholder="State" /></SelectTrigger>
                           <SelectContent>{US_STATES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                         </Select>
                         {shops && shops.length > 0 ? (
                           <div className="space-y-2">
                             {shops.map((s: any, i: number) => (
-                              <Card key={i} className="bg-zinc-900/40 border-zinc-800 p-3" data-testid={`shop-card-${i}`}>
+                              <Card key={i} className="glass-card p-3" data-testid={`shop-card-${i}`}>
                                 <h5 className="text-sm font-bold text-white">{s.name}</h5>
                                 <p className="text-xs text-zinc-500">{s.address || s.city}</p>
                                 {s.specialty && <Badge className="mt-1 bg-purple-500/10 text-purple-400 border-purple-500/30 text-[10px]">{s.specialty}</Badge>}
@@ -686,13 +686,13 @@ function CommunityTab() {
                     {section.id === "events" && (
                       <>
                         <Select value={eventState} onValueChange={setEventState}>
-                          <SelectTrigger className="bg-zinc-900 border-zinc-700 w-32" data-testid="select-event-state"><SelectValue placeholder="State" /></SelectTrigger>
+                          <SelectTrigger className="bg-black/30 border-white/10 focus:border-primary/50 w-32" data-testid="select-event-state"><SelectValue placeholder="State" /></SelectTrigger>
                           <SelectContent>{US_STATES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                         </Select>
                         {events && events.length > 0 ? (
                           <div className="space-y-2">
                             {events.map((ev: any, i: number) => (
-                              <Card key={i} className="bg-zinc-900/40 border-zinc-800 p-3" data-testid={`event-card-${i}`}>
+                              <Card key={i} className="glass-card p-3" data-testid={`event-card-${i}`}>
                                 <h5 className="text-sm font-bold text-white">{ev.name || ev.title}</h5>
                                 <p className="text-xs text-zinc-500">{ev.date} {ev.location && `- ${ev.location}`}</p>
                                 {ev.type && <Badge className="mt-1 bg-amber-500/10 text-amber-400 border-amber-500/30 text-[10px]">{ev.type}</Badge>}
@@ -767,7 +767,7 @@ function OpportunitiesTab() {
           <div className="space-y-4">
             {programs.map((prog: any, i: number) => (
               <motion.div key={prog.id || i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
-                <Card className="bg-zinc-900/60 border-zinc-800 hover:border-primary/30 transition-all p-5" data-testid={`cdl-program-${i}`}>
+                <Card className="glass-card hover:border-primary/30 transition-all p-5" data-testid={`cdl-program-${i}`}>
                   <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -809,26 +809,26 @@ function OpportunitiesTab() {
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                         <div className="mt-4 pt-4 border-t border-zinc-800 space-y-3">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <Input placeholder="Full Name" value={referralForm.fullName} onChange={(e) => setReferralForm({ ...referralForm, fullName: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-referral-name" />
-                            <Input type="email" placeholder="Email" value={referralForm.email} onChange={(e) => setReferralForm({ ...referralForm, email: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-referral-email" />
-                            <Input placeholder="Phone" value={referralForm.phone} onChange={(e) => setReferralForm({ ...referralForm, phone: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-referral-phone" />
-                            <Input placeholder="Your Location" value={referralForm.location} onChange={(e) => setReferralForm({ ...referralForm, location: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-referral-location" />
+                            <Input placeholder="Full Name" value={referralForm.fullName} onChange={(e) => setReferralForm({ ...referralForm, fullName: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-referral-name" />
+                            <Input type="email" placeholder="Email" value={referralForm.email} onChange={(e) => setReferralForm({ ...referralForm, email: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-referral-email" />
+                            <Input placeholder="Phone" value={referralForm.phone} onChange={(e) => setReferralForm({ ...referralForm, phone: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-referral-phone" />
+                            <Input placeholder="Your Location" value={referralForm.location} onChange={(e) => setReferralForm({ ...referralForm, location: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-referral-location" />
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <Select value={referralForm.cdlClass} onValueChange={(v) => setReferralForm({ ...referralForm, cdlClass: v })}>
-                              <SelectTrigger className="bg-zinc-900 border-zinc-700" data-testid="select-cdl-class"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="select-cdl-class"><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 {["Class A", "Class B", "Passenger"].map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                               </SelectContent>
                             </Select>
                             <Select value={referralForm.experienceLevel} onValueChange={(v) => setReferralForm({ ...referralForm, experienceLevel: v })}>
-                              <SelectTrigger className="bg-zinc-900 border-zinc-700" data-testid="select-experience"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="select-experience"><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 {["None", "Student", "1-2 Years", "3-5 Years", "5+ Years"].map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           </div>
-                          <Input placeholder="Message (optional)" value={referralForm.message} onChange={(e) => setReferralForm({ ...referralForm, message: e.target.value })} className="bg-zinc-900 border-zinc-700" data-testid="input-referral-message" />
+                          <Input placeholder="Message (optional)" value={referralForm.message} onChange={(e) => setReferralForm({ ...referralForm, message: e.target.value })} className="bg-black/30 border-white/10 focus:border-primary/50" data-testid="input-referral-message" />
                           <Button
                             className="w-full bg-primary hover:bg-primary/80 text-black font-medium"
                             onClick={() => referralMutation.mutate()}
@@ -846,7 +846,7 @@ function OpportunitiesTab() {
             ))}
           </div>
         ) : (
-          <Card className="bg-zinc-900/40 border-zinc-800 p-8 text-center">
+          <Card className="glass-card p-8 text-center">
             <Briefcase className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
             <p className="text-sm text-zinc-500">No programs available right now. Check back soon!</p>
           </Card>
@@ -856,7 +856,7 @@ function OpportunitiesTab() {
       <div>
         <h3 className="text-lg font-bold text-white mb-1">Other Opportunities</h3>
         <p className="text-sm text-zinc-500 mb-4">Aviation, aerospace, skilled trades & more</p>
-        <Card className="bg-zinc-900/40 border-zinc-800 p-6 text-center border-dashed">
+        <Card className="glass-card p-6 text-center border-dashed">
           <Star className="w-8 h-8 text-primary/30 mx-auto mb-2" />
           <p className="text-sm text-zinc-500">More career opportunities coming soon.</p>
           <p className="text-xs text-zinc-600 mt-1">Aviation, aerospace, diesel tech, welding & more</p>
@@ -883,7 +883,7 @@ export default function BreakRoom() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/30 rounded-full text-primary text-sm mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 glass-ultra rounded-xl text-primary text-sm mb-6"
             >
               <Coffee className="w-4 h-4" />
               Pit Stop Hub
@@ -927,8 +927,8 @@ export default function BreakRoom() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`${
                   activeTab === tab.id
-                    ? "bg-primary hover:bg-primary/80 text-black font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-                    : "border-zinc-700 text-zinc-400 hover:text-white hover:border-primary/40 bg-transparent"
+                    ? "glass-card-accent text-black font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                    : "glass-card text-zinc-400 hover:text-white hover:border-primary/40"
                 } transition-all`}
                 data-testid={`tab-${tab.id}`}
               >

@@ -106,7 +106,7 @@ export default function Checkout() {
           {/* Order Summary */}
           <div className="space-y-6">
             <h2 className="font-tech font-bold text-2xl uppercase text-primary">Order Summary</h2>
-            <Card className="bg-card/50 border-border p-6 space-y-4">
+            <Card className="glass-card card-3d border-border p-6 space-y-4">
               <div className="flex gap-4">
                 <div className="w-20 h-20 bg-black/20 rounded overflow-hidden">
                   <img src="https://images.unsplash.com/photo-1600685039239-c72963c4a8a5?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" />
@@ -142,7 +142,7 @@ export default function Checkout() {
           {/* Payment Method */}
           <div className="space-y-6">
             <h2 className="font-tech font-bold text-2xl uppercase text-primary">Payment Method</h2>
-            <Card className="bg-card border-border p-1">
+            <Card className="glass-ultra border-border p-1">
               <Tabs defaultValue="card" className="w-full">
                 <TabsList className="w-full grid grid-cols-2 bg-black/20 h-12 p-1">
                   <TabsTrigger value="card" className="font-mono text-xs uppercase flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-black">

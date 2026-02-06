@@ -66,7 +66,7 @@ const COMPARISON = [
   { feature: "Monthly Price", us: "$49", them: "$179+" },
   { feature: "Repair Orders", us: "Unlimited", them: "Unlimited" },
   { feature: "Users", us: "Unlimited", them: "Per-seat pricing" },
-  { feature: "Parts Search (40+ retailers)", us: true, them: false },
+  { feature: "Parts Search (50+ retailers)", us: true, them: false },
   { feature: "AI Assistant (Buddy)", us: true, them: false },
   { feature: "DIY Guides Library", us: true, them: false },
   { feature: "Marketing Hub", us: "Add-on", them: "$345+/mo" },
@@ -347,7 +347,7 @@ export default function MechanicsGarageSales() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="p-6 bg-zinc-900/50 border-zinc-800 hover:border-cyan-500/30 transition-all h-full">
+                <Card className="p-6 glass-card card-3d border-white/10 hover:border-cyan-500/30 transition-all h-full">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-green-500/20 flex items-center justify-center mb-4">
                     <feature.icon className="w-6 h-6 text-cyan-400" />
                   </div>
@@ -372,7 +372,7 @@ export default function MechanicsGarageSales() {
             <p className="text-zinc-400">Same features. Fraction of the cost.</p>
           </div>
 
-          <Card className="bg-zinc-900/50 border-zinc-800 overflow-hidden">
+          <Card className="glass-ultra border-white/10 overflow-hidden">
             <div className="grid grid-cols-3 gap-4 p-4 bg-zinc-800/50 border-b border-zinc-700">
               <div className="font-bold text-zinc-400">Feature</div>
               <div className="text-center">
@@ -385,7 +385,7 @@ export default function MechanicsGarageSales() {
               </div>
             </div>
             {COMPARISON.map((row, i) => (
-              <div key={i} className="grid grid-cols-3 gap-4 p-4 border-b border-zinc-800 last:border-0">
+              <div key={i} className="grid grid-cols-3 gap-4 p-4 border-b border-white/10 last:border-0">
                 <div className="text-zinc-300">{row.feature}</div>
                 <div className="text-center">
                   {typeof row.us === "boolean" ? (
@@ -417,7 +417,7 @@ export default function MechanicsGarageSales() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {SHOP_TYPES.map((type) => (
-              <Card key={type.id} className="p-6 bg-zinc-900/50 border-zinc-800 hover:border-cyan-500/30 transition-all text-center cursor-pointer group">
+              <Card key={type.id} className="p-6 glass-card border-white/10 hover:border-cyan-500/30 transition-all text-center cursor-pointer group">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500/10 to-green-500/10 flex items-center justify-center mx-auto mb-4 group-hover:from-cyan-500/20 group-hover:to-green-500/20 transition-all">
                   <type.icon className="w-8 h-8 text-cyan-400" />
                 </div>
@@ -444,14 +444,14 @@ export default function MechanicsGarageSales() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="p-6 bg-zinc-900/50 border-zinc-800 h-full">
+                <Card className="p-6 glass-card border-white/10 h-full">
                   <div className="flex gap-1 mb-4">
                     {[...Array(testimonial.rating)].map((_, j) => (
                       <Star key={j} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                     ))}
                   </div>
                   <p className="text-zinc-300 italic mb-4">"{testimonial.quote}"</p>
-                  <div className="border-t border-zinc-800 pt-4">
+                  <div className="border-t border-white/10 pt-4">
                     <p className="text-white font-medium">{testimonial.name}</p>
                     <p className="text-zinc-500 text-sm">{testimonial.location}</p>
                   </div>
@@ -534,7 +534,7 @@ export default function MechanicsGarageSales() {
                           value={formData.shopName}
                           onChange={(e) => setFormData({ ...formData, shopName: e.target.value })}
                           placeholder="Mike's Auto Care"
-                          className="bg-zinc-800/50 border-zinc-700 mt-1"
+                          className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
                           data-testid="input-shop-name"
                         />
                       </div>
@@ -545,7 +545,7 @@ export default function MechanicsGarageSales() {
                           value={formData.contactName}
                           onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
                           placeholder="Mike Johnson"
-                          className="bg-zinc-800/50 border-zinc-700 mt-1"
+                          className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
                           data-testid="input-contact-name"
                         />
                       </div>
@@ -560,7 +560,7 @@ export default function MechanicsGarageSales() {
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                           placeholder="mike@example.com"
-                          className="bg-zinc-800/50 border-zinc-700 mt-1"
+                          className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
                           data-testid="input-email"
                         />
                       </div>
@@ -572,7 +572,7 @@ export default function MechanicsGarageSales() {
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           placeholder="(555) 123-4567"
-                          className="bg-zinc-800/50 border-zinc-700 mt-1"
+                          className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
                           data-testid="input-phone"
                         />
                       </div>
@@ -589,7 +589,7 @@ export default function MechanicsGarageSales() {
                             className={`p-2 rounded-lg border text-xs font-medium transition-all ${
                               formData.shopType === type.label
                                 ? "border-cyan-500 bg-cyan-500/10 text-cyan-400"
-                                : "border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-zinc-600"
+                                : "border-white/10 bg-black/30 text-zinc-400 hover:border-primary/30"
                             }`}
                             data-testid={`button-shop-type-${type.id}`}
                           >
@@ -606,7 +606,7 @@ export default function MechanicsGarageSales() {
                           value={formData.currentSoftware}
                           onChange={(e) => setFormData({ ...formData, currentSoftware: e.target.value })}
                           placeholder="e.g., AutoLeap, pen & paper"
-                          className="bg-zinc-800/50 border-zinc-700 mt-1"
+                          className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
                           data-testid="input-current-software"
                         />
                       </div>
@@ -616,7 +616,7 @@ export default function MechanicsGarageSales() {
                           value={formData.employees}
                           onChange={(e) => setFormData({ ...formData, employees: e.target.value })}
                           placeholder="e.g., 3"
-                          className="bg-zinc-800/50 border-zinc-700 mt-1"
+                          className="bg-black/30 border-white/10 focus:border-primary/50 mt-1"
                           data-testid="input-employees"
                         />
                       </div>
@@ -628,7 +628,7 @@ export default function MechanicsGarageSales() {
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         placeholder="Tell us about your shop or any questions you have..."
-                        className="bg-zinc-800/50 border-zinc-700 mt-1 min-h-[80px]"
+                        className="bg-black/30 border-white/10 focus:border-primary/50 mt-1 min-h-[80px]"
                         data-testid="input-message"
                       />
                     </div>
@@ -675,7 +675,7 @@ export default function MechanicsGarageSales() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-zinc-800">
+      <footer className="py-8 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Wrench className="w-5 h-5 text-cyan-400" />

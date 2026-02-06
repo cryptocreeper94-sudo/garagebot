@@ -233,11 +233,11 @@ export default function Garage() {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans">
         <Nav />
-        <div className="container mx-auto px-4 pt-24 text-center">
+        <div className="container mx-auto px-4 pt-24 text-center glass-ultra rounded-xl p-12">
           <Car className="w-24 h-24 mx-auto mb-6 text-primary/30" />
           <h1 className="text-3xl font-tech font-bold uppercase text-primary mb-4">Sign In to Access Your Garage</h1>
           <p className="text-muted-foreground mb-8">Keep track of your vehicles, maintenance history, and open recalls</p>
-          <Button size="lg" className="font-tech uppercase gap-2" onClick={() => window.location.href = "/auth"} data-testid="button-login">
+          <Button size="lg" className="btn-cyber font-tech uppercase gap-2" onClick={() => window.location.href = "/auth"} data-testid="button-login">
             Sign In with PIN
           </Button>
           <p className="text-muted-foreground text-xs mt-4">Secure PIN authentication</p>
@@ -252,26 +252,26 @@ export default function Garage() {
       <div className="w-full px-2 pt-[85px] lg:pt-[80px] pb-16">
         <div className="flex overflow-x-auto md:grid md:grid-cols-12 gap-0 mb-0 scrollbar-hide">
           <div className="md:col-span-8 min-w-[85vw] md:min-w-0 flex-shrink-0">
-            <Card className="bento-glass border-primary/20 p-3 h-full">
+            <Card className="bento-glass card-3d border-primary/20 p-3 h-full">
               <h1 className="text-xl font-tech font-bold uppercase text-primary" data-testid="text-page-title">My Garage</h1>
               <p className="text-muted-foreground text-[10px] font-mono">VEHICLE PASSPORT • RECALLS • SERVICE</p>
             </Card>
           </div>
           <div className="md:col-span-4">
-            <Card className="bento-glass bento-glow border-primary/20 p-3 h-full flex items-center justify-center">
+            <Card className="bento-glass bento-glow card-3d border-primary/20 p-3 h-full flex items-center justify-center">
               <Dialog open={addVehicleOpen} onOpenChange={setAddVehicleOpen}>
                 <DialogTrigger asChild>
                   <Button className="gap-2 font-tech uppercase text-xs glow-primary" data-testid="button-add-vehicle">
                     <Plus className="w-3 h-3" /> Add Vehicle
                   </Button>
                 </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto glass-ultra">
               <DialogHeader>
                 <DialogTitle className="font-tech text-xl uppercase">Add Vehicle to Garage</DialogTitle>
                 <DialogDescription>Scan your VIN to auto-fill vehicle details or enter manually</DialogDescription>
               </DialogHeader>
               <div className="space-y-3 py-4">
-                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                <div className="glass-card bg-primary/5 border border-primary/20 rounded-lg p-4">
                   <Label className="text-primary font-tech text-sm uppercase mb-2 block">Quick VIN Decode</Label>
                   <div className="flex gap-2">
                     <Input 
@@ -295,7 +295,7 @@ export default function Garage() {
                     <motion.div 
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded text-sm"
+                      className="mt-3 p-3 glass-card bg-green-500/10 border border-green-500/30 rounded text-sm"
                     >
                       <div className="flex items-center gap-2 text-green-400 mb-2">
                         <CheckCircle className="w-4 h-4" />
@@ -374,7 +374,7 @@ export default function Garage() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : vehicles.length === 0 ? (
-          <Card className="bg-card/50 border-dashed border-2 border-muted p-12 text-center">
+          <Card className="glass-ultra border-dashed border-2 border-primary/20 card-3d p-12 text-center">
             <Car className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
             <h3 className="text-xl font-tech uppercase text-muted-foreground mb-2">No Vehicles Yet</h3>
             <p className="text-sm text-muted-foreground mb-6">Add your first vehicle to track maintenance and check for recalls</p>
@@ -396,7 +396,7 @@ export default function Garage() {
                     transition={{ delay: index * 0.1 }}
                   >
                     <Card 
-                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${selectedVehicle?.id === vehicle.id ? 'border-primary bg-primary/5' : 'bg-card'}`}
+                      className={`p-4 cursor-pointer transition-all hover:border-primary/50 glass-card card-3d ${selectedVehicle?.id === vehicle.id ? 'border-primary bg-primary/5' : ''}`}
                       onClick={() => setSelectedVehicle(vehicle)}
                       data-testid={`card-vehicle-${vehicle.id}`}
                     >
@@ -432,7 +432,7 @@ export default function Garage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <Card className="bg-card border-primary/30 overflow-hidden">
+                  <Card className="glass-ultra rounded-xl border-primary/30 overflow-hidden">
                     <div className="h-32 bg-gradient-to-r from-primary/10 to-transparent flex items-end p-6">
                       <div className="flex items-center gap-4 flex-1">
                         <Button 
@@ -463,7 +463,7 @@ export default function Garage() {
 
                     <Tabs defaultValue="passport" className="p-6">
                       <div className="overflow-x-auto scrollbar-hide -mx-2 px-2 mb-6">
-                        <TabsList className="inline-flex w-auto min-w-full gap-1">
+                        <TabsList className="inline-flex w-auto min-w-full gap-1 glass-card">
                           <TabsTrigger value="passport" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-passport">
                             <Shield className="w-3 h-3 mr-1" /> Passport
                           </TabsTrigger>
@@ -565,7 +565,7 @@ export default function Garage() {
                           <ScrollArea className="h-[400px]">
                             <div className="space-y-0">
                               {recalls.map((recall, index) => (
-                                <Card key={index} className="p-4 bg-destructive/5 border-destructive/20" data-testid={`card-recall-${index}`}>
+                                <Card key={index} className="p-4 glass-card bg-destructive/5 border-destructive/20" data-testid={`card-recall-${index}`}>
                                   <div className="flex items-start gap-3">
                                     <AlertTriangle className="w-5 h-5 text-destructive mt-1 flex-shrink-0" />
                                     <div className="flex-1">
@@ -596,7 +596,7 @@ export default function Garage() {
                                 <Plus className="w-3 h-3 mr-1" /> Log Service
                               </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="glass-ultra">
                               <DialogHeader>
                                 <DialogTitle className="font-tech uppercase">Log Service Record</DialogTitle>
                                 <DialogDescription>Track maintenance for your {selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</DialogDescription>
@@ -688,7 +688,7 @@ export default function Garage() {
                           <ScrollArea className="h-[400px]">
                             <div className="space-y-3">
                               {serviceRecords.map((record) => (
-                                <Card key={record.id} className="p-4 bg-muted/30" data-testid={`card-service-${record.id}`}>
+                                <Card key={record.id} className="p-4 glass-card" data-testid={`card-service-${record.id}`}>
                                   <div className="flex items-start justify-between">
                                     <div className="flex items-start gap-3">
                                       <div className="p-2 rounded bg-primary/10">
@@ -754,7 +754,7 @@ export default function Garage() {
                   </Card>
                 </motion.div>
               ) : (
-                <Card className="bg-card/50 border-dashed border-2 h-full min-h-[400px] flex items-center justify-center">
+                <Card className="glass-ultra border-dashed border-2 border-primary/20 rounded-xl h-full min-h-[400px] flex items-center justify-center">
                   <div className="text-center">
                     <ChevronRight className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30 rotate-180" />
                     <h3 className="font-tech uppercase text-muted-foreground">Select a Vehicle</h3>

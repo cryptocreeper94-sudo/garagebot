@@ -92,7 +92,7 @@ export default function VendorSignup() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="bg-card/50 border-primary/20 p-6 mb-6">
+          <Card className="glass-ultra border-primary/20 p-6 mb-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-lg bg-primary/20">
                 <Store className="w-6 h-6 text-primary" />
@@ -104,9 +104,9 @@ export default function VendorSignup() {
             </div>
           </Card>
 
-          <Card className="bg-card/50 border-primary/20 p-6">
+          <Card className="glass-ultra border-primary/20 p-6">
             <p className="text-muted-foreground mb-6">
-              Join our network of 40+ retailers and reach millions of customers searching for auto parts. Fill out the form below and our partnerships team will be in touch.
+              Join our network of 50+ retailers and reach millions of customers searching for auto parts. Fill out the form below and our partnerships team will be in touch.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">

@@ -92,7 +92,7 @@ function BlogList() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-8 glass-ultra rounded-xl p-6"
           >
             <div className="flex items-center gap-3 mb-2">
               <BookOpen className="w-8 h-8 text-primary" />
@@ -155,7 +155,7 @@ function BlogList() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {featuredPosts.map(post => (
                   <Link key={post.id} href={`/blog/${post.slug}`}>
-                    <Card className="p-4 hover:border-primary/50 transition-colors cursor-pointer h-full" data-testid={`card-featured-${post.id}`}>
+                    <Card className="p-4 glass-card card-3d hover:border-primary/50 transition-colors cursor-pointer h-full" data-testid={`card-featured-${post.id}`}>
                       <Badge className="mb-2 bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
                         Featured
                       </Badge>
@@ -200,7 +200,7 @@ function BlogList() {
                 >
                   <Link href={`/blog/${post.slug}`}>
                     <Card 
-                      className="p-5 hover:border-primary/50 transition-all cursor-pointer h-full flex flex-col"
+                      className="p-5 glass-card hover:border-primary/50 transition-all cursor-pointer h-full flex flex-col"
                       data-testid={`card-blog-post-${post.id}`}
                     >
                       <div className="flex items-center gap-2 mb-3">
