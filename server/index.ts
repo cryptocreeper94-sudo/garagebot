@@ -5,6 +5,10 @@ import { createServer } from "http";
 import { runMigrations } from 'stripe-replit-sync';
 import { getStripeSync } from "./stripeClient";
 import { WebhookHandlers } from "./webhookHandlers";
+import { setupChatWebSocket } from "./services/chat-websocket";
+import { createChatRouter } from "./chat-routes";
+import { communityHubService } from "./services/community-hub-service";
+import { initBuddyBot } from "./services/buddy-chat-bot";
 
 const app = express();
 const httpServer = createServer(app);
@@ -130,6 +134,19 @@ async function initStripe() {
   });
 
   await registerRoutes(httpServer, app);
+
+  app.use(createChatRouter());
+
+  setupChatWebSocket(httpServer);
+
+  try {
+    await communityHubService.seedGarageBotCommunity();
+    log("GarageBot community seeded", "chat");
+    await initBuddyBot();
+    log("Buddy AI bot initialized", "chat");
+  } catch (err: any) {
+    log(`Chat init error: ${err.message}`, "chat");
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
