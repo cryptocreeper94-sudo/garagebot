@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -429,7 +431,9 @@ export default function MarketingHub() {
   const charCount = getCharacterCount(newPost.content, newPost.platform);
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background">
+      <Nav />
+      <div className="pt-[50px] p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">
@@ -1369,6 +1373,8 @@ export default function MarketingHub() {
           </DialogContent>
         </Dialog>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }
