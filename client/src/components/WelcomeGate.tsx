@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,17 +10,158 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import {
   X, Eye, EyeOff, Loader2, CheckCircle, AlertCircle,
-  Car, Mail, User, Lock, ArrowRight, KeyRound
+  Car, Mail, User, Lock, ArrowRight, KeyRound, Shield,
+  FileText, ChevronDown, Globe
 } from "lucide-react";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 
-type View = "signup" | "login" | "forgot" | "reset-sent";
+type View = "signup" | "signup-terms" | "login" | "forgot" | "reset-sent";
 
 interface PasswordCheck {
   length: boolean;
   uppercase: boolean;
+  lowercase: boolean;
+  number: boolean;
   special: boolean;
 }
+
+const TERMS_TEXT = `TERMS OF SERVICE — GarageBot by DarkWave Studios LLC
+Last Updated: February 2026
+
+1. ACCEPTANCE OF TERMS
+By accessing or using GarageBot ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Platform. GarageBot is operated by DarkWave Studios LLC ("we", "us", "our"). These terms apply to all users, including visitors, registered users, and Pro subscribers.
+
+2. PLATFORM SERVICES
+GarageBot provides:
+• Parts Aggregation: Search across 50+ automotive and motorized vehicle retailers. We are an aggregator and do not sell parts directly.
+• My Garage: Store and manage your vehicles, service history, and specifications.
+• Genesis Hallmark: Blockchain-verified vehicle identity and ownership records on the Solana network.
+• DIY Repair Guides: AI-generated step-by-step maintenance and repair instructions.
+• Buddy AI Assistant: Conversational parts finding, recommendations, and vehicle diagnostics.
+• Insurance Comparison: Compare quotes from insurance providers.
+• Mechanics Garage: Shop management subscription service for professional mechanics.
+• Motorized Hobby Section: Parts and resources for RC cars, drones/FPV, model aircraft, and slot cars.
+
+3. ACCOUNT REGISTRATION
+You must provide accurate, complete information when creating an account. Your account credentials (username, email, password) are your responsibility. You agree to maintain the security of your password and accept responsibility for all activities under your account. Your password works across all DarkWave Trust Layer connected applications.
+
+4. SUBSCRIPTIONS & PAYMENTS
+• Pro Subscription (Founders Circle): Current pricing at $4.99/month or $39.99/year. Founders Circle members lock in their rate permanently, even after price increases. Subscriptions auto-renew unless cancelled before the billing period ends.
+• Mechanics Garage Subscription: Professional shop management tools with tiered pricing. See subscription details for current rates.
+• Affiliate Purchases: When you purchase parts through our affiliate links, the transaction is with the retailer. All warranties, returns, and support are handled by the respective retailer. We may earn commissions on qualifying purchases at no additional cost to you.
+• Refunds are processed in accordance with our refund policy.
+
+5. USER CONDUCT
+You agree not to:
+• Use the Platform for any unlawful purpose
+• Attempt to gain unauthorized access to any part of the Platform
+• Interfere with or disrupt the Platform's operation
+• Submit false or misleading information
+• Use automated means to access the Platform without permission
+• Harass, abuse, or harm other users
+• Reverse engineer or attempt to extract source code
+
+6. INTELLECTUAL PROPERTY
+All content, features, and functionality of the Platform are owned by DarkWave Studios LLC and are protected by copyright, trademark, and other intellectual property laws. Genesis Hallmark NFTs grant ownership of the digital asset but not the underlying Platform technology.
+
+7. DISCLAIMER OF WARRANTIES
+The Platform is provided "as is" and "as available" without warranties of any kind. We do not guarantee the accuracy of parts information, pricing, or availability from third-party retailers. DIY guides and AI recommendations are for informational purposes only — always consult a certified mechanic for safety-critical repairs.
+
+8. LIMITATION OF LIABILITY
+DarkWave Studios LLC shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Platform, including but not limited to damages from parts purchased through affiliate links, vehicle repairs performed based on our guides, or data loss.
+
+9. INDEMNIFICATION
+You agree to indemnify and hold harmless DarkWave Studios LLC from any claims, damages, or expenses arising from your use of the Platform or violation of these Terms.
+
+10. MODIFICATION OF TERMS
+We reserve the right to modify these Terms at any time. We will notify registered users of material changes via email. Continued use of the Platform after changes constitutes acceptance of the modified Terms.
+
+11. TERMINATION
+We may suspend or terminate your account at our discretion for violations of these Terms. Upon termination, your right to use the Platform ceases immediately. Data associated with your account may be deleted after a reasonable retention period.
+
+12. GOVERNING LAW
+These Terms are governed by the laws of the State of Delaware, USA. Any disputes shall be resolved in the courts of Delaware.
+
+13. CONTACT
+For questions about these Terms, contact us at support@darkwavestudios.io or through our in-app support system.`;
+
+const PRIVACY_TEXT = `PRIVACY POLICY — GarageBot by DarkWave Studios LLC
+Last Updated: February 2026
+
+1. INFORMATION WE COLLECT
+GarageBot collects information you provide directly to us, including:
+• Account information (first name, username, email, password)
+• Vehicle information (VIN, year, make, model, service history)
+• Transaction data for parts purchases and subscriptions
+• Communication preferences and service requests
+• Mechanic shop business information (for Mechanics Garage subscribers)
+
+We automatically collect certain information when you use our platform:
+• Device and browser information
+• IP address and approximate location data (for local pickup features)
+• Usage patterns and search history
+• Cookie and session data
+
+2. HOW WE USE YOUR INFORMATION
+• To provide and improve our parts search and aggregation services
+• To maintain your vehicle records and service history
+• To process transactions and Genesis Hallmark minting
+• To send service reminders and important notifications
+• To connect you with mechanic shops and insurance providers
+• To personalize your experience with relevant recommendations
+• To detect and prevent fraud or unauthorized access
+• To sync your credentials across DarkWave Trust Layer connected apps
+
+3. INFORMATION SHARING
+We do not sell your personal information. We may share information with:
+• Parts Retailers: When you click through to purchase parts, the retailer receives necessary order information.
+• Mechanic Shops: If you use our Shop Portal, service records are shared with shops you authorize.
+• Insurance Partners: Quote request information is shared with carriers you select.
+• Payment Processors: Stripe processes all payments securely. We do not store your full credit card information.
+• DarkWave Ecosystem: Your account credentials are synced via Trust Layer for single-password access across DarkWave apps.
+• Service Providers: Trusted vendors who help operate our platform under strict confidentiality agreements.
+• Law Enforcement: When required by law or to protect our legal rights.
+
+4. DATA SECURITY
+We implement industry-standard security measures including:
+• Encrypted password storage using bcrypt hashing
+• HTTPS encryption for all data transmission
+• Session-based authentication with secure cookie handling
+• Blockchain verification for Genesis Hallmark records
+• Regular security audits and monitoring
+
+5. DATA RETENTION
+We retain your data as long as your account is active or as needed to provide services. After account deletion:
+• Personal data is removed within 30 days
+• Transaction records are retained for 7 years for legal compliance
+• Blockchain records (Genesis Hallmarks) are permanent and immutable
+
+6. YOUR RIGHTS
+You have the right to:
+• Access your personal data
+• Correct inaccurate information
+• Request deletion of your account and data
+• Opt out of marketing communications
+• Export your vehicle and service data
+• Restrict processing of your data
+
+7. COOKIES & TRACKING
+We use essential cookies for authentication and session management. Analytics cookies help us improve the platform. You can manage cookie preferences in your browser settings.
+
+8. CHILDREN'S PRIVACY
+GarageBot is not intended for users under 13 years of age. We do not knowingly collect information from children under 13. If you believe a child has provided us with personal information, please contact us immediately.
+
+9. INTERNATIONAL USERS
+GarageBot is operated in the United States. By using the Platform, you consent to the transfer of your data to the US. We comply with applicable data protection regulations.
+
+10. CHANGES TO THIS POLICY
+We may update this Privacy Policy periodically. We will notify you of material changes via email or prominent notice on the Platform.
+
+11. CONTACT US
+For privacy-related inquiries:
+Email: privacy@darkwavestudios.io
+Support: Through our in-app support system
+Address: DarkWave Studios LLC, Delaware, USA`;
 
 export default function WelcomeGate() {
   const { user, isLoading: authLoading } = useAuth();
@@ -49,12 +190,30 @@ export default function WelcomeGate() {
 
   const [forgotEmail, setForgotEmail] = useState("");
 
+  const [termsScrolled, setTermsScrolled] = useState(false);
+  const [privacyScrolled, setPrivacyScrolled] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [showingTerms, setShowingTerms] = useState(true);
+
+  const termsRef = useRef<HTMLDivElement>(null);
+  const privacyRef = useRef<HTMLDivElement>(null);
+
   const passwordChecks: PasswordCheck = {
     length: signupForm.password.length >= 8,
     uppercase: /[A-Z]/.test(signupForm.password),
+    lowercase: /[a-z]/.test(signupForm.password),
+    number: /[0-9]/.test(signupForm.password),
     special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(signupForm.password),
   };
-  const passwordValid = passwordChecks.length && passwordChecks.uppercase && passwordChecks.special;
+  const passwordValid = passwordChecks.length && passwordChecks.uppercase && passwordChecks.lowercase && passwordChecks.number && passwordChecks.special;
+
+  const handleScroll = useCallback((ref: React.RefObject<HTMLDivElement | null>, setter: (v: boolean) => void) => {
+    const el = ref.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
+    if (atBottom) setter(true);
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -69,12 +228,21 @@ export default function WelcomeGate() {
     }
   }, [user, authLoading]);
 
+  useEffect(() => {
+    const openHandler = () => {
+      setView("signup");
+      setIsOpen(true);
+    };
+    window.addEventListener("garagebot:open-welcome", openHandler);
+    return () => window.removeEventListener("garagebot:open-welcome", openHandler);
+  }, []);
+
   const handleDismiss = () => {
     sessionStorage.setItem("garagebot_welcome_dismissed", "true");
     setIsOpen(false);
   };
 
-  const handleSignup = async () => {
+  const handleGoToTerms = () => {
     if (!signupForm.firstName.trim()) {
       toast({ title: "Missing info", description: "Please enter your first name", variant: "destructive" });
       return;
@@ -89,6 +257,19 @@ export default function WelcomeGate() {
     }
     if (!passwordValid) {
       toast({ title: "Password requirements", description: "Please meet all password requirements", variant: "destructive" });
+      return;
+    }
+    setView("signup-terms");
+    setShowingTerms(true);
+    setTermsScrolled(false);
+    setPrivacyScrolled(false);
+    setTermsAccepted(false);
+    setPrivacyAccepted(false);
+  };
+
+  const handleSignup = async () => {
+    if (!termsAccepted || !privacyAccepted) {
+      toast({ title: "Required", description: "Please accept both Terms of Service and Privacy Policy", variant: "destructive" });
       return;
     }
 
@@ -234,6 +415,16 @@ export default function WelcomeGate() {
                     </p>
                   </>
                 )}
+                {view === "signup-terms" && (
+                  <>
+                    <h2 className="text-2xl font-tech font-bold uppercase mb-1">
+                      Review & <span className="text-primary">Accept</span>
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Please read and accept before creating your account
+                    </p>
+                  </>
+                )}
                 {view === "login" && (
                   <>
                     <h2 className="text-2xl font-tech font-bold uppercase mb-1">
@@ -336,6 +527,14 @@ export default function WelcomeGate() {
                           {passwordChecks.uppercase ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
                           One uppercase letter
                         </div>
+                        <div className={`flex items-center gap-1.5 text-[11px] ${passwordChecks.lowercase ? "text-green-400" : "text-muted-foreground"}`}>
+                          {passwordChecks.lowercase ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+                          One lowercase letter
+                        </div>
+                        <div className={`flex items-center gap-1.5 text-[11px] ${passwordChecks.number ? "text-green-400" : "text-muted-foreground"}`}>
+                          {passwordChecks.number ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+                          One number
+                        </div>
                         <div className={`flex items-center gap-1.5 text-[11px] ${passwordChecks.special ? "text-green-400" : "text-muted-foreground"}`}>
                           {passwordChecks.special ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
                           One special character (!@#$%...)
@@ -361,21 +560,25 @@ export default function WelcomeGate() {
                     </div>
                   </div>
 
+                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Globe className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[11px] font-mono text-primary uppercase">DarkWave Ecosystem</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      Your password works across all DarkWave Trust Layer apps — one password for GarageBot, ORBIT, and more.
+                    </p>
+                  </div>
+
                   <Button
                     className="w-full h-12 font-tech uppercase bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-                    onClick={handleSignup}
+                    onClick={handleGoToTerms}
                     disabled={isLoading}
-                    data-testid="button-signup-submit"
+                    data-testid="button-signup-continue"
                   >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <>
-                        <Car className="w-5 h-5 mr-2" />
-                        Get My Free Garage
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </>
-                    )}
+                    <FileText className="w-5 h-5 mr-2" />
+                    Continue — Review Terms
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
 
                   <p className="text-center text-xs text-muted-foreground">
@@ -388,6 +591,131 @@ export default function WelcomeGate() {
                       Log in
                     </button>
                   </p>
+                </div>
+              )}
+
+              {view === "signup-terms" && (
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowingTerms(true)}
+                      className={`flex-1 py-2 px-3 rounded-lg text-xs font-mono uppercase transition-all ${showingTerms ? "bg-primary/20 text-primary border border-primary/40" : "bg-white/5 text-muted-foreground border border-white/10 hover:bg-white/10"}`}
+                      data-testid="tab-terms"
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <FileText className="w-3 h-3" />
+                        Terms of Service
+                        {termsScrolled && <CheckCircle className="w-3 h-3 text-green-400" />}
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setShowingTerms(false)}
+                      className={`flex-1 py-2 px-3 rounded-lg text-xs font-mono uppercase transition-all ${!showingTerms ? "bg-primary/20 text-primary border border-primary/40" : "bg-white/5 text-muted-foreground border border-white/10 hover:bg-white/10"}`}
+                      data-testid="tab-privacy"
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Shield className="w-3 h-3" />
+                        Privacy Policy
+                        {privacyScrolled && <CheckCircle className="w-3 h-3 text-green-400" />}
+                      </div>
+                    </button>
+                  </div>
+
+                  {showingTerms ? (
+                    <div className="relative">
+                      <div
+                        ref={termsRef}
+                        onScroll={() => handleScroll(termsRef, setTermsScrolled)}
+                        className="h-56 overflow-y-auto rounded-lg bg-black/40 border border-white/10 p-4 text-[11px] text-muted-foreground leading-relaxed whitespace-pre-wrap font-mono scrollbar-thin"
+                        data-testid="scroll-terms"
+                      >
+                        {TERMS_TEXT}
+                      </div>
+                      {!termsScrolled && (
+                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/80 to-transparent rounded-b-lg flex items-end justify-center pb-2 pointer-events-none">
+                          <div className="flex items-center gap-1 text-[10px] text-primary animate-bounce pointer-events-none">
+                            <ChevronDown className="w-3 h-3" />
+                            Scroll to read all
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <div
+                        ref={privacyRef}
+                        onScroll={() => handleScroll(privacyRef, setPrivacyScrolled)}
+                        className="h-56 overflow-y-auto rounded-lg bg-black/40 border border-white/10 p-4 text-[11px] text-muted-foreground leading-relaxed whitespace-pre-wrap font-mono scrollbar-thin"
+                        data-testid="scroll-privacy"
+                      >
+                        {PRIVACY_TEXT}
+                      </div>
+                      {!privacyScrolled && (
+                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/80 to-transparent rounded-b-lg flex items-end justify-center pb-2 pointer-events-none">
+                          <div className="flex items-center gap-1 text-[10px] text-primary animate-bounce pointer-events-none">
+                            <ChevronDown className="w-3 h-3" />
+                            Scroll to read all
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    <div className={`flex items-start gap-2 p-3 rounded-lg border transition-all ${termsScrolled ? "bg-white/5 border-white/10" : "bg-white/[0.02] border-white/5 opacity-50"}`}>
+                      <Checkbox
+                        id="accept-terms"
+                        checked={termsAccepted}
+                        disabled={!termsScrolled}
+                        onCheckedChange={(checked) => setTermsAccepted(!!checked)}
+                        data-testid="checkbox-accept-terms"
+                      />
+                      <label htmlFor="accept-terms" className={`text-xs cursor-pointer ${!termsScrolled ? "cursor-not-allowed" : ""}`}>
+                        I have read and agree to the <span className="text-primary">Terms of Service</span>
+                        {!termsScrolled && <span className="text-[10px] text-muted-foreground block mt-0.5">(scroll through to enable)</span>}
+                      </label>
+                    </div>
+
+                    <div className={`flex items-start gap-2 p-3 rounded-lg border transition-all ${privacyScrolled ? "bg-white/5 border-white/10" : "bg-white/[0.02] border-white/5 opacity-50"}`}>
+                      <Checkbox
+                        id="accept-privacy"
+                        checked={privacyAccepted}
+                        disabled={!privacyScrolled}
+                        onCheckedChange={(checked) => setPrivacyAccepted(!!checked)}
+                        data-testid="checkbox-accept-privacy"
+                      />
+                      <label htmlFor="accept-privacy" className={`text-xs cursor-pointer ${!privacyScrolled ? "cursor-not-allowed" : ""}`}>
+                        I have read and agree to the <span className="text-primary">Privacy Policy</span>
+                        {!privacyScrolled && <span className="text-[10px] text-muted-foreground block mt-0.5">(scroll through to enable)</span>}
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1 font-tech uppercase border-white/20"
+                      onClick={() => setView("signup")}
+                      data-testid="button-back-to-signup"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      className="flex-1 h-12 font-tech uppercase bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)] disabled:opacity-40 disabled:cursor-not-allowed"
+                      onClick={handleSignup}
+                      disabled={isLoading || !termsAccepted || !privacyAccepted}
+                      data-testid="button-signup-submit"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <>
+                          <Car className="w-5 h-5 mr-2" />
+                          Create Account
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
 

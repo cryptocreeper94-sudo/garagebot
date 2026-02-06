@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
 import { VENDORS, VendorInfo, generateVendorSearchUrl, getVendorsForVehicleType } from "@/lib/mockData";
+import { useAuthGate } from "@/hooks/useAuthGate";
 
 interface Vendor {
   id: string;
@@ -91,7 +92,8 @@ interface EnhancedVendorResult {
   directUrl: string;
 }
 
-function VendorCard({ result, index, displayQuery }: { result: EnhancedVendorResult; index: number; displayQuery: string }) {
+function VendorCard({ result, index, displayQuery, requireAuth }: { result: EnhancedVendorResult; index: number; displayQuery: string; requireAuth: (action: () => void, featureName?: string) => void }) {
+  const openLink = () => window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -101,7 +103,7 @@ function VendorCard({ result, index, displayQuery }: { result: EnhancedVendorRes
     >
       <Card 
         className="glass-card card-3d border-border hover:border-primary/50 transition-all group overflow-hidden cursor-pointer h-full"
-        onClick={() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer')}
+        onClick={() => requireAuth(openLink, "compare prices across retailers")}
         data-testid={`card-vendor-${result.vendor.slug}`}
       >
         <div className="p-4">
@@ -144,7 +146,7 @@ function VendorCard({ result, index, displayQuery }: { result: EnhancedVendorRes
             className="w-full font-tech uppercase text-xs border-primary/30 text-primary hover:bg-primary hover:text-black"
             onClick={(e) => {
               e.stopPropagation();
-              window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
+              requireAuth(openLink, "compare prices across retailers");
             }}
             data-testid={`button-search-${result.vendor.slug}`}
           >
@@ -167,6 +169,7 @@ export default function Results() {
   const category = params.get('category') || '';
   const vehicleType = params.get('type') || '';
 
+  const { requireAuth } = useAuthGate();
   const [isLoading, setIsLoading] = useState(true);
   const [scanText, setScanText] = useState(SCANNING_STORES[0]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -600,7 +603,7 @@ export default function Results() {
                     </div>
                     <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
                       {sortedResults.map((result, index) => (
-                        <VendorCard key={result.vendor.id} result={result} index={index} displayQuery={displayQuery} />
+                        <VendorCard key={result.vendor.id} result={result} index={index} displayQuery={displayQuery} requireAuth={requireAuth} />
                       ))}
                     </div>
                   </div>
@@ -617,7 +620,7 @@ export default function Results() {
                     >
                       <Card 
                         className="glass-card card-3d border-border hover:border-primary/50 transition-all group cursor-pointer"
-                        onClick={() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer')}
+                        onClick={() => requireAuth(() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer'), "compare prices across retailers")}
                         data-testid={`list-vendor-${result.vendor.slug}`}
                       >
                         <div className="p-3 flex items-center gap-3">

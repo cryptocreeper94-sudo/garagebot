@@ -597,6 +597,20 @@ export async function registerRoutes(
     }
   });
 
+  app.post('/api/support/ticket', async (req, res) => {
+    try {
+      const { name, email, subject, message } = req.body;
+      if (!subject || !message) {
+        return res.status(400).json({ error: "Subject and message are required" });
+      }
+      console.log('[Support] New ticket:', { name, email, subject, message: message.substring(0, 100) });
+      res.json({ success: true, message: "Your support request has been submitted. We'll get back to you soon!" });
+    } catch (error) {
+      console.error("Support ticket error:", error);
+      res.status(500).json({ error: "Failed to submit support ticket" });
+    }
+  });
+
   // AI Assistant Routes with sliding window rate limiting
   const aiAssistant = await import("./services/aiAssistant");
   
@@ -10136,6 +10150,25 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete maintenance schedule" });
+    }
+  });
+
+  app.post("/api/support/rating", isAuthenticated, async (req: any, res) => {
+    try {
+      const schema = z.object({
+        rating: z.number().int().min(1).max(5),
+        comment: z.string().optional(),
+      });
+      const parsed = schema.parse(req.body);
+      const userId = req.user?.id || req.user?.claims?.sub || "anonymous";
+      console.log(`[Rating] User ${userId} rated ${parsed.rating}/5${parsed.comment ? ` - "${parsed.comment}"` : ""}`);
+      res.json({ success: true });
+    } catch (error: any) {
+      if (error?.issues) {
+        res.status(400).json({ error: "Invalid rating data", details: error.issues });
+      } else {
+        res.status(500).json({ error: "Failed to submit rating" });
+      }
     }
   });
 

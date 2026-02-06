@@ -8,8 +8,11 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { useAuth } from "@/hooks/useAuth";
 import WelcomeGate from "@/components/WelcomeGate";
 import AIMascot from "@/components/AIMascot";
+import FloatingHelp from "@/components/FloatingHelp";
+import RatingPrompt from "@/components/RatingPrompt";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
+import CookieConsent from "@/components/CookieConsent";
 
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 
@@ -46,6 +49,7 @@ import ShadeTreeMechanics from "@/pages/ShadeTreeMechanics";
 import TriviaQuiz from "@/pages/TriviaQuiz";
 import BreakRoom from "@/pages/BreakRoom";
 import CDLDirectory from "@/pages/CDLDirectory";
+import Support from "@/pages/Support";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -88,6 +92,7 @@ function Router() {
       <Route path="/trivia">{() => <TriviaQuiz />}</Route>
       <Route path="/break-room">{() => <BreakRoom />}</Route>
       <Route path="/cdl-directory">{() => <CDLDirectory />}</Route>
+      <Route path="/support">{() => <Support />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );
@@ -125,6 +130,9 @@ function App() {
           <AnalyticsTracker />
           <Router />
           <AIMascot mascotName="Buddy" />
+          <RatingPrompt />
+          <FloatingHelp />
+          <CookieConsent />
           <AuthAwareExtras />
         </TooltipProvider>
       </CartProvider>
