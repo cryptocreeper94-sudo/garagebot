@@ -17,7 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { VENDORS, VendorInfo, generateVendorSearchUrl, CATEGORIES } from "@/lib/mockData";
 import { useAuthGate } from "@/hooks/useAuthGate";
 
-const AFFILIATE_NETWORKS = ["Amazon Associates", "eBay Partner Network", "CJ Affiliate", "ShareASale", "AvantLink", "Impact"];
+const AFFILIATE_NETWORKS = ["Amazon Associates", "eBay Partner Network", "CJ Affiliate", "ShareASale", "AvantLink", "Impact", "Rexing Affiliate", "GoAffPro"];
 
 function isAffiliatePartner(vendor: VendorInfo): boolean {
   return !!vendor.affiliateNetwork && AFFILIATE_NETWORKS.includes(vendor.affiliateNetwork);
