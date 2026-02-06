@@ -49,10 +49,16 @@ export function useSignalChat(options: ChatSocketOptions = {}) {
           case "new_dm":
             optionsRef.current.onMessage?.(data);
             break;
+          case "typing":
           case "user_typing":
             optionsRef.current.onTyping?.(data);
             break;
+          case "presence":
           case "presence_update":
+            optionsRef.current.onPresence?.(data);
+            break;
+          case "user_joined":
+          case "user_left":
             optionsRef.current.onPresence?.(data);
             break;
         }
