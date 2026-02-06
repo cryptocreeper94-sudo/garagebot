@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearch, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, Award, Globe, ArrowRight } from "lucide-react";
+import { ExternalLink, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, Award, Globe, ArrowRight, Star, TrendingDown, ShoppingCart, Loader2, BarChart3 } from "lucide-react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { AdSenseHorizontal } from "@/components/AdSense";
@@ -18,6 +18,33 @@ import { VENDORS, VendorInfo, generateVendorSearchUrl, CATEGORIES } from "@/lib/
 import { useAuthGate } from "@/hooks/useAuthGate";
 
 const AFFILIATE_NETWORKS = ["Amazon Associates", "eBay Partner Network", "CJ Affiliate", "ShareASale", "AvantLink", "Impact", "Rexing Affiliate", "GoAffPro"];
+
+interface PriceProduct {
+  id: string;
+  name: string;
+  price: number | null;
+  originalPrice?: number | null;
+  imageUrl?: string;
+  productUrl: string;
+  retailer: string;
+  retailerSlug: string;
+  retailerColor: string;
+  inStock?: boolean;
+  shipping?: string;
+  rating?: number;
+  reviewCount?: number;
+  partNumber?: string;
+  isAffiliate: boolean;
+  affiliateUrl: string;
+}
+
+interface PriceComparisonData {
+  query: string;
+  vehicle?: { year?: string; make?: string; model?: string };
+  products: PriceProduct[];
+  retailerLinks: { name: string; slug: string; searchUrl: string; color: string; isAffiliate: boolean }[];
+  timestamp: number;
+}
 
 function isAffiliatePartner(vendor: VendorInfo): boolean {
   return !!vendor.affiliateNetwork && AFFILIATE_NETWORKS.includes(vendor.affiliateNetwork);
@@ -329,6 +356,262 @@ function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: {
   );
 }
 
+function ProductCard({ product, index, requireAuth, searchQuery }: { product: PriceProduct; index: number; requireAuth: (action: () => void, featureName?: string) => void; searchQuery: string }) {
+  const hasPrice = product.price !== null && product.price > 0;
+  const hasSale = product.originalPrice && product.price && product.originalPrice > product.price;
+  const savings = hasSale ? Math.round(((product.originalPrice! - product.price!) / product.originalPrice!) * 100) : 0;
+
+  const handleClick = () => {
+    trackClick(product.retailerSlug, searchQuery, product.affiliateUrl, product.isAffiliate ? 'affiliate_product' : 'product_direct');
+    window.open(product.affiliateUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className="group"
+    >
+      <div
+        className={`relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/10 ${
+          hasPrice ? 'bg-white/[0.03] border-white/10 hover:border-primary/40' : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+        }`}
+        onClick={() => requireAuth(handleClick, "compare prices")}
+        data-testid={`product-card-${product.id}`}
+      >
+        {index === 0 && hasPrice && (
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500 via-primary to-green-500" />
+        )}
+
+        {hasSale && savings > 0 && (
+          <div className="absolute top-2 right-2 z-10">
+            <Badge className="bg-red-500/90 text-white text-[9px] font-bold px-1.5 py-0.5 border-0">
+              {savings}% OFF
+            </Badge>
+          </div>
+        )}
+
+        <div className="p-3 sm:p-4">
+          <div className="flex gap-3">
+            {product.imageUrl && (
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="w-full h-full object-contain p-1"
+                  loading="lazy"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: product.retailerColor }} />
+                <span className="font-mono text-[9px] uppercase tracking-wider" style={{ color: product.retailerColor }}>
+                  {product.retailer}
+                </span>
+                {product.isAffiliate && (
+                  <Badge variant="outline" className="text-[7px] h-3 px-1 border-primary/30 text-primary">
+                    PARTNER
+                  </Badge>
+                )}
+              </div>
+
+              <h4 className="text-xs sm:text-sm font-medium text-white line-clamp-2 leading-snug mb-2 group-hover:text-primary/90 transition-colors">
+                {product.name}
+              </h4>
+
+              <div className="flex items-end justify-between gap-2">
+                <div>
+                  {hasPrice ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lg sm:text-xl font-bold text-green-400 font-mono" data-testid={`price-${product.id}`}>
+                        ${product.price!.toFixed(2)}
+                      </span>
+                      {hasSale && (
+                        <span className="text-xs text-muted-foreground line-through font-mono">
+                          ${product.originalPrice!.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground font-mono">Check Price</span>
+                  )}
+
+                  <div className="flex items-center gap-2 mt-1">
+                    {product.rating && (
+                      <div className="flex items-center gap-0.5">
+                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                        <span className="text-[10px] text-yellow-400 font-mono">{product.rating.toFixed(1)}</span>
+                        {product.reviewCount && (
+                          <span className="text-[9px] text-muted-foreground">({product.reviewCount.toLocaleString()})</span>
+                        )}
+                      </div>
+                    )}
+                    {product.shipping && (
+                      <span className="text-[9px] text-blue-400 font-mono">{product.shipping}</span>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2.5 text-[9px] font-tech uppercase text-primary hover:bg-primary hover:text-black shrink-0 gap-1"
+                  data-testid={`button-buy-${product.id}`}
+                >
+                  View <ExternalLink className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {product.partNumber && (
+            <div className="mt-2 pt-2 border-t border-white/5">
+              <span className="text-[9px] text-muted-foreground font-mono">Part# {product.partNumber}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function PriceComparisonSection({ data, isLoading, searchQuery, requireAuth }: {
+  data?: PriceComparisonData;
+  isLoading: boolean;
+  searchQuery: string;
+  requireAuth: (action: () => void, featureName?: string) => void;
+}) {
+  const [showAllProducts, setShowAllProducts] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Loader2 className="w-5 h-5 text-primary animate-spin" />
+          <h2 className="font-tech text-lg font-bold uppercase text-white">Comparing Prices...</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="h-32 rounded-xl bg-white/[0.02] border border-white/5 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const productsWithPrices = data.products.filter(p => p.price !== null && p.price > 0);
+  const searchOnlyLinks = data.products.filter(p => p.price === null || p.price === 0);
+  const displayProducts = showAllProducts ? productsWithPrices : productsWithPrices.slice(0, 8);
+
+  const lowestPrice = productsWithPrices.length > 0 ? productsWithPrices[0].price : null;
+  const highestPrice = productsWithPrices.length > 1 ? productsWithPrices[productsWithPrices.length - 1].price : null;
+  const potentialSavings = lowestPrice && highestPrice && highestPrice > lowestPrice
+    ? (highestPrice - lowestPrice).toFixed(2) : null;
+
+  const retailersChecked = new Set(data.products.map(p => p.retailer)).size;
+
+  return (
+    <div className="mb-6 space-y-4">
+      {productsWithPrices.length > 0 && (
+        <>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-primary" />
+              <h2 className="font-tech text-lg font-bold uppercase text-white" data-testid="text-price-comparison">
+                Price Comparison
+              </h2>
+              <Badge variant="outline" className="text-[9px] border-green-500/30 text-green-400">
+                {productsWithPrices.length} prices found
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-[9px] border-primary/30 text-primary font-mono">
+                {retailersChecked} stores checked
+              </Badge>
+              {potentialSavings && (
+                <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[9px] font-mono">
+                  <TrendingDown className="w-3 h-3 mr-0.5" /> Save up to ${potentialSavings}
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {lowestPrice && (
+            <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/20">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4 text-green-400" />
+                <span className="text-xs text-green-400 font-tech">BEST PRICE FOUND:</span>
+                <span className="text-lg font-bold text-green-400 font-mono">${lowestPrice.toFixed(2)}</span>
+                <span className="text-xs text-muted-foreground">at {productsWithPrices[0].retailer}</span>
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" data-testid="price-comparison-grid">
+            {displayProducts.map((product, i) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                index={i}
+                requireAuth={requireAuth}
+                searchQuery={searchQuery}
+              />
+            ))}
+          </div>
+
+          {productsWithPrices.length > 8 && (
+            <Button
+              variant="ghost"
+              className="w-full text-xs text-muted-foreground hover:text-primary font-mono"
+              onClick={() => setShowAllProducts(!showAllProducts)}
+              data-testid="button-show-all-prices"
+            >
+              {showAllProducts ? 'Show Less' : `Show All ${productsWithPrices.length} Results`}
+              {showAllProducts ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
+            </Button>
+          )}
+        </>
+      )}
+
+      {data.retailerLinks.length > 0 && (
+        <div className="mt-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe className="w-4 h-4 text-muted-foreground" />
+            <h3 className="font-tech text-sm font-bold uppercase text-muted-foreground">Search All Retailers Directly</h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {data.retailerLinks.map((link) => (
+              <Button
+                key={link.slug}
+                variant="outline"
+                size="sm"
+                className="h-8 text-[10px] font-tech uppercase border-white/10 hover:border-primary/40 gap-1.5"
+                onClick={() => {
+                  requireAuth(() => {
+                    trackClick(link.slug, searchQuery, link.searchUrl, link.isAffiliate ? 'affiliate_quick' : 'quick_link');
+                    window.open(link.searchUrl, '_blank', 'noopener,noreferrer');
+                  }, "search retailers");
+                }}
+                data-testid={`quick-link-${link.slug}`}
+              >
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: link.color }} />
+                {link.name}
+                {link.isAffiliate && <Tag className="w-2.5 h-2.5 text-primary" />}
+                <ExternalLink className="w-2.5 h-2.5 opacity-50" />
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function VehicleTypeBrowse({ vehicleType, onSearch }: { vehicleType: string; onSearch: (query: string) => void }) {
   const typeLabel = VEHICLE_TYPE_LABELS[vehicleType] || vehicleType;
   const searches = VEHICLE_TYPE_SEARCHES[vehicleType] || VEHICLE_TYPE_SEARCHES['cars'] || [];
@@ -500,6 +783,29 @@ export default function Results() {
       return res.json();
     },
     enabled: hasSearchQuery,
+  });
+
+  const { data: priceData, isLoading: priceLoading } = useQuery<PriceComparisonData>({
+    queryKey: ['prices', query, partNumber, year, make, model, vehicleType],
+    queryFn: async () => {
+      const res = await fetch('/api/prices/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          query: query || partNumber || category,
+          year,
+          make,
+          model,
+          vehicleType,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to compare prices');
+      return res.json();
+    },
+    enabled: hasSearchQuery,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
 
   useEffect(() => {
@@ -712,19 +1018,26 @@ export default function Results() {
                 <VehicleTypeBrowse vehicleType={vehicleType} onSearch={handleBrowseSearch} />
               ) : (
                 <div className="space-y-6">
+                  <PriceComparisonSection
+                    data={priceData}
+                    isLoading={priceLoading && !isLoading}
+                    searchQuery={displayQuery}
+                    requireAuth={requireAuth}
+                  />
+
                   {affiliateVendors.length > 0 && (
                     <section>
                       <div className="flex items-center gap-2 mb-4">
                         <Tag className="w-5 h-5 text-primary" />
                         <h2 className="font-tech text-lg font-bold uppercase text-white" data-testid="text-partner-retailers">
-                          Partner Retailers
+                          All {vendorsWithUrls.length} Retailers
                         </h2>
                         <Badge variant="outline" className="text-[9px] border-green-500/30 text-green-400 ml-auto">
                           <DollarSign className="w-3 h-3 mr-0.5" /> {affiliateVendors.length} partners
                         </Badge>
                       </div>
                       <p className="text-[11px] text-muted-foreground mb-3 -mt-2">
-                        Direct links to "{displayQuery}" {vehicleLabel ? `for ${vehicleLabel}` : ''} — sorted by relevance
+                        Direct links to "{displayQuery}" {vehicleLabel ? `for ${vehicleLabel}` : ''} across all retailers
                       </p>
                       <div className="space-y-2">
                         {affiliateVendors.map((v, i) => (

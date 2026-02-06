@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations } from "@shared/schema";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
+import { comparePrice } from "./services/price-comparison";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import { db } from "@db";
@@ -2397,6 +2398,42 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Search error:", error);
       res.status(500).json({ error: "Failed to search" });
+    }
+  });
+
+  const priceCompareSchema = z.object({
+    query: z.string().min(1).max(200).trim(),
+    year: z.string().max(4).optional(),
+    make: z.string().max(50).optional(),
+    model: z.string().max(50).optional(),
+    vehicleType: z.string().max(30).optional(),
+  });
+
+  app.post("/api/prices/compare", async (req: any, res) => {
+    try {
+      const parsed = priceCompareSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid search parameters", details: fromZodError(parsed.error).message });
+      }
+      const { query, year, make, model, vehicleType } = parsed.data;
+
+      const vehicle = (year || make || model) ? { year, make, model } : undefined;
+
+      await storage.logSearch({
+        userId: req.user?.claims?.sub || null,
+        sessionId: req.sessionID,
+        query,
+        vehicleYear: year,
+        vehicleMake: make,
+        vehicleModel: model,
+        category: vehicleType,
+      });
+
+      const results = await comparePrice(query, vehicle, vehicleType);
+      res.json(results);
+    } catch (error) {
+      console.error("Price comparison error:", error);
+      res.status(500).json({ error: "Failed to compare prices" });
     }
   });
 
