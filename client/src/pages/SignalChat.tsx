@@ -53,8 +53,51 @@ function getChannelIcon(name: string) {
   return <Hash className="w-4 h-4 text-slate-400" />;
 }
 
+function AuthGate() {
+  return (
+    <div className="min-h-screen bg-background">
+      <Nav />
+      <main className="container mx-auto px-4 pt-20 pb-8 flex items-center justify-center min-h-[80vh]">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md"
+        >
+          <div className="w-20 h-20 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto mb-6">
+            <MessageSquare className="w-10 h-10 text-cyan-400" />
+          </div>
+          <h2 className="text-2xl font-rajdhani font-bold text-white mb-3">
+            Signal Community Chat
+          </h2>
+          <p className="text-slate-400 mb-6">
+            Sign in to join the GarageBot community, get support from Buddy AI, and chat with other enthusiasts.
+          </p>
+          <button
+            data-testid="chat-login-button"
+            onClick={() => {
+              sessionStorage.removeItem("garagebot_welcome_dismissed");
+              setTimeout(() => {
+                window.dispatchEvent(new CustomEvent("garagebot:open-welcome"));
+              }, 100);
+            }}
+            className="px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-lg transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+          >
+            Sign In to Chat
+          </button>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
+
 export default function SignalChat() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  if (!user) return <AuthGate />;
+  return <SignalChatInner />;
+}
+
+function SignalChatInner() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -129,7 +172,7 @@ export default function SignalChat() {
 
   const { data: communities = [] } = useQuery<ChatCommunity[]>({
     queryKey: ["/api/chat/communities"],
-    enabled: isAuthenticated,
+    enabled: !!user,
   });
 
   useEffect(() => {
