@@ -1,4 +1,4 @@
-import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge, Crown, Hammer, Sparkles, Lightbulb, Droplets, Navigation, Settings, PaintBucket, Sofa, CircleDot, Flame, Cable, Drill, Fan, Leaf } from "lucide-react";
+import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge, Crown, Hammer, Sparkles, Lightbulb, Droplets, Navigation, Settings, PaintBucket, Sofa, CircleDot, Flame, Cable, Drill, Fan, Leaf, Gamepad2, Plane, Radio, Trophy, Joystick } from "lucide-react";
 
 // Vendor search URL templates - {query}, {year}, {make}, {model}, {zip} are placeholders
 export interface VendorInfo {
@@ -94,7 +94,7 @@ export const VENDORS: VendorInfo[] = [
     slug: "amazon",
     searchTemplate: "https://www.amazon.com/s?k={query}&i=automotive",
     hasLocalPickup: false,
-    categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "powersports"],
+    categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "powersports", "rc", "drones", "modelaircraft", "slotcars"],
     priority: 90,
     supportsOEM: true,
     supportsAftermarket: true,
@@ -107,7 +107,7 @@ export const VENDORS: VendorInfo[] = [
     slug: "ebay",
     searchTemplate: "https://www.ebay.com/sch/i.html?_nkw={query}&_sacat=6000",
     hasLocalPickup: false,
-    categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "exotics", "kitcars", "powersports"],
+    categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "exotics", "kitcars", "powersports", "rc", "drones", "modelaircraft", "slotcars"],
     priority: 85,
     supportsOEM: true,
     supportsAftermarket: true,
@@ -400,6 +400,139 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "CJ Affiliate",
     logoColor: "#FF0000"
   },
+  // ============================================
+  // MOTORIZED HOBBY - RC, Drones, Model, Slot Cars
+  // ============================================
+  {
+    id: "amainhobbies",
+    name: "AMain Hobbies",
+    slug: "amainhobbies",
+    searchTemplate: "https://www.amainhobbies.com/search?s={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "drones", "modelaircraft", "slotcars"],
+    priority: 95,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AvantLink",
+    logoColor: "#0066CC"
+  },
+  {
+    id: "horizonhobby",
+    name: "Horizon Hobby",
+    slug: "horizonhobby",
+    searchTemplate: "https://www.horizonhobby.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "drones", "modelaircraft"],
+    priority: 94,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#003399"
+  },
+  {
+    id: "towerhobbies",
+    name: "Tower Hobbies",
+    slug: "towerhobbies",
+    searchTemplate: "https://www.towerhobbies.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "drones", "modelaircraft", "slotcars"],
+    priority: 93,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AvantLink",
+    logoColor: "#FF6600"
+  },
+  {
+    id: "hobbyking",
+    name: "HobbyKing",
+    slug: "hobbyking",
+    searchTemplate: "https://hobbyking.com/en_us/catalogsearch/result/?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "drones", "modelaircraft"],
+    priority: 90,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#FF0000"
+  },
+  {
+    id: "getfpv",
+    name: "GetFPV",
+    slug: "getfpv",
+    searchTemplate: "https://www.getfpv.com/catalogsearch/result/?q={query}",
+    hasLocalPickup: false,
+    categories: ["drones"],
+    priority: 92,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#00CC66"
+  },
+  {
+    id: "redcatracing",
+    name: "Redcat Racing",
+    slug: "redcatracing",
+    searchTemplate: "https://www.redcatracing.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc"],
+    priority: 88,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "GoAffPro",
+    logoColor: "#CC0000"
+  },
+  {
+    id: "hosimrc",
+    name: "Hosim RC",
+    slug: "hosimrc",
+    searchTemplate: "https://www.hosim.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc"],
+    priority: 85,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#0099CC"
+  },
+  {
+    id: "betafpv",
+    name: "BETAFPV",
+    slug: "betafpv",
+    searchTemplate: "https://betafpv.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["drones"],
+    priority: 87,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#FFD700"
+  },
+  {
+    id: "bezgar",
+    name: "Bezgar",
+    slug: "bezgar",
+    searchTemplate: "https://bezgar.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc"],
+    priority: 82,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#FF3300"
+  },
+  {
+    id: "rcplanet",
+    name: "RC Planet",
+    slug: "rcplanet",
+    searchTemplate: "https://www.rcplanet.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "slotcars"],
+    priority: 86,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#3366CC"
+  },
 ];
 
 // Helper function to generate search URL for a vendor
@@ -431,7 +564,7 @@ export function generateVendorSearchUrl(
 // Get vendors for a specific vehicle type
 export function getVendorsForVehicleType(vehicleType: string): VendorInfo[] {
   return VENDORS
-    .filter(v => v.categories.includes(vehicleType) || v.categories.includes('cars')) // cars is default
+    .filter(v => v.categories.includes(vehicleType))
     .sort((a, b) => b.priority - a.priority);
 }
 
@@ -458,6 +591,11 @@ export const VEHICLE_TYPES = [
   { id: "generators", name: "Generators", icon: Fan, description: "Portable, Standby, Inverter", image: "/generated_images/generator_power.png" },
   { id: "smallengines", name: "Small Engines", icon: Leaf, description: "Mowers, Chainsaws, Trimmers", image: "/generated_images/small_engines_equipment.png" },
   { id: "aviation", name: "Aviation", icon: Gauge, description: "Aircraft, Helicopter, Ultralight", image: "/generated_images/aviation_aircraft.png" },
+  // Motorized Hobby
+  { id: "rc", name: "RC & Hobby", icon: Gamepad2, description: "RC Cars, Crawlers, Drift", image: "/generated_images/rc_hobby_vehicles.png" },
+  { id: "drones", name: "Drones & FPV", icon: Radio, description: "Racing, Camera, FPV", image: "/generated_images/drones_fpv.png" },
+  { id: "modelaircraft", name: "Model Aircraft", icon: Plane, description: "RC Planes, Helis, Gliders", image: "/generated_images/model_aircraft.png" },
+  { id: "slotcars", name: "Slot Cars", icon: Trophy, description: "1/32, 1/24, HO Scale", image: "/generated_images/slot_cars.png" },
 ];
 
 export const CATEGORIES = [
@@ -481,6 +619,10 @@ export const CATEGORIES = [
   { id: "ignition", name: "Ignition", icon: Flame, image: "/generated_images/ignition_parts.png" },
   { id: "beltshoses", name: "Belts & Hoses", icon: Cable, image: "/generated_images/belts_and_hoses.png" },
   { id: "tools", name: "Tools", icon: Drill, image: "/generated_images/mechanic_tools.png" },
+  { id: "rcelectronics", name: "RC Electronics", icon: Radio, image: "/generated_images/rc_hobby_vehicles.png" },
+  { id: "propellers", name: "Propellers & Rotors", icon: Fan, image: "/generated_images/drones_fpv.png" },
+  { id: "lipobatteries", name: "LiPo Batteries", icon: Battery, image: "/generated_images/rc_hobby_vehicles.png" },
+  { id: "rcbodies", name: "Bodies & Shells", icon: PaintBucket, image: "/generated_images/rc_hobby_vehicles.png" },
 ];
 
 export const SPECIALTY_RETAILERS = {
@@ -509,6 +651,38 @@ export const SPECIALTY_RETAILERS = {
     { name: "Detroit Speed", url: "https://www.detroitspeed.com", specialty: "Pro-Touring Suspension" },
     { name: "Speedmaster", url: "https://www.speedmaster1.com", specialty: "Engine Components" },
     { name: "Superlite Cars", url: "https://www.superlitecars.com", specialty: "SL-C & Aero Kits" },
+  ],
+  rc: [
+    { name: "AMain Hobbies", url: "https://www.amainhobbies.com", specialty: "RC Cars & Parts" },
+    { name: "Horizon Hobby", url: "https://www.horizonhobby.com", specialty: "RC Vehicles & Aircraft" },
+    { name: "Tower Hobbies", url: "https://www.towerhobbies.com", specialty: "RC Cars, Planes, Boats" },
+    { name: "Redcat Racing", url: "https://www.redcatracing.com", specialty: "RC Trucks & Crawlers" },
+    { name: "RC Planet", url: "https://www.rcplanet.com", specialty: "RC Cars & Slot Cars" },
+    { name: "Traxxas", url: "https://traxxas.com", specialty: "RC Trucks & Accessories" },
+  ],
+  drones: [
+    { name: "GetFPV", url: "https://www.getfpv.com", specialty: "FPV Drones & Parts" },
+    { name: "BETAFPV", url: "https://betafpv.com", specialty: "FPV Racing Drones" },
+    { name: "HobbyKing", url: "https://hobbyking.com", specialty: "RC & Drone Electronics" },
+    { name: "RaceDayQuads", url: "https://www.racedayquads.com", specialty: "FPV Racing Parts" },
+    { name: "Rotor Riot", url: "https://rotorriot.com", specialty: "FPV Gear & Apparel" },
+    { name: "ChinaHobbyLine", url: "https://chinahobbyline.com", specialty: "LiPo Batteries" },
+  ],
+  modelaircraft: [
+    { name: "Horizon Hobby", url: "https://www.horizonhobby.com", specialty: "E-flite & Blade Aircraft" },
+    { name: "Tower Hobbies", url: "https://www.towerhobbies.com", specialty: "RC Planes & Helis" },
+    { name: "Motion RC", url: "https://www.motionrc.com", specialty: "Scale RC Aircraft" },
+    { name: "Hobby-Lobby", url: "https://www.hobby-lobby.com", specialty: "Balsa & Scale Kits" },
+    { name: "Chief Aircraft", url: "https://www.chiefaircraft.com", specialty: "Giant Scale Planes" },
+    { name: "AMain Hobbies", url: "https://www.amainhobbies.com", specialty: "Aircraft & Helicopter Parts" },
+  ],
+  slotcars: [
+    { name: "Carrera Slots", url: "https://www.carreraslots.com", specialty: "Carrera & Scalextric" },
+    { name: "LEB Hobbies", url: "https://www.lebhobbies.com", specialty: "NSR, Slot.it, Fly Cars" },
+    { name: "Lucky Bob's", url: "https://www.luckybobs.com", specialty: "HO Scale Slot Cars" },
+    { name: "Professor Motor", url: "https://www.professormotor.com", specialty: "Slot Car Parts & Track" },
+    { name: "Hobby1", url: "https://hobby1.com", specialty: "Carrera & Auto World" },
+    { name: "RC Planet", url: "https://www.rcplanet.com", specialty: "Slot Cars & Accessories" },
   ],
 };
 
