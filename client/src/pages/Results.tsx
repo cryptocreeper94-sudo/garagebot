@@ -16,6 +16,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useQuery } from "@tanstack/react-query";
 import { VENDORS, VendorInfo, generateVendorSearchUrl, CATEGORIES } from "@/lib/mockData";
 import { useAuthGate } from "@/hooks/useAuthGate";
+import { useAuth } from "@/hooks/useAuth";
 
 const AFFILIATE_NETWORKS = ["Amazon Associates", "eBay Partner Network", "CJ Affiliate", "ShareASale", "AvantLink", "Impact", "Rexing Affiliate", "GoAffPro"];
 
@@ -751,15 +752,23 @@ export default function Results() {
   const model = params.get('model') || '';
   const category = params.get('category') || '';
   const vehicleType = params.get('type') || '';
+  const urlZip = params.get('zip') || '';
 
   const { requireAuth } = useAuthGate();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [scanText, setScanText] = useState(SCANNING_MESSAGES[0]);
   const [showLocalOnly, setShowLocalOnly] = useState(false);
-  const [zipCode, setZipCode] = useState('');
+  const [zipCode, setZipCode] = useState(urlZip);
   const [showOEMOnly, setShowOEMOnly] = useState(false);
   const [showAftermarketOnly, setShowAftermarketOnly] = useState(false);
   const [showAllVendors, setShowAllVendors] = useState(false);
+
+  useEffect(() => {
+    if (!zipCode && user?.zipCode) {
+      setZipCode(user.zipCode);
+    }
+  }, [user?.zipCode]);
 
   const hasSearchQuery = !!(query || partNumber || category);
 
@@ -786,7 +795,7 @@ export default function Results() {
   });
 
   const { data: priceData, isLoading: priceLoading } = useQuery<PriceComparisonData>({
-    queryKey: ['prices', query, partNumber, year, make, model, vehicleType],
+    queryKey: ['prices', query, partNumber, year, make, model, vehicleType, zipCode],
     queryFn: async () => {
       const res = await fetch('/api/prices/compare', {
         method: 'POST',
@@ -798,6 +807,7 @@ export default function Results() {
           make,
           model,
           vehicleType,
+          zipCode: zipCode || undefined,
         }),
       });
       if (!res.ok) throw new Error('Failed to compare prices');
@@ -967,7 +977,26 @@ export default function Results() {
                       size="sm"
                       variant="outline"
                       className="h-8 px-2 text-xs border-primary/30"
-                      onClick={() => navigator.geolocation?.getCurrentPosition(() => {})}
+                      onClick={() => {
+                        navigator.geolocation?.getCurrentPosition(
+                          async (pos) => {
+                            try {
+                              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&addressdetails=1`, {
+                                headers: { 'Accept': 'application/json' }
+                              });
+                              const data = await res.json();
+                              const detectedZip = data?.address?.postcode;
+                              if (detectedZip && /^\d{5}/.test(detectedZip)) {
+                                setZipCode(detectedZip.slice(0, 5));
+                              }
+                            } catch (e) {
+                              console.error('Geocoding failed:', e);
+                            }
+                          },
+                          () => {},
+                          { enableHighAccuracy: false, timeout: 5000 }
+                        );
+                      }}
                       data-testid="button-use-location"
                     >
                       <MapPin className="w-3 h-3" />

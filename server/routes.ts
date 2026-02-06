@@ -2407,6 +2407,7 @@ export async function registerRoutes(
     make: z.string().max(50).optional(),
     model: z.string().max(50).optional(),
     vehicleType: z.string().max(30).optional(),
+    zipCode: z.string().regex(/^\d{5}$/).optional(),
   });
 
   app.post("/api/prices/compare", async (req: any, res) => {
@@ -2415,7 +2416,7 @@ export async function registerRoutes(
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid search parameters", details: fromZodError(parsed.error).message });
       }
-      const { query, year, make, model, vehicleType } = parsed.data;
+      const { query, year, make, model, vehicleType, zipCode } = parsed.data;
 
       const vehicle = (year || make || model) ? { year, make, model } : undefined;
 
@@ -2429,7 +2430,7 @@ export async function registerRoutes(
         category: vehicleType,
       });
 
-      const results = await comparePrice(query, vehicle, vehicleType);
+      const results = await comparePrice(query, vehicle, vehicleType, zipCode);
       res.json(results);
     } catch (error) {
       console.error("Price comparison error:", error);

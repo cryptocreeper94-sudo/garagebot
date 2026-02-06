@@ -199,9 +199,10 @@ async function fetchAmazonProducts(query: string, vehicle?: { year?: string; mak
   }
 }
 
-async function fetchAutoZoneProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }): Promise<ProductResult[]> {
+async function fetchAutoZoneProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }, zipCode?: string): Promise<ProductResult[]> {
   const fullQuery = buildSearchQuery(query, vehicle);
-  const searchUrl = `https://www.autozone.com/searchresult?searchText=${encodeURIComponent(fullQuery)}`;
+  const zipParam = zipCode ? `&storeZipCode=${encodeURIComponent(zipCode)}` : '';
+  const searchUrl = `https://www.autozone.com/searchresult?searchText=${encodeURIComponent(fullQuery)}${zipParam}`;
 
   try {
     const apiUrl = `https://www.autozone.com/rest/search/v3/results?searchText=${encodeURIComponent(fullQuery)}&pageSize=8`;
@@ -286,9 +287,10 @@ async function fetchAutoZoneProducts(query: string, vehicle?: { year?: string; m
   }
 }
 
-async function fetchOReillyProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }): Promise<ProductResult[]> {
+async function fetchOReillyProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }, zipCode?: string): Promise<ProductResult[]> {
   const fullQuery = buildSearchQuery(query, vehicle);
-  const searchUrl = `https://www.oreillyauto.com/shop/b/${encodeURIComponent(fullQuery)}`;
+  const zipParam = zipCode ? `?postalCode=${encodeURIComponent(zipCode)}` : '';
+  const searchUrl = `https://www.oreillyauto.com/shop/b/${encodeURIComponent(fullQuery)}${zipParam}`;
 
   return [{
     id: 'oreilly-search',
@@ -299,15 +301,16 @@ async function fetchOReillyProducts(query: string, vehicle?: { year?: string; ma
     retailerSlug: 'oreilly',
     retailerColor: '#00843D',
     inStock: true,
-    shipping: 'Free Same-Day Pickup',
+    shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
     isAffiliate: false,
     affiliateUrl: searchUrl,
   }];
 }
 
-async function fetchAdvanceAutoProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }): Promise<ProductResult[]> {
+async function fetchAdvanceAutoProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }, zipCode?: string): Promise<ProductResult[]> {
   const fullQuery = buildSearchQuery(query, vehicle);
-  const searchUrl = `https://shop.advanceautoparts.com/web/SearchResults?searchTerm=${encodeURIComponent(fullQuery)}`;
+  const zipParam = zipCode ? `&storeId=&zipCode=${encodeURIComponent(zipCode)}` : '';
+  const searchUrl = `https://shop.advanceautoparts.com/web/SearchResults?searchTerm=${encodeURIComponent(fullQuery)}${zipParam}`;
 
   return [{
     id: 'advance-search',
@@ -318,15 +321,16 @@ async function fetchAdvanceAutoProducts(query: string, vehicle?: { year?: string
     retailerSlug: 'advance',
     retailerColor: '#CC0000',
     inStock: true,
-    shipping: 'Free Same-Day Pickup',
+    shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
     isAffiliate: true,
     affiliateUrl: searchUrl,
   }];
 }
 
-async function fetchNAPAProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }): Promise<ProductResult[]> {
+async function fetchNAPAProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }, zipCode?: string): Promise<ProductResult[]> {
   const fullQuery = buildSearchQuery(query, vehicle);
-  const searchUrl = `https://www.napaonline.com/en/search?q=${encodeURIComponent(fullQuery)}`;
+  const zipParam = zipCode ? `&nearbyStoreZip=${encodeURIComponent(zipCode)}` : '';
+  const searchUrl = `https://www.napaonline.com/en/search?q=${encodeURIComponent(fullQuery)}${zipParam}`;
 
   return [{
     id: 'napa-search',
@@ -337,7 +341,7 @@ async function fetchNAPAProducts(query: string, vehicle?: { year?: string; make?
     retailerSlug: 'napa',
     retailerColor: '#003DA5',
     inStock: true,
-    shipping: 'Free Same-Day Pickup',
+    shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
     isAffiliate: false,
     affiliateUrl: searchUrl,
   }];
@@ -362,9 +366,10 @@ async function fetchRockAutoProducts(query: string, vehicle?: { year?: string; m
   }];
 }
 
-async function fetchWalmartProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }): Promise<ProductResult[]> {
+async function fetchWalmartProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }, zipCode?: string): Promise<ProductResult[]> {
   const fullQuery = buildSearchQuery(query, vehicle);
-  const searchUrl = `https://www.walmart.com/search?q=${encodeURIComponent(fullQuery)}&cat_id=91083`;
+  const zipParam = zipCode ? `&stores_zip=${encodeURIComponent(zipCode)}` : '';
+  const searchUrl = `https://www.walmart.com/search?q=${encodeURIComponent(fullQuery)}&cat_id=91083${zipParam}`;
 
   try {
     const res = await fetchWithTimeout(searchUrl);
@@ -438,19 +443,20 @@ async function fetchWalmartProducts(query: string, vehicle?: { year?: string; ma
 export async function comparePrice(
   query: string,
   vehicle?: { year?: string; make?: string; model?: string },
-  vehicleType?: string
+  vehicleType?: string,
+  zipCode?: string
 ): Promise<PriceComparisonResult> {
-  console.log(`[PriceCompare] Searching: "${query}" vehicle: ${JSON.stringify(vehicle)} type: ${vehicleType}`);
+  console.log(`[PriceCompare] Searching: "${query}" vehicle: ${JSON.stringify(vehicle)} type: ${vehicleType} zip: ${zipCode || 'none'}`);
 
   const fetchers = [
     fetchEbayProducts(query, vehicle),
     fetchAmazonProducts(query, vehicle),
-    fetchAutoZoneProducts(query, vehicle),
-    fetchOReillyProducts(query, vehicle),
-    fetchAdvanceAutoProducts(query, vehicle),
-    fetchNAPAProducts(query, vehicle),
+    fetchAutoZoneProducts(query, vehicle, zipCode),
+    fetchOReillyProducts(query, vehicle, zipCode),
+    fetchAdvanceAutoProducts(query, vehicle, zipCode),
+    fetchNAPAProducts(query, vehicle, zipCode),
     fetchRockAutoProducts(query, vehicle),
-    fetchWalmartProducts(query, vehicle),
+    fetchWalmartProducts(query, vehicle, zipCode),
   ];
 
   const results = await Promise.allSettled(fetchers);
@@ -470,15 +476,20 @@ export async function comparePrice(
   const sortedProducts = [...productsWithPrices, ...productsWithoutPrices];
 
   const fullQuery = buildSearchQuery(query, vehicle);
+  const azZip = zipCode ? `&storeZipCode=${encodeURIComponent(zipCode)}` : '';
+  const orZip = zipCode ? `?postalCode=${encodeURIComponent(zipCode)}` : '';
+  const aaZip = zipCode ? `&zipCode=${encodeURIComponent(zipCode)}` : '';
+  const napaZip = zipCode ? `&nearbyStoreZip=${encodeURIComponent(zipCode)}` : '';
+  const wmZip = zipCode ? `&stores_zip=${encodeURIComponent(zipCode)}` : '';
   const retailerLinks = [
-    { name: 'AutoZone', slug: 'autozone', searchUrl: `https://www.autozone.com/searchresult?searchText=${encodeURIComponent(fullQuery)}`, color: '#FF6600', isAffiliate: true },
-    { name: "O'Reilly", slug: 'oreilly', searchUrl: `https://www.oreillyauto.com/shop/b/${encodeURIComponent(fullQuery)}`, color: '#00843D', isAffiliate: false },
-    { name: 'Advance Auto', slug: 'advance', searchUrl: `https://shop.advanceautoparts.com/web/SearchResults?searchTerm=${encodeURIComponent(fullQuery)}`, color: '#CC0000', isAffiliate: true },
-    { name: 'NAPA', slug: 'napa', searchUrl: `https://www.napaonline.com/en/search?q=${encodeURIComponent(fullQuery)}`, color: '#003DA5', isAffiliate: false },
+    { name: 'AutoZone', slug: 'autozone', searchUrl: `https://www.autozone.com/searchresult?searchText=${encodeURIComponent(fullQuery)}${azZip}`, color: '#FF6600', isAffiliate: true },
+    { name: "O'Reilly", slug: 'oreilly', searchUrl: `https://www.oreillyauto.com/shop/b/${encodeURIComponent(fullQuery)}${orZip}`, color: '#00843D', isAffiliate: false },
+    { name: 'Advance Auto', slug: 'advance', searchUrl: `https://shop.advanceautoparts.com/web/SearchResults?searchTerm=${encodeURIComponent(fullQuery)}${aaZip}`, color: '#CC0000', isAffiliate: true },
+    { name: 'NAPA', slug: 'napa', searchUrl: `https://www.napaonline.com/en/search?q=${encodeURIComponent(fullQuery)}${napaZip}`, color: '#003DA5', isAffiliate: false },
     { name: 'RockAuto', slug: 'rockauto', searchUrl: `https://www.rockauto.com/en/catalog/?a=${encodeURIComponent(fullQuery)}`, color: '#336699', isAffiliate: false },
     { name: 'Amazon', slug: 'amazon', searchUrl: `https://www.amazon.com/s?k=${encodeURIComponent(fullQuery)}&i=automotive&tag=${process.env.AMAZON_ASSOCIATE_ID || 'garagebot0e-20'}`, color: '#FF9900', isAffiliate: true },
     { name: 'eBay Motors', slug: 'ebay', searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(fullQuery)}&_sacat=6000&mkcid=1&mkrid=711-53200-19255-0&campid=${process.env.EBAY_CAMPAIGN_ID || '5339140935'}&toolid=10001`, color: '#E53238', isAffiliate: true },
-    { name: 'Walmart', slug: 'walmart', searchUrl: `https://www.walmart.com/search?q=${encodeURIComponent(fullQuery)}&cat_id=91083`, color: '#0071CE', isAffiliate: false },
+    { name: 'Walmart', slug: 'walmart', searchUrl: `https://www.walmart.com/search?q=${encodeURIComponent(fullQuery)}&cat_id=91083${wmZip}`, color: '#0071CE', isAffiliate: false },
     { name: 'Rexing', slug: 'rexing', searchUrl: `https://rexing.com/?s=${encodeURIComponent(fullQuery)}&post_type=product&ref=5357356`, color: '#1A1A2E', isAffiliate: true },
     { name: 'SILAZANE50', slug: 'silazane50', searchUrl: `https://www.anrdoezrs.net/click-101643977-7675405?url=${encodeURIComponent(`https://silazane50usa.com/collections/all?q=${fullQuery}`)}`, color: '#C4A35A', isAffiliate: true },
   ];
