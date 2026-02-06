@@ -2377,3 +2377,236 @@ export const marketingMessageTemplates = pgTable("marketing_message_templates", 
 export const insertMarketingMessageTemplateSchema = createInsertSchema(marketingMessageTemplates).omit({ id: true, createdAt: true });
 export type InsertMarketingMessageTemplate = z.infer<typeof insertMarketingMessageTemplateSchema>;
 export type MarketingMessageTemplate = typeof marketingMessageTemplates.$inferSelect;
+
+// ========== BREAK ROOM FEATURES ==========
+
+// Mileage Entries for gig workers / contractors
+export const mileageEntries = pgTable("mileage_entries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  date: timestamp("date").notNull().defaultNow(),
+  startOdometer: integer("start_odometer"),
+  endOdometer: integer("end_odometer"),
+  distance: decimal("distance", { precision: 10, scale: 2 }),
+  purpose: text("purpose"),
+  isBusinessTrip: boolean("is_business_trip").default(false),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_mileage_user").on(table.userId),
+  index("IDX_mileage_date").on(table.date),
+]);
+
+export const insertMileageEntrySchema = createInsertSchema(mileageEntries).omit({ id: true, createdAt: true });
+export type InsertMileageEntry = z.infer<typeof insertMileageEntrySchema>;
+export type MileageEntry = typeof mileageEntries.$inferSelect;
+
+// Speed Traps - Community reported
+export const speedTraps = pgTable("speed_traps", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }).notNull(),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }).notNull(),
+  description: text("description"),
+  trapType: text("trap_type").default("speed_trap"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  zipCode: text("zip_code"),
+  verifiedCount: integer("verified_count").default(1),
+  reportedCount: integer("reported_count").default(1),
+  isActive: boolean("is_active").default(true),
+  lastVerified: timestamp("last_verified").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_speed_traps_location").on(table.latitude, table.longitude),
+  index("IDX_speed_traps_state").on(table.state),
+  index("IDX_speed_traps_active").on(table.isActive),
+]);
+
+export const insertSpeedTrapSchema = createInsertSchema(speedTraps).omit({ id: true, createdAt: true, lastVerified: true });
+export type InsertSpeedTrap = z.infer<typeof insertSpeedTrapSchema>;
+export type SpeedTrap = typeof speedTraps.$inferSelect;
+
+// Specialty Shops & Salvage Yards
+export const specialtyShops = pgTable("specialty_shops", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  shopType: text("shop_type").notNull(),
+  specialties: text("specialties").array().default(sql`ARRAY[]::text[]`),
+  vehicleTypes: text("vehicle_types").array().default(sql`ARRAY[]::text[]`),
+  makes: text("makes").array().default(sql`ARRAY[]::text[]`),
+  description: text("description"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  zipCode: text("zip_code"),
+  phone: text("phone"),
+  website: text("website"),
+  email: text("email"),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  rating: decimal("rating", { precision: 3, scale: 2 }),
+  reviewCount: integer("review_count").default(0),
+  imageUrl: text("image_url"),
+  isVerified: boolean("is_verified").default(false),
+  submittedBy: varchar("submitted_by").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_specialty_shops_type").on(table.shopType),
+  index("IDX_specialty_shops_state").on(table.state),
+  index("IDX_specialty_shops_zip").on(table.zipCode),
+]);
+
+export const insertSpecialtyShopSchema = createInsertSchema(specialtyShops).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertSpecialtyShop = z.infer<typeof insertSpecialtyShopSchema>;
+export type SpecialtyShop = typeof specialtyShops.$inferSelect;
+
+// Car Events & Shows
+export const carEvents = pgTable("car_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  eventType: text("event_type").notNull(),
+  vehicleCategories: text("vehicle_categories").array().default(sql`ARRAY[]::text[]`),
+  description: text("description"),
+  date: timestamp("date"),
+  endDate: timestamp("end_date"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  zipCode: text("zip_code"),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  website: text("website"),
+  ticketUrl: text("ticket_url"),
+  cost: text("cost"),
+  imageUrl: text("image_url"),
+  isFeatured: boolean("is_featured").default(false),
+  submittedBy: varchar("submitted_by").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_car_events_type").on(table.eventType),
+  index("IDX_car_events_date").on(table.date),
+  index("IDX_car_events_state").on(table.state),
+]);
+
+export const insertCarEventSchema = createInsertSchema(carEvents).omit({ id: true, createdAt: true });
+export type InsertCarEvent = z.infer<typeof insertCarEventSchema>;
+export type CarEvent = typeof carEvents.$inferSelect;
+
+// CDL Programs & Recruiting
+export const cdlPrograms = pgTable("cdl_programs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyName: text("company_name").notNull(),
+  programType: text("program_type").notNull(),
+  category: text("category").default("trucking"),
+  description: text("description"),
+  requirements: text("requirements"),
+  benefits: text("benefits"),
+  payRange: text("pay_range"),
+  trainingLength: text("training_length"),
+  tuitionCost: text("tuition_cost"),
+  tuitionReimbursement: boolean("tuition_reimbursement").default(false),
+  signOnBonus: text("sign_on_bonus"),
+  referralBonus: text("referral_bonus"),
+  location: text("location"),
+  state: text("state"),
+  isNationwide: boolean("is_nationwide").default(false),
+  website: text("website"),
+  applyUrl: text("apply_url"),
+  phone: text("phone"),
+  logoUrl: text("logo_url"),
+  isFeatured: boolean("is_featured").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_cdl_programs_type").on(table.programType),
+  index("IDX_cdl_programs_category").on(table.category),
+  index("IDX_cdl_programs_state").on(table.state),
+  index("IDX_cdl_programs_active").on(table.isActive),
+]);
+
+export const insertCdlProgramSchema = createInsertSchema(cdlPrograms).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertCdlProgram = z.infer<typeof insertCdlProgramSchema>;
+export type CdlProgram = typeof cdlPrograms.$inferSelect;
+
+// CDL Referrals / Interest Forms
+export const cdlReferrals = pgTable("cdl_referrals", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  programId: varchar("program_id").notNull().references(() => cdlPrograms.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  location: text("location"),
+  cdlClassInterest: text("cdl_class_interest"),
+  experience: text("experience"),
+  message: text("message"),
+  status: text("status").default("submitted"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_cdl_referrals_program").on(table.programId),
+  index("IDX_cdl_referrals_user").on(table.userId),
+  index("IDX_cdl_referrals_status").on(table.status),
+]);
+
+export const insertCdlReferralSchema = createInsertSchema(cdlReferrals).omit({ id: true, createdAt: true });
+export type InsertCdlReferral = z.infer<typeof insertCdlReferralSchema>;
+export type CdlReferral = typeof cdlReferrals.$inferSelect;
+
+// Fuel Price Reports - Community reported
+export const fuelReports = pgTable("fuel_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  stationName: text("station_name").notNull(),
+  stationBrand: text("station_brand"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  zipCode: text("zip_code"),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  priceRegular: decimal("price_regular", { precision: 5, scale: 3 }),
+  priceMidgrade: decimal("price_midgrade", { precision: 5, scale: 3 }),
+  pricePremium: decimal("price_premium", { precision: 5, scale: 3 }),
+  priceDiesel: decimal("price_diesel", { precision: 5, scale: 3 }),
+  priceE85: decimal("price_e85", { precision: 5, scale: 3 }),
+  reportedAt: timestamp("reported_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_fuel_reports_zip").on(table.zipCode),
+  index("IDX_fuel_reports_state").on(table.state),
+  index("IDX_fuel_reports_date").on(table.reportedAt),
+]);
+
+export const insertFuelReportSchema = createInsertSchema(fuelReports).omit({ id: true, createdAt: true });
+export type InsertFuelReport = z.infer<typeof insertFuelReportSchema>;
+export type FuelReport = typeof fuelReports.$inferSelect;
+
+// Scanned Documents (receipts, registration, insurance, etc.)
+export const scannedDocuments = pgTable("scanned_documents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  documentType: text("document_type").notNull(),
+  title: text("title"),
+  extractedText: text("extracted_text"),
+  extractedData: jsonb("extracted_data"),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  amount: decimal("amount", { precision: 10, scale: 2 }),
+  vendor: text("vendor"),
+  date: timestamp("date"),
+  category: text("category"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_scanned_docs_user").on(table.userId),
+  index("IDX_scanned_docs_type").on(table.documentType),
+  index("IDX_scanned_docs_date").on(table.date),
+]);
+
+export const insertScannedDocumentSchema = createInsertSchema(scannedDocuments).omit({ id: true, createdAt: true });
+export type InsertScannedDocument = z.infer<typeof insertScannedDocumentSchema>;
+export type ScannedDocument = typeof scannedDocuments.$inferSelect;

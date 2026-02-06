@@ -4,7 +4,8 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema } from "@shared/schema";
+import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import { db } from "@db";
@@ -8693,6 +8694,278 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       res.json(location);
     } catch (err) {
       res.status(500).json({ error: 'Failed to create location' });
+    }
+  });
+
+  // ========== BREAK ROOM API ROUTES ==========
+
+  // Auto News
+  app.get("/api/break-room/news", async (req, res) => {
+    try {
+      const { category } = req.query;
+      const articles = getAutoNewsByCategory(category as string);
+      res.json(articles);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch news" });
+    }
+  });
+
+  // NHTSA Recall Checker
+  app.get("/api/break-room/recalls", async (req, res) => {
+    try {
+      const { make, model, year } = req.query;
+      if (!make || !model || !year) {
+        return res.status(400).json({ error: "make, model, and year are required" });
+      }
+      const recalls = await getNHTSARecalls(make as string, model as string, parseInt(year as string));
+      res.json(recalls);
+    } catch (error) {
+      console.error("NHTSA recall error:", error);
+      res.status(500).json({ error: "Failed to check recalls" });
+    }
+  });
+
+  // Document Scanner
+  app.post("/api/break-room/scan", isAuthenticated, async (req: any, res) => {
+    try {
+      const { image, documentType } = req.body;
+      if (!image || !documentType) {
+        return res.status(400).json({ error: "image and documentType are required" });
+      }
+      const result = await scanDocument(image, documentType);
+
+      if (result.success) {
+        const userId = req.user?.claims?.sub || (req.session as any).userId;
+        await db.insert(scannedDocuments).values({
+          userId,
+          documentType,
+          title: result.extractedData?.vendor || result.extractedData?.provider || `${documentType} scan`,
+          extractedText: result.rawText,
+          extractedData: result.extractedData,
+          amount: result.extractedData?.total ? String(result.extractedData.total) : null,
+          vendor: result.extractedData?.vendor || result.extractedData?.provider,
+          date: result.extractedData?.date ? new Date(result.extractedData.date) : new Date(),
+          category: documentType,
+        });
+      }
+
+      res.json(result);
+    } catch (error) {
+      console.error("Document scan error:", error);
+      res.status(500).json({ error: "Failed to scan document" });
+    }
+  });
+
+  // Mileage Tracker
+  app.get("/api/break-room/mileage", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const entries = await db.select().from(mileageEntries)
+        .where(eq(mileageEntries.userId, userId))
+        .orderBy(desc(mileageEntries.date))
+        .limit(50);
+      res.json(entries);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch mileage entries" });
+    }
+  });
+
+  app.post("/api/break-room/mileage", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const result = insertMileageEntrySchema.safeParse({ ...req.body, userId });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const [entry] = await db.insert(mileageEntries).values(result.data).returning();
+      res.json(entry);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create mileage entry" });
+    }
+  });
+
+  // Speed Traps
+  app.get("/api/break-room/speed-traps", async (req, res) => {
+    try {
+      const { state, zip } = req.query;
+      let query = db.select().from(speedTraps).where(eq(speedTraps.isActive, true));
+      if (state) {
+        query = db.select().from(speedTraps).where(and(eq(speedTraps.isActive, true), eq(speedTraps.state, state as string)));
+      }
+      const traps = await query.orderBy(desc(speedTraps.createdAt)).limit(100);
+      res.json(traps);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch speed traps" });
+    }
+  });
+
+  app.post("/api/break-room/speed-traps", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const result = insertSpeedTrapSchema.safeParse({ ...req.body, userId });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const [trap] = await db.insert(speedTraps).values(result.data).returning();
+      res.json(trap);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to report speed trap" });
+    }
+  });
+
+  // Specialty Shops
+  app.get("/api/break-room/specialty-shops", async (req, res) => {
+    try {
+      const { state, zip, type } = req.query;
+      let results;
+      if (state) {
+        results = await db.select().from(specialtyShops).where(eq(specialtyShops.state, state as string)).orderBy(specialtyShops.name).limit(100);
+      } else if (type) {
+        results = await db.select().from(specialtyShops).where(eq(specialtyShops.shopType, type as string)).orderBy(specialtyShops.name).limit(100);
+      } else {
+        results = await db.select().from(specialtyShops).orderBy(specialtyShops.name).limit(100);
+      }
+      res.json(results);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch specialty shops" });
+    }
+  });
+
+  app.post("/api/break-room/specialty-shops", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const result = insertSpecialtyShopSchema.safeParse({ ...req.body, submittedBy: userId });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const [shop] = await db.insert(specialtyShops).values(result.data).returning();
+      res.json(shop);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to submit specialty shop" });
+    }
+  });
+
+  // Car Events
+  app.get("/api/break-room/events", async (req, res) => {
+    try {
+      const { state, type } = req.query;
+      let results;
+      if (state) {
+        results = await db.select().from(carEvents).where(eq(carEvents.state, state as string)).orderBy(carEvents.date).limit(100);
+      } else if (type) {
+        results = await db.select().from(carEvents).where(eq(carEvents.eventType, type as string)).orderBy(carEvents.date).limit(100);
+      } else {
+        results = await db.select().from(carEvents).orderBy(carEvents.date).limit(100);
+      }
+      res.json(results);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch events" });
+    }
+  });
+
+  app.post("/api/break-room/events", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const result = insertCarEventSchema.safeParse({ ...req.body, submittedBy: userId });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const [event] = await db.insert(carEvents).values(result.data).returning();
+      res.json(event);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to submit event" });
+    }
+  });
+
+  // CDL Programs
+  app.get("/api/break-room/cdl-programs", async (req, res) => {
+    try {
+      const { state, category, type } = req.query;
+      let results;
+      if (state) {
+        results = await db.select().from(cdlPrograms).where(and(eq(cdlPrograms.isActive, true), eq(cdlPrograms.state, state as string))).orderBy(desc(cdlPrograms.isFeatured), cdlPrograms.companyName).limit(100);
+      } else if (category) {
+        results = await db.select().from(cdlPrograms).where(and(eq(cdlPrograms.isActive, true), eq(cdlPrograms.category, category as string))).orderBy(desc(cdlPrograms.isFeatured), cdlPrograms.companyName).limit(100);
+      } else {
+        results = await db.select().from(cdlPrograms).where(eq(cdlPrograms.isActive, true)).orderBy(desc(cdlPrograms.isFeatured), cdlPrograms.companyName).limit(100);
+      }
+      res.json(results);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch CDL programs" });
+    }
+  });
+
+  // CDL Referrals / Interest Forms (public for lead gen, with anti-spam)
+  const cdlRateLimiter = new Map<string, number[]>();
+  app.post("/api/break-room/cdl-referrals", async (req, res) => {
+    try {
+      const clientIP = req.ip || req.socket.remoteAddress || 'unknown';
+      const ipHash = crypto.createHash('sha256').update(clientIP).digest('hex').substring(0, 16);
+      const now = Date.now();
+      const submissions = cdlRateLimiter.get(ipHash) || [];
+      const recent = submissions.filter(t => now - t < 3600000);
+      if (recent.length >= 3) {
+        return res.status(429).json({ error: "Too many submissions. Please try again later." });
+      }
+      cdlRateLimiter.set(ipHash, [...recent, now]);
+
+      const result = insertCdlReferralSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      if (!result.data.email || !result.data.fullName || !result.data.programId) {
+        return res.status(400).json({ error: "Name, email, and program are required" });
+      }
+      const [referral] = await db.insert(cdlReferrals).values(result.data).returning();
+      res.json(referral);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to submit interest form" });
+    }
+  });
+
+  // Fuel Reports
+  app.get("/api/break-room/fuel", async (req, res) => {
+    try {
+      const { zip, state } = req.query;
+      let results;
+      if (zip) {
+        results = await db.select().from(fuelReports).where(eq(fuelReports.zipCode, zip as string)).orderBy(desc(fuelReports.reportedAt)).limit(50);
+      } else if (state) {
+        results = await db.select().from(fuelReports).where(eq(fuelReports.state, state as string)).orderBy(desc(fuelReports.reportedAt)).limit(50);
+      } else {
+        results = await db.select().from(fuelReports).orderBy(desc(fuelReports.reportedAt)).limit(50);
+      }
+      res.json(results);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch fuel reports" });
+    }
+  });
+
+  app.post("/api/break-room/fuel", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const result = insertFuelReportSchema.safeParse({ ...req.body, userId });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const [report] = await db.insert(fuelReports).values(result.data).returning();
+      res.json(report);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to submit fuel report" });
+    }
+  });
+
+  // Scanned Documents History
+  app.get("/api/break-room/scans", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const scans = await db.select().from(scannedDocuments)
+        .where(eq(scannedDocuments.userId, userId))
+        .orderBy(desc(scannedDocuments.createdAt))
+        .limit(50);
+      res.json(scans);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch scan history" });
     }
   });
 
