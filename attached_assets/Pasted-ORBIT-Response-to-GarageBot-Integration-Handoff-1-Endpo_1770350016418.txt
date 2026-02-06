@@ -1,0 +1,206 @@
+ORBIT Response to GarageBot Integration Handoff
+
+1. Endpoints - All LIVE (13 total)
+
+All 13 ecosystem endpoints are live and accepting requests at https://orbitstaffing.io:
+
+Endpoint	Status
+GET /api/ecosystem/status	LIVE
+POST /api/ecosystem/sync/contractors	LIVE
+POST /api/ecosystem/sync/workers	LIVE
+POST /api/ecosystem/sync/timesheets	LIVE
+POST /api/ecosystem/sync/1099	LIVE
+POST /api/ecosystem/sync/w2	LIVE
+POST /api/ecosystem/sync/certifications	LIVE
+GET /api/ecosystem/shops/{shopId}/workers	LIVE
+GET /api/ecosystem/shops/{shopId}/payroll	LIVE
+GET/POST /api/ecosystem/logs	LIVE
+GET/POST /api/ecosystem/snippets	LIVE
+2. Authentication - CORRECTIONS NEEDED
+
+ORBIT uses two headers for ecosystem auth, not HMAC:
+
+X-API-Key — the app's API key
+X-API-Secret — the raw API secret (ORBIT hashes it server-side with SHA256 and compares)
+GarageBot can remove these extra headers (they're ignored):
+
+X-Timestamp (not used)
+X-Signature (not used on ecosystem endpoints)
+X-App-Name (not used)
+GarageBot IS registered and active. API key: dw_app_3c88bda688e781b58b2b46144bf6006a49add5c28eed327e
+
+3. Status Response Format - CORRECTION
+
+GarageBot expects { version, registered } but ORBIT returns:
+
+{
+  "connected": true,
+  "hubName": "ORBIT Staffing Ecosystem Hub",
+  "appName": "GarageBot",
+  "permissions": ["read:workers", "write:workers", ...],
+  "lastSync": null
+}
+Adjust your status check accordingly.
+
+4. Financial Hub Endpoint - CORRECTION
+
+The endpoint is /api/financial-hub/ingest — NOT /api/financial-hub/events.
+
+Different auth headers for Financial Hub:
+
+X-Orbit-Api-Key — the Financial Hub API key
+X-Orbit-Signature — HMAC-SHA256 of the request body
+GarageBot would need separate Financial Hub credentials (registered through the ORBIT Financial Hub partner system, separate from the ecosystem).
+
+5. Webhooks (ORBIT -> GarageBot)
+
+Outbound webhooks are not currently implemented. This is a future feature. For now, GarageBot should poll the ecosystem endpoints for updates.
+
+6. Shop Provisioning
+
+Option A is not available yet. Shops are currently managed through the ORBIT admin dashboard. For launch, GarageBot should sync worker/contractor/timesheet data for shops, and ORBIT will store it under the shopId (tenantId) that GarageBot provides.
+
+7. Payroll Capabilities
+
+ORBIT is currently a record-keeping and compliance tracking system — it tracks W-2 and 1099 records, calculates royalty splits, and generates blockchain-stamped financial statements. Actual payroll processing (direct deposits, tax filings, W-2 generation) would need integration with a processor like Gusto or ADP. That can be added later.
+
+8. Production Database
+
+GarageBot's credentials need to be inserted into the production database. The dev registration is confirmed, but publishing only pushes code — not data. GarageBot's production INSERT:
+
+INSERT INTO ecosystem_connected_apps (id, app_name, app_slug, api_key, api_secret_hash, permissions, is_active)
+VALUES (
+  'f2fcc14f-445e-47f7-a9a5-c51870c55106',
+  'GarageBot', 'garagebot',
+  'dw_app_3c88bda688e781b58b2b46144bf6006a49add5c28eed327e',
+  'f54c812dfa512da955d7af8e94f719159c01bf5dc2b0ec23a2710ac98f09daeb',
+  '{read:workers,write:workers,read:contractors,write:contractors,read:1099,write:1099,read:timesheets,write:timesheets,read:certifications,write:certifications,read:code,write:code}',
+  true
+);
+You'll need to run this in the production database after the next publish.
+
+Summary: What GarageBot needs to fix on their side:
+
+Remove X-Timestamp, X-Signature, X-App-Name headers (or leave them — they're just ignored)
+Change Financial Hub endpoint from /events to /ingest
+Use different auth headers for Financial Hub vs Ecosystem
+Update status check to expect ORBIT's actual response format
+Use polling instead of webhooks for now
+Everything else is ready. Once you run that production INSERT, GarageBot can start calling all endpoints.
+
+
+Scroll to latest
+
+Make, test, iterate…
+
+Publishing
+Production
+Status
+Jason published 4 days ago
+Visibility
+Public
+Domain
+https://admin-preview-login-cryptocreeper94.replit.app
+https://orbitstaffing.net
+https://orbitstaffing.io
+Type
+Autoscale
+(4 vCPU / 8 GiB RAM / 3 Max)
+See all usage
+Database
+Production database connected
+0208d77a
+JA
+cryptocreeper94
+Jason
+published 4 days ago
+ce7eb1b3
+JA
+cryptocreeper94
+Jason
+failed to publish 4 days ago
+abafdcd5
+JA
+cryptocreeper94
+Jason
+published 12 days ago
+2daa27bf
+JA
+cryptocreeper94
+Jason
+published 12 days ago
+003d39c2
+JA
+cryptocreeper94
+Jason
+published 12 days ago
+a2dcb5e0
+JA
+cryptocreeper94
+Jason
+published 12 days ago
+613e5f7d
+JA
+cryptocreeper94
+Jason
+published 12 days ago
+3ea83023
+JA
+cryptocreeper94
+Jason
+published 12 days ago
+d809bf9b
+JA
+cryptocreeper94
+Jason
+published 12 days ago
+7f1cec73
+JA
+cryptocreeper94
+Jason
+published about 1 month ago
+e265aed3
+JA
+cryptocreeper94
+Jason
+published about 1 month ago
+1498b31a
+JA
+cryptocreeper94
+Jason
+published about 1 month ago
+10422d49
+JA
+cryptocreeper94
+Jason
+published about 1 month ago
+b8046849
+JA
+cryptocreeper94
+Jason
+published about 2 months ago
+32776e07
+JA
+cryptocreeper94
+Jason
+published about 2 months ago
+626f48f3
+JA
+cryptocreeper94
+Jason
+published about 2 months ago
+604b1ba2
+JA
+cryptocreeper94
+Jason
+published about 2 months ago
+0f610263
+JA
+cryptocreeper94
+Jason
+published about 2 months ago
+56abcde6
+JA
+cryptocreeper94
+Jason
+published about 2 months ago
