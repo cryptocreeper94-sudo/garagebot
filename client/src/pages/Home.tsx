@@ -31,12 +31,19 @@ import VehicleShowcase from "@/components/VehicleShowcase";
 import AchievementBadges from "@/components/AchievementBadges";
 
 import useSoundEffects from "@/hooks/useSoundEffects";
+import { useAuth } from "@/hooks/useAuth";
 import { Volume2, VolumeX } from "lucide-react";
+
+function getTimeGreeting(): string {
+  const h = new Date().getHours();
+  return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+}
 
 export default function Home() {
   const [_, setLocation] = useLocation();
   const [isSearching, setIsSearching] = useState(false);
   const { soundEnabled, toggleSound, playSound } = useSoundEffects();
+  const { user, isAuthenticated } = useAuth();
   const [webUrl, setWebUrl] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
@@ -124,8 +131,8 @@ export default function Home() {
                 {/* Full Welcome Title */}
                 <div className="relative py-4">
                   <div className="flex flex-col items-center text-center">
-                    <p className="text-base xl:text-lg font-tech text-muted-foreground tracking-widest uppercase mb-2">
-                      Welcome to
+                    <p className="text-base xl:text-lg font-tech text-muted-foreground tracking-widest uppercase mb-2" data-testid="text-home-greeting">
+                      {isAuthenticated && user ? `${getTimeGreeting()}, ${user.firstName || user.username || 'there'}` : 'Welcome to'}
                     </p>
                     <div className="flex items-end relative">
                       
@@ -514,8 +521,8 @@ export default function Home() {
             </div>
             
             {/* Welcome Title */}
-            <p className="text-base font-tech text-muted-foreground tracking-widest uppercase mb-3">
-              Welcome to
+            <p className="text-base font-tech text-muted-foreground tracking-widest uppercase mb-3" data-testid="text-mobile-greeting">
+              {isAuthenticated && user ? `${getTimeGreeting()}, ${user.firstName || user.username || 'there'}` : 'Welcome to'}
             </p>
             <div className="relative inline-block mb-4">
               <h1 className="text-3xl sm:text-4xl font-tech font-black uppercase tracking-tight">
