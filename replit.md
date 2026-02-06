@@ -112,7 +112,32 @@ Preferred communication style: Simple, everyday language.
 - **AI**: OpenAI GPT-4.
 - **Blockchain**: Solana (via Helius API).
 - **Weather Radar**: RainViewer API, NOAA Weather Alerts API.
-- **ORBIT Ecosystem**: ORBIT Staffing Ecosystem Hub (orbitstaffing.io).
+- **ORBIT Staffing OS**: Full payroll and staffing platform at `https://orbitstaffing.replit.app`.
+  - **Hub URL env var**: `ORBIT_HUB_URL` = `https://orbitstaffing.replit.app`
+  - **Auth**: `X-API-Key` + `X-API-Secret` + `X-App-Name: GarageBot` headers on all ecosystem endpoints.
+  - **App ID**: `dw_app_garagebot` | API Key stored in `ORBIT_ECOSYSTEM_API_KEY` env secret
+  - **Ecosystem Endpoints** (13 total, all authenticated):
+    - `GET /api/ecosystem/status` - Connection health check
+    - `POST /api/ecosystem/sync/workers` - Push mechanic/worker records
+    - `POST /api/ecosystem/sync/contractors` - Push contractor records
+    - `POST /api/ecosystem/sync/timesheets` - Push daily hours
+    - `POST /api/ecosystem/sync/certifications` - Push ASE/trade certs
+    - `POST /api/ecosystem/sync/1099` - Push 1099 contractor payment data
+    - `POST /api/ecosystem/sync/w2` - Sync W-2 employee data for year-end
+    - `GET /api/ecosystem/shops/:shopId/workers` - Get shop workers
+    - `GET /api/ecosystem/shops/:shopId/payroll` - Get shop payroll records
+    - `GET/POST /api/ecosystem/logs` - Activity logging
+    - `GET/POST /api/ecosystem/snippets` - Code snippet sharing
+  - **Payroll Engine Endpoints** (4 total, PUBLIC - no auth):
+    - `GET /api/payroll/engine/status` - Payroll engine health
+    - `GET /api/payroll/overtime/rules` - All 50 state overtime rules
+    - `GET /api/payroll/overtime/rules/:state` - State-specific rules
+    - `POST /api/payroll/overtime/calculate` - Calculate overtime (CA daily OT/DT, AK, NV, CO, MN, KS special rules)
+  - **Financial Hub**: `POST /api/financial-hub/ingest` with `X-Orbit-Api-Key` + `X-Orbit-Signature` (HMAC-SHA256)
+  - **Webhooks** (ORBIT -> GarageBot): Endpoint at `/webhooks/orbit`, verified via `x-orbit-signature` HMAC-SHA256.
+    - Events: `payroll.completed`, `payroll.payment.sent`, `payroll.payment.failed`, `worker.created`, `worker.updated`, `document.generated`, `tax.form.ready`
+  - **Payroll Capabilities**: Federal/state/local tax calculations (all 50 states + DC), FICA, garnishments (CCPA-compliant), direct deposit via Stripe Connect ACH, W-2/1099-NEC generation, Form 941/W-3/1096, pay stubs with ORBIT hallmark.
+  - **Client Files**: `server/services/orbitEcosystem.ts` (OrbitEcosystemClient), `server/ecosystemHub.ts` (EcosystemClient for Dev Hub).
 
 ## QuickBooks Integration
 - **Purpose**: Facilitates OAuth flow for connecting shops to QuickBooks Online.

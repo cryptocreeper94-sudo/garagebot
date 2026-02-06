@@ -4054,6 +4054,202 @@ export async function registerRoutes(
     }
   });
 
+  app.post('/api/orbit/sync-workers', isAuthenticated, async (req: any, res) => {
+    try {
+      const { workers } = req.body;
+      if (!workers || !Array.isArray(workers)) {
+        return res.status(400).json({ error: "workers array is required" });
+      }
+      const result = await orbitClient.syncWorkers(workers);
+      res.json({ success: !!result, result });
+    } catch (error) {
+      console.error("ORBIT sync workers error:", error);
+      res.status(500).json({ error: "Failed to sync workers to ORBIT" });
+    }
+  });
+
+  app.post('/api/orbit/sync-contractors', isAuthenticated, async (req: any, res) => {
+    try {
+      const { contractors } = req.body;
+      if (!contractors || !Array.isArray(contractors)) {
+        return res.status(400).json({ error: "contractors array is required" });
+      }
+      const result = await orbitClient.syncContractors(contractors);
+      res.json({ success: !!result, result });
+    } catch (error) {
+      console.error("ORBIT sync contractors error:", error);
+      res.status(500).json({ error: "Failed to sync contractors to ORBIT" });
+    }
+  });
+
+  app.post('/api/orbit/sync-timesheets', isAuthenticated, async (req: any, res) => {
+    try {
+      const { timesheets } = req.body;
+      if (!timesheets || !Array.isArray(timesheets)) {
+        return res.status(400).json({ error: "timesheets array is required" });
+      }
+      const result = await orbitClient.syncTimesheets(timesheets);
+      res.json({ success: !!result, result });
+    } catch (error) {
+      console.error("ORBIT sync timesheets error:", error);
+      res.status(500).json({ error: "Failed to sync timesheets to ORBIT" });
+    }
+  });
+
+  app.post('/api/orbit/sync-certifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const { certifications } = req.body;
+      if (!certifications || !Array.isArray(certifications)) {
+        return res.status(400).json({ error: "certifications array is required" });
+      }
+      const result = await orbitClient.syncCertifications(certifications);
+      res.json({ success: !!result, result });
+    } catch (error) {
+      console.error("ORBIT sync certifications error:", error);
+      res.status(500).json({ error: "Failed to sync certifications to ORBIT" });
+    }
+  });
+
+  app.post('/api/orbit/sync-1099', isAuthenticated, async (req: any, res) => {
+    try {
+      const { year, payments } = req.body;
+      if (!year || !payments || !Array.isArray(payments)) {
+        return res.status(400).json({ error: "year and payments array are required" });
+      }
+      const result = await orbitClient.sync1099Payments(year, payments);
+      res.json({ success: !!result, result });
+    } catch (error) {
+      console.error("ORBIT sync 1099 error:", error);
+      res.status(500).json({ error: "Failed to sync 1099 data to ORBIT" });
+    }
+  });
+
+  app.post('/api/orbit/sync-w2', isAuthenticated, async (req: any, res) => {
+    try {
+      const { year, employees } = req.body;
+      if (!year || !employees || !Array.isArray(employees)) {
+        return res.status(400).json({ error: "year and employees array are required" });
+      }
+      const result = await orbitClient.syncW2Data(year, employees);
+      res.json({ success: !!result, result });
+    } catch (error) {
+      console.error("ORBIT sync W2 error:", error);
+      res.status(500).json({ error: "Failed to sync W-2 data to ORBIT" });
+    }
+  });
+
+  app.get('/api/orbit/shop/:shopId/workers', isAuthenticated, async (req: any, res) => {
+    try {
+      const result = await orbitClient.getShopWorkers(req.params.shopId);
+      res.json(result || { success: false, workers: [] });
+    } catch (error) {
+      console.error("ORBIT get shop workers error:", error);
+      res.status(500).json({ error: "Failed to get shop workers from ORBIT" });
+    }
+  });
+
+  app.get('/api/orbit/shop/:shopId/payroll', isAuthenticated, async (req: any, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const result = await orbitClient.getShopPayroll(req.params.shopId, limit);
+      res.json(result || { success: false, records: [] });
+    } catch (error) {
+      console.error("ORBIT get shop payroll error:", error);
+      res.status(500).json({ error: "Failed to get shop payroll from ORBIT" });
+    }
+  });
+
+  app.get('/api/orbit/payroll/engine-status', async (req, res) => {
+    try {
+      const result = await orbitClient.getPayrollEngineStatus();
+      res.json(result || { error: "Could not reach ORBIT payroll engine" });
+    } catch (error) {
+      console.error("ORBIT payroll engine status error:", error);
+      res.status(500).json({ error: "Failed to get payroll engine status" });
+    }
+  });
+
+  app.get('/api/orbit/payroll/overtime-rules', async (req, res) => {
+    try {
+      const result = await orbitClient.getOvertimeRules();
+      res.json(result || { error: "Could not fetch overtime rules" });
+    } catch (error) {
+      console.error("ORBIT overtime rules error:", error);
+      res.status(500).json({ error: "Failed to get overtime rules" });
+    }
+  });
+
+  app.get('/api/orbit/payroll/overtime-rules/:state', async (req, res) => {
+    try {
+      const result = await orbitClient.getOvertimeRules(req.params.state);
+      res.json(result || { error: "Could not fetch overtime rules for state" });
+    } catch (error) {
+      console.error("ORBIT state overtime rules error:", error);
+      res.status(500).json({ error: "Failed to get state overtime rules" });
+    }
+  });
+
+  app.post('/api/orbit/payroll/calculate-overtime', async (req, res) => {
+    try {
+      const { dailyHours, hourlyRate, state } = req.body;
+      if (!dailyHours || !hourlyRate || !state) {
+        return res.status(400).json({ error: "dailyHours, hourlyRate, and state are required" });
+      }
+      const result = await orbitClient.calculateOvertime({ dailyHours, hourlyRate, state });
+      res.json(result || { error: "Could not calculate overtime" });
+    } catch (error) {
+      console.error("ORBIT calculate overtime error:", error);
+      res.status(500).json({ error: "Failed to calculate overtime" });
+    }
+  });
+
+  app.post('/webhooks/orbit', (req, res) => {
+    try {
+      const signature = req.headers['x-orbit-signature'] as string;
+      const rawPayload = (req as any).rawBody ? (req as any).rawBody.toString() : JSON.stringify(req.body);
+      const isValid = orbitClient.verifyWebhookSignature(rawPayload, signature);
+
+      if (!isValid) {
+        console.warn('[ORBIT Webhook] Invalid signature - rejecting');
+        return res.status(401).json({ error: "Invalid signature" });
+      }
+
+      const { event, data } = req.body;
+      console.log(`[ORBIT Webhook] Received event: ${event}`);
+
+      switch (event) {
+        case 'payroll.completed':
+          console.log(`[ORBIT Webhook] Payroll completed for tenant ${data?.tenantId} - total: $${data?.totalNet}`);
+          break;
+        case 'payroll.payment.sent':
+          console.log(`[ORBIT Webhook] Payment sent: ${data?.workerId} - $${data?.amount}`);
+          break;
+        case 'payroll.payment.failed':
+          console.error(`[ORBIT Webhook] Payment FAILED: ${data?.workerId} - ${data?.reason}`);
+          break;
+        case 'worker.created':
+          console.log(`[ORBIT Webhook] Worker created: ${data?.workerId}`);
+          break;
+        case 'worker.updated':
+          console.log(`[ORBIT Webhook] Worker updated: ${data?.workerId}`);
+          break;
+        case 'document.generated':
+          console.log(`[ORBIT Webhook] Document ready: ${data?.type} - hallmark: ${data?.hallmarkId}`);
+          break;
+        case 'tax.form.ready':
+          console.log(`[ORBIT Webhook] Tax form ready: ${data?.formType}`);
+          break;
+        default:
+          console.log(`[ORBIT Webhook] Unknown event: ${event}`, data);
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error("[ORBIT Webhook] Error processing webhook:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
   // ============================================
   // TRUST LAYER GATEWAY INTEGRATION
   // Self-service ecosystem connection (no credentials needed)

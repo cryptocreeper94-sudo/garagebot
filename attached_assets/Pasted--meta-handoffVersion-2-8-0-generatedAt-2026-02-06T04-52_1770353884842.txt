@@ -1,0 +1,250 @@
+{
+  "meta": {
+    "handoffVersion": "2.8.0",
+    "generatedAt": "2026-02-06T04:52:30.011Z",
+    "source": "ORBIT Staffing OS",
+    "target": "GarageBot",
+    "orbitHubUrl": "https://orbitstaffing.replit.app",
+    "hallmark": "Powered by ORBIT Staffing OS | DarkWave Studios"
+  },
+  "authentication": {
+    "instructions": [
+      "GarageBot is already registered in the ORBIT Ecosystem Hub.",
+      "Use the API key and secret stored in your ORBIT_ECOSYSTEM_API_KEY and ORBIT_ECOSYSTEM_API_SECRET environment variables.",
+      "Every request to ORBIT must include these headers: X-API-Key and X-API-Secret.",
+      "If you need to re-register, POST to /api/admin/ecosystem/register-app with the registration payload below."
+    ],
+    "headers": {
+      "Content-Type": "application/json",
+      "X-API-Key": "${ORBIT_ECOSYSTEM_API_KEY}",
+      "X-API-Secret": "${ORBIT_ECOSYSTEM_API_SECRET}",
+      "X-App-Name": "GarageBot"
+    },
+    "reRegistrationPayload": {
+      "appName": "GarageBot",
+      "appSlug": "garagebot",
+      "appUrl": "https://garagebot.io",
+      "description": "Auto shop management platform - mechanic scheduling, invoicing, and shop operations",
+      "permissions": [
+        "read:workers",
+        "write:workers",
+        "read:timesheets",
+        "write:timesheets",
+        "read:1099",
+        "write:1099",
+        "write:certifications",
+        "read:payroll"
+      ],
+      "category": "automotive",
+      "tags": ["auto-shop", "mechanics", "scheduling", "invoicing"]
+    },
+    "testConnection": {
+      "method": "GET",
+      "endpoint": "/api/ecosystem/status",
+      "expectedResponse": {
+        "connected": true,
+        "permissions": ["read:workers", "write:workers", "..."],
+        "hubName": "ORBIT Staffing OS"
+      }
+    }
+  },
+  "ecosystemClient": {
+    "instructions": [
+      "Copy the orbitClient class below into your GarageBot codebase.",
+      "Initialize it with your environment variables.",
+      "Use it for all communication with ORBIT."
+    ],
+    "typescript": "// ═══════════════════════════════════════════════════════════════════\n// FILE: services/orbitClient.ts\n// DROP INTO YOUR GARAGEBOT CODEBASE - HANDLES ALL ORBIT COMMUNICATION\n// ═══════════════════════════════════════════════════════════════════\n\ninterface WorkerData {\n  id: string;\n  firstName: string;\n  lastName: string;\n  email?: string;\n  phone?: string;\n  status: string;\n  payRate?: number;\n  workState?: string;\n  certifications?: string[];\n}\n\ninterface TimesheetData {\n  id: string;\n  workerId: string;\n  date: string;\n  hoursWorked: number;\n  overtimeHours?: number;\n  jobId?: string;\n  status: string;\n}\n\ninterface ContractorData {\n  id: string;\n  name: string;\n  email?: string;\n  phone?: string;\n  totalPaid?: number;\n  status?: string;\n}\n\ninterface CertificationData {\n  id: string;\n  workerId: string;\n  name: string;\n  issuedBy?: string;\n  issueDate?: string;\n  expirationDate?: string;\n  status: string;\n}\n\ninterface Payment1099 {\n  payeeId: string;\n  payeeName: string;\n  amount: number;\n  date: string;\n  description?: string;\n}\n\ninterface OvertimeRequest {\n  dailyHours: number[] | { date: string; hoursWorked: number; dayOfWeek: number }[];\n  hourlyRate: number;\n  state: string;\n}\n\nexport class OrbitPayrollClient {\n  private hubUrl: string;\n  private apiKey: string;\n  private apiSecret: string;\n\n  constructor(config?: { hubUrl?: string; apiKey?: string; apiSecret?: string }) {\n    this.hubUrl = (config?.hubUrl || process.env.ORBIT_HUB_URL || \"\").replace(/\\/$/, \"\");\n    this.apiKey = config?.apiKey || process.env.ORBIT_ECOSYSTEM_API_KEY || \"\";\n    this.apiSecret = config?.apiSecret || process.env.ORBIT_ECOSYSTEM_API_SECRET || \"\";\n  }\n\n  private async request<T>(endpoint: string, method: string, body?: any): Promise<T> {\n    const url = endpoint.startsWith(\"/api/ecosystem\")\n      ? `${this.hubUrl}${endpoint}`\n      : `${this.hubUrl}/api/ecosystem${endpoint}`;\n\n    const response = await fetch(url, {\n      method,\n      headers: {\n        \"Content-Type\": \"application/json\",\n        \"X-API-Key\": this.apiKey,\n        \"X-API-Secret\": this.apiSecret,\n        \"X-App-Name\": \"GarageBot\",\n      },\n      body: body ? JSON.stringify(body) : undefined,\n    });\n\n    if (!response.ok) {\n      const error = await response.text();\n      throw new Error(`ORBIT request failed: ${response.status} - ${error}`);\n    }\n\n    return response.json();\n  }\n\n  async checkConnection(): Promise<{ connected: boolean; permissions: string[] }> {\n    try { return await this.request(\"/status\", \"GET\"); }\n    catch { return { connected: false, permissions: [] }; }\n  }\n\n  async syncWorkers(workers: WorkerData[]): Promise<any> {\n    return this.request(\"/sync/workers\", \"POST\", { workers });\n  }\n\n  async syncContractors(contractors: ContractorData[]): Promise<any> {\n    return this.request(\"/sync/contractors\", \"POST\", { contractors });\n  }\n\n  async syncTimesheets(timesheets: TimesheetData[]): Promise<any> {\n    return this.request(\"/sync/timesheets\", \"POST\", { timesheets });\n  }\n\n  async syncCertifications(certs: CertificationData[]): Promise<any> {\n    return this.request(\"/sync/certifications\", \"POST\", { certifications: certs });\n  }\n\n  async sync1099Payments(year: number, payments: Payment1099[]): Promise<any> {\n    return this.request(\"/sync/1099\", \"POST\", { year, payments });\n  }\n\n  async syncW2Data(year: number, employees: { id: string; name: string }[]): Promise<any> {\n    return this.request(\"/sync/w2\", \"POST\", { year, employees });\n  }\n\n  async getShopWorkers(shopId: string): Promise<any> {\n    return this.request(`/shops/${shopId}/workers`, \"GET\");\n  }\n\n  async getShopPayroll(shopId: string, limit?: number): Promise<any> {\n    const q = limit ? `?limit=${limit}` : \"\";\n    return this.request(`/shops/${shopId}/payroll${q}`, \"GET\");\n  }\n\n  async logActivity(action: string, details?: Record<string, any>): Promise<any> {\n    return this.request(\"/logs\", \"POST\", { action, details });\n  }\n\n  async getActivityLogs(): Promise<any[]> {\n    return this.request(\"/logs\", \"GET\");\n  }\n\n  async pushSnippet(snippet: { name: string; code: string; language: string; category: string }): Promise<any> {\n    return this.request(\"/snippets\", \"POST\", snippet);\n  }\n\n  async getSnippets(category?: string): Promise<any[]> {\n    const q = category ? `?category=${category}` : \"\";\n    return this.request(`/snippets${q}`, \"GET\");\n  }\n\n  async getEngineStatus(): Promise<any> {\n    const res = await fetch(`${this.hubUrl}/api/payroll/engine/status`);\n    return res.json();\n  }\n\n  async getOvertimeRules(): Promise<any[]> {\n    const res = await fetch(`${this.hubUrl}/api/payroll/overtime/rules`);\n    return res.json();\n  }\n\n  async getOvertimeRuleForState(state: string): Promise<any> {\n    const res = await fetch(`${this.hubUrl}/api/payroll/overtime/rules/${state}`);\n    return res.json();\n  }\n\n  async calculateOvertime(req: OvertimeRequest): Promise<any> {\n    const res = await fetch(`${this.hubUrl}/api/payroll/overtime/calculate`, {\n      method: \"POST\",\n      headers: { \"Content-Type\": \"application/json\" },\n      body: JSON.stringify(req),\n    });\n    return res.json();\n  }\n}\n\n// INITIALIZATION:\n// import { OrbitPayrollClient } from \"./services/orbitClient\";\n// const orbit = new OrbitPayrollClient();\n// const status = await orbit.checkConnection();\n// console.log(\"ORBIT connected:\", status.connected);"
+  },
+  "environmentVariables": {
+    "instructions": ["Set these in your GarageBot .env or Replit secrets:"],
+    "required": {
+      "ORBIT_HUB_URL": {
+        "description": "The base URL of the ORBIT Staffing OS instance",
+        "example": "https://orbitstaffing.replit.app"
+      },
+      "ORBIT_ECOSYSTEM_API_KEY": {
+        "description": "Your GarageBot API key from ORBIT ecosystem registration",
+        "example": "dw_app_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "note": "Use the key provided when GarageBot was registered. If lost, re-register via /api/admin/ecosystem/register-app"
+      },
+      "ORBIT_ECOSYSTEM_API_SECRET": {
+        "description": "Your GarageBot API secret from ORBIT ecosystem registration",
+        "note": "This was provided during registration. If lost, re-register to get a new one."
+      }
+    }
+  },
+  "workflows": {
+    "onboardMechanic": {
+      "description": "When a new mechanic is added in GarageBot, sync them to ORBIT for payroll",
+      "steps": [
+        "1. Collect mechanic info in GarageBot (name, email, phone, pay rate, state)",
+        "2. Call orbit.syncWorkers([mechanicData]) to push to ORBIT",
+        "3. ORBIT creates the worker record and makes them payroll-eligible",
+        "4. If the mechanic has ASE certifications, call orbit.syncCertifications([certs])"
+      ],
+      "sampleCode": "const orbit = new OrbitPayrollClient();\n\nawait orbit.syncWorkers([{\n  id: \"gb-mech-001\",\n  firstName: \"Mike\",\n  lastName: \"Johnson\",\n  email: \"mike@garageshop.com\",\n  phone: \"615-555-1234\",\n  status: \"active\",\n  payRate: 32.50,\n  workState: \"TN\",\n  certifications: [\"ASE-A1\", \"ASE-A4\", \"ASE-A5\"],\n}]);\n\nawait orbit.syncCertifications([{\n  id: \"cert-ase-a1-001\",\n  workerId: \"gb-mech-001\",\n  name: \"ASE A1 - Engine Repair\",\n  issuedBy: \"National Institute for Automotive Service Excellence\",\n  issueDate: \"2024-06-15\",\n  expirationDate: \"2029-06-15\",\n  status: \"active\",\n}]);"
+    },
+    "submitTimesheets": {
+      "description": "Push daily hours from GarageBot to ORBIT for payroll processing",
+      "steps": [
+        "1. GarageBot tracks mechanic clock-in/clock-out times",
+        "2. At end of day or pay period, batch timesheets to ORBIT",
+        "3. ORBIT calculates overtime using state-specific rules",
+        "4. Timesheets become available for the next payroll run"
+      ],
+      "sampleCode": "const orbit = new OrbitPayrollClient();\n\nawait orbit.syncTimesheets([\n  {\n    id: \"ts-2026-02-06-001\",\n    workerId: \"gb-mech-001\",\n    date: \"2026-02-06\",\n    hoursWorked: 9.5,\n    overtimeHours: 1.5,\n    jobId: \"RO-4521\",\n    status: \"approved\",\n  },\n  {\n    id: \"ts-2026-02-06-002\",\n    workerId: \"gb-mech-002\",\n    date: \"2026-02-06\",\n    hoursWorked: 8.0,\n    overtimeHours: 0,\n    jobId: \"RO-4522\",\n    status: \"approved\",\n  },\n]);"
+    },
+    "calculateOvertime": {
+      "description": "Use ORBIT's multi-state overtime engine for mechanic hours",
+      "supportedStates": "All 50 states. Special rules: CA (daily OT/DT + 7th day), AK (daily OT), NV (daily OT), CO (12hr daily), MN (48hr), KS (46hr)",
+      "sampleCode": "const orbit = new OrbitPayrollClient();\n\n// OPTION A: Simple array of daily hours\nconst result = await orbit.calculateOvertime({\n  dailyHours: [8, 9, 10, 8, 8, 6, 4],\n  hourlyRate: 35.00,\n  state: \"CA\",\n});\n\n// OPTION B: Detailed format with specific dates\nconst resultDetailed = await orbit.calculateOvertime({\n  dailyHours: [\n    { date: \"2026-02-02\", hoursWorked: 8, dayOfWeek: 1 },\n    { date: \"2026-02-03\", hoursWorked: 9, dayOfWeek: 2 },\n    { date: \"2026-02-04\", hoursWorked: 10, dayOfWeek: 3 },\n  ],\n  hourlyRate: 35.00,\n  state: \"CA\",\n});\n\n// Returns: { regularHours, overtimeHours, doubleTimeHours, regularPay, overtimePay, doubleTimePay, totalPay, ruleApplied, breakdown }"
+    },
+    "pullPayrollData": {
+      "description": "Pull payroll records and summaries for your shop from ORBIT",
+      "sampleCode": "const orbit = new OrbitPayrollClient();\n\nconst payroll = await orbit.getShopPayroll(\"your-tenant-id\", 50);\n// Returns: { success, shopId, recordCount, totalPaid, totalGross, records: [...] }\n\nconst workers = await orbit.getShopWorkers(\"your-tenant-id\");\n// Returns: { success, shopId, workerCount, workers: [...] }"
+    },
+    "yearEndTaxDocs": {
+      "description": "Sync year-end tax document data with ORBIT",
+      "steps": [
+        "1. For W-2 employees: Call orbit.syncW2Data(year, employees)",
+        "2. For 1099 contractors: Call orbit.sync1099Payments(year, payments)",
+        "3. ORBIT generates the actual W-2 and 1099-NEC forms",
+        "4. All documents stamped with ORBIT hallmark for verification"
+      ],
+      "sampleCode": "const orbit = new OrbitPayrollClient();\n\nawait orbit.sync1099Payments(2026, [\n  {\n    payeeId: \"gb-contractor-001\",\n    payeeName: \"Bob's Mobile Diagnostics\",\n    amount: 45000.00,\n    date: \"2026-12-31\",\n    description: \"Contract diagnostic services - FY2026\",\n  },\n]);\n\nawait orbit.syncW2Data(2026, [\n  { id: \"gb-mech-001\", name: \"Mike Johnson\" },\n  { id: \"gb-mech-002\", name: \"Sarah Williams\" },\n]);"
+    }
+  },
+  "apiReference": {
+    "baseUrl": "https://orbitstaffing.replit.app",
+    "authNote": "All /api/ecosystem/* endpoints require X-API-Key and X-API-Secret headers. Public payroll endpoints (/api/payroll/overtime/*) do not require auth.",
+    "ecosystemEndpoints": [
+      { "method": "GET", "path": "/api/ecosystem/status", "description": "Test connection and verify permissions", "auth": true },
+      { "method": "POST", "path": "/api/ecosystem/sync/workers", "description": "Push mechanic/worker records to ORBIT", "auth": true, "body": "{ workers: WorkerData[] }" },
+      { "method": "POST", "path": "/api/ecosystem/sync/contractors", "description": "Push contractor records to ORBIT", "auth": true, "body": "{ contractors: ContractorData[] }" },
+      { "method": "POST", "path": "/api/ecosystem/sync/timesheets", "description": "Push daily hours/timesheets to ORBIT", "auth": true, "body": "{ timesheets: TimesheetData[] }" },
+      { "method": "POST", "path": "/api/ecosystem/sync/certifications", "description": "Push ASE/trade certifications to ORBIT", "auth": true, "body": "{ certifications: CertificationData[] }" },
+      { "method": "POST", "path": "/api/ecosystem/sync/1099", "description": "Push 1099 payment data for contractors", "auth": true, "body": "{ year: number, payments: Payment1099[] }" },
+      { "method": "POST", "path": "/api/ecosystem/sync/w2", "description": "Sync W-2 employee data for year-end", "auth": true, "body": "{ year: number, employees: { id, name }[] }" },
+      { "method": "GET", "path": "/api/ecosystem/shops/:shopId/workers", "description": "Get all workers for a shop/tenant", "auth": true },
+      { "method": "GET", "path": "/api/ecosystem/shops/:shopId/payroll", "description": "Get payroll records for a shop/tenant", "auth": true, "queryParams": "?limit=50" },
+      { "method": "GET", "path": "/api/ecosystem/logs", "description": "Get activity logs for your app", "auth": true },
+      { "method": "POST", "path": "/api/ecosystem/logs", "description": "Push activity log entry", "auth": true, "body": "{ action: string, details?: object }" },
+      { "method": "POST", "path": "/api/ecosystem/snippets", "description": "Share code snippets across ecosystem", "auth": true },
+      { "method": "GET", "path": "/api/ecosystem/snippets", "description": "Get shared code snippets", "auth": true }
+    ],
+    "payrollEngineEndpoints": [
+      { "method": "GET", "path": "/api/payroll/engine/status", "description": "Get ORBIT payroll engine status", "auth": false },
+      { "method": "GET", "path": "/api/payroll/overtime/rules", "description": "Get all state overtime rules", "auth": false },
+      { "method": "GET", "path": "/api/payroll/overtime/rules/:state", "description": "Get overtime rule for specific state", "auth": false },
+      { "method": "POST", "path": "/api/payroll/overtime/calculate", "description": "Calculate overtime for daily hours", "auth": false, "body": "{ dailyHours: number[] | {date,hoursWorked,dayOfWeek}[], hourlyRate: number, state: string }" }
+    ],
+    "dataSchemas": {
+      "WorkerData": { "id": "string", "firstName": "string", "lastName": "string", "email": "string?", "phone": "string?", "status": "string", "payRate": "number?", "workState": "string?", "certifications": "string[]?" },
+      "TimesheetData": { "id": "string", "workerId": "string", "date": "string (YYYY-MM-DD)", "hoursWorked": "number", "overtimeHours": "number?", "jobId": "string?", "status": "string" },
+      "ContractorData": { "id": "string", "name": "string", "email": "string?", "phone": "string?", "totalPaid": "number?", "status": "string?" },
+      "CertificationData": { "id": "string", "workerId": "string", "name": "string", "issuedBy": "string?", "issueDate": "string?", "expirationDate": "string?", "status": "string" }
+    }
+  },
+  "payrollCapabilities": {
+    "taxCalculation": {
+      "federal": "2025 brackets for Single, Married Filing Jointly, Head of Household",
+      "fica": "Social Security 6.2% (wage base $176,100), Medicare 1.45%, Additional Medicare 0.9% over $200K",
+      "stateIncomeTax": "All 50 states + DC with correct rates, brackets, and exemptions",
+      "localTax": "KY, OH, PA, IN, MI, MD, NY, MO occupational/local taxes"
+    },
+    "garnishments": "CCPA-compliant garnishment processing with priority ordering (child support > federal tax > creditor > student loan)",
+    "overtime": {
+      "federal": "FLSA 40hr/week at 1.5x",
+      "california": "Daily OT after 8hrs (1.5x), Daily DT after 12hrs (2x), 7th consecutive day rules",
+      "alaska": "Daily OT after 8hrs",
+      "nevada": "Daily OT after 8hrs",
+      "colorado": "Daily OT after 12hrs",
+      "minnesota": "Weekly OT after 48hrs",
+      "kansas": "Weekly OT after 46hrs"
+    },
+    "directDeposit": "Stripe Connect ACH transfers with idempotency and status tracking",
+    "documents": {
+      "payStubs": "Formatted text with earnings, deductions, YTD, ORBIT hallmark",
+      "w2": "Full Form W-2 with all boxes (1-20), batch generation",
+      "form1099NEC": "1099-NEC for independent contractor mechanics"
+    },
+    "taxForms": {
+      "form941": "Quarterly federal tax return data",
+      "w3": "Annual transmittal of W-2s",
+      "form1096": "Annual transmittal of 1099s",
+      "depositSchedule": "Semi-weekly or monthly deposit schedule calculation",
+      "liabilitySummary": "Quarterly and annual tax liability breakdown"
+    },
+    "reporting": [
+      "Tax liability by quarter and annual",
+      "Deposit schedule with next-due dates",
+      "New hire state reporting",
+      "Worker earnings summary with effective tax rate",
+      "Payment summary by pay period"
+    ]
+  },
+  "mechanicTenantSetup": {
+    "description": "How to set up a new garage/auto shop as a tenant in ORBIT",
+    "steps": [
+      "1. Register the shop as a company in ORBIT (name, address, EIN, state)",
+      "2. Sync all mechanics as workers with their pay rates and work states",
+      "3. Sync ASE certifications for compliance tracking",
+      "4. Set up daily/weekly timesheet sync from GarageBot clock-in/clock-out",
+      "5. ORBIT handles all payroll processing, tax calculations, and document generation",
+      "6. Pull pay stubs and tax documents back to display in GarageBot"
+    ],
+    "certificationTypes": [
+      "ASE A1 - Engine Repair", "ASE A2 - Automatic Transmission", "ASE A3 - Manual Drivetrain",
+      "ASE A4 - Suspension & Steering", "ASE A5 - Brakes", "ASE A6 - Electrical/Electronic Systems",
+      "ASE A7 - Heating & Air Conditioning", "ASE A8 - Engine Performance", "ASE A9 - Light Vehicle Diesel Engines",
+      "ASE L1 - Advanced Engine Performance", "ASE L2 - Electronic Diesel Engine Diagnosis",
+      "ASE L3 - Light Duty Hybrid/Electric Vehicle", "ASE Master Technician",
+      "EPA 608 Certification", "State Inspection License", "Manufacturer Specific (Toyota, Honda, Ford, etc.)"
+    ],
+    "workerClassification": {
+      "w2Employee": "Full-time/part-time mechanics on payroll - ORBIT handles all withholdings",
+      "contractor1099": "Independent contractors - ORBIT tracks payments and generates 1099-NEC at year-end",
+      "tip": "Use worker status 'active' for current, 'inactive' for seasonal, 'terminated' for former mechanics"
+    }
+  },
+  "webhooks": {
+    "description": "ORBIT sends webhook notifications for payroll events to connected apps",
+    "setup": "ORBIT uses the GARAGEBOT_WEBHOOK_SECRET for HMAC-SHA256 verification of webhook payloads",
+    "events": [
+      "payroll.completed - A payroll run has finished processing",
+      "payroll.payment.sent - A direct deposit has been initiated",
+      "payroll.payment.failed - A payment failed to process",
+      "worker.created - A new worker was added",
+      "worker.updated - A worker record was modified",
+      "document.generated - A pay stub, W-2, or 1099 was generated",
+      "tax.form.ready - A tax form (941, W-3) is ready"
+    ],
+    "verificationCode": "import crypto from \"crypto\";\n\nfunction verifyOrbitWebhook(payload: string, signature: string, secret: string): boolean {\n  const expected = crypto.createHmac(\"sha256\", secret).update(payload).digest(\"hex\");\n  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));\n}\n\napp.post(\"/webhooks/orbit\", (req, res) => {\n  const signature = req.headers[\"x-orbit-signature\"] as string;\n  const isValid = verifyOrbitWebhook(JSON.stringify(req.body), signature, process.env.GARAGEBOT_WEBHOOK_SECRET);\n  if (!isValid) return res.status(401).json({ error: \"Invalid signature\" });\n  \n  const { event, data } = req.body;\n  switch (event) {\n    case \"payroll.completed\":\n      console.log(\"Payroll completed for\", data.tenantId, \"- total:\", data.totalNet);\n      break;\n    case \"document.generated\":\n      console.log(\"Document ready:\", data.type, data.hallmarkId);\n      break;\n  }\n  res.json({ received: true });\n});"
+  },
+  "quickStartChecklist": [
+    "[ ] Set ORBIT_HUB_URL, ORBIT_ECOSYSTEM_API_KEY, ORBIT_ECOSYSTEM_API_SECRET in env",
+    "[ ] Copy OrbitPayrollClient class into services/orbitClient.ts",
+    "[ ] Call orbit.checkConnection() to verify connectivity",
+    "[ ] Sync existing mechanics: orbit.syncWorkers([...mechanicData])",
+    "[ ] Sync ASE certifications: orbit.syncCertifications([...certs])",
+    "[ ] Hook up clock-in/clock-out -> orbit.syncTimesheets([...timesheets])",
+    "[ ] Set up webhook endpoint at /webhooks/orbit for payroll notifications",
+    "[ ] Test overtime calculation: orbit.calculateOvertime({...})",
+    "[ ] Pull payroll data: orbit.getShopPayroll(tenantId)",
+    "[ ] Done - ORBIT handles everything else automatically"
+  ],
+  "financialHub": {
+    "appId": "dw_app_garagebot",
+    "royaltySplit": "100% Jason (GarageBot is not a 50/50 product)",
+    "webhookSecret": "Set in GARAGEBOT_WEBHOOK_SECRET environment variable",
+    "note": "All financial transactions from GarageBot flow through the DarkWave Financial Hub for royalty tracking and Solana blockchain stamping"
+  }
+}
+That's the whole thing. Copy the code block above and paste it straight into GarageBot's agent. It has everything needed to run payroll through ORBIT -- the drop-in client class, all 17 endpoints, sample code for every workflow, webhook verification, and the quick-start checklist.
+
+
+Scroll to latest
+
+Make, test, iterate…
+
