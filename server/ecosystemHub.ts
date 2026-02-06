@@ -1,5 +1,3 @@
-import crypto from "crypto";
-
 interface EcosystemConfig {
   hubUrl: string;
   apiKey: string;
@@ -113,29 +111,17 @@ export class EcosystemClient {
     this.appName = config.appName;
   }
 
-  private generateSignature(bodyStr: string, timestamp: string): string {
-    const message = `${bodyStr}${timestamp}`;
-    return crypto
-      .createHmac("sha256", this.apiSecret)
-      .update(message)
-      .digest("hex");
-  }
-
   private async request<T>(
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
     body?: unknown
   ): Promise<T> {
-    const timestamp = Date.now().toString();
-    const bodyStr = body ? JSON.stringify(body) : "";
-    const signature = this.generateSignature(bodyStr, timestamp);
+    const bodyStr = body ? JSON.stringify(body) : undefined;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "X-Api-Key": this.apiKey,
-      "X-Api-Secret": this.apiSecret,
-      "X-Timestamp": timestamp,
-      "X-Signature": signature,
+      "X-API-Key": this.apiKey,
+      "X-API-Secret": this.apiSecret,
     };
 
     const response = await fetch(`${this.hubUrl}${endpoint}`, {
@@ -152,10 +138,16 @@ export class EcosystemClient {
     return response.json();
   }
 
-  async checkConnection(): Promise<{ connected: boolean; hubVersion?: string; appRegistered?: boolean; error?: string }> {
+  async checkConnection(): Promise<{ connected: boolean; hubName?: string; appName?: string; permissions?: string[]; lastSync?: string | null; error?: string }> {
     try {
-      const result = await this.request<{ version: string; registered: boolean }>("/api/ecosystem/status");
-      return { connected: true, hubVersion: result.version, appRegistered: result.registered };
+      const result = await this.request<{ connected: boolean; hubName: string; appName: string; permissions: string[]; lastSync: string | null }>("/api/ecosystem/status");
+      return {
+        connected: result.connected,
+        hubName: result.hubName,
+        appName: result.appName,
+        permissions: result.permissions,
+        lastSync: result.lastSync,
+      };
     } catch (error) {
       console.log("[devhub] Connection error:", String(error));
       return { connected: false, error: String(error) };

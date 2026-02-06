@@ -4011,9 +4011,11 @@ export async function registerRoutes(
     try {
       const status = await orbitClient.checkStatus();
       res.json({
-        connected: !!status,
-        status: status || { message: 'ORBIT client not configured or unreachable' },
-        webhookSecretConfigured: !!process.env.GARAGEBOT_WEBHOOK_SECRET,
+        connected: status?.connected ?? false,
+        hubName: status?.hubName || null,
+        appName: status?.appName || null,
+        permissions: status?.permissions || [],
+        lastSync: status?.lastSync || null,
       });
     } catch (error) {
       console.error("ORBIT status check error:", error);

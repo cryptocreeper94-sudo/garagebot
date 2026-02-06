@@ -3,7 +3,7 @@ import crypto from 'crypto';
 const ORBIT_HUB_URL = process.env.ORBIT_HUB_URL || 'https://orbitstaffing.io';
 const ORBIT_API_KEY = process.env.ORBIT_ECOSYSTEM_API_KEY;
 const ORBIT_API_SECRET = process.env.ORBIT_ECOSYSTEM_API_SECRET;
-const GARAGEBOT_WEBHOOK_SECRET = process.env.GARAGEBOT_WEBHOOK_SECRET;
+const ORBIT_FINANCIAL_HUB_KEY = process.env.ORBIT_FINANCIAL_HUB_KEY;
 
 interface ContractorData {
   externalId: string;
@@ -37,6 +37,14 @@ interface FinancialEvent {
   metadata?: Record<string, any>;
 }
 
+interface OrbitStatusResponse {
+  connected: boolean;
+  hubName: string;
+  appName: string;
+  permissions: string[];
+  lastSync: string | null;
+}
+
 interface OrbitResponse {
   success: boolean;
   message?: string;
@@ -67,7 +75,6 @@ export class OrbitEcosystemClient {
           'Content-Type': 'application/json',
           'X-API-Key': ORBIT_API_KEY!,
           'X-API-Secret': ORBIT_API_SECRET!,
-          'X-App-Name': 'GarageBot',
         },
         body: body ? JSON.stringify(body) : undefined,
       });
@@ -106,19 +113,28 @@ export class OrbitEcosystemClient {
       return null;
     }
 
+    const financialHubKey = ORBIT_FINANCIAL_HUB_KEY || ORBIT_API_KEY;
+
     try {
-      const response = await fetch(`${ORBIT_HUB_URL}/api/financial-hub/events`, {
+      const bodyPayload = JSON.stringify({
+        sourceSystem: 'garagebot',
+        sourceAppId: 'dw_app_garagebot',
+        ...event,
+      });
+
+      const signature = crypto
+        .createHmac('sha256', ORBIT_API_SECRET!)
+        .update(bodyPayload)
+        .digest('hex');
+
+      const response = await fetch(`${ORBIT_HUB_URL}/api/financial-hub/ingest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': ORBIT_API_KEY!,
-          'X-API-Secret': ORBIT_API_SECRET!,
+          'X-Orbit-Api-Key': financialHubKey!,
+          'X-Orbit-Signature': signature,
         },
-        body: JSON.stringify({
-          sourceSystem: 'garagebot',
-          sourceAppId: 'dw_app_garagebot',
-          ...event,
-        }),
+        body: bodyPayload,
       });
 
       if (!response.ok) {
@@ -137,9 +153,15 @@ export class OrbitEcosystemClient {
     return this.request('/logs', 'POST', { action, details });
   }
 
-  async checkStatus(): Promise<OrbitResponse | null> {
+  async checkStatus(): Promise<OrbitStatusResponse | null> {
     console.log('[ORBIT] Checking connection status...');
-    return this.request('/status', 'GET', null);
+    return this.request<OrbitStatusResponse>('/status', 'GET');
+  }
+
+  async pollForUpdates(since?: string): Promise<OrbitResponse | null> {
+    const query = since ? `?since=${encodeURIComponent(since)}` : '';
+    console.log(`[ORBIT] Polling for updates${since ? ` since ${since}` : ''}...`);
+    return this.request(`/logs${query}`, 'GET');
   }
 
   async syncWorker(worker: {
@@ -188,27 +210,6 @@ export class OrbitEcosystemClient {
       jobType: job.serviceType,
       notes: job.notes,
     }]);
-  }
-
-  getWebhookSecret(): string {
-    return GARAGEBOT_WEBHOOK_SECRET || '';
-  }
-
-  verifyWebhookSignature(payload: string, signature: string): boolean {
-    if (!GARAGEBOT_WEBHOOK_SECRET || !signature) return false;
-    const expectedSignature = crypto
-      .createHmac('sha256', GARAGEBOT_WEBHOOK_SECRET)
-      .update(payload)
-      .digest('hex');
-    if (signature.length !== expectedSignature.length) return false;
-    try {
-      return crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(expectedSignature)
-      );
-    } catch {
-      return false;
-    }
   }
 }
 
