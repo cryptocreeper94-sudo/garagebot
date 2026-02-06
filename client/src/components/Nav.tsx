@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check, Coffee } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check, Coffee, MessageCircle, Truck, Gamepad2, HeadphonesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
@@ -332,8 +332,8 @@ export default function Nav() {
                       </div>
                     </Link>
                     
-                    <Link href="/guides" onClick={() => setIsOpen(false)}>
-                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/guides' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-guides">
+                    <Link href="/diy-guides" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/diy-guides' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-guides">
                         <FileText className="w-5 h-5" />
                         <span className="font-medium">DIY Guides</span>
                       </div>
@@ -347,6 +347,28 @@ export default function Nav() {
                       </div>
                     </Link>
                     
+                    <Link href="/chat" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/chat' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-chat">
+                        <MessageCircle className="w-5 h-5" />
+                        <span className="font-medium">Signal Chat</span>
+                        <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px] font-mono ml-auto">LIVE</Badge>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/shade-tree" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/shade-tree' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-shade-tree">
+                        <Wrench className="w-5 h-5" />
+                        <span className="font-medium">Shade Tree DIY</span>
+                      </div>
+                    </Link>
+
+                    <Link href="/cdl-directory" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/cdl-directory' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-cdl">
+                        <Truck className="w-5 h-5" />
+                        <span className="font-medium">CDL Directory</span>
+                      </div>
+                    </Link>
+
                     <Link href="/blog" onClick={() => setIsOpen(false)}>
                       <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/blog' || location.startsWith('/blog/') ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-blog">
                         <FileText className="w-5 h-5" />
@@ -411,6 +433,20 @@ export default function Nav() {
                       </div>
                     </Link>
                     
+                    <Link href="/support" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/support' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-support">
+                        <HeadphonesIcon className="w-5 h-5" />
+                        <span className="font-medium">Support</span>
+                      </div>
+                    </Link>
+
+                    <Link href="/trivia" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/trivia' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-trivia">
+                        <Gamepad2 className="w-5 h-5" />
+                        <span className="font-medium">Trivia Quiz</span>
+                      </div>
+                    </Link>
+
                     {/* Coming Soon Items */}
                     <div className="pt-2 mt-2 border-t border-white/10">
                       <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider px-3 mb-1 block">Coming Soon</span>

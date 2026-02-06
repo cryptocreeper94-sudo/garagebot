@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import {
   Truck, MapPin, DollarSign, Shield, Heart, Clock, Star, Search, Filter,
   Building2, GraduationCap, Phone, Globe, Mail, ChevronLeft, ChevronRight, X,
@@ -963,6 +965,8 @@ export default function CDLDirectory() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
+      <Nav />
+      <div className="pt-[50px]">
       <section className="relative overflow-hidden pt-16 pb-8">
         <div className="absolute inset-0 bg-gradient-to-br from-[#00D9FF]/10 via-transparent to-cyan-500/5" />
         <div className="absolute inset-0">
@@ -1234,6 +1238,8 @@ export default function CDLDirectory() {
         open={interestOpen}
         onClose={() => setInterestOpen(false)}
       />
+      </div>
+      <Footer />
     </div>
   );
 }

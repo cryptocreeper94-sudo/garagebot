@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { 
   Wrench, FileText, Calendar, Users, BarChart3, DollarSign,
   CheckCircle, ArrowRight, Play, Building2, Phone, Mail,
@@ -183,6 +185,8 @@ export default function MechanicsGarageSales() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
+      <Nav />
+      <div className="pt-[50px]">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-green-500/10" />
@@ -689,6 +693,8 @@ export default function MechanicsGarageSales() {
           </div>
         </div>
       </footer>
+      </div>
+      <Footer />
     </div>
   );
 }

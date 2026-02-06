@@ -31,7 +31,7 @@ export default function Footer() {
     <footer className="sticky-footer border-t border-border/30 bg-card/95 backdrop-blur-md py-2">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
-          <span className="font-medium text-foreground">© 2025 DarkWave Studios, LLC</span>
+          <span className="font-medium text-foreground">© {new Date().getFullYear()} DarkWave Studios, LLC</span>
           <span className="hidden sm:inline text-border">|</span>
           {latestRelease?.version ? (
             <Badge 

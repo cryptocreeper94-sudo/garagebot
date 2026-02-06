@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import {
   Wrench, BookOpen, Lightbulb, Video, Users, Star,
   Car, Truck, Ship, Cog, ArrowRight, Search, Filter,
@@ -193,6 +195,8 @@ export default function ShadeTreeMechanics() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
+      <Nav />
+      <div className="pt-[50px]">
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-amber-500/10" />
@@ -554,6 +558,8 @@ export default function ShadeTreeMechanics() {
           </div>
         </div>
       </section>
+      </div>
+      <Footer />
     </div>
   );
 }

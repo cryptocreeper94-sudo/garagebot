@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Coffee, Newspaper, Wrench, Users, Briefcase, Camera, Gauge, AlertTriangle,
@@ -871,6 +873,8 @@ export default function BreakRoom() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
+      <Nav />
+      <div className="pt-[50px]">
       <section className="relative overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-cyan-500/5" />
         <div className="absolute inset-0">
@@ -958,6 +962,8 @@ export default function BreakRoom() {
           </AnimatePresence>
         </div>
       </section>
+      </div>
+      <Footer />
     </div>
   );
 }
