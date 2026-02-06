@@ -24,10 +24,17 @@ import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Footer";
 import TrustLayerReviews from "@/components/TrustLayerReviews";
 import NativeProductRecs from "@/components/NativeProductRecs";
+import DailyFunFact from "@/components/DailyFunFact";
+import VehicleShowcase from "@/components/VehicleShowcase";
+import AchievementBadges from "@/components/AchievementBadges";
+import SpinToWin from "@/components/SpinToWin";
+import useSoundEffects from "@/hooks/useSoundEffects";
+import { Volume2, VolumeX } from "lucide-react";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
   const [isSearching, setIsSearching] = useState(false);
+  const { soundEnabled, toggleSound, playSound } = useSoundEffects();
   const [webUrl, setWebUrl] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
@@ -41,6 +48,7 @@ export default function Home() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     
+    playSound('search');
     setIsSearching(true);
     
     const params = new URLSearchParams();
@@ -772,13 +780,31 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Reviews Section */}
+      {/* Vehicle Showcase */}
+      <section className="py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <VehicleShowcase />
+        </div>
+      </section>
+
+      {/* Fun Engagement Row */}
+      <section className="py-8 px-4 bg-gradient-to-b from-transparent via-primary/5 to-transparent">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <DailyFunFact />
+            <AchievementBadges />
+          </div>
+        </div>
+      </section>
+
+      {/* Recommended Gear */}
       <section className="py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <NativeProductRecs context="tools" layout="horizontal" title="Top Gear for Your Next Project" maxItems={4} />
         </div>
       </section>
 
+      {/* Reviews Section */}
       <section className="py-16 px-4 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
@@ -794,6 +820,19 @@ export default function Home() {
           <NativeProductRecs context="outdoor" layout="grid" title="Road Trip Ready" maxItems={4} />
         </div>
       </section>
+
+      {/* Sound Toggle */}
+      <button
+        onClick={toggleSound}
+        className="fixed bottom-20 left-4 z-40 p-2 rounded-full bg-card/80 border border-border/50 backdrop-blur-sm hover:bg-card transition-all"
+        data-testid="button-sound-toggle"
+        title={soundEnabled ? 'Mute sounds' : 'Enable sounds'}
+      >
+        {soundEnabled ? <Volume2 className="w-4 h-4 text-primary" /> : <VolumeX className="w-4 h-4 text-muted-foreground" />}
+      </button>
+
+      {/* Spin to Win */}
+      <SpinToWin />
       
       {/* Footer - Dynamic Version */}
       <Footer />
