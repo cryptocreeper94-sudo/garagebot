@@ -61,7 +61,15 @@ Preferred communication style: Simple, everyday language.
     - **Opportunities**: CDL Schools & Trucking Programs directory with referral forms.
 
 ## Affiliate Strategy
-- **Current**: Vehicle-aware search links to over 40 retailers.
+- **Current**: Vehicle-aware search links to over 50 retailers across automotive, marine, powersports, and motorized hobby categories.
+- **Active Affiliate Accounts (CONNECTED)**:
+  - **Amazon Associates** - CONNECTED and operational
+  - **eBay Partner Network** - CONNECTED and operational
+  - **CJ Affiliate** - CONNECTED and operational (covers Horizon Hobby and other CJ merchants)
+- **Pending Affiliate Accounts (NOT YET CONNECTED)**:
+  - **AvantLink** - Needed for AMain Hobbies, RC Planet
+  - **ShareASale** - Needed for Tower Hobbies, GetFPV, Redcat Racing
+  - **Direct Programs** - HobbyKing, BETAFPV (apply on their sites)
 - **Future Direction**: Integration of product data feeds from affiliate networks and direct APIs with retailers for real-time inventory updates.
 
 ## Blockchain Verification
