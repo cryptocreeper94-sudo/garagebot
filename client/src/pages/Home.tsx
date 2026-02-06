@@ -3,7 +3,7 @@ import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink,
-  ScanLine, Camera, Mic, Wrench, Car, Sparkles, MessageCircle, Bot, TrendingUp, Terminal,
+  Wrench, Car, Sparkles, MessageCircle, Bot, TrendingUp, Terminal,
   BookOpen, PlayCircle, CheckCircle2, Images, Shield, Users, Zap, Star, Gift, Crown, X
 } from "lucide-react";
 import Nav from "@/components/Nav";
@@ -285,38 +285,42 @@ export default function Home() {
                 <div className="grid grid-cols-4 gap-2">
                   <Dialog open={showVinScanner} onOpenChange={setShowVinScanner}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className="h-auto py-3 flex flex-col gap-1 border-primary/20 hover:bg-primary/10 hover:border-primary/40 btn-glow icon-bounce" data-testid="button-vin-scanner">
-                        <ScanLine className="w-5 h-5 text-primary" />
-                        <span className="text-[9px] font-tech uppercase">VIN</span>
-                      </Button>
+                      <button className="relative h-[72px] rounded-lg overflow-hidden border border-primary/20 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] transition-all group" data-testid="button-vin-scanner">
+                        <img src="/generated_images/vin_scanner_tool.png" alt="VIN Scanner" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                        <span className="absolute bottom-1.5 left-0 right-0 text-center text-[9px] font-tech uppercase text-white drop-shadow-lg">VIN</span>
+                      </button>
                     </DialogTrigger>
                     <DialogContent className="max-w-lg"><VinScanner /></DialogContent>
                   </Dialog>
 
                   <Dialog open={showPhotoSearch} onOpenChange={setShowPhotoSearch}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className="h-auto py-3 flex flex-col gap-1 border-purple-500/20 hover:bg-purple-500/10 hover:border-purple-500/40 glow-secondary icon-bounce" data-testid="button-photo-search">
-                        <Camera className="w-5 h-5 text-purple-400" />
-                        <span className="text-[9px] font-tech uppercase">Photo</span>
-                      </Button>
+                      <button className="relative h-[72px] rounded-lg overflow-hidden border border-purple-500/20 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)] transition-all group" data-testid="button-photo-search">
+                        <img src="/generated_images/photo_search_tool.png" alt="Photo Search" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                        <span className="absolute bottom-1.5 left-0 right-0 text-center text-[9px] font-tech uppercase text-white drop-shadow-lg">Photo</span>
+                      </button>
                     </DialogTrigger>
                     <DialogContent className="max-w-lg"><PhotoSearch /></DialogContent>
                   </Dialog>
 
                   <Dialog open={showVoiceSearch} onOpenChange={setShowVoiceSearch}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className="h-auto py-3 flex flex-col gap-1 border-green-500/20 hover:bg-green-500/10 hover:border-green-500/40 icon-bounce" data-testid="button-voice-search">
-                        <Mic className="w-5 h-5 text-green-400" />
-                        <span className="text-[9px] font-tech uppercase">Voice</span>
-                      </Button>
+                      <button className="relative h-[72px] rounded-lg overflow-hidden border border-green-500/20 hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(34,197,94,0.2)] transition-all group" data-testid="button-voice-search">
+                        <img src="/generated_images/voice_search_tool.png" alt="Voice Search" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                        <span className="absolute bottom-1.5 left-0 right-0 text-center text-[9px] font-tech uppercase text-white drop-shadow-lg">Voice</span>
+                      </button>
                     </DialogTrigger>
                     <DialogContent className="max-w-lg"><VoiceSearch /></DialogContent>
                   </Dialog>
 
-                  <Button variant="outline" className="h-auto py-3 flex flex-col gap-1 border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/40 icon-bounce" onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()} data-testid="button-buddy-chat">
-                    <Bot className="w-5 h-5 text-cyan-400" />
-                    <span className="text-[9px] font-tech uppercase">Buddy</span>
-                  </Button>
+                  <button className="relative h-[72px] rounded-lg overflow-hidden border border-cyan-500/20 hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] transition-all group" onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()} data-testid="button-buddy-chat">
+                    <img src="/generated_images/buddy_ai_assistant.png" alt="Buddy AI" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    <span className="absolute bottom-1.5 left-0 right-0 text-center text-[9px] font-tech uppercase text-white drop-shadow-lg">Buddy</span>
+                  </button>
                 </div>
               </Card>
             </motion.div>
@@ -631,35 +635,39 @@ export default function Home() {
               <div className="grid grid-cols-4 gap-2">
                 <Dialog open={showVinScanner} onOpenChange={setShowVinScanner}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="h-auto py-2 flex flex-col gap-1 border-primary/20 hover:bg-primary/10" data-testid="button-vin-scanner-mobile">
-                      <ScanLine className="w-4 h-4 text-primary" />
-                      <span className="text-[8px] font-tech uppercase">VIN</span>
-                    </Button>
+                    <button className="relative h-[60px] rounded-lg overflow-hidden border border-primary/20 hover:border-primary/50 transition-all group" data-testid="button-vin-scanner-mobile">
+                      <img src="/generated_images/vin_scanner_tool.png" alt="VIN Scanner" className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                      <span className="absolute bottom-1 left-0 right-0 text-center text-[8px] font-tech uppercase text-white drop-shadow-lg">VIN</span>
+                    </button>
                   </DialogTrigger>
                   <DialogContent><VinScanner /></DialogContent>
                 </Dialog>
                 <Dialog open={showPhotoSearch} onOpenChange={setShowPhotoSearch}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="h-auto py-2 flex flex-col gap-1 border-purple-500/20 hover:bg-purple-500/10" data-testid="button-photo-search-mobile">
-                      <Camera className="w-4 h-4 text-purple-400" />
-                      <span className="text-[8px] font-tech uppercase">Photo</span>
-                    </Button>
+                    <button className="relative h-[60px] rounded-lg overflow-hidden border border-purple-500/20 hover:border-purple-500/50 transition-all group" data-testid="button-photo-search-mobile">
+                      <img src="/generated_images/photo_search_tool.png" alt="Photo Search" className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                      <span className="absolute bottom-1 left-0 right-0 text-center text-[8px] font-tech uppercase text-white drop-shadow-lg">Photo</span>
+                    </button>
                   </DialogTrigger>
                   <DialogContent><PhotoSearch /></DialogContent>
                 </Dialog>
                 <Dialog open={showVoiceSearch} onOpenChange={setShowVoiceSearch}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="h-auto py-2 flex flex-col gap-1 border-green-500/20 hover:bg-green-500/10" data-testid="button-voice-search-mobile">
-                      <Mic className="w-4 h-4 text-green-400" />
-                      <span className="text-[8px] font-tech uppercase">Voice</span>
-                    </Button>
+                    <button className="relative h-[60px] rounded-lg overflow-hidden border border-green-500/20 hover:border-green-500/50 transition-all group" data-testid="button-voice-search-mobile">
+                      <img src="/generated_images/voice_search_tool.png" alt="Voice Search" className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                      <span className="absolute bottom-1 left-0 right-0 text-center text-[8px] font-tech uppercase text-white drop-shadow-lg">Voice</span>
+                    </button>
                   </DialogTrigger>
                   <DialogContent><VoiceSearch /></DialogContent>
                 </Dialog>
-                <Button variant="outline" className="h-auto py-2 flex flex-col gap-1 border-cyan-500/20 hover:bg-cyan-500/10" onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()} data-testid="button-buddy-chat-mobile">
-                  <Bot className="w-4 h-4 text-cyan-400" />
-                  <span className="text-[8px] font-tech uppercase">Buddy</span>
-                </Button>
+                <button className="relative h-[60px] rounded-lg overflow-hidden border border-cyan-500/20 hover:border-cyan-500/50 transition-all group" onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()} data-testid="button-buddy-chat-mobile">
+                  <img src="/generated_images/buddy_ai_assistant.png" alt="Buddy AI" className="absolute inset-0 w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <span className="absolute bottom-1 left-0 right-0 text-center text-[8px] font-tech uppercase text-white drop-shadow-lg">Buddy</span>
+                </button>
               </div>
             </Card>
           </motion.div>
