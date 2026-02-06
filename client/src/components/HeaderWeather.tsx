@@ -133,10 +133,10 @@ export default function HeaderWeather() {
         </span>
       </button>
 
-      {showWeatherView && (
+      {showWeatherView && weather && (
         <WeatherRadarFull 
+          weather={weather}
           onClose={() => setShowWeatherView(false)} 
-          initialZip={effectiveZip}
         />
       )}
     </>
