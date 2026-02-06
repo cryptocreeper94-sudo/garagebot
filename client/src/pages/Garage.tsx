@@ -17,9 +17,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Car, Trash2, Settings, AlertTriangle, CheckCircle, 
   RefreshCw, FileText, Wrench, Star, Shield, Search, 
-  Calendar, DollarSign, MapPin, ChevronRight, Loader2, Brain
+  Calendar, DollarSign, MapPin, ChevronRight, Loader2, Brain,
+  FileCheck, Fuel, TrendingDown, Phone
 } from "lucide-react";
 import SmartRecommendations from "@/components/SmartRecommendations";
+import { WarrantyManager, FuelTracker, ExpenseTracker, MaintenanceScheduler, PriceWatch, EmergencyInfo } from "@/components/GarageFeatures";
 import { BlockchainStatus } from "@/components/BlockchainStatus";
 
 interface Vehicle {
@@ -460,21 +462,41 @@ export default function Garage() {
                     </div>
 
                     <Tabs defaultValue="passport" className="p-6">
-                      <TabsList className="grid grid-cols-4 mb-6">
-                        <TabsTrigger value="passport" className="font-tech uppercase text-xs" data-testid="tab-passport">
-                          <Shield className="w-4 h-4 mr-1" /> Passport
-                        </TabsTrigger>
-                        <TabsTrigger value="ai" className="font-tech uppercase text-xs" data-testid="tab-ai">
-                          <Brain className="w-4 h-4 mr-1" /> AI Insights
-                        </TabsTrigger>
-                        <TabsTrigger value="recalls" className="font-tech uppercase text-xs" data-testid="tab-recalls">
-                          <AlertTriangle className="w-4 h-4 mr-1" /> Recalls
-                          {recalls.length > 0 && <Badge variant="destructive" className="ml-1 text-xs">{recalls.length}</Badge>}
-                        </TabsTrigger>
-                        <TabsTrigger value="service" className="font-tech uppercase text-xs" data-testid="tab-service">
-                          <Wrench className="w-4 h-4 mr-1" /> Service
-                        </TabsTrigger>
-                      </TabsList>
+                      <div className="overflow-x-auto scrollbar-hide -mx-2 px-2 mb-6">
+                        <TabsList className="inline-flex w-auto min-w-full gap-1">
+                          <TabsTrigger value="passport" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-passport">
+                            <Shield className="w-3 h-3 mr-1" /> Passport
+                          </TabsTrigger>
+                          <TabsTrigger value="ai" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-ai">
+                            <Brain className="w-3 h-3 mr-1" /> AI
+                          </TabsTrigger>
+                          <TabsTrigger value="recalls" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-recalls">
+                            <AlertTriangle className="w-3 h-3 mr-1" /> Recalls
+                            {recalls.length > 0 && <Badge variant="destructive" className="ml-1 text-[10px]">{recalls.length}</Badge>}
+                          </TabsTrigger>
+                          <TabsTrigger value="service" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-service">
+                            <Wrench className="w-3 h-3 mr-1" /> Service
+                          </TabsTrigger>
+                          <TabsTrigger value="warranty" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-warranty">
+                            <FileCheck className="w-3 h-3 mr-1" /> Warranty
+                          </TabsTrigger>
+                          <TabsTrigger value="fuel" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-fuel">
+                            <Fuel className="w-3 h-3 mr-1" /> Fuel
+                          </TabsTrigger>
+                          <TabsTrigger value="expenses" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-expenses">
+                            <DollarSign className="w-3 h-3 mr-1" /> Expenses
+                          </TabsTrigger>
+                          <TabsTrigger value="maintenance" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-maintenance">
+                            <Calendar className="w-3 h-3 mr-1" /> Schedule
+                          </TabsTrigger>
+                          <TabsTrigger value="pricewatch" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-pricewatch">
+                            <TrendingDown className="w-3 h-3 mr-1" /> Prices
+                          </TabsTrigger>
+                          <TabsTrigger value="emergency" className="font-tech uppercase text-[10px] px-2 whitespace-nowrap" data-testid="tab-emergency">
+                            <Phone className="w-3 h-3 mr-1" /> Emergency
+                          </TabsTrigger>
+                        </TabsList>
+                      </div>
 
                       <TabsContent value="passport" className="space-y-0">
                         <div className="flex overflow-x-auto md:grid md:grid-cols-2 gap-0 scrollbar-hide">
@@ -703,6 +725,30 @@ export default function Garage() {
                             </div>
                           </ScrollArea>
                         )}
+                      </TabsContent>
+
+                      <TabsContent value="warranty">
+                        <WarrantyManager vehicleId={selectedVehicle.id} />
+                      </TabsContent>
+                      <TabsContent value="fuel">
+                        <FuelTracker vehicleId={selectedVehicle.id} />
+                      </TabsContent>
+                      <TabsContent value="expenses">
+                        <ExpenseTracker vehicleId={selectedVehicle.id} />
+                      </TabsContent>
+                      <TabsContent value="maintenance">
+                        <MaintenanceScheduler vehicleId={selectedVehicle.id} />
+                      </TabsContent>
+                      <TabsContent value="pricewatch">
+                        <PriceWatch vehicleId={selectedVehicle.id} userId={user?.id || ''} />
+                      </TabsContent>
+                      <TabsContent value="emergency">
+                        <EmergencyInfo 
+                          vehicleId={selectedVehicle.id}
+                          vehicleVin={selectedVehicle.vin || ''}
+                          vehicleOilType={selectedVehicle.oilType || ''}
+                          vehicleTireSize={selectedVehicle.tireSize || ''}
+                        />
                       </TabsContent>
                     </Tabs>
                   </Card>

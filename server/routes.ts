@@ -4,7 +4,7 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema } from "@shared/schema";
+import { insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema } from "@shared/schema";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
@@ -9081,6 +9081,292 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       res.json(referral);
     } catch (error) {
       res.status(500).json({ error: "Failed to submit interest form" });
+    }
+  });
+
+  // ============================================
+  // COMPREHENSIVE DRIVER FEATURES
+  // ============================================
+
+  // Warranties
+  app.get("/api/warranties", isAuthenticated, async (req: any, res) => {
+    try {
+      const warranties = await storage.getWarrantiesByUser(req.user.id);
+      res.json(warranties);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch warranties" });
+    }
+  });
+
+  app.get("/api/vehicles/:vehicleId/warranties", isAuthenticated, async (req: any, res) => {
+    try {
+      const warranties = await storage.getWarrantiesByVehicle(req.params.vehicleId);
+      res.json(warranties);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch warranties" });
+    }
+  });
+
+  app.post("/api/warranties", isAuthenticated, async (req: any, res) => {
+    try {
+      const result = insertWarrantySchema.safeParse({ ...req.body, userId: req.user.id });
+      if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
+      const warranty = await storage.createWarranty(result.data);
+      res.json(warranty);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create warranty" });
+    }
+  });
+
+  app.patch("/api/warranties/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const warranty = await storage.updateWarranty(req.params.id, req.body);
+      if (!warranty) return res.status(404).json({ error: "Warranty not found" });
+      res.json(warranty);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update warranty" });
+    }
+  });
+
+  app.delete("/api/warranties/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const deleted = await storage.deleteWarranty(req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Warranty not found" });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete warranty" });
+    }
+  });
+
+  // Warranty Claims
+  app.get("/api/warranties/:warrantyId/claims", isAuthenticated, async (req: any, res) => {
+    try {
+      const claims = await storage.getWarrantyClaimsByWarranty(req.params.warrantyId);
+      res.json(claims);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch warranty claims" });
+    }
+  });
+
+  app.post("/api/warranties/:warrantyId/claims", isAuthenticated, async (req: any, res) => {
+    try {
+      const result = insertWarrantyClaimSchema.safeParse({ ...req.body, warrantyId: req.params.warrantyId, userId: req.user.id });
+      if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
+      const claim = await storage.createWarrantyClaim(result.data);
+      res.json(claim);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create warranty claim" });
+    }
+  });
+
+  // Fuel Logs
+  app.get("/api/vehicles/:vehicleId/fuel-logs", isAuthenticated, async (req: any, res) => {
+    try {
+      const logs = await storage.getFuelLogsByVehicle(req.params.vehicleId);
+      res.json(logs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch fuel logs" });
+    }
+  });
+
+  app.get("/api/fuel-logs", isAuthenticated, async (req: any, res) => {
+    try {
+      const logs = await storage.getFuelLogsByUser(req.user.id);
+      res.json(logs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch fuel logs" });
+    }
+  });
+
+  app.post("/api/vehicles/:vehicleId/fuel-logs", isAuthenticated, async (req: any, res) => {
+    try {
+      const result = insertFuelLogSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: req.user.id });
+      if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
+      const log = await storage.createFuelLog(result.data);
+      res.json(log);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create fuel log" });
+    }
+  });
+
+  app.delete("/api/fuel-logs/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const deleted = await storage.deleteFuelLog(req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Fuel log not found" });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete fuel log" });
+    }
+  });
+
+  // Vehicle Expenses
+  app.get("/api/vehicles/:vehicleId/expenses", isAuthenticated, async (req: any, res) => {
+    try {
+      const expenses = await storage.getExpensesByVehicle(req.params.vehicleId);
+      res.json(expenses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch expenses" });
+    }
+  });
+
+  app.get("/api/expenses", isAuthenticated, async (req: any, res) => {
+    try {
+      const expenses = await storage.getExpensesByUser(req.user.id);
+      res.json(expenses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch expenses" });
+    }
+  });
+
+  app.get("/api/vehicles/:vehicleId/expense-summary", isAuthenticated, async (req: any, res) => {
+    try {
+      const summary = await storage.getExpenseSummaryByVehicle(req.params.vehicleId);
+      res.json(summary);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch expense summary" });
+    }
+  });
+
+  app.post("/api/vehicles/:vehicleId/expenses", isAuthenticated, async (req: any, res) => {
+    try {
+      const result = insertVehicleExpenseSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: req.user.id });
+      if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
+      const expense = await storage.createExpense(result.data);
+      res.json(expense);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create expense" });
+    }
+  });
+
+  app.delete("/api/expenses/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const deleted = await storage.deleteExpense(req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Expense not found" });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete expense" });
+    }
+  });
+
+  // Price History
+  app.get("/api/price-alerts/:alertId/history", isAuthenticated, async (req: any, res) => {
+    try {
+      const history = await storage.getPriceHistoryByAlert(req.params.alertId);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch price history" });
+    }
+  });
+
+  app.get("/api/price-history", isAuthenticated, async (req: any, res) => {
+    try {
+      const history = await storage.getPriceHistoryByUser(req.user.id);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch price history" });
+    }
+  });
+
+  // Emergency Contacts
+  app.get("/api/emergency-contacts", isAuthenticated, async (req: any, res) => {
+    try {
+      const contacts = await storage.getEmergencyContactsByUser(req.user.id);
+      res.json(contacts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch emergency contacts" });
+    }
+  });
+
+  app.post("/api/emergency-contacts", isAuthenticated, async (req: any, res) => {
+    try {
+      const result = insertEmergencyContactSchema.safeParse({ ...req.body, userId: req.user.id });
+      if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
+      const contact = await storage.createEmergencyContact(result.data);
+      res.json(contact);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create emergency contact" });
+    }
+  });
+
+  app.patch("/api/emergency-contacts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const contact = await storage.updateEmergencyContact(req.params.id, req.body);
+      if (!contact) return res.status(404).json({ error: "Contact not found" });
+      res.json(contact);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update contact" });
+    }
+  });
+
+  app.delete("/api/emergency-contacts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const deleted = await storage.deleteEmergencyContact(req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Contact not found" });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete contact" });
+    }
+  });
+
+  // Maintenance Schedules
+  app.get("/api/vehicles/:vehicleId/maintenance", isAuthenticated, async (req: any, res) => {
+    try {
+      const schedules = await storage.getMaintenanceSchedulesByVehicle(req.params.vehicleId);
+      res.json(schedules);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch maintenance schedules" });
+    }
+  });
+
+  app.get("/api/maintenance/overdue", isAuthenticated, async (req: any, res) => {
+    try {
+      const overdue = await storage.getOverdueMaintenanceByUser(req.user.id);
+      res.json(overdue);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch overdue maintenance" });
+    }
+  });
+
+  app.post("/api/vehicles/:vehicleId/maintenance", isAuthenticated, async (req: any, res) => {
+    try {
+      const result = insertMaintenanceScheduleSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: req.user.id });
+      if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
+      const schedule = await storage.createMaintenanceSchedule(result.data);
+      res.json(schedule);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create maintenance schedule" });
+    }
+  });
+
+  app.patch("/api/maintenance/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const schedule = await storage.updateMaintenanceSchedule(req.params.id, req.body);
+      if (!schedule) return res.status(404).json({ error: "Schedule not found" });
+      res.json(schedule);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update maintenance schedule" });
+    }
+  });
+
+  app.post("/api/maintenance/:id/complete", isAuthenticated, async (req: any, res) => {
+    try {
+      const { completedMileage } = req.body;
+      if (!completedMileage) return res.status(400).json({ error: "completedMileage is required" });
+      const schedule = await storage.completeMaintenanceTask(req.params.id, parseInt(completedMileage));
+      if (!schedule) return res.status(404).json({ error: "Schedule not found" });
+      res.json(schedule);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to complete maintenance task" });
+    }
+  });
+
+  app.delete("/api/maintenance/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const deleted = await storage.deleteMaintenanceSchedule(req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Schedule not found" });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete maintenance schedule" });
     }
   });
 
