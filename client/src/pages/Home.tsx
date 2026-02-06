@@ -823,6 +823,143 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Mission Statement & Founder Story */}
+      <section className="py-16 px-4 relative overflow-hidden" data-testid="section-mission">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent pointer-events-none" />
+        <div className="max-w-5xl mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono mb-6">
+              <Terminal className="w-3 h-3" />
+              OUR MISSION
+            </div>
+            <h2 className="text-3xl md:text-4xl font-tech font-bold uppercase tracking-tight text-white mb-6" data-testid="text-mission-title">
+              One Search. Every Store.{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">
+                Every Engine.
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              GarageBot exists to make finding parts for anything with a motor simple, fast, and even fun.
+              Whether you're rebuilding a classic Mustang, maintaining your family SUV, rigging your bass boat,
+              tuning an FPV racing drone, or keeping a fleet of semis on the road — you deserve one place
+              that searches everywhere so you don't have to.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-14"
+          >
+            {[
+              { label: "Cars & Trucks", icon: "🚗" },
+              { label: "Motorcycles", icon: "🏍️" },
+              { label: "ATVs & UTVs", icon: "🏔️" },
+              { label: "Boats & Marine", icon: "🚤" },
+              { label: "RVs & Trailers", icon: "🚐" },
+              { label: "Classics & Hot Rods", icon: "🏁" },
+              { label: "Exotics", icon: "🏎️" },
+              { label: "Diesel & Commercial", icon: "🚛" },
+              { label: "Tractors & Farm", icon: "🚜" },
+              { label: "Heavy Equipment", icon: "🏗️" },
+              { label: "Small Engines", icon: "⚙️" },
+              { label: "Generators", icon: "🔌" },
+              { label: "Powersports", icon: "❄️" },
+              { label: "Aviation", icon: "✈️" },
+              { label: "RC & Hobby", icon: "🎮" },
+              { label: "Drones & FPV", icon: "📡" },
+              { label: "Model Aircraft", icon: "🛩️" },
+              { label: "Slot Cars", icon: "🏆" },
+              { label: "Go-Karts", icon: "🏎️" },
+              { label: "Golf Carts", icon: "⛳" },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/20 transition-colors"
+              >
+                <span className="text-base">{item.icon}</span>
+                <span className="text-[11px] text-muted-foreground font-medium truncate">{item.label}</span>
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="relative rounded-xl overflow-hidden" data-testid="card-founder-story">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 rounded-xl" />
+              <div className="relative bg-card/80 backdrop-blur-sm border border-white/5 rounded-xl p-6 md:p-8">
+                <div className="flex flex-col md:flex-row gap-6 items-start">
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.4)]">
+                      <Wrench className="w-8 h-8 text-black" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="text-xl font-tech font-bold uppercase text-white" data-testid="text-founder-name">
+                        From the Founder
+                      </h3>
+                      <span className="px-2 py-0.5 text-[9px] font-mono uppercase bg-primary/20 text-primary border border-primary/30 rounded">
+                        Jason // DarkWave Studios
+                      </span>
+                    </div>
+                    <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+                      <p>
+                        I've been searching for parts for over 35 years. From flipping through paper catalogs
+                        and calling stores to waiting on hold, to doing the exact same runaround online — and
+                        somehow it never got easier. The internet gave us a thousand places to buy parts, but
+                        nobody ever bothered to put them all in one place. I got tired of opening fifteen tabs
+                        just to compare prices on a set of brake pads. AutoZone, O'Reilly, Amazon, eBay, NAPA,
+                        RockAuto, then some specialty site you found on a forum from 2014. Half the time the
+                        part numbers don't match, the fitment info is wrong, and you end up ordering the wrong
+                        thing anyway. After 35 years of that, I decided if nobody else was going to fix it,
+                        I would.
+                      </p>
+                      <p>
+                        And it's not just cars. The fragmentation across the entire motorized industry is
+                        massive — and nobody talks about it. Motorcycles, ATVs, UTVs, boats, personal
+                        watercraft, RVs, tractors, heavy equipment, generators, chainsaws, dirt bikes,
+                        snowmobiles, go-karts, golf carts, aviation, diesel rigs — even RC cars, racing
+                        drones, model aircraft, and slot cars. Every single one of these worlds has its own
+                        scattered mess of retailers, part numbers, and fitment data with zero cohesion between
+                        any of them. A guy rebuilding a Harley is having the exact same frustrating experience
+                        as someone rigging a bass boat, maintaining a farm tractor, or building a competition
+                        FPV drone. Everyone is doing the same thing: searching site after site, comparing
+                        prices manually, and hoping they got the right part.
+                      </p>
+                      <p>
+                        That's what GarageBot fixes. One search. Every store. Real prices side by side. Filtered
+                        by your ZIP code so you can see what's available for local pickup or what ships fastest.
+                        I built this for real people who work on real machines — not just cars, but{" "}
+                        <span className="text-primary font-medium">everything with a motor</span>. If it has an
+                        engine, a battery, or a propeller, we've got you covered. This isn't some corporate
+                        project built by people who've never turned a wrench. This was built by a guy who got
+                        fed up and decided 35 years was long enough to wait.
+                      </p>
+                      <p className="text-primary font-tech text-base">
+                        Right Part. First Time. Every Engine. That's not a slogan — it's the whole point.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       <section className="py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <NativeProductRecs context="outdoor" layout="grid" title="Road Trip Ready" maxItems={4} />
