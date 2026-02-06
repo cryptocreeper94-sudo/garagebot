@@ -50,6 +50,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Payment Processing
 - **Provider**: Stripe, integrated using Stripe Elements React components and Stripe's backend SDK.
+- **Ad-Free Subscription**: $5/month tier removes all ads; Pro users automatically ad-free. Checkout at `POST /api/subscription/ad-free/checkout`. Webhook lifecycle handles active/trialing (enable), past_due/unpaid/paused/incomplete (disable), deleted (cancel). Schema fields: `adFreeSubscription`, `adFreeExpiresAt`, `adFreeStripeSubscriptionId`.
+
+## Ad Monetization
+- **Google AdSense**: Publisher ID `ca-pub-7386731030203849` via `VITE_ADSENSE_PUBLISHER_ID`. Ad components (`AdSense.tsx`, `AdSenseSlot.tsx`) check user subscription status; ads hidden for Pro and ad-free subscribers. Placements on Dashboard, Results, DIY Guides, Blog, Break Room — never on login/signup/checkout flows. Upgrade prompt shown to free users near ad placements.
 
 ## Build & Deployment
 - **Development Environment**: Client (Vite) and backend (tsx) development servers with Hot Module Replacement (HMR).
