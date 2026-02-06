@@ -2916,3 +2916,227 @@ export const maintenanceSchedules = pgTable("maintenance_schedules", {
 export const insertMaintenanceScheduleSchema = createInsertSchema(maintenanceSchedules).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertMaintenanceSchedule = z.infer<typeof insertMaintenanceScheduleSchema>;
 export type MaintenanceSchedule = typeof maintenanceSchedules.$inferSelect;
+
+// ============================================
+// Signal Chat - Community Messaging System
+// ============================================
+
+export const communities = pgTable("communities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  icon: text("icon").default("⚡"),
+  imageUrl: text("image_url"),
+  ownerId: text("owner_id").notNull(),
+  isVerified: boolean("is_verified").notNull().default(false),
+  isPublic: boolean("is_public").notNull().default(true),
+  memberCount: integer("member_count").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const communityChannels = pgTable("community_channels", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  communityId: varchar("community_id").notNull().references(() => communities.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  type: text("type").notNull().default("chat"),
+  position: integer("position").notNull().default(0),
+  isLocked: boolean("is_locked").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const communityMembers = pgTable("community_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  communityId: varchar("community_id").notNull().references(() => communities.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(),
+  username: text("username").notNull(),
+  role: text("role").notNull().default("member"),
+  isOnline: boolean("is_online").notNull().default(false),
+  lastSeenAt: timestamp("last_seen_at").defaultNow(),
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
+});
+
+export const communityMessages = pgTable("community_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  channelId: varchar("channel_id").notNull().references(() => communityChannels.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(),
+  username: text("username").notNull(),
+  content: text("content").notNull(),
+  isBot: boolean("is_bot").notNull().default(false),
+  replyToId: varchar("reply_to_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  editedAt: timestamp("edited_at"),
+});
+
+export const communityBots = pgTable("community_bots", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  communityId: varchar("community_id").notNull().references(() => communities.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  icon: text("icon").default("🤖"),
+  webhookUrl: text("webhook_url"),
+  apiKey: text("api_key"),
+  isActive: boolean("is_active").notNull().default(true),
+  permissions: text("permissions").default("read,write"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const messageReactions = pgTable("message_reactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  messageId: varchar("message_id").notNull().references(() => communityMessages.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(),
+  username: text("username").notNull(),
+  emoji: text("emoji").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const messageAttachments = pgTable("message_attachments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  messageId: varchar("message_id").notNull().references(() => communityMessages.id, { onDelete: "cascade" }),
+  type: text("type").notNull(),
+  url: text("url").notNull(),
+  filename: text("filename"),
+  size: integer("size"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const dmConversations = pgTable("dm_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  participant1Id: text("participant1_id").notNull(),
+  participant1Name: text("participant1_name").notNull(),
+  participant2Id: text("participant2_id").notNull(),
+  participant2Name: text("participant2_name").notNull(),
+  lastMessageAt: timestamp("last_message_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const directMessages = pgTable("direct_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id").notNull().references(() => dmConversations.id, { onDelete: "cascade" }),
+  senderId: text("sender_id").notNull(),
+  senderName: text("sender_name").notNull(),
+  content: text("content").notNull(),
+  attachmentUrl: text("attachment_url"),
+  attachmentName: text("attachment_name"),
+  attachmentType: text("attachment_type"),
+  isRead: boolean("is_read").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const communityPolls = pgTable("community_polls", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  channelId: varchar("channel_id").notNull().references(() => communityChannels.id, { onDelete: "cascade" }),
+  creatorId: text("creator_id").notNull(),
+  creatorName: text("creator_name").notNull(),
+  question: text("question").notNull(),
+  options: text("options").notNull(),
+  allowMultiple: boolean("allow_multiple").notNull().default(false),
+  endsAt: timestamp("ends_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const pollVotes = pgTable("poll_votes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  pollId: varchar("poll_id").notNull().references(() => communityPolls.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(),
+  optionIndex: integer("option_index").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const scheduledMessages = pgTable("scheduled_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  channelId: varchar("channel_id").notNull().references(() => communityChannels.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(),
+  username: text("username").notNull(),
+  content: text("content").notNull(),
+  attachmentUrl: text("attachment_url"),
+  scheduledFor: timestamp("scheduled_for").notNull(),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const communityRoles = pgTable("community_roles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  communityId: varchar("community_id").notNull().references(() => communities.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  color: text("color").default("#6366f1"),
+  position: integer("position").notNull().default(0),
+  permissions: text("permissions").notNull().default("read,write"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const customEmojis = pgTable("custom_emojis", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  communityId: varchar("community_id").notNull().references(() => communities.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  imageUrl: text("image_url").notNull(),
+  uploaderId: text("uploader_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const memberNotificationSettings = pgTable("member_notification_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(),
+  communityId: varchar("community_id").notNull().references(() => communities.id, { onDelete: "cascade" }),
+  channelId: varchar("channel_id"),
+  level: text("level").notNull().default("all"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const pinnedMessages = pgTable("pinned_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  messageId: varchar("message_id").notNull().references(() => communityMessages.id, { onDelete: "cascade" }),
+  channelId: varchar("channel_id").notNull().references(() => communityChannels.id, { onDelete: "cascade" }),
+  pinnedById: text("pinned_by_id").notNull(),
+  pinnedAt: timestamp("pinned_at").defaultNow().notNull(),
+});
+
+export const messageThreads = pgTable("message_threads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  parentMessageId: varchar("parent_message_id").notNull().references(() => communityMessages.id, { onDelete: "cascade" }),
+  channelId: varchar("channel_id").notNull().references(() => communityChannels.id, { onDelete: "cascade" }),
+  replyCount: integer("reply_count").notNull().default(0),
+  lastReplyAt: timestamp("last_reply_at").defaultNow(),
+});
+
+// Signal Chat Insert Schemas
+export const insertCommunitySchema = createInsertSchema(communities).omit({ id: true, memberCount: true, createdAt: true, updatedAt: true });
+export const insertChannelSchema = createInsertSchema(communityChannels).omit({ id: true, createdAt: true });
+export const insertMemberSchema = createInsertSchema(communityMembers).omit({ id: true, isOnline: true, lastSeenAt: true, joinedAt: true });
+export const insertCommunityMessageSchema = createInsertSchema(communityMessages).omit({ id: true, createdAt: true, editedAt: true });
+export const insertBotSchema = createInsertSchema(communityBots).omit({ id: true, createdAt: true });
+export const insertReactionSchema = createInsertSchema(messageReactions).omit({ id: true, createdAt: true });
+export const insertAttachmentSchema = createInsertSchema(messageAttachments).omit({ id: true, createdAt: true });
+export const insertDmConversationSchema = createInsertSchema(dmConversations).omit({ id: true, lastMessageAt: true, createdAt: true });
+export const insertDirectMessageSchema = createInsertSchema(directMessages).omit({ id: true, isRead: true, createdAt: true });
+export const insertPollSchema = createInsertSchema(communityPolls).omit({ id: true, createdAt: true });
+export const insertScheduledMessageSchema = createInsertSchema(scheduledMessages).omit({ id: true, status: true, createdAt: true });
+export const insertCommunityRoleSchema = createInsertSchema(communityRoles).omit({ id: true, createdAt: true });
+export const insertCustomEmojiSchema = createInsertSchema(customEmojis).omit({ id: true, createdAt: true });
+export const insertPinnedMessageSchema = createInsertSchema(pinnedMessages).omit({ id: true, pinnedAt: true });
+export const insertMessageThreadSchema = createInsertSchema(messageThreads).omit({ id: true, replyCount: true, lastReplyAt: true });
+
+// Signal Chat Types
+export type Community = typeof communities.$inferSelect;
+export type InsertCommunity = z.infer<typeof insertCommunitySchema>;
+export type CommunityChannel = typeof communityChannels.$inferSelect;
+export type InsertChannel = z.infer<typeof insertChannelSchema>;
+export type CommunityMember = typeof communityMembers.$inferSelect;
+export type InsertMember = z.infer<typeof insertMemberSchema>;
+export type CommunityMessage = typeof communityMessages.$inferSelect;
+export type InsertCommunityMessage = z.infer<typeof insertCommunityMessageSchema>;
+export type CommunityBot = typeof communityBots.$inferSelect;
+export type InsertBot = z.infer<typeof insertBotSchema>;
+export type MessageReaction = typeof messageReactions.$inferSelect;
+export type MessageAttachment = typeof messageAttachments.$inferSelect;
+export type DmConversation = typeof dmConversations.$inferSelect;
+export type DirectMessage = typeof directMessages.$inferSelect;
+export type InsertDirectMessage = z.infer<typeof insertDirectMessageSchema>;
+export type CommunityPoll = typeof communityPolls.$inferSelect;
+export type PollVote = typeof pollVotes.$inferSelect;
+export type ScheduledMessage = typeof scheduledMessages.$inferSelect;
+export type CommunityRole = typeof communityRoles.$inferSelect;
+export type CustomEmoji = typeof customEmojis.$inferSelect;
+export type PinnedMessage = typeof pinnedMessages.$inferSelect;
+export type MessageThread = typeof messageThreads.$inferSelect;
