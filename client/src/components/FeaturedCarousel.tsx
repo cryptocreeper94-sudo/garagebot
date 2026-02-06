@@ -39,7 +39,7 @@ const FALLBACK_DEALS: Deal[] = [
     price: "29.99",
     originalPrice: "39.99",
     discount: "25% OFF",
-    imageUrl: "https://images.unsplash.com/photo-1635784063748-252802c6c25c?q=80&w=600&auto=format&fit=crop",
+    imageUrl: "/generated_images/product_motor_oil.png",
     vendor: "AutoZone",
     vendorUrl: RETAILER_URLS["AutoZone"],
     searchQuery: "mobil+1+5w30+synthetic+oil",
@@ -53,7 +53,7 @@ const FALLBACK_DEALS: Deal[] = [
     price: "54.99",
     originalPrice: "64.99",
     discount: "15% OFF",
-    imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=600&auto=format&fit=crop",
+    imageUrl: "/generated_images/product_brake_pads.png",
     vendor: "O'Reilly",
     vendorUrl: RETAILER_URLS["O'Reilly"],
     searchQuery: "duralast+gold+brake+pads",
@@ -67,7 +67,7 @@ const FALLBACK_DEALS: Deal[] = [
     price: "219.99",
     originalPrice: "249.99",
     discount: "$30 OFF",
-    imageUrl: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=600&auto=format&fit=crop",
+    imageUrl: "/generated_images/car_battery.png",
     vendor: "Advance",
     vendorUrl: RETAILER_URLS["Advance"],
     searchQuery: "diehard+platinum+agm+battery",
@@ -81,7 +81,7 @@ const FALLBACK_DEALS: Deal[] = [
     price: "49.99",
     originalPrice: "59.99",
     discount: "$10 OFF",
-    imageUrl: "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?q=80&w=600&auto=format&fit=crop",
+    imageUrl: "/generated_images/product_air_filter.png",
     vendor: "Amazon",
     vendorUrl: RETAILER_URLS["Amazon"],
     searchQuery: "K%26N+high+performance+air+filter",
@@ -172,7 +172,7 @@ export default function FeaturedCarousel() {
                     <div className="h-20 w-full relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
                       <img
-                        src={deal.imageUrl || "https://images.unsplash.com/photo-1635784063748-252802c6c25c?q=80&w=600&auto=format&fit=crop"}
+                        src={deal.imageUrl || "/generated_images/product_motor_oil.png"}
                         alt={deal.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70"
                       />

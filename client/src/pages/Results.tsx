@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSearch } from "wouter";
+import { useSearch, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, ExternalLink, Filter, Check, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Clock, ArrowRight, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, TrendingDown, Award, Globe } from "lucide-react";
+import { ExternalLink, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, Award, Globe, ArrowRight } from "lucide-react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { AdSenseHorizontal } from "@/components/AdSense";
@@ -11,11 +11,10 @@ import ShareButton from "@/components/ShareButton";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
-import { VENDORS, VendorInfo, generateVendorSearchUrl, getVendorsForVehicleType, MOCK_RESULTS } from "@/lib/mockData";
+import { VENDORS, VendorInfo, generateVendorSearchUrl, CATEGORIES } from "@/lib/mockData";
 import { useAuthGate } from "@/hooks/useAuthGate";
 
 const AFFILIATE_NETWORKS = ["Amazon Associates", "eBay Partner Network", "CJ Affiliate", "ShareASale", "AvantLink", "Impact"];
@@ -35,25 +34,6 @@ const SCANNING_MESSAGES = [
   "Building direct links...",
 ];
 
-function getVendorColor(slug: string): string {
-  const colors: Record<string, string> = {
-    'autozone': '#FF6600',
-    'oreilly': '#00843D',
-    'advance': '#CC0000',
-    'rockauto': '#336699',
-    'amazon': '#FF9900',
-    'napa': '#003DA5',
-    'vmc': '#CC0000',
-    'ebay': '#E53238',
-    'westmarine': '#003399',
-    'denniskirk': '#003366',
-    'rockymountain': '#FF4500',
-    'summit': '#FF0000',
-    'jegs': '#FFCC00',
-  };
-  return colors[slug] || '#06b6d4';
-}
-
 function trackClick(vendorId: string, searchQuery: string, url: string, context: string) {
   fetch('/api/affiliates/track', {
     method: 'POST',
@@ -70,179 +50,218 @@ function trackClick(vendorId: string, searchQuery: string, url: string, context:
   }).catch(() => {});
 }
 
-const STORE_TO_VENDOR: Record<string, string> = {
-  "AutoZone": "autozone",
-  "O'Reilly": "oreilly",
-  "Amazon": "amazon",
-  "RockAuto": "rockauto",
-  "NAPA": "napa",
-  "eBay Motors": "ebay",
-  "Advance Auto": "advanceauto",
-  "West Marine": "westmarine",
-  "Dennis Kirk": "denniskirk",
-  "Rocky Mountain ATV": "rockymountain",
-  "Summit Racing": "summit",
-  "VMC Chinese Parts": "vmcchineseparts",
-  "Walmart": "amazon",
-  "Camping World": "campingworld",
+const VEHICLE_TYPE_LABELS: Record<string, string> = {
+  cars: "Cars & Trucks",
+  trucks: "Trucks",
+  motorcycles: "Motorcycles",
+  atvs: "ATVs",
+  utvs: "UTVs",
+  rvs: "RVs & Motorhomes",
+  boats: "Boats & Marine",
+  jetskis: "Jet Skis & PWC",
+  snowmobiles: "Snowmobiles",
+  golfcarts: "Golf Carts",
+  gokarts: "Go-Karts",
+  smallengines: "Small Engines",
+  aviation: "Aviation",
+  tractors: "Tractors & Farm",
+  heavyequipment: "Heavy Equipment",
+  classics: "Classic & Hot Rod",
+  exotics: "Exotics",
+  kitcars: "Kit & Custom",
+  powersports: "Powersports",
+  rv: "RV & Trailer",
+  diesel: "Diesel & Commercial",
+  heavyequip: "Heavy Equipment",
+  generators: "Generators",
+  rc: "RC & Hobby",
+  drones: "Drones & FPV",
+  modelaircraft: "Model Aircraft",
+  slotcars: "Slot Cars",
 };
 
-function getStoreUrl(storeName: string, partNumber: string, partName: string): string {
-  const slug = STORE_TO_VENDOR[storeName];
-  const vendor = slug ? VENDORS.find(v => v.id === slug || v.slug === slug) : null;
-  if (vendor) {
-    return generateVendorSearchUrl(vendor, partNumber || partName, {});
-  }
-  return `https://www.google.com/search?q=${encodeURIComponent(`${partNumber} ${storeName} buy`)}`;
-}
+const VEHICLE_TYPE_SEARCHES: Record<string, { label: string; query: string }[]> = {
+  cars: [
+    { label: "Brake Pads", query: "brake pads" },
+    { label: "Oil Filters", query: "oil filter" },
+    { label: "Air Filters", query: "air filter" },
+    { label: "Spark Plugs", query: "spark plugs" },
+    { label: "Headlights", query: "headlight bulb" },
+    { label: "Wiper Blades", query: "wiper blade" },
+    { label: "Car Battery", query: "car battery" },
+    { label: "Serpentine Belt", query: "serpentine belt" },
+  ],
+  trucks: [
+    { label: "Brake Pads", query: "truck brake pads" },
+    { label: "Air Filters", query: "truck air filter" },
+    { label: "LED Headlights", query: "LED headlight bulb" },
+    { label: "Tonneau Cover", query: "tonneau cover" },
+    { label: "Lift Kit", query: "lift kit" },
+    { label: "Towing Hitch", query: "towing hitch" },
+    { label: "Truck Battery", query: "truck battery" },
+    { label: "Running Boards", query: "running boards" },
+  ],
+  motorcycles: [
+    { label: "Chain & Sprocket", query: "motorcycle chain sprocket kit" },
+    { label: "Brake Pads", query: "motorcycle brake pads" },
+    { label: "Oil Filter", query: "motorcycle oil filter" },
+    { label: "Air Filter", query: "motorcycle air filter" },
+    { label: "Tires", query: "motorcycle tires" },
+    { label: "Handlebars", query: "motorcycle handlebars" },
+    { label: "Battery", query: "motorcycle battery" },
+    { label: "Exhaust", query: "motorcycle exhaust" },
+  ],
+  atvs: [
+    { label: "ATV Tires", query: "ATV tires" },
+    { label: "Carburetor", query: "ATV carburetor" },
+    { label: "Winch", query: "ATV winch" },
+    { label: "CVT Belt", query: "ATV drive belt" },
+    { label: "Brake Pads", query: "ATV brake pads" },
+    { label: "Air Filter", query: "ATV air filter" },
+    { label: "Spark Plug", query: "ATV spark plug" },
+    { label: "Bumper", query: "ATV front bumper" },
+  ],
+  utvs: [
+    { label: "UTV Windshield", query: "UTV windshield" },
+    { label: "Drive Belt", query: "UTV CVT belt" },
+    { label: "UTV Tires", query: "UTV tires" },
+    { label: "Roof & Doors", query: "UTV roof doors" },
+    { label: "Winch", query: "UTV winch" },
+    { label: "Axle", query: "UTV axle" },
+    { label: "Light Bar", query: "UTV LED light bar" },
+    { label: "Bumper", query: "UTV bumper" },
+  ],
+  boats: [
+    { label: "Propeller", query: "boat propeller" },
+    { label: "Gear Lube", query: "marine gear lube" },
+    { label: "Fuel Filter", query: "marine fuel filter" },
+    { label: "Impeller", query: "outboard impeller" },
+    { label: "Spark Plugs", query: "marine spark plug" },
+    { label: "Boat Battery", query: "marine battery" },
+    { label: "Trim Tab", query: "boat trim tabs" },
+    { label: "Anchor", query: "boat anchor" },
+  ],
+  jetskis: [
+    { label: "Wear Ring", query: "jet ski wear ring" },
+    { label: "Impeller", query: "jet ski impeller" },
+    { label: "Spark Plug", query: "jet ski spark plug" },
+    { label: "Battery", query: "jet ski battery" },
+    { label: "Oil", query: "jet ski 2-stroke oil" },
+    { label: "Fuel Filter", query: "jet ski fuel filter" },
+    { label: "Cover", query: "jet ski cover" },
+    { label: "Seat", query: "jet ski seat" },
+  ],
+  snowmobiles: [
+    { label: "Drive Belt", query: "snowmobile drive belt" },
+    { label: "Ski Runners", query: "snowmobile ski carbide" },
+    { label: "Track", query: "snowmobile track" },
+    { label: "Spark Plug", query: "snowmobile spark plug" },
+    { label: "Windshield", query: "snowmobile windshield" },
+    { label: "Slides", query: "snowmobile hyfax slides" },
+    { label: "Cover", query: "snowmobile cover" },
+    { label: "Battery", query: "snowmobile battery" },
+  ],
+  golfcarts: [
+    { label: "Battery Pack", query: "golf cart batteries" },
+    { label: "Tires & Wheels", query: "golf cart tires wheels" },
+    { label: "Charger", query: "golf cart battery charger" },
+    { label: "Controller", query: "golf cart speed controller" },
+    { label: "Seat Cover", query: "golf cart seat cover" },
+    { label: "Enclosure", query: "golf cart enclosure" },
+    { label: "Lift Kit", query: "golf cart lift kit" },
+    { label: "Lights", query: "golf cart LED lights" },
+  ],
+  gokarts: [
+    { label: "Carburetor", query: "go kart carburetor" },
+    { label: "Clutch", query: "go kart clutch" },
+    { label: "Tires", query: "go kart tires" },
+    { label: "Chain", query: "go kart chain" },
+    { label: "Throttle Cable", query: "go kart throttle cable" },
+    { label: "Brake Pads", query: "go kart brake pads" },
+    { label: "Spark Plug", query: "go kart spark plug" },
+    { label: "Drive Belt", query: "go kart belt" },
+  ],
+  smallengines: [
+    { label: "Spark Plug", query: "small engine spark plug" },
+    { label: "Air Filter", query: "lawn mower air filter" },
+    { label: "Carburetor", query: "small engine carburetor" },
+    { label: "Pull Cord", query: "recoil starter rope" },
+    { label: "Mower Blade", query: "lawn mower blade" },
+    { label: "Oil", query: "small engine oil SAE 30" },
+    { label: "Fuel Line", query: "small engine fuel line" },
+    { label: "Chainsaw Chain", query: "chainsaw chain" },
+  ],
+  tractors: [
+    { label: "Oil Filter", query: "tractor oil filter" },
+    { label: "Air Filter", query: "tractor air filter" },
+    { label: "Hydraulic Fluid", query: "tractor hydraulic fluid" },
+    { label: "Battery", query: "tractor battery" },
+    { label: "PTO Shaft", query: "PTO shaft" },
+    { label: "3-Point Parts", query: "3 point hitch parts" },
+    { label: "Tires", query: "tractor tires" },
+    { label: "Seat", query: "tractor seat" },
+  ],
+  heavyequipment: [
+    { label: "Hydraulic Hose", query: "hydraulic hose" },
+    { label: "Bucket Teeth", query: "excavator bucket teeth" },
+    { label: "Filters", query: "heavy equipment filter kit" },
+    { label: "Track Pads", query: "excavator track pads" },
+    { label: "Cylinders", query: "hydraulic cylinder" },
+    { label: "Battery", query: "heavy equipment battery" },
+    { label: "Pins & Bushings", query: "excavator pins bushings" },
+    { label: "Cutting Edge", query: "loader cutting edge" },
+  ],
+  aviation: [
+    { label: "Oil", query: "aviation oil" },
+    { label: "Spark Plugs", query: "aircraft spark plug" },
+    { label: "Tires", query: "aircraft tire" },
+    { label: "Battery", query: "aircraft battery" },
+    { label: "Air Filter", query: "aircraft air filter" },
+    { label: "Fuel Filter", query: "aircraft fuel filter" },
+    { label: "Brake Pads", query: "aircraft brake lining" },
+    { label: "Pitot Cover", query: "pitot tube cover" },
+  ],
+  rvs: [
+    { label: "Water Pump", query: "RV water pump" },
+    { label: "Awning", query: "RV awning" },
+    { label: "Holding Tank", query: "RV holding tank chemicals" },
+    { label: "Battery", query: "RV deep cycle battery" },
+    { label: "Fridge Parts", query: "RV refrigerator parts" },
+    { label: "LED Lights", query: "RV LED lights" },
+    { label: "Tires", query: "RV tires" },
+    { label: "Sewer Hose", query: "RV sewer hose" },
+  ],
+};
 
-interface PartResult {
-  id: number;
-  name: string;
-  partNumber: string;
-  fitment: string;
-  image: string;
-  prices: { store: string; price: number; shipping: string; inStock: boolean; location: string }[];
-  rating: number;
-  reviews: number;
-}
+const VEHICLE_TYPE_IMAGES: Record<string, string> = {
+  cars: "/generated_images/cars_and_trucks.png",
+  trucks: "/generated_images/pickup_truck.png",
+  motorcycles: "/generated_images/motorcycle.png",
+  atvs: "/generated_images/atv_and_utv.png",
+  utvs: "/generated_images/atv_and_utv.png",
+  boats: "/generated_images/boat_marine.png",
+  jetskis: "/generated_images/jet_ski_watercraft.png",
+  snowmobiles: "/generated_images/snowmobile_snow.png",
+  golfcarts: "/generated_images/golf_cart.png",
+  gokarts: "/generated_images/go_kart_racing.png",
+  smallengines: "/generated_images/small_engines_equipment.png",
+  aviation: "/generated_images/aviation_aircraft.png",
+  tractors: "/generated_images/tractor_farm.png",
+  heavyequipment: "/generated_images/heavy_equipment.png",
+  rvs: "/generated_images/rv_trailer.png",
+  classics: "/generated_images/classic_hot_rod.png",
+  exotics: "/generated_images/exotic_supercar.png",
+  diesel: "/generated_images/diesel_commercial_truck.png",
+  powersports: "/generated_images/atv_and_utv.png",
+  generators: "/generated_images/generator_power.png",
+  rc: "/generated_images/rc_hobby_vehicles.png",
+  drones: "/generated_images/drones_fpv.png",
+};
 
 interface VendorWithUrl {
   vendor: VendorInfo;
   searchUrl: string;
   isAffiliate: boolean;
-}
-
-function PartComparisonCard({ part, index, requireAuth }: { part: PartResult; index: number; requireAuth: (action: () => void, featureName?: string) => void }) {
-  const [expanded, setExpanded] = useState(index === 0);
-  const lowestPrice = Math.min(...part.prices.map(p => p.price));
-  const highestPrice = Math.max(...part.prices.map(p => p.price));
-  const savings = highestPrice - lowestPrice;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-    >
-      <Card className="glass-card border-border hover:border-primary/30 transition-all overflow-hidden" data-testid={`card-part-${part.id}`}>
-        <div className="p-4 md:p-5">
-          <div className="flex gap-4">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-white/5 shrink-0">
-              <img src={part.image} alt={part.name} className="w-full h-full object-cover" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <h3 className="font-tech font-bold text-sm md:text-base text-white truncate">{part.name}</h3>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-primary/30 text-primary font-mono">
-                      {part.partNumber}
-                    </Badge>
-                    <span className="text-[10px] text-muted-foreground">{part.fitment}</span>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="text-lg md:text-xl font-bold text-primary font-mono">${lowestPrice.toFixed(2)}</div>
-                  {savings > 0 && (
-                    <div className="text-[10px] text-green-400 flex items-center gap-1 justify-end">
-                      <TrendingDown className="w-3 h-3" />
-                      Save ${savings.toFixed(2)}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 mt-2">
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={`w-3 h-3 ${i < Math.floor(part.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-white/20'}`} />
-                  ))}
-                  <span className="text-[10px] text-muted-foreground ml-1">{part.rating} ({part.reviews.toLocaleString()})</span>
-                </div>
-                <Badge variant="outline" className="text-[9px] h-4 border-green-500/30 text-green-400">
-                  {part.prices.length} stores
-                </Badge>
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="w-full mt-3 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground hover:text-primary transition-colors"
-            data-testid={`button-expand-part-${part.id}`}
-          >
-            <span className="font-mono uppercase">Compare {part.prices.length} Prices</span>
-            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
-
-          <AnimatePresence>
-            {expanded && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="mt-3 space-y-2">
-                  {part.prices
-                    .sort((a, b) => a.price - b.price)
-                    .map((price, pi) => (
-                    <div
-                      key={pi}
-                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer hover:border-primary/50 ${
-                        pi === 0
-                          ? 'bg-primary/5 border-primary/20'
-                          : 'bg-white/[0.02] border-white/5'
-                      }`}
-                      onClick={() => requireAuth(() => {
-                        const storeUrl = getStoreUrl(price.store, part.partNumber, part.name);
-                        trackClick(price.store, part.name, storeUrl, 'price_comparison');
-                        window.open(storeUrl, '_blank', 'noopener,noreferrer');
-                      }, "compare prices across retailers")}
-                      data-testid={`price-row-${part.id}-${pi}`}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-tech font-bold text-sm text-white">{price.store}</span>
-                          {pi === 0 && (
-                            <Badge className="text-[8px] h-4 px-1.5 bg-primary/20 text-primary border-primary/30">
-                              BEST PRICE
-                            </Badge>
-                          )}
-                          {price.inStock && (
-                            <Badge variant="outline" className="text-[8px] h-4 px-1 border-green-500/30 text-green-400">
-                              IN STOCK
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 mt-1">
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            {price.location.includes("mi") ? <MapPin className="w-2.5 h-2.5 text-green-400" /> : <Globe className="w-2.5 h-2.5 text-blue-400" />}
-                            {price.location}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            <Truck className="w-2.5 h-2.5" /> {price.shipping}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`font-mono font-bold text-base ${pi === 0 ? 'text-primary' : 'text-white'}`}>
-                          ${price.price.toFixed(2)}
-                        </span>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </Card>
-    </motion.div>
-  );
 }
 
 function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: { vendorWithUrl: VendorWithUrl; displayQuery: string; requireAuth: (action: () => void, featureName?: string) => void; index: number }) {
@@ -303,10 +322,139 @@ function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: {
           className="h-8 px-3 text-[10px] font-tech uppercase text-primary hover:bg-primary hover:text-black shrink-0 gap-1"
           data-testid={`button-go-${vendor.slug}`}
         >
-          Go to Part <ExternalLink className="w-3 h-3" />
+          Search Store <ExternalLink className="w-3 h-3" />
         </Button>
       </div>
     </motion.div>
+  );
+}
+
+function VehicleTypeBrowse({ vehicleType, onSearch }: { vehicleType: string; onSearch: (query: string) => void }) {
+  const typeLabel = VEHICLE_TYPE_LABELS[vehicleType] || vehicleType;
+  const searches = VEHICLE_TYPE_SEARCHES[vehicleType] || VEHICLE_TYPE_SEARCHES['cars'] || [];
+  const heroImage = VEHICLE_TYPE_IMAGES[vehicleType];
+
+  const relevantCategories = CATEGORIES.filter(cat => {
+    const universalCats = ['brakes', 'engine', 'electrical', 'filters', 'oilfluids', 'tools', 'ignition', 'batteries'];
+    const boatCats = ['marine', 'propellers'];
+    const powersportsCats = ['powersports'];
+    
+    if (['boats', 'jetskis'].includes(vehicleType)) {
+      return [...universalCats, ...boatCats].includes(cat.id);
+    }
+    if (['atvs', 'utvs', 'motorcycles', 'snowmobiles', 'gokarts'].includes(vehicleType)) {
+      return [...universalCats, ...powersportsCats].includes(cat.id);
+    }
+    if (['rc', 'drones', 'modelaircraft', 'slotcars'].includes(vehicleType)) {
+      return ['rcelectronics', 'propellers', 'lipobatteries', 'rcbodies', 'tools'].includes(cat.id);
+    }
+    return universalCats.includes(cat.id) || ['suspension', 'exhaust', 'cooling', 'steering', 'transmission', 'body', 'tireswheels', 'beltshoses', 'lighting'].includes(cat.id);
+  }).slice(0, 8);
+
+  return (
+    <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative rounded-xl overflow-hidden"
+      >
+        {heroImage && (
+          <div className="absolute inset-0">
+            <img src={heroImage} alt={typeLabel} className="w-full h-full object-cover opacity-30" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40" />
+          </div>
+        )}
+        <div className="relative p-6 md:p-8">
+          <h2 className="font-tech text-2xl md:text-3xl font-bold text-white mb-2" data-testid="text-browse-title">
+            {typeLabel} Parts
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Search across {VENDORS.length}+ retailers for {typeLabel.toLowerCase()} parts, accessories, and supplies
+          </p>
+          <div className="flex gap-2 max-w-lg">
+            <Input
+              placeholder={`Search ${typeLabel.toLowerCase()} parts...`}
+              className="h-11 bg-black/40 border-white/15 focus:border-primary/50 text-sm"
+              data-testid="input-browse-search"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
+                  onSearch((e.target as HTMLInputElement).value.trim());
+                }
+              }}
+            />
+            <Button
+              className="h-11 px-4 btn-cyber shrink-0"
+              onClick={() => {
+                const input = document.querySelector('[data-testid="input-browse-search"]') as HTMLInputElement;
+                if (input?.value.trim()) onSearch(input.value.trim());
+              }}
+              data-testid="button-browse-search"
+            >
+              <Search className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+
+      <section>
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="w-5 h-5 text-primary" />
+          <h3 className="font-tech text-lg font-bold uppercase text-white" data-testid="text-popular-parts">Popular {typeLabel} Parts</h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {searches.map((s, i) => (
+            <motion.div
+              key={s.query}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04 }}
+            >
+              <button
+                className="w-full p-3 rounded-lg glass-card border border-white/5 hover:border-primary/40 transition-all text-left group"
+                onClick={() => onSearch(s.query)}
+                data-testid={`button-popular-${s.label.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                <span className="font-tech text-sm text-white group-hover:text-primary transition-colors">{s.label}</span>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="text-[9px] text-muted-foreground font-mono">SEARCH</span>
+                  <ArrowRight className="w-2.5 h-2.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {relevantCategories.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Package className="w-5 h-5 text-muted-foreground" />
+            <h3 className="font-tech text-base font-bold uppercase text-muted-foreground">Browse by Category</h3>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {relevantCategories.map((cat, i) => (
+              <motion.div
+                key={cat.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.03 }}
+              >
+                <Link href={`/results?category=${cat.id}&type=${vehicleType}&q=${encodeURIComponent(cat.name)}`}>
+                  <div className="relative rounded-lg overflow-hidden h-24 cursor-pointer group" data-testid={`category-card-${cat.id}`}>
+                    <img src={cat.image} alt={cat.name} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-70 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                    <div className="absolute inset-0 border border-white/10 rounded-lg group-hover:border-primary/40 transition-colors" />
+                    <div className="absolute bottom-2 left-3">
+                      <span className="font-tech text-xs uppercase text-white drop-shadow-lg">{cat.name}</span>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 }
 
@@ -330,6 +478,8 @@ export default function Results() {
   const [showAftermarketOnly, setShowAftermarketOnly] = useState(false);
   const [showAllVendors, setShowAllVendors] = useState(false);
 
+  const hasSearchQuery = !!(query || partNumber || category);
+
   const { data: searchResults } = useQuery({
     queryKey: ['search', query, partNumber, year, make, model, category],
     queryFn: async () => {
@@ -349,10 +499,14 @@ export default function Results() {
       if (!res.ok) throw new Error('Failed to search');
       return res.json();
     },
-    enabled: !!(query || partNumber),
+    enabled: hasSearchQuery,
   });
 
   useEffect(() => {
+    if (!hasSearchQuery) {
+      setIsLoading(false);
+      return;
+    }
     let step = 0;
     const interval = setInterval(() => {
       step++;
@@ -362,25 +516,13 @@ export default function Results() {
     }, 250);
     const timer = setTimeout(() => setIsLoading(false), 2000);
     return () => { clearTimeout(timer); clearInterval(interval); };
-  }, []);
+  }, [hasSearchQuery]);
 
-  const displayQuery = query || partNumber || 'Parts Search';
+  const displayQuery = query || partNumber || category || '';
   const vehicleLabel = [year, make, model].filter(Boolean).join(' ');
 
-  const matchingParts = useMemo(() => {
-    const searchLower = (query || partNumber || '').toLowerCase();
-    return MOCK_RESULTS.filter(part => {
-      const nameMatch = part.name.toLowerCase().includes(searchLower);
-      const pnMatch = part.partNumber.toLowerCase().includes(searchLower);
-      const fitmentMatch = part.fitment.toLowerCase().includes(searchLower);
-      const categoryMatch = searchLower.split(' ').some(word =>
-        part.name.toLowerCase().includes(word) || part.fitment.toLowerCase().includes(word)
-      );
-      return nameMatch || pnMatch || fitmentMatch || categoryMatch;
-    });
-  }, [query, partNumber]);
-
   const vendorsWithUrls = useMemo((): VendorWithUrl[] => {
+    const searchTerm = displayQuery || (vehicleType ? VEHICLE_TYPE_LABELS[vehicleType] || vehicleType : '');
     let vendors = vehicleType
       ? VENDORS.filter(v => v.categories.includes(vehicleType) || v.categories.includes('cars'))
       : VENDORS;
@@ -392,7 +534,7 @@ export default function Results() {
     return vendors
       .map(vendor => ({
         vendor,
-        searchUrl: generateVendorSearchUrl(vendor, query || partNumber || '', { year, make, model, zip: zipCode }),
+        searchUrl: generateVendorSearchUrl(vendor, searchTerm, { year, make, model, zip: zipCode }),
         isAffiliate: isAffiliatePartner(vendor),
       }))
       .sort((a, b) => {
@@ -402,24 +544,36 @@ export default function Results() {
         if (!a.vendor.hasLocalPickup && b.vendor.hasLocalPickup) return 1;
         return b.vendor.priority - a.vendor.priority;
       });
-  }, [vehicleType, query, partNumber, year, make, model, zipCode, showLocalOnly, showOEMOnly, showAftermarketOnly]);
+  }, [vehicleType, displayQuery, year, make, model, zipCode, showLocalOnly, showOEMOnly, showAftermarketOnly]);
 
   const affiliateVendors = vendorsWithUrls.filter(v => v.isAffiliate);
   const otherVendors = vendorsWithUrls.filter(v => !v.isAffiliate);
   const displayedOtherVendors = showAllVendors ? otherVendors : otherVendors.slice(0, 6);
+
+  const handleBrowseSearch = (searchQuery: string) => {
+    const newParams = new URLSearchParams();
+    newParams.set('q', searchQuery);
+    if (vehicleType) newParams.set('type', vehicleType);
+    if (year) newParams.set('year', year);
+    if (make) newParams.set('make', make);
+    if (model) newParams.set('model', model);
+    window.location.href = `/results?${newParams.toString()}`;
+  };
+
+  const isBrowseMode = vehicleType && !hasSearchQuery;
+  const contextLabel = displayQuery || (VEHICLE_TYPE_LABELS[vehicleType] || vehicleType || 'Parts Search');
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
       <div className="pt-[85px] lg:pt-[80px] min-h-[calc(100vh-5rem)] w-full pb-16">
-        {/* Vehicle Context Bar */}
         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b border-primary/10">
           <div className="container mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex items-center gap-2">
                 <Car className="w-4 h-4 text-primary" />
-                <span className="font-tech text-sm font-bold text-white uppercase">{displayQuery}</span>
+                <span className="font-tech text-sm font-bold text-white uppercase" data-testid="text-context-query">{contextLabel}</span>
               </div>
               {vehicleLabel && (
                 <Badge variant="outline" className="font-mono text-[10px] border-green-500/30 text-green-400">
@@ -428,7 +582,7 @@ export default function Results() {
               )}
               {vehicleType && (
                 <Badge variant="outline" className="font-mono text-[10px] border-blue-500/30 text-blue-400">
-                  {vehicleType.toUpperCase()}
+                  {(VEHICLE_TYPE_LABELS[vehicleType] || vehicleType).toUpperCase()}
                 </Badge>
               )}
             </div>
@@ -436,15 +590,18 @@ export default function Results() {
               <Badge variant="outline" className="font-mono text-[10px] border-primary/30 text-primary">
                 <Zap className="w-3 h-3 mr-1" /> {vendorsWithUrls.length} RETAILERS MATCHED
               </Badge>
-              <PriceAlertButton partName={displayQuery} partNumber={partNumber || undefined} />
-              <ShareButton partName={displayQuery} vendorName="GarageBot" searchUrl={window.location.href} />
+              {hasSearchQuery && (
+                <>
+                  <PriceAlertButton partName={contextLabel} partNumber={partNumber || undefined} />
+                  <ShareButton partName={contextLabel} vendorName="GarageBot" searchUrl={window.location.href} />
+                </>
+              )}
             </div>
           </div>
         </div>
 
         <div className="container mx-auto px-4 mt-6">
           <div className="grid grid-cols-12 gap-6">
-            {/* Left Sidebar - Filters */}
             <div className="hidden lg:block col-span-3">
               <div className="sticky top-24 space-y-4">
                 <div className="p-4 rounded-lg bg-white/[0.02] border border-white/5">
@@ -533,9 +690,8 @@ export default function Results() {
               </div>
             </div>
 
-            {/* Main Content */}
             <div className="col-span-12 lg:col-span-9">
-              {isLoading ? (
+              {isLoading && hasSearchQuery ? (
                 <div className="py-16">
                   <div className="max-w-md mx-auto text-center">
                     <div className="relative w-20 h-20 mx-auto mb-6">
@@ -552,33 +708,16 @@ export default function Results() {
                     </div>
                   </div>
                 </div>
+              ) : isBrowseMode ? (
+                <VehicleTypeBrowse vehicleType={vehicleType} onSearch={handleBrowseSearch} />
               ) : (
                 <div className="space-y-6">
-                  {/* Part Comparison Cards - the real value */}
-                  {matchingParts.length > 0 && (
-                    <section>
-                      <div className="flex items-center gap-2 mb-4">
-                        <Award className="w-5 h-5 text-primary" />
-                        <h2 className="font-tech text-lg font-bold uppercase text-white">Price Comparison</h2>
-                        <Badge variant="outline" className="text-[9px] border-primary/30 text-primary ml-auto">
-                          {matchingParts.length} parts found
-                        </Badge>
-                      </div>
-                      <div className="space-y-4">
-                        {matchingParts.map((part, index) => (
-                          <PartComparisonCard key={part.id} part={part} index={index} requireAuth={requireAuth} />
-                        ))}
-                      </div>
-                    </section>
-                  )}
-
-                  {/* Affiliate Partner Retailers - revenue generators at top */}
                   {affiliateVendors.length > 0 && (
                     <section>
                       <div className="flex items-center gap-2 mb-4">
                         <Tag className="w-5 h-5 text-primary" />
-                        <h2 className="font-tech text-lg font-bold uppercase text-white">
-                          {matchingParts.length > 0 ? 'Search More Partner Retailers' : 'Partner Retailers'}
+                        <h2 className="font-tech text-lg font-bold uppercase text-white" data-testid="text-partner-retailers">
+                          Partner Retailers
                         </h2>
                         <Badge variant="outline" className="text-[9px] border-green-500/30 text-green-400 ml-auto">
                           <DollarSign className="w-3 h-3 mr-0.5" /> {affiliateVendors.length} partners
@@ -595,12 +734,11 @@ export default function Results() {
                     </section>
                   )}
 
-                  {/* Other Retailers */}
                   {otherVendors.length > 0 && (
                     <section>
                       <div className="flex items-center gap-2 mb-4">
                         <Store className="w-5 h-5 text-muted-foreground" />
-                        <h2 className="font-tech text-base font-bold uppercase text-muted-foreground">More Retailers</h2>
+                        <h2 className="font-tech text-base font-bold uppercase text-muted-foreground" data-testid="text-more-retailers">More Retailers</h2>
                         <Badge variant="outline" className="text-[9px] border-white/20 text-muted-foreground ml-auto">
                           {otherVendors.length} stores
                         </Badge>
@@ -624,8 +762,7 @@ export default function Results() {
                     </section>
                   )}
 
-                  {/* No Results */}
-                  {matchingParts.length === 0 && vendorsWithUrls.length === 0 && (
+                  {vendorsWithUrls.length === 0 && (
                     <div className="text-center py-20">
                       <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="font-tech text-xl mb-2">No Retailers Found</h3>
@@ -633,7 +770,6 @@ export default function Results() {
                     </div>
                   )}
 
-                  {/* Mobile Filters */}
                   <div className="lg:hidden p-4 rounded bg-white/5 border border-white/5">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <span className="text-xs font-mono text-muted-foreground">FILTERS:</span>
@@ -662,12 +798,10 @@ export default function Results() {
                     </div>
                   </div>
 
-                  {/* Mobile Fun Facts */}
                   <div className="lg:hidden">
                     <VehicleFunFacts query={query} make={make} model={model} vehicleType={vehicleType} />
                   </div>
 
-                  {/* Info Banner */}
                   <div className="p-4 rounded-lg bg-gradient-to-r from-primary/5 to-transparent border border-primary/10">
                     <div className="flex items-start gap-3">
                       <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
