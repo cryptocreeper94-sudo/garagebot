@@ -32,36 +32,40 @@ interface NativeProductRecsProps {
   title?: string;
 }
 
+function amazonSearchUrl(query: string): string {
+  return `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=garagebot0e-20`;
+}
+
 const CONTEXTUAL_PRODUCTS: Record<string, ProductRec[]> = {
   tools: [
-    { id: "t1", title: "Professional Mechanic Tool Set - 230pc", brand: "DEWALT", description: "Chrome vanadium steel, lifetime warranty", price: "$199.99", originalPrice: "$279.99", rating: 4.8, reviewCount: 2340, affiliateUrl: "#", tag: "Best Seller", category: "tools" },
-    { id: "t2", title: "Digital Torque Wrench 1/2\" Drive", brand: "GEARWRENCH", description: "Electronic torque & angle, buzzer alert", price: "$89.99", rating: 4.7, reviewCount: 1120, affiliateUrl: "#", category: "tools" },
-    { id: "t3", title: "OBD2 Scanner - Full System Diagnostic", brand: "FOXWELL", description: "ABS, SRS, transmission, engine codes", price: "$59.99", originalPrice: "$89.99", rating: 4.6, reviewCount: 3450, affiliateUrl: "#", tag: "Top Pick", category: "tools" },
-    { id: "t4", title: "3-Ton Low Profile Floor Jack", brand: "PITTSBURGH", description: "Quick lift, rapid pump, safety valve", price: "$129.99", rating: 4.5, reviewCount: 890, affiliateUrl: "#", category: "tools" },
+    { id: "t1", title: "Professional Mechanic Tool Set - 230pc", brand: "DEWALT", description: "Chrome vanadium steel, lifetime warranty", price: "$199.99", originalPrice: "$279.99", rating: 4.8, reviewCount: 2340, affiliateUrl: amazonSearchUrl("DEWALT mechanic tool set 230 piece"), tag: "Best Seller", category: "tools" },
+    { id: "t2", title: "Digital Torque Wrench 1/2\" Drive", brand: "GEARWRENCH", description: "Electronic torque & angle, buzzer alert", price: "$89.99", rating: 4.7, reviewCount: 1120, affiliateUrl: amazonSearchUrl("GEARWRENCH digital torque wrench"), category: "tools" },
+    { id: "t3", title: "OBD2 Scanner - Full System Diagnostic", brand: "FOXWELL", description: "ABS, SRS, transmission, engine codes", price: "$59.99", originalPrice: "$89.99", rating: 4.6, reviewCount: 3450, affiliateUrl: amazonSearchUrl("FOXWELL OBD2 scanner full system"), tag: "Top Pick", category: "tools" },
+    { id: "t4", title: "3-Ton Low Profile Floor Jack", brand: "PITTSBURGH", description: "Quick lift, rapid pump, safety valve", price: "$129.99", rating: 4.5, reviewCount: 890, affiliateUrl: amazonSearchUrl("3 ton low profile floor jack"), category: "tools" },
   ],
   safety: [
-    { id: "s1", title: "Mechanic Work Gloves - Cut Resistant", brand: "MECHANIX", description: "Impact protection, touchscreen capable", price: "$24.99", rating: 4.9, reviewCount: 5670, affiliateUrl: "#", tag: "Most Popular", category: "safety" },
-    { id: "s2", title: "Safety Glasses - Anti-Fog", brand: "3M", description: "ANSI Z87.1 rated, UV protection", price: "$12.99", rating: 4.7, reviewCount: 8900, affiliateUrl: "#", category: "safety" },
-    { id: "s3", title: "Mechanics Creeper - Padded", brand: "TORIN", description: "6 casters, 350lb capacity, headrest", price: "$44.99", originalPrice: "$59.99", rating: 4.6, reviewCount: 1230, affiliateUrl: "#", category: "safety" },
+    { id: "s1", title: "Mechanic Work Gloves - Cut Resistant", brand: "MECHANIX", description: "Impact protection, touchscreen capable", price: "$24.99", rating: 4.9, reviewCount: 5670, affiliateUrl: amazonSearchUrl("Mechanix Wear mechanic gloves cut resistant"), tag: "Most Popular", category: "safety" },
+    { id: "s2", title: "Safety Glasses - Anti-Fog", brand: "3M", description: "ANSI Z87.1 rated, UV protection", price: "$12.99", rating: 4.7, reviewCount: 8900, affiliateUrl: amazonSearchUrl("3M safety glasses anti fog"), category: "safety" },
+    { id: "s3", title: "Mechanics Creeper - Padded", brand: "TORIN", description: "6 casters, 350lb capacity, headrest", price: "$44.99", originalPrice: "$59.99", rating: 4.6, reviewCount: 1230, affiliateUrl: amazonSearchUrl("TORIN mechanics creeper padded"), category: "safety" },
   ],
   garage: [
-    { id: "g1", title: "5-Shelf Steel Garage Storage", brand: "HUSKY", description: "Heavy duty, 4000lb capacity, adjustable", price: "$89.99", rating: 4.7, reviewCount: 3400, affiliateUrl: "#", tag: "Best Value", category: "garage" },
-    { id: "g2", title: "LED Shop Light 4ft - 5000K Daylight", brand: "LITHONIA", description: "10,000 lumens, linkable, pull chain", price: "$34.99", rating: 4.8, reviewCount: 6700, affiliateUrl: "#", category: "garage" },
-    { id: "g3", title: "Rolling Tool Cabinet - 15 Drawer", brand: "CRAFTSMAN", description: "Ball-bearing slides, power strip, keyed lock", price: "$449.99", originalPrice: "$599.99", rating: 4.9, reviewCount: 2100, affiliateUrl: "#", tag: "Pro Choice", category: "garage" },
+    { id: "g1", title: "5-Shelf Steel Garage Storage", brand: "HUSKY", description: "Heavy duty, 4000lb capacity, adjustable", price: "$89.99", rating: 4.7, reviewCount: 3400, affiliateUrl: amazonSearchUrl("Husky 5 shelf steel garage storage"), tag: "Best Value", category: "garage" },
+    { id: "g2", title: "LED Shop Light 4ft - 5000K Daylight", brand: "LITHONIA", description: "10,000 lumens, linkable, pull chain", price: "$34.99", rating: 4.8, reviewCount: 6700, affiliateUrl: amazonSearchUrl("LED shop light 4ft 5000K"), category: "garage" },
+    { id: "g3", title: "Rolling Tool Cabinet - 15 Drawer", brand: "CRAFTSMAN", description: "Ball-bearing slides, power strip, keyed lock", price: "$449.99", originalPrice: "$599.99", rating: 4.9, reviewCount: 2100, affiliateUrl: amazonSearchUrl("Craftsman rolling tool cabinet 15 drawer"), tag: "Pro Choice", category: "garage" },
   ],
   outdoor: [
-    { id: "o1", title: "Portable Jump Starter 2000A Peak", brand: "NOCO", description: "Gas & diesel engines, USB power bank", price: "$99.99", rating: 4.8, reviewCount: 12000, affiliateUrl: "#", tag: "Essential", category: "outdoor" },
-    { id: "o2", title: "12V Tire Inflator - Digital", brand: "VIAIR", description: "150 PSI, auto shutoff, LED light", price: "$49.99", rating: 4.6, reviewCount: 4500, affiliateUrl: "#", category: "outdoor" },
-    { id: "o3", title: "Roadside Emergency Kit - 123pc", brand: "AAA", description: "First aid, jumper cables, flashlight, tools", price: "$39.99", rating: 4.7, reviewCount: 3200, affiliateUrl: "#", category: "outdoor" },
+    { id: "o1", title: "Portable Jump Starter 2000A Peak", brand: "NOCO", description: "Gas & diesel engines, USB power bank", price: "$99.99", rating: 4.8, reviewCount: 12000, affiliateUrl: amazonSearchUrl("NOCO portable jump starter 2000A"), tag: "Essential", category: "outdoor" },
+    { id: "o2", title: "12V Tire Inflator - Digital", brand: "VIAIR", description: "150 PSI, auto shutoff, LED light", price: "$49.99", rating: 4.6, reviewCount: 4500, affiliateUrl: amazonSearchUrl("VIAIR 12V tire inflator digital"), category: "outdoor" },
+    { id: "o3", title: "Roadside Emergency Kit - 123pc", brand: "AAA", description: "First aid, jumper cables, flashlight, tools", price: "$39.99", rating: 4.7, reviewCount: 3200, affiliateUrl: amazonSearchUrl("roadside emergency kit automotive"), category: "outdoor" },
   ],
   marine: [
-    { id: "m1", title: "Marine Battery Charger - 3 Bank", brand: "MINN KOTA", description: "Onboard charger, auto sensing, waterproof", price: "$219.99", rating: 4.7, reviewCount: 890, affiliateUrl: "#", tag: "Top Rated", category: "marine" },
-    { id: "m2", title: "Boat Trailer Guide-On - 60\"", brand: "CE SMITH", description: "Galvanized steel, carpet pads, adjustable", price: "$79.99", rating: 4.5, reviewCount: 560, affiliateUrl: "#", category: "marine" },
+    { id: "m1", title: "Marine Battery Charger - 3 Bank", brand: "MINN KOTA", description: "Onboard charger, auto sensing, waterproof", price: "$219.99", rating: 4.7, reviewCount: 890, affiliateUrl: amazonSearchUrl("Minn Kota marine battery charger 3 bank"), tag: "Top Rated", category: "marine" },
+    { id: "m2", title: "Boat Trailer Guide-On - 60\"", brand: "CE SMITH", description: "Galvanized steel, carpet pads, adjustable", price: "$79.99", rating: 4.5, reviewCount: 560, affiliateUrl: amazonSearchUrl("CE Smith boat trailer guide on"), category: "marine" },
   ],
   aviation: [
-    { id: "a1", title: "Aviation Headset - Active Noise Cancelling", brand: "DAVID CLARK", description: "ANR, Bluetooth, comfort gel ear seals", price: "$795.00", rating: 4.9, reviewCount: 2340, affiliateUrl: "#", tag: "Pilot Favorite", category: "aviation" },
-    { id: "a2", title: "Aircraft Engine Oil - Aeroshell W100", brand: "SHELL", description: "Single grade, ashless dispersant", price: "$12.49", rating: 4.8, reviewCount: 670, affiliateUrl: "#", category: "aviation" },
-    { id: "a3", title: "Portable Aviation GPS", brand: "GARMIN", description: "Aera 760, touchscreen, weather, terrain", price: "$1,649.00", rating: 4.7, reviewCount: 340, affiliateUrl: "#", tag: "Pro Pick", category: "aviation" },
+    { id: "a1", title: "Aviation Headset - Active Noise Cancelling", brand: "DAVID CLARK", description: "ANR, Bluetooth, comfort gel ear seals", price: "$795.00", rating: 4.9, reviewCount: 2340, affiliateUrl: amazonSearchUrl("David Clark aviation headset ANR"), tag: "Pilot Favorite", category: "aviation" },
+    { id: "a2", title: "Aircraft Engine Oil - Aeroshell W100", brand: "SHELL", description: "Single grade, ashless dispersant", price: "$12.49", rating: 4.8, reviewCount: 670, affiliateUrl: amazonSearchUrl("AeroShell W100 aviation oil"), category: "aviation" },
+    { id: "a3", title: "Portable Aviation GPS", brand: "GARMIN", description: "Aera 760, touchscreen, weather, terrain", price: "$1,649.00", rating: 4.7, reviewCount: 340, affiliateUrl: amazonSearchUrl("Garmin Aera 760 aviation GPS"), tag: "Pro Pick", category: "aviation" },
   ],
 };
 

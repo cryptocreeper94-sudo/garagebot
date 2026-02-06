@@ -93,7 +93,22 @@ interface EnhancedVendorResult {
 }
 
 function VendorCard({ result, index, displayQuery, requireAuth }: { result: EnhancedVendorResult; index: number; displayQuery: string; requireAuth: (action: () => void, featureName?: string) => void }) {
-  const openLink = () => window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
+  const openLink = () => {
+    fetch('/api/affiliates/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        partnerId: result.vendor.id,
+        productName: displayQuery,
+        searchQuery: displayQuery,
+        sourceUrl: window.location.href,
+        destinationUrl: result.searchUrl,
+        clickContext: 'search_results',
+      }),
+    }).catch(() => {});
+    window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
+  };
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -620,7 +635,15 @@ export default function Results() {
                     >
                       <Card 
                         className="glass-card card-3d border-border hover:border-primary/50 transition-all group cursor-pointer"
-                        onClick={() => requireAuth(() => window.open(result.searchUrl, '_blank', 'noopener,noreferrer'), "compare prices across retailers")}
+                        onClick={() => requireAuth(() => {
+                          fetch('/api/affiliates/track', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ partnerId: result.vendor.id, searchQuery: displayQuery, sourceUrl: window.location.href, clickContext: 'search_results_list' }),
+                          }).catch(() => {});
+                          window.open(result.searchUrl, '_blank', 'noopener,noreferrer');
+                        }, "compare prices across retailers")}
                         data-testid={`list-vendor-${result.vendor.slug}`}
                       >
                         <div className="p-3 flex items-center gap-3">
