@@ -81,6 +81,15 @@ Preferred communication style: Simple, everyday language.
 ## CDL & Trucking Company Directory
 - **Functionality**: A portable directory (`/cdl-directory`) of trucking companies and CDL programs with search, filter, and interest/referral forms.
 
+## Signal Chat (Community Messaging)
+- **Route**: `/chat` — Full-featured community chat integrated into GarageBot.
+- **Backend**: 17 database tables (communities, channels, members, messages, bots, reactions, attachments, DMs, polls, roles, threads, pins, etc.), CommunityHubService with 36 CRUD methods, 24 REST API endpoints, WebSocket layer at `/ws/chat` with session-based auth.
+- **Frontend**: SignalChat page with real-time messaging via `useSignalChat` hook, Deep Space themed UI with glassmorphism and cyan accents.
+- **Buddy AI Bot**: Auto-responds in `#garagebot-support` channel using OpenAI GPT-4o-mini, flags messages for human escalation when needed (billing, refund, security, etc.).
+- **Auto-Seeding**: GarageBot community with `#general`, `#garagebot-support`, and `#announcements` channels created automatically on startup.
+- **Auth Gating**: Unauthenticated users see a login prompt; authenticated users auto-join the GarageBot community.
+- **Key Files**: `server/services/community-hub-service.ts`, `server/services/chat-websocket.ts`, `server/services/buddy-chat-bot.ts`, `server/chat-routes.ts`, `client/src/pages/SignalChat.tsx`, `client/src/hooks/useSignalChat.ts`, `shared/chat-types.ts`.
+
 ## Shade Tree Mechanics (DIY Community)
 - **Purpose**: A community hub (`/shade-tree`) for DIY enthusiasts, providing categorized repair guides, community tips, and estimated savings.
 

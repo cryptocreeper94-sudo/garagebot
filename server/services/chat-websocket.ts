@@ -18,10 +18,11 @@ interface ChannelSubscription {
 const channels = new Map<string, Set<AuthenticatedSocket>>();
 const userSockets = new Map<string, Set<AuthenticatedSocket>>();
 
+const sessionPool = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
+
 async function getSessionUser(sid: string): Promise<{ userId: string; username: string } | null> {
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
   try {
-    const result = await pool.query("SELECT sess FROM sessions WHERE sid = $1 AND expire > NOW()", [sid]);
+    const result = await sessionPool.query("SELECT sess FROM sessions WHERE sid = $1 AND expire > NOW()", [sid]);
     if (result.rows.length === 0) return null;
     const sess = typeof result.rows[0].sess === "string" ? JSON.parse(result.rows[0].sess) : result.rows[0].sess;
     const userId = sess.userId;
@@ -30,8 +31,6 @@ async function getSessionUser(sid: string): Promise<{ userId: string; username: 
   } catch (e) {
     console.error("[ChatWS] Session lookup error:", e);
     return null;
-  } finally {
-    await pool.end();
   }
 }
 
