@@ -45,9 +45,13 @@ export default function Footer() {
             <span className="font-mono text-primary/80">v1.0.0</span>
           )}
           <span className="hidden sm:inline text-border">|</span>
-          <Link href="/investors" className="hover:text-primary transition-colors" data-testid="footer-link-investors">Investors</Link>
+          <Link href="/about" className="hover:text-primary transition-colors" data-testid="footer-link-about">About</Link>
+          <Link href="/contact" className="hover:text-primary transition-colors" data-testid="footer-link-contact">Contact</Link>
           <Link href="/terms" className="hover:text-primary transition-colors" data-testid="footer-link-terms">Terms</Link>
           <Link href="/privacy" className="hover:text-primary transition-colors" data-testid="footer-link-privacy">Privacy</Link>
+          <Link href="/affiliate-disclosure" className="hover:text-primary transition-colors" data-testid="footer-link-affiliate">Affiliates</Link>
+          <Link href="/investors" className="hover:text-primary transition-colors" data-testid="footer-link-investors">Investors</Link>
+          <Link href="/support" className="hover:text-primary transition-colors" data-testid="footer-link-support">Support</Link>
           <Link href="/break-room" className="hover:text-primary transition-colors" data-testid="footer-link-breakroom">Break Room</Link>
           <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
           <Link href="/dev" className="hover:text-primary transition-colors" data-testid="footer-link-dev">Dev</Link>
