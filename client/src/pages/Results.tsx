@@ -380,6 +380,7 @@ function ProductCard({ product, index, requireAuth, searchQuery }: { product: Pr
         }`}
         onClick={() => requireAuth(handleClick, "compare prices")}
         data-testid={`product-card-${product.id}`}
+        data-href={product.affiliateUrl || product.productUrl}
       >
         {index === 0 && hasPrice && (
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-500 via-primary to-green-500" />
@@ -416,6 +417,12 @@ function ProductCard({ product, index, requireAuth, searchQuery }: { product: Pr
                   <Badge variant="outline" className="text-[7px] h-3 px-1 border-primary/30 text-primary">
                     PARTNER
                   </Badge>
+                )}
+                {product.price !== null && product.price > 0 && (
+                  <span className="flex items-center gap-0.5 text-[7px] font-mono text-green-400 uppercase">
+                    <span className="w-1 h-1 rounded-full bg-green-400 animate-pulse" />
+                    LIVE
+                  </span>
                 )}
               </div>
 
@@ -579,12 +586,22 @@ function PriceComparisonSection({ data, isLoading, searchQuery, requireAuth }: {
         </>
       )}
 
+      {productsWithPrices.length > 0 && (
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/5 border border-primary/10" data-testid="info-live-prices">
+          <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <p className="text-xs text-muted-foreground font-tech">
+            Prices shown are pulled live from retailer websites. Additional stores are linked below — we're actively building direct price feeds with more retailers to expand real-time comparisons.
+          </p>
+        </div>
+      )}
+
       {data.retailerLinks.length > 0 && (
         <div className="mt-4">
           <div className="flex items-center gap-2 mb-3">
             <Globe className="w-4 h-4 text-muted-foreground" />
             <h3 className="font-tech text-sm font-bold uppercase text-muted-foreground">Search All Retailers Directly</h3>
           </div>
+          <p className="text-[10px] text-muted-foreground mb-2">Click to check prices directly — live price feeds coming soon for these stores</p>
           <div className="flex flex-wrap gap-2">
             {data.retailerLinks.map((link) => (
               <Button

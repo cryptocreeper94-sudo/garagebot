@@ -292,7 +292,7 @@ async function fetchOReillyProducts(query: string, vehicle?: { year?: string; ma
   const zipParam = zipCode ? `?postalCode=${encodeURIComponent(zipCode)}` : '';
   const searchUrl = `https://www.oreillyauto.com/shop/b/${encodeURIComponent(fullQuery)}${zipParam}`;
 
-  return [{
+  const fallback: ProductResult = {
     id: 'oreilly-search',
     name: `Search O'Reilly for "${query}"`,
     price: null,
@@ -304,7 +304,54 @@ async function fetchOReillyProducts(query: string, vehicle?: { year?: string; ma
     shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
     isAffiliate: false,
     affiliateUrl: searchUrl,
-  }];
+  };
+
+  try {
+    const res = await fetchWithTimeout(searchUrl);
+    if (!res.ok) return [fallback];
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const products: ProductResult[] = [];
+
+    $('[class*="product-card"], [class*="product-list"] [class*="product"], .js-product-container, [data-product-id], .product-item, .search-result-item').each((i, el) => {
+      if (products.length >= 6) return false;
+      const $el = $(el);
+      const itemText = $el.text();
+
+      const name = $el.find('h2, h3, [class*="product-title"], [class*="product-name"], a[class*="title"]').first().text().trim()
+                   || $el.find('a').first().text().trim();
+      if (!name || name.length < 5) return;
+
+      const priceMatches = itemText.match(/\$(\d+[\.,]\d{2})/);
+      const price = priceMatches ? parseFloat(priceMatches[1].replace(',', '')) : null;
+
+      const imageUrl = $el.find('img').first().attr('src') || $el.find('img').first().attr('data-src') || undefined;
+      const itemUrl = $el.find('a').first().attr('href') || '';
+      const productUrl = itemUrl.startsWith('http') ? itemUrl : itemUrl ? `https://www.oreillyauto.com${itemUrl}` : searchUrl;
+
+      if (price && price > 0) {
+        products.push({
+          id: `oreilly-${products.length}`,
+          name: name.substring(0, 120),
+          price,
+          imageUrl: imageUrl?.startsWith('http') ? imageUrl : undefined,
+          productUrl,
+          retailer: "O'Reilly Auto Parts",
+          retailerSlug: 'oreilly',
+          retailerColor: '#00843D',
+          inStock: true,
+          shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
+          isAffiliate: false,
+          affiliateUrl: productUrl,
+        });
+      }
+    });
+
+    return products.length > 0 ? products : [fallback];
+  } catch (e) {
+    console.error('[PriceCompare] O\'Reilly fetch failed:', e);
+    return [fallback];
+  }
 }
 
 async function fetchAdvanceAutoProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }, zipCode?: string): Promise<ProductResult[]> {
@@ -312,7 +359,7 @@ async function fetchAdvanceAutoProducts(query: string, vehicle?: { year?: string
   const zipParam = zipCode ? `&storeId=&zipCode=${encodeURIComponent(zipCode)}` : '';
   const searchUrl = `https://shop.advanceautoparts.com/web/SearchResults?searchTerm=${encodeURIComponent(fullQuery)}${zipParam}`;
 
-  return [{
+  const fallback: ProductResult = {
     id: 'advance-search',
     name: `Search Advance Auto for "${query}"`,
     price: null,
@@ -324,7 +371,54 @@ async function fetchAdvanceAutoProducts(query: string, vehicle?: { year?: string
     shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
     isAffiliate: true,
     affiliateUrl: searchUrl,
-  }];
+  };
+
+  try {
+    const res = await fetchWithTimeout(searchUrl);
+    if (!res.ok) return [fallback];
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const products: ProductResult[] = [];
+
+    $('[class*="product-card"], [class*="product-list"] [class*="product"], [data-testid*="product"], .product-item, .search-result-item, [class*="ProductCard"]').each((i, el) => {
+      if (products.length >= 6) return false;
+      const $el = $(el);
+      const itemText = $el.text();
+
+      const name = $el.find('h2, h3, [class*="product-title"], [class*="product-name"], [class*="productName"], a[class*="title"]').first().text().trim()
+                   || $el.find('a').first().text().trim();
+      if (!name || name.length < 5) return;
+
+      const priceMatches = itemText.match(/\$(\d+[\.,]\d{2})/);
+      const price = priceMatches ? parseFloat(priceMatches[1].replace(',', '')) : null;
+
+      const imageUrl = $el.find('img').first().attr('src') || $el.find('img').first().attr('data-src') || undefined;
+      const itemUrl = $el.find('a').first().attr('href') || '';
+      const productUrl = itemUrl.startsWith('http') ? itemUrl : itemUrl ? `https://shop.advanceautoparts.com${itemUrl}` : searchUrl;
+
+      if (price && price > 0) {
+        products.push({
+          id: `advance-${products.length}`,
+          name: name.substring(0, 120),
+          price,
+          imageUrl: imageUrl?.startsWith('http') ? imageUrl : undefined,
+          productUrl,
+          retailer: 'Advance Auto Parts',
+          retailerSlug: 'advance',
+          retailerColor: '#CC0000',
+          inStock: true,
+          shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
+          isAffiliate: true,
+          affiliateUrl: productUrl,
+        });
+      }
+    });
+
+    return products.length > 0 ? products : [fallback];
+  } catch (e) {
+    console.error('[PriceCompare] Advance Auto fetch failed:', e);
+    return [fallback];
+  }
 }
 
 async function fetchNAPAProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }, zipCode?: string): Promise<ProductResult[]> {
@@ -332,7 +426,7 @@ async function fetchNAPAProducts(query: string, vehicle?: { year?: string; make?
   const zipParam = zipCode ? `&nearbyStoreZip=${encodeURIComponent(zipCode)}` : '';
   const searchUrl = `https://www.napaonline.com/en/search?q=${encodeURIComponent(fullQuery)}${zipParam}`;
 
-  return [{
+  const fallback: ProductResult = {
     id: 'napa-search',
     name: `Search NAPA for "${query}"`,
     price: null,
@@ -344,14 +438,61 @@ async function fetchNAPAProducts(query: string, vehicle?: { year?: string; make?
     shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
     isAffiliate: false,
     affiliateUrl: searchUrl,
-  }];
+  };
+
+  try {
+    const res = await fetchWithTimeout(searchUrl);
+    if (!res.ok) return [fallback];
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const products: ProductResult[] = [];
+
+    $('[class*="product-card"], [class*="product-tile"], [class*="ProductCard"], .product-item, .search-result-item, [data-product], [class*="product_card"]').each((i, el) => {
+      if (products.length >= 6) return false;
+      const $el = $(el);
+      const itemText = $el.text();
+
+      const name = $el.find('h2, h3, [class*="product-title"], [class*="product-name"], [class*="productName"], a[class*="title"], [class*="product_title"]').first().text().trim()
+                   || $el.find('a').first().text().trim();
+      if (!name || name.length < 5) return;
+
+      const priceMatches = itemText.match(/\$(\d+[\.,]\d{2})/);
+      const price = priceMatches ? parseFloat(priceMatches[1].replace(',', '')) : null;
+
+      const imageUrl = $el.find('img').first().attr('src') || $el.find('img').first().attr('data-src') || undefined;
+      const itemUrl = $el.find('a').first().attr('href') || '';
+      const productUrl = itemUrl.startsWith('http') ? itemUrl : itemUrl ? `https://www.napaonline.com${itemUrl}` : searchUrl;
+
+      if (price && price > 0) {
+        products.push({
+          id: `napa-${products.length}`,
+          name: name.substring(0, 120),
+          price,
+          imageUrl: imageUrl?.startsWith('http') ? imageUrl : undefined,
+          productUrl,
+          retailer: 'NAPA Auto Parts',
+          retailerSlug: 'napa',
+          retailerColor: '#003DA5',
+          inStock: true,
+          shipping: zipCode ? `Pickup near ${zipCode}` : 'Free Same-Day Pickup',
+          isAffiliate: false,
+          affiliateUrl: productUrl,
+        });
+      }
+    });
+
+    return products.length > 0 ? products : [fallback];
+  } catch (e) {
+    console.error('[PriceCompare] NAPA fetch failed:', e);
+    return [fallback];
+  }
 }
 
 async function fetchRockAutoProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }): Promise<ProductResult[]> {
   const fullQuery = buildSearchQuery(query, vehicle);
   const searchUrl = `https://www.rockauto.com/en/catalog/?a=${encodeURIComponent(fullQuery)}`;
 
-  return [{
+  const fallback: ProductResult = {
     id: 'rockauto-search',
     name: `Search RockAuto for "${query}"`,
     price: null,
@@ -363,7 +504,57 @@ async function fetchRockAutoProducts(query: string, vehicle?: { year?: string; m
     shipping: 'Ships nationwide',
     isAffiliate: false,
     affiliateUrl: searchUrl,
-  }];
+  };
+
+  try {
+    const res = await fetchWithTimeout(searchUrl);
+    if (!res.ok) return [fallback];
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const products: ProductResult[] = [];
+
+    $('tr[class*="listing"], [class*="product-listing"], .ra-listing-row, [class*="LISTING"], td[class*="listing"]').each((i, el) => {
+      if (products.length >= 8) return false;
+      const $el = $(el);
+      const itemText = $el.text();
+
+      const name = $el.find('a[class*="listing-description"], span[class*="listing-text"], a[class*="ra-"], a').first().text().trim();
+      if (!name || name.length < 5) return;
+
+      const priceMatches = itemText.match(/\$(\d+[\.,]\d{2})/);
+      const price = priceMatches ? parseFloat(priceMatches[1].replace(',', '')) : null;
+
+      const imageUrl = $el.find('img').first().attr('src') || $el.find('img').first().attr('data-src') || undefined;
+      const itemUrl = $el.find('a').first().attr('href') || '';
+      const productUrl = itemUrl.startsWith('http') ? itemUrl : itemUrl ? `https://www.rockauto.com${itemUrl}` : searchUrl;
+
+      const partNumMatch = itemText.match(/Part\s*#?\s*:?\s*([A-Z0-9\-]+)/i);
+      const partNumber = partNumMatch ? partNumMatch[1] : undefined;
+
+      if (price && price > 0) {
+        products.push({
+          id: `rockauto-${products.length}`,
+          name: name.substring(0, 120),
+          price,
+          imageUrl: imageUrl?.startsWith('http') ? imageUrl : undefined,
+          productUrl,
+          retailer: 'RockAuto',
+          retailerSlug: 'rockauto',
+          retailerColor: '#336699',
+          inStock: true,
+          shipping: 'Ships nationwide',
+          partNumber,
+          isAffiliate: false,
+          affiliateUrl: productUrl,
+        });
+      }
+    });
+
+    return products.length > 0 ? products : [fallback];
+  } catch (e) {
+    console.error('[PriceCompare] RockAuto fetch failed:', e);
+    return [fallback];
+  }
 }
 
 async function fetchWalmartProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }, zipCode?: string): Promise<ProductResult[]> {
