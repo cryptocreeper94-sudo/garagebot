@@ -30,7 +30,7 @@ const SHOWCASE_VEHICLES: VehicleType[] = [
 
 function VehicleCard({ vehicle, index }: { vehicle: VehicleType; index: number }) {
   return (
-    <Link href={`/results?vehicleType=${vehicle.id}`}>
+    <Link href={`/results?type=${vehicle.id}`}>
       <motion.div
         whileHover={{ scale: 1.05, y: -4 }}
         whileTap={{ scale: 0.97 }}
