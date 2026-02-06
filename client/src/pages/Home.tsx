@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, ChevronRight, Wallet, Database, Cpu, Tag, ArrowRight, Hexagon, Globe, ExternalLink,
   Wrench, Car, Sparkles, MessageCircle, Bot, TrendingUp, Terminal,
-  BookOpen, PlayCircle, CheckCircle2, Images, Shield, Users, Zap, Star, Gift, Crown, X
+  BookOpen, PlayCircle, CheckCircle2, Images, Shield, Users, Zap, Star, Gift, Crown, X,
+  Bike, Ship, Truck, Tractor, Plane, Cog, PlugZap, Snowflake, Trophy, Gamepad2,
+  Radio, Navigation, Gauge, Flame, ChevronLeft, Sailboat, Construction
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import CategoryGrid from "@/components/CategoryGrid";
@@ -857,38 +859,50 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-14"
+            className="mb-14 relative"
           >
-            {[
-              { label: "Cars & Trucks", icon: "🚗" },
-              { label: "Motorcycles", icon: "🏍️" },
-              { label: "ATVs & UTVs", icon: "🏔️" },
-              { label: "Boats & Marine", icon: "🚤" },
-              { label: "RVs & Trailers", icon: "🚐" },
-              { label: "Classics & Hot Rods", icon: "🏁" },
-              { label: "Exotics", icon: "🏎️" },
-              { label: "Diesel & Commercial", icon: "🚛" },
-              { label: "Tractors & Farm", icon: "🚜" },
-              { label: "Heavy Equipment", icon: "🏗️" },
-              { label: "Small Engines", icon: "⚙️" },
-              { label: "Generators", icon: "🔌" },
-              { label: "Powersports", icon: "❄️" },
-              { label: "Aviation", icon: "✈️" },
-              { label: "RC & Hobby", icon: "🎮" },
-              { label: "Drones & FPV", icon: "📡" },
-              { label: "Model Aircraft", icon: "🛩️" },
-              { label: "Slot Cars", icon: "🏆" },
-              { label: "Go-Karts", icon: "🏎️" },
-              { label: "Golf Carts", icon: "⛳" },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/20 transition-colors"
-              >
-                <span className="text-base">{item.icon}</span>
-                <span className="text-[11px] text-muted-foreground font-medium truncate">{item.label}</span>
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            <div className="overflow-hidden">
+              <div className="flex animate-[scroll_40s_linear_infinite] hover:[animation-play-state:paused]" style={{ width: "max-content" }}>
+                {[...Array(2)].map((_, setIndex) => (
+                  <div key={setIndex} className="flex gap-3 mr-3">
+                    {[
+                      { label: "Cars & Trucks", Icon: Car, color: "text-cyan-400", bg: "from-cyan-500/20 to-cyan-600/10" },
+                      { label: "Motorcycles", Icon: Bike, color: "text-orange-400", bg: "from-orange-500/20 to-orange-600/10" },
+                      { label: "ATVs & UTVs", Icon: Gauge, color: "text-green-400", bg: "from-green-500/20 to-green-600/10" },
+                      { label: "Boats & Marine", Icon: Sailboat, color: "text-blue-400", bg: "from-blue-500/20 to-blue-600/10" },
+                      { label: "RVs & Trailers", Icon: Truck, color: "text-amber-400", bg: "from-amber-500/20 to-amber-600/10" },
+                      { label: "Classics & Hot Rods", Icon: Flame, color: "text-red-400", bg: "from-red-500/20 to-red-600/10" },
+                      { label: "Exotics", Icon: Star, color: "text-yellow-400", bg: "from-yellow-500/20 to-yellow-600/10" },
+                      { label: "Diesel & Commercial", Icon: Truck, color: "text-slate-400", bg: "from-slate-500/20 to-slate-600/10" },
+                      { label: "Tractors & Farm", Icon: Tractor, color: "text-emerald-400", bg: "from-emerald-500/20 to-emerald-600/10" },
+                      { label: "Heavy Equipment", Icon: Construction, color: "text-orange-300", bg: "from-orange-400/20 to-orange-500/10" },
+                      { label: "Small Engines", Icon: Cog, color: "text-zinc-400", bg: "from-zinc-500/20 to-zinc-600/10" },
+                      { label: "Generators", Icon: PlugZap, color: "text-yellow-300", bg: "from-yellow-400/20 to-yellow-500/10" },
+                      { label: "Powersports", Icon: Snowflake, color: "text-sky-400", bg: "from-sky-500/20 to-sky-600/10" },
+                      { label: "Aviation", Icon: Plane, color: "text-indigo-400", bg: "from-indigo-500/20 to-indigo-600/10" },
+                      { label: "RC & Hobby", Icon: Gamepad2, color: "text-pink-400", bg: "from-pink-500/20 to-pink-600/10" },
+                      { label: "Drones & FPV", Icon: Radio, color: "text-violet-400", bg: "from-violet-500/20 to-violet-600/10" },
+                      { label: "Model Aircraft", Icon: Navigation, color: "text-teal-400", bg: "from-teal-500/20 to-teal-600/10" },
+                      { label: "Slot Cars", Icon: Trophy, color: "text-amber-300", bg: "from-amber-400/20 to-amber-500/10" },
+                      { label: "Go-Karts", Icon: Gauge, color: "text-lime-400", bg: "from-lime-500/20 to-lime-600/10" },
+                      { label: "Golf Carts", Icon: Car, color: "text-green-300", bg: "from-green-400/20 to-green-500/10" },
+                    ].map((item) => (
+                      <div
+                        key={`${setIndex}-${item.label}`}
+                        className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-white/[0.03] border border-white/5 hover:border-primary/30 transition-all hover:bg-white/[0.06] flex-shrink-0 group cursor-default"
+                      >
+                        <div className={`w-8 h-8 rounded-md bg-gradient-to-br ${item.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <item.Icon className={`w-4 h-4 ${item.color}`} />
+                        </div>
+                        <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </motion.div>
 
           <motion.div
