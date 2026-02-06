@@ -51,6 +51,9 @@ import BreakRoom from "@/pages/BreakRoom";
 import CDLDirectory from "@/pages/CDLDirectory";
 import Support from "@/pages/Support";
 import SignalChat from "@/pages/SignalChat";
+import AffiliateDisclosure from "@/pages/AffiliateDisclosure";
+import About from "@/pages/About";
+import Contact from "@/pages/Contact";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -95,6 +98,9 @@ function Router() {
       <Route path="/cdl-directory">{() => <CDLDirectory />}</Route>
       <Route path="/support">{() => <Support />}</Route>
       <Route path="/chat">{() => <SignalChat />}</Route>
+      <Route path="/affiliate-disclosure">{() => <AffiliateDisclosure />}</Route>
+      <Route path="/about">{() => <About />}</Route>
+      <Route path="/contact">{() => <Contact />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );

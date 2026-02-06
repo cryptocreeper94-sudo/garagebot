@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/callback
+Disallow: /checkout
+Disallow: /checkout/success
+Disallow: /checkout/cancel
+Disallow: /account
+Disallow: /dashboard
+Disallow: /ws/
+
+Sitemap: https://garagebot.replit.app/sitemap.xml

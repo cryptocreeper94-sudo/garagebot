@@ -63,6 +63,45 @@ export async function registerRoutes(
   // Auth middleware
   await setupAuth(app);
 
+  // SEO: Sitemap.xml
+  app.get('/sitemap.xml', (_req, res) => {
+    const baseUrl = 'https://garagebot.replit.app';
+    const pages = [
+      { path: '/', priority: '1.0', changefreq: 'daily' },
+      { path: '/about', priority: '0.8', changefreq: 'monthly' },
+      { path: '/contact', priority: '0.7', changefreq: 'monthly' },
+      { path: '/terms', priority: '0.5', changefreq: 'monthly' },
+      { path: '/privacy', priority: '0.5', changefreq: 'monthly' },
+      { path: '/affiliate-disclosure', priority: '0.5', changefreq: 'monthly' },
+      { path: '/support', priority: '0.6', changefreq: 'monthly' },
+      { path: '/blog', priority: '0.8', changefreq: 'weekly' },
+      { path: '/diy-guides', priority: '0.8', changefreq: 'weekly' },
+      { path: '/pro', priority: '0.7', changefreq: 'monthly' },
+      { path: '/mechanics-garage', priority: '0.7', changefreq: 'monthly' },
+      { path: '/mechanics-garage/info', priority: '0.6', changefreq: 'monthly' },
+      { path: '/shade-tree', priority: '0.6', changefreq: 'weekly' },
+      { path: '/break-room', priority: '0.6', changefreq: 'daily' },
+      { path: '/hallmark', priority: '0.6', changefreq: 'monthly' },
+      { path: '/investors', priority: '0.5', changefreq: 'monthly' },
+      { path: '/vendor-signup', priority: '0.5', changefreq: 'monthly' },
+      { path: '/insurance', priority: '0.6', changefreq: 'monthly' },
+      { path: '/cdl-directory', priority: '0.5', changefreq: 'weekly' },
+      { path: '/chat', priority: '0.5', changefreq: 'daily' },
+    ];
+    const today = new Date().toISOString().split('T')[0];
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages.map(p => `  <url>
+    <loc>${baseUrl}${p.path}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  });
+
   // Auth routes (Replit OIDC)
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
