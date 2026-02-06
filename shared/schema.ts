@@ -299,6 +299,26 @@ export const orbitPayrollRuns = pgTable("orbit_payroll_runs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Business Software Integrations - tracks per-shop OAuth connections to external services
+export const businessIntegrations = pgTable("business_integrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shopId: varchar("shop_id").notNull().references(() => shops.id, { onDelete: "cascade" }),
+  service: text("service").notNull(),
+  status: text("status").default("disconnected"),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  tokenExpiresAt: timestamp("token_expires_at"),
+  externalId: text("external_id"),
+  companyName: text("company_name"),
+  scopes: text("scopes"),
+  config: jsonb("config"),
+  lastSyncAt: timestamp("last_sync_at"),
+  connectedAt: timestamp("connected_at"),
+  disconnectedAt: timestamp("disconnected_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Shop reviews
 export const shopReviews = pgTable("shop_reviews", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

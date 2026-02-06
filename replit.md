@@ -139,10 +139,29 @@ Preferred communication style: Simple, everyday language.
   - **Payroll Capabilities**: Federal/state/local tax calculations (all 50 states + DC), FICA, garnishments (CCPA-compliant), direct deposit via Stripe Connect ACH, W-2/1099-NEC generation, Form 941/W-3/1096, pay stubs with ORBIT hallmark.
   - **Client Files**: `server/services/orbitEcosystem.ts` (OrbitEcosystemClient), `server/ecosystemHub.ts` (EcosystemClient for Dev Hub).
 
-## QuickBooks Integration
-- **Purpose**: Facilitates OAuth flow for connecting shops to QuickBooks Online.
-- **Capabilities**: Synchronizes repair orders to invoices and manages customer data.
-
-## PartsTech Integration
-- **Purpose**: Enables real-time parts ordering from a vast network of retailers.
-- **Capabilities**: Offers parts search, inventory checks, VIN decoding, and order placement functionalities.
+## Unified Business Integrations Hub
+- **Purpose**: Allows Mechanics Garage shops to connect their existing business software via OAuth.
+- **Service**: `server/services/businessIntegrations.ts` - Unified service handling all OAuth flows.
+- **Database**: `business_integrations` table tracks per-shop connections with encrypted token storage.
+- **API Routes**: `/api/integrations/available`, `/api/shops/:shopId/integrations/:service/connect|disconnect|status`
+- **Frontend**: `BusinessIntegrationsTab` component in MechanicsGarage.tsx with dynamic connect/disconnect.
+- **Supported Integrations** (14 total, OAuth credentials needed for activation):
+  - **Accounting**: QuickBooks Online, FreshBooks, Xero, Sage Business Cloud, Wave Accounting
+  - **Payroll/HR**: UKG Pro, ADP Workforce Now, Gusto, Paychex Flex
+  - **Scheduling/Communication**: Google Calendar, Twilio, Mailchimp
+  - **Parts/Inventory**: PartsTech, Nexpart
+- **OAuth Credential Env Vars** (add when ready):
+  - QuickBooks: `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`
+  - UKG: `UKG_CLIENT_ID`, `UKG_CLIENT_SECRET`
+  - ADP: `ADP_CLIENT_ID`, `ADP_CLIENT_SECRET`
+  - Gusto: `GUSTO_CLIENT_ID`, `GUSTO_CLIENT_SECRET`
+  - Paychex: `PAYCHEX_CLIENT_ID`, `PAYCHEX_CLIENT_SECRET`
+  - FreshBooks: `FRESHBOOKS_CLIENT_ID`, `FRESHBOOKS_CLIENT_SECRET`
+  - Xero: `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`
+  - Sage: `SAGE_CLIENT_ID`, `SAGE_CLIENT_SECRET`
+  - Wave: `WAVE_CLIENT_ID`, `WAVE_CLIENT_SECRET`
+  - Google Calendar: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+  - Twilio: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`
+  - Mailchimp: `MAILCHIMP_CLIENT_ID`, `MAILCHIMP_CLIENT_SECRET`
+  - PartsTech: `PARTSTECH_API_KEY`, `PARTSTECH_API_SECRET`
+  - Nexpart: `NEXPART_API_KEY`, `NEXPART_API_SECRET`
