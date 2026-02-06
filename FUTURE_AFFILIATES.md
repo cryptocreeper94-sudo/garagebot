@@ -33,6 +33,7 @@ This document tracks potential affiliate partnerships, their networks, commissio
 | AutoZone | CJ Affiliate | 1.6-3% | 45d | https://www.cj.com/advertiser/autozone | 6,400+ stores, largest chain |
 | NAPA Auto Parts | Direct/CJ | Varies | - | https://www.napaonline.com/en/affiliate-program | 6,000 stores, 500k+ SKUs |
 | O'Reilly Auto Parts | Direct | Varies | - | Contact: affiliates@oreillyauto.com | 6,100+ stores |
+| Walmart Auto Parts | Impact Radius | 1-4% | 3d | https://affiliates.walmart.com/ | 4,700+ stores, huge auto section |
 | Pep Boys | Direct | Varies | - | Contact via website | 900+ stores |
 
 ### Tier 2: Online-First Retailers
@@ -124,9 +125,9 @@ This document tracks potential affiliate partnerships, their networks, commissio
 
 ### Impact Radius
 - **Signup**: https://impact.com/
-- **Best For**: Performance brands
+- **Best For**: Performance brands, major retailers
 - **Payout**: $25 minimum
-- **Partners Available**: JEGS, Advance Auto Parts
+- **Partners Available**: JEGS, Advance Auto Parts, Walmart
 
 ### AvantLink
 - **Signup**: https://www.avantlink.com/
@@ -247,10 +248,11 @@ This document tracks potential affiliate partnerships, their networks, commissio
 ## Next Steps
 
 ### Immediate (This Week):
-1. [ ] Apply to AutoZone via CJ Affiliate
-2. [ ] Apply to RockAuto direct program
-3. [ ] Apply to NAPA affiliate program
-4. [ ] Check Insurify application status
+1. [ ] Apply to Walmart via Impact Radius (https://affiliates.walmart.com/)
+2. [ ] Apply to AutoZone via CJ Affiliate
+3. [ ] Apply to RockAuto direct program
+4. [ ] Apply to NAPA affiliate program
+5. [ ] Check Insurify application status
 
 ### Short Term (This Month):
 1. [ ] Complete all Tier 1 chain applications
