@@ -75,16 +75,19 @@ export function validateUsername(username: string): { valid: boolean; error?: st
 
 export function validateMainPin(pin: string): { valid: boolean; error?: string } {
   if (pin.length < 8) {
-    return { valid: false, error: "PIN must be at least 8 characters" };
+    return { valid: false, error: "Password must be at least 8 characters" };
   }
   if (!/[A-Z]/.test(pin)) {
-    return { valid: false, error: "PIN must contain at least one uppercase letter" };
+    return { valid: false, error: "Password must contain at least one uppercase letter" };
   }
   if (!/[a-z]/.test(pin)) {
-    return { valid: false, error: "PIN must contain at least one lowercase letter" };
+    return { valid: false, error: "Password must contain at least one lowercase letter" };
+  }
+  if (!/[0-9]/.test(pin)) {
+    return { valid: false, error: "Password must contain at least one number" };
   }
   if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pin)) {
-    return { valid: false, error: "PIN must contain at least one special character" };
+    return { valid: false, error: "Password must contain at least one special character" };
   }
   return { valid: true };
 }
