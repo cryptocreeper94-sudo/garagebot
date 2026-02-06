@@ -67,9 +67,24 @@ Preferred communication style: Simple, everyday language.
   - **eBay Partner Network** - CONNECTED and operational
   - **CJ Affiliate** - CONNECTED and operational (covers Horizon Hobby and other CJ merchants)
 - **Pending Affiliate Accounts (NOT YET CONNECTED)**:
-  - **AvantLink** - Needed for AMain Hobbies, RC Planet
-  - **ShareASale** - Needed for Tower Hobbies, GetFPV, Redcat Racing
+  - **AvantLink** - Needed for AMain Hobbies, RC Planet | Sign up: https://www.avantlink.com/
+  - **ShareASale** - Needed for Tower Hobbies, GetFPV, Redcat Racing | Sign up: https://www.shareasale.com/
   - **Direct Programs** - HobbyKing, BETAFPV (apply on their sites)
+- **Pending Business Integration OAuth Accounts (NOT YET CONNECTED)**:
+  - **QuickBooks Online** - Accounting sync | Sign up: https://developer.intuit.com/ | Env: `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`
+  - **FreshBooks** - Invoicing/time tracking | Sign up: https://www.freshbooks.com/api | Env: `FRESHBOOKS_CLIENT_ID`, `FRESHBOOKS_CLIENT_SECRET`
+  - **Xero** - Cloud accounting | Sign up: https://developer.xero.com/ | Env: `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`
+  - **Sage Business Cloud** - Business management | Sign up: https://developer.sage.com/ | Env: `SAGE_CLIENT_ID`, `SAGE_CLIENT_SECRET`
+  - **Wave Accounting** - Free small biz accounting | Sign up: https://developer.waveapps.com/ | Env: `WAVE_CLIENT_ID`, `WAVE_CLIENT_SECRET`
+  - **UKG Pro** - HR/payroll/talent | Sign up: https://developer.ukg.com/ | Env: `UKG_CLIENT_ID`, `UKG_CLIENT_SECRET`
+  - **ADP Workforce Now** - Payroll/HR | Sign up: https://developers.adp.com/ | Env: `ADP_CLIENT_ID`, `ADP_CLIENT_SECRET`
+  - **Gusto** - Modern payroll | Sign up: https://dev.gusto.com/ | Env: `GUSTO_CLIENT_ID`, `GUSTO_CLIENT_SECRET`
+  - **Paychex Flex** - Payroll/benefits | Sign up: https://developer.paychex.com/ | Env: `PAYCHEX_CLIENT_ID`, `PAYCHEX_CLIENT_SECRET`
+  - **Google Calendar** - Scheduling | Sign up: https://console.cloud.google.com/ | Env: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+  - **Twilio** - SMS/communication | Sign up: https://www.twilio.com/console | Env: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`
+  - **Mailchimp** - Email marketing | Sign up: https://admin.mailchimp.com/account/api/ | Env: `MAILCHIMP_CLIENT_ID`, `MAILCHIMP_CLIENT_SECRET`
+  - **PartsTech** - Parts ordering | Sign up: https://www.partstech.com/integrations | Env: `PARTSTECH_API_KEY`, `PARTSTECH_API_SECRET`
+  - **Nexpart** - Electronic parts catalog | Sign up: https://www.nexpart.com/ | Env: `NEXPART_API_KEY`, `NEXPART_API_SECRET`
 - **Future Direction**: Integration of product data feeds from affiliate networks and direct APIs with retailers for real-time inventory updates.
 
 ## Blockchain Verification
