@@ -5,51 +5,43 @@ interface EcosystemConfig {
   appName: string;
 }
 
-interface Worker {
+interface WorkerData {
   id: string;
   firstName: string;
   lastName: string;
-  email: string;
-  status: "active" | "inactive" | "terminated";
-  employeeType: "w2" | "1099";
-  hireDate?: string;
-  terminationDate?: string;
-  hourlyRate?: number;
-  salary?: number;
-  department?: string;
-  position?: string;
+  email?: string;
+  phone?: string;
+  status: string;
+  payRate?: number;
+  workState?: string;
+  certifications?: string[];
 }
 
-interface Contractor {
+interface ContractorData {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  businessName?: string;
-  taxId?: string;
-  status: "active" | "inactive";
-  contractStart?: string;
-  contractEnd?: string;
-  hourlyRate?: number;
+  name: string;
+  email?: string;
+  phone?: string;
+  totalPaid?: number;
+  status?: string;
 }
 
-interface Timesheet {
+interface TimesheetData {
   id: string;
   workerId: string;
   date: string;
   hoursWorked: number;
-  overtime?: number;
-  notes?: string;
-  approved?: boolean;
-  approvedBy?: string;
+  overtimeHours?: number;
+  jobId?: string;
+  status: string;
 }
 
 interface Payment1099 {
-  contractorId: string;
+  payeeId: string;
+  payeeName: string;
   amount: number;
   date: string;
   description?: string;
-  invoiceNumber?: string;
 }
 
 interface PayrollW2 {
@@ -65,15 +57,14 @@ interface PayrollW2 {
   netPay: number;
 }
 
-interface Certification {
+interface CertificationData {
   id: string;
   workerId: string;
   name: string;
-  issuer: string;
-  issueDate: string;
+  issuedBy?: string;
+  issueDate?: string;
   expirationDate?: string;
-  certificationNumber?: string;
-  verified?: boolean;
+  status: string;
 }
 
 interface CodeSnippet {
@@ -122,6 +113,7 @@ export class EcosystemClient {
       "Content-Type": "application/json",
       "X-API-Key": this.apiKey,
       "X-API-Secret": this.apiSecret,
+      "X-App-Name": this.appName,
     };
 
     const response = await fetch(`${this.hubUrl}${endpoint}`, {
@@ -166,28 +158,28 @@ export class EcosystemClient {
     return this.request(`/api/ecosystem/snippets${query}`);
   }
 
-  async syncWorkers(workers: Worker[]): Promise<{ synced: number; errors: string[] }> {
+  async syncWorkers(workers: WorkerData[]): Promise<{ synced: number; errors: string[] }> {
     return this.request("/api/ecosystem/sync/workers", "POST", { workers });
   }
 
-  async syncContractors(contractors: Contractor[]): Promise<{ synced: number; errors: string[] }> {
+  async syncContractors(contractors: ContractorData[]): Promise<{ synced: number; errors: string[] }> {
     return this.request("/api/ecosystem/sync/contractors", "POST", { contractors });
   }
 
-  async sync1099Data(year: number, contractors: Payment1099[]): Promise<{ synced: number; totalAmount: number }> {
-    return this.request("/api/ecosystem/sync/1099", "POST", { year, contractors });
+  async syncTimesheets(timesheets: TimesheetData[]): Promise<{ synced: number; totalHours: number }> {
+    return this.request("/api/ecosystem/sync/timesheets", "POST", { timesheets });
+  }
+
+  async syncCertifications(certifications: CertificationData[]): Promise<{ synced: number; expiringSoon: number }> {
+    return this.request("/api/ecosystem/sync/certifications", "POST", { certifications });
+  }
+
+  async sync1099Payments(year: number, payments: Payment1099[]): Promise<{ synced: number; totalAmount: number }> {
+    return this.request("/api/ecosystem/sync/1099", "POST", { year, payments });
   }
 
   async syncW2Payroll(year: number, employees: PayrollW2[]): Promise<{ synced: number; totalGross: number }> {
     return this.request("/api/ecosystem/sync/w2", "POST", { year, employees });
-  }
-
-  async syncTimesheets(timesheets: Timesheet[]): Promise<{ synced: number; totalHours: number }> {
-    return this.request("/api/ecosystem/sync/timesheets", "POST", { timesheets });
-  }
-
-  async syncCertifications(certifications: Certification[]): Promise<{ synced: number; expiringSoon: number }> {
-    return this.request("/api/ecosystem/sync/certifications", "POST", { certifications });
   }
 
   async getActivityLogs(limit: number = 50): Promise<ActivityLog[]> {
@@ -203,22 +195,24 @@ export class EcosystemClient {
     });
   }
 
-  async getWorkersByShop(shopId: string): Promise<Worker[]> {
+  async getWorkersByShop(shopId: string): Promise<WorkerData[]> {
     return this.request(`/api/ecosystem/shops/${shopId}/workers`);
   }
 
-  async getShopPayrollSummary(shopId: string, year: number, month: number): Promise<{
-    totalW2Gross: number;
-    total1099Payments: number;
-    employeeCount: number;
-    contractorCount: number;
+  async getShopPayrollSummary(shopId: string, limit: number = 50): Promise<{
+    success: boolean;
+    shopId: string;
+    recordCount: number;
+    totalPaid: number;
+    totalGross: number;
+    records: any[];
   }> {
-    return this.request(`/api/ecosystem/shops/${shopId}/payroll?year=${year}&month=${month}`);
+    return this.request(`/api/ecosystem/shops/${shopId}/payroll?limit=${limit}`);
   }
 }
 
 export function createDevHubClient(): EcosystemClient | null {
-  const hubUrl = process.env.DEV_HUB_URL || process.env.ORBIT_ECOSYSTEM_URL || "https://darkwavestudios.io";
+  const hubUrl = process.env.DEV_HUB_URL || process.env.ORBIT_HUB_URL || "https://orbitstaffing.replit.app";
   const apiKey = process.env.ORBIT_ECOSYSTEM_API_KEY;
   const apiSecret = process.env.ORBIT_ECOSYSTEM_API_SECRET;
 
