@@ -46,6 +46,8 @@ export const users = pgTable("users", {
   persistenceEnabled: boolean("persistence_enabled").default(false),
   persistenceExpiresAt: timestamp("persistence_expires_at"),
   lastLoginAt: timestamp("last_login_at"),
+  passwordResetToken: text("password_reset_token"),
+  passwordResetExpiresAt: timestamp("password_reset_expires_at"),
   referralCode: text("referral_code").unique(),
   referredByUserId: varchar("referred_by_user_id"),
   referralPointsBalance: integer("referral_points_balance").default(0),

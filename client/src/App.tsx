@@ -5,7 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/hooks/useCart";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import OnboardingModal from "@/components/OnboardingModal";
+import { useAuth } from "@/hooks/useAuth";
+import WelcomeGate from "@/components/WelcomeGate";
 import AIMascot from "@/components/AIMascot";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
@@ -92,6 +93,17 @@ function Router() {
   );
 }
 
+function AuthAwareExtras() {
+  const { user } = useAuth();
+  if (!user) return null;
+  return (
+    <>
+      <AddToHomeScreen />
+      <BuddyHideSeek />
+    </>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -109,12 +121,11 @@ function App() {
             />
           </div>
           <Toaster />
-          <OnboardingModal />
-          <AddToHomeScreen />
+          <WelcomeGate />
           <AnalyticsTracker />
           <Router />
           <AIMascot mascotName="Buddy" />
-          <BuddyHideSeek />
+          <AuthAwareExtras />
         </TooltipProvider>
       </CartProvider>
     </QueryClientProvider>
