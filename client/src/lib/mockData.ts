@@ -400,6 +400,20 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "CJ Affiliate",
     logoColor: "#FF0000"
   },
+  // Dashcams & Vehicle Electronics
+  {
+    id: "rexing",
+    name: "Rexing",
+    slug: "rexing",
+    searchTemplate: "https://www.rexingusa.com/?s={query}&post_type=product&ref=5357356",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv", "motorcycles", "atvs", "boats", "powersports"],
+    priority: 80,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Rexing Affiliate",
+    logoColor: "#1A1A2E"
+  },
   // ============================================
   // MOTORIZED HOBBY - RC, Drones, Model, Slot Cars
   // ============================================
