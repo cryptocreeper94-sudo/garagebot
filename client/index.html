@@ -84,14 +84,30 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('SW registered:', registration.scope);
-            })
-            .catch(error => {
-              console.log('SW registration failed:', error);
+        window.addEventListener('load', async () => {
+          try {
+            const registration = await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
+            console.log('SW registered:', registration.scope);
+            if (registration.waiting) {
+              registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'activated') {
+                    caches.keys().then(names => {
+                      names.forEach(name => {
+                        if (name !== 'garagebot-v18') caches.delete(name);
+                      });
+                    });
+                  }
+                });
+              }
             });
+          } catch (error) {
+            console.log('SW registration failed:', error);
+          }
         });
       }
     </script>
