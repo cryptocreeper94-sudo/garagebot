@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
@@ -333,11 +333,18 @@ export default function Nav() {
                       </div>
                     </Link>
                     
+                    <Link href="/break-room" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/break-room' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-break-room">
+                        <Coffee className="w-5 h-5" />
+                        <span className="font-medium">Break Room</span>
+                        <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px] font-mono ml-auto">NEW</Badge>
+                      </div>
+                    </Link>
+                    
                     <Link href="/blog" onClick={() => setIsOpen(false)}>
                       <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/blog' || location.startsWith('/blog/') ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-blog">
                         <FileText className="w-5 h-5" />
                         <span className="font-medium">Blog</span>
-                        <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px] font-mono ml-auto">NEW</Badge>
                       </div>
                     </Link>
                     

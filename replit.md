@@ -62,6 +62,18 @@ Preferred communication style: Simple, everyday language.
 - **Content**: Each guide includes YouTube search queries for video alternatives and per-step video links.
 - **Translation**: Cross-industry terminology translation for part names.
 
+## Break Room Hub
+- **Route**: `/break-room`
+- **Component**: `client/src/pages/BreakRoom.tsx`
+- **Service**: `server/services/breakRoomService.ts`
+- **Features** (organized in 4 tabs):
+  - **News Tab**: Categorized motorsports/auto news with stacked carousels (NASCAR, F1, MotoGP, Off-Road, Trucking, Marine, Classic Cars, EV/Electric, Aviation, General). 60+ curated articles with curated data.
+  - **Tools Tab**: Receipt/Document Scanner (OpenAI Vision OCR), Mileage Tracker (business miles for tax deductions), NHTSA Recall Checker (free public API), Maintenance Scheduler (links to Garage).
+  - **Community Tab**: Speed Trap Alerts (community-reported), Fuel Price Finder (community-reported), Specialty Shops & Salvage Yards Directory (seeded with 10 shops), Car Shows & Events Finder (seeded with 10 events).
+  - **Opportunities Tab**: CDL Schools & Trucking Programs directory (seeded with 10 programs including Werner, Swift, Schneider, CRST, Roehl, Prime, flight schools, marine/heavy equipment training), interest/referral forms for lead generation.
+- **Database Tables**: `mileage_entries`, `speed_traps`, `specialty_shops`, `car_events`, `cdl_programs`, `cdl_referrals`, `fuel_reports`, `scanned_documents`
+- **API Prefix**: `/api/break-room/*` (news, recalls, scan, mileage, speed-traps, specialty-shops, events, cdl-programs, cdl-referrals, fuel, scans)
+
 ## Affiliate Strategy
 - **Current**: Vehicle-aware search links to 40+ retailers.
 - **Future**: Product data feeds from affiliate networks and direct APIs with retailers for real-time inventory.
