@@ -70,7 +70,7 @@ export default function AffiliateDisclosure() {
                       <li><strong className="text-foreground">Amazon Associates</strong> — Amazon's official affiliate program</li>
                       <li><strong className="text-foreground">eBay Partner Network</strong> — eBay's affiliate marketplace</li>
                       <li><strong className="text-foreground">CJ Affiliate</strong> — Commission Junction performance marketing network</li>
-                      <li><strong className="text-foreground">ShareASale</strong> — Affiliate marketing network for merchants and publishers</li>
+                      <li><strong className="text-foreground">ShareASale</strong> — Affiliate marketing network for merchants and publishers (GARVEE)</li>
                       <li><strong className="text-foreground">Impact Radius</strong> — Partnership automation platform</li>
                       <li><strong className="text-foreground">AvantLink</strong> — Technology-driven affiliate marketing network</li>
                       <li><strong className="text-foreground">FlexOffers</strong> — Digital publisher monetization platform</li>
