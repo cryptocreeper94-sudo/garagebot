@@ -54,6 +54,7 @@ import SignalChat from "@/pages/SignalChat";
 import AffiliateDisclosure from "@/pages/AffiliateDisclosure";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
+import PartsMarketplace from "@/pages/PartsMarketplace";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -101,6 +102,7 @@ function Router() {
       <Route path="/affiliate-disclosure">{() => <AffiliateDisclosure />}</Route>
       <Route path="/about">{() => <About />}</Route>
       <Route path="/contact">{() => <Contact />}</Route>
+      <Route path="/marketplace">{() => <PartsMarketplace />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );

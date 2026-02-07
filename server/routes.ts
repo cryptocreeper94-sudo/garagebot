@@ -4,7 +4,7 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations } from "@shared/schema";
+import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations, insertPartListingSchema, updatePartListingSchema, insertPartListingMessageSchema, partListings } from "@shared/schema";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
 import { comparePrice } from "./services/price-comparison";
 import { fromZodError } from "zod-validation-error";
@@ -10477,6 +10477,137 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       } else {
         res.status(500).json({ error: "Failed to submit rating" });
       }
+    }
+  });
+
+  // Parts Marketplace Routes
+  app.get("/api/marketplace/listings", async (req, res) => {
+    try {
+      const { make, model, year, category, search, vehicleType } = req.query;
+      const listings = await storage.getPartListings({
+        make: make as string,
+        model: model as string,
+        year: year ? parseInt(year as string) : undefined,
+        category: category as string,
+        search: search as string,
+        vehicleType: vehicleType as string,
+        status: 'active',
+      });
+      res.json(listings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch listings" });
+    }
+  });
+
+  app.get("/api/marketplace/listings/:id", async (req, res) => {
+    try {
+      const listing = await storage.getPartListing(req.params.id);
+      if (!listing) return res.status(404).json({ error: "Listing not found" });
+      await storage.incrementPartListingViews(listing.id);
+      const seller = await storage.getUser(listing.sellerId);
+      res.json({ ...listing, seller: seller ? { username: seller.username, firstName: seller.firstName, city: seller.city, state: seller.state, profileImageUrl: seller.profileImageUrl, createdAt: seller.createdAt } : null });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch listing" });
+    }
+  });
+
+  app.get("/api/marketplace/my-listings", async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+      const listings = await storage.getPartListingsBySeller(userId);
+      res.json(listings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch your listings" });
+    }
+  });
+
+  app.post("/api/marketplace/listings", async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+      const result = insertPartListingSchema.safeParse({ ...req.body, sellerId: userId });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const listing = await storage.createPartListing(result.data);
+      res.json(listing);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create listing" });
+    }
+  });
+
+  app.patch("/api/marketplace/listings/:id", async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+      const listing = await storage.getPartListing(req.params.id);
+      if (!listing) return res.status(404).json({ error: "Listing not found" });
+      if (listing.sellerId !== userId) return res.status(403).json({ error: "Not authorized" });
+      const parsed = updatePartListingSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: "Invalid update data", details: parsed.error.flatten() });
+      const updated = await storage.updatePartListing(req.params.id, parsed.data);
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update listing" });
+    }
+  });
+
+  app.delete("/api/marketplace/listings/:id", async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+      const listing = await storage.getPartListing(req.params.id);
+      if (!listing) return res.status(404).json({ error: "Listing not found" });
+      if (listing.sellerId !== userId) return res.status(403).json({ error: "Not authorized" });
+      await storage.deletePartListing(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete listing" });
+    }
+  });
+
+  app.post("/api/marketplace/listings/:id/contact", async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+      const listing = await storage.getPartListing(req.params.id);
+      if (!listing) return res.status(404).json({ error: "Listing not found" });
+      const result = insertPartListingMessageSchema.safeParse({
+        listingId: listing.id,
+        senderId: userId,
+        recipientId: listing.sellerId,
+        message: req.body.message,
+      });
+      if (!result.success) {
+        return res.status(400).json({ error: fromZodError(result.error).toString() });
+      }
+      const msg = await storage.createPartListingMessage(result.data);
+      await storage.incrementPartListingContacts(listing.id);
+      res.json(msg);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  app.get("/api/marketplace/messages", async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+      const messages = await storage.getPartListingMessages(userId);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
+  app.get("/api/marketplace/stats", async (req: any, res) => {
+    try {
+      const [activeResult] = await db.select({ count: sql<number>`count(*)` }).from(partListings).where(eq(partListings.status, 'active'));
+      const [totalResult] = await db.select({ count: sql<number>`count(*)` }).from(partListings);
+      res.json({ active: Number(activeResult?.count || 0), total: Number(totalResult?.count || 0) });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch stats" });
     }
   });
 

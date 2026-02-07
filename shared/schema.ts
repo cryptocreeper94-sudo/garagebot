@@ -3193,3 +3193,56 @@ export type ChatChannel = typeof chatChannels.$inferSelect;
 export type InsertChatChannel = z.infer<typeof insertChatChannelSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+export const partListings = pgTable("part_listings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sellerId: varchar("seller_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  partNumber: text("part_number"),
+  condition: text("condition").notNull().default("used"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  category: text("category").default("general"),
+  photos: text("photos").array(),
+  fitmentYear: integer("fitment_year"),
+  fitmentMake: text("fitment_make"),
+  fitmentModel: text("fitment_model"),
+  fitmentTrim: text("fitment_trim"),
+  vehicleType: text("vehicle_type").default("car"),
+  compatibleVehicles: jsonb("compatible_vehicles"),
+  location: text("location"),
+  sellerZipCode: text("seller_zip_code"),
+  shippingAvailable: boolean("shipping_available").default(false),
+  shippingPrice: decimal("shipping_price", { precision: 10, scale: 2 }),
+  status: text("status").notNull().default("active"),
+  views: integer("views").default(0),
+  contactCount: integer("contact_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_part_listings_seller").on(table.sellerId),
+  index("IDX_part_listings_status").on(table.status),
+  index("IDX_part_listings_fitment").on(table.fitmentMake, table.fitmentModel, table.fitmentYear),
+]);
+
+export const partListingMessages = pgTable("part_listing_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  listingId: varchar("listing_id").notNull().references(() => partListings.id, { onDelete: "cascade" }),
+  senderId: varchar("sender_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  recipientId: varchar("recipient_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  message: text("message").notNull(),
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_part_messages_listing").on(table.listingId),
+  index("IDX_part_messages_recipient").on(table.recipientId),
+]);
+
+export const insertPartListingSchema = createInsertSchema(partListings).omit({ id: true, views: true, contactCount: true, createdAt: true, updatedAt: true });
+export const updatePartListingSchema = insertPartListingSchema.partial().omit({ sellerId: true });
+export const insertPartListingMessageSchema = createInsertSchema(partListingMessages).omit({ id: true, isRead: true, createdAt: true });
+
+export type PartListing = typeof partListings.$inferSelect;
+export type InsertPartListing = z.infer<typeof insertPartListingSchema>;
+export type PartListingMessage = typeof partListingMessages.$inferSelect;
+export type InsertPartListingMessage = z.infer<typeof insertPartListingMessageSchema>;
