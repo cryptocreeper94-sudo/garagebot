@@ -1,9 +1,9 @@
 import { db } from '@db';
-import { marketingPosts, marketingImages, socialIntegrations, scheduledPosts } from '@shared/schema';
-import { eq, and, asc, sql, desc } from 'drizzle-orm';
+import { marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles } from '@shared/schema';
+import { eq, and, asc, sql, desc, isNotNull } from 'drizzle-orm';
 import { TwitterConnector, postToFacebook, postToInstagram } from './social-connectors';
 
-const POSTING_HOURS = [8, 10, 12, 14, 16, 18, 20];
+const POSTING_HOURS = [0, 3, 6, 9, 12, 15, 18, 21];
 const ECOSYSTEM_URLS = {
   garagebot: 'https://garagebot.io',
   dwtl: 'https://dwtl.io',
@@ -21,6 +21,41 @@ function getBaseUrl(): string {
 
 let isRunning = false;
 let lastPostHour = -1;
+
+async function ensureMetaIntegration() {
+  const pageId = process.env.META_PAGE_ID;
+  const pageAccessToken = process.env.META_PAGE_ACCESS_TOKEN;
+
+  if (!pageId || !pageAccessToken) {
+    console.log('[Marketing] META_PAGE_ID or META_PAGE_ACCESS_TOKEN not set, skipping Meta integration setup');
+    return;
+  }
+
+  const [existing] = await db.select().from(socialIntegrations)
+    .where(eq(socialIntegrations.tenantId, 'garagebot')).limit(1);
+
+  if (existing) {
+    await db.update(socialIntegrations)
+      .set({
+        facebookPageId: pageId,
+        facebookPageAccessToken: pageAccessToken,
+        facebookConnected: true,
+        facebookPageName: 'GarageBot.io',
+        updatedAt: new Date(),
+      })
+      .where(eq(socialIntegrations.tenantId, 'garagebot'));
+    console.log('[Marketing] Updated Meta integration for garagebot');
+  } else {
+    await db.insert(socialIntegrations).values({
+      tenantId: 'garagebot',
+      facebookPageId: pageId,
+      facebookPageAccessToken: pageAccessToken,
+      facebookConnected: true,
+      facebookPageName: 'GarageBot.io',
+    });
+    console.log('[Marketing] Created Meta integration for garagebot');
+  }
+}
 
 async function getIntegration(tenantId: string = 'garagebot') {
   const [integration] = await db.select().from(socialIntegrations)
@@ -135,6 +170,57 @@ async function executeScheduledPosts() {
   }
 }
 
+async function fetchMetaInsights() {
+  const accessToken = process.env.META_PAGE_ACCESS_TOKEN;
+  if (!accessToken) {
+    return;
+  }
+
+  const postedPosts = await db.select().from(scheduledPosts)
+    .where(and(
+      eq(scheduledPosts.status, 'posted'),
+      isNotNull(scheduledPosts.externalPostId)
+    ));
+
+  for (const post of postedPosts) {
+    try {
+      const insightsUrl = `https://graph.facebook.com/v21.0/${post.externalPostId}/insights?metric=post_impressions,post_reach,post_clicks&access_token=${accessToken}`;
+      const insightsRes = await fetch(insightsUrl);
+      const insightsData = await insightsRes.json();
+
+      let impressions = post.impressions || 0;
+      let reach = post.reach || 0;
+      let clicks = post.clicks || 0;
+
+      if (insightsData.data && Array.isArray(insightsData.data)) {
+        for (const metric of insightsData.data) {
+          const value = metric.values?.[0]?.value || 0;
+          if (metric.name === 'post_impressions') impressions = value;
+          if (metric.name === 'post_reach') reach = value;
+          if (metric.name === 'post_clicks') clicks = value;
+        }
+      }
+
+      const engagementUrl = `https://graph.facebook.com/v21.0/${post.externalPostId}?fields=likes.summary(true),comments.summary(true),shares&access_token=${accessToken}`;
+      const engagementRes = await fetch(engagementUrl);
+      const engagementData = await engagementRes.json();
+
+      const likes = engagementData.likes?.summary?.total_count || post.likes || 0;
+      const comments = engagementData.comments?.summary?.total_count || post.comments || 0;
+      const shares = engagementData.shares?.count || post.shares || 0;
+
+      await db.update(scheduledPosts)
+        .set({ impressions, reach, clicks, likes, comments, shares })
+        .where(eq(scheduledPosts.id, post.id));
+
+    } catch (err) {
+      console.error(`[Marketing] Failed to fetch insights for post ${post.externalPostId}:`, err);
+    }
+  }
+
+  console.log(`[Marketing] Fetched Meta insights for ${postedPosts.length} posts`);
+}
+
 export function startMarketingScheduler() {
   if (isRunning) {
     console.log('[Marketing] Scheduler already running');
@@ -142,13 +228,19 @@ export function startMarketingScheduler() {
   }
   
   console.log('[Marketing] Starting scheduler...');
-  console.log('[Marketing] Posts scheduled at: 8am, 10am, 12pm, 2pm, 4pm, 6pm, 8pm');
+  console.log('[Marketing] Posts scheduled every 3 hours: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm');
   
   isRunning = true;
+
+  ensureMetaIntegration().catch(err => console.error('[Marketing] Meta integration error:', err));
   
   setInterval(() => {
     executeScheduledPosts().catch(err => console.error('[Marketing] Error:', err));
   }, 60 * 1000);
+
+  setInterval(() => {
+    fetchMetaInsights().catch(err => console.error('[Marketing] Insights fetch error:', err));
+  }, 30 * 60 * 1000);
   
   executeScheduledPosts().catch(err => console.error('[Marketing] Initial run error:', err));
 }
@@ -172,4 +264,93 @@ export async function getMarketingStats() {
     totalFailed: Number(failedCount.count),
     postingHours: POSTING_HOURS,
   };
+}
+
+export async function getTopPerformingContent() {
+  const results = await db.select({
+    marketingPostId: scheduledPosts.marketingPostId,
+    totalLikes: sql<number>`coalesce(sum(${scheduledPosts.likes}), 0)`,
+    totalComments: sql<number>`coalesce(sum(${scheduledPosts.comments}), 0)`,
+    totalShares: sql<number>`coalesce(sum(${scheduledPosts.shares}), 0)`,
+    totalEngagement: sql<number>`coalesce(sum(${scheduledPosts.likes}), 0) + coalesce(sum(${scheduledPosts.comments}), 0) + coalesce(sum(${scheduledPosts.shares}), 0)`,
+    totalImpressions: sql<number>`coalesce(sum(${scheduledPosts.impressions}), 0)`,
+    totalReach: sql<number>`coalesce(sum(${scheduledPosts.reach}), 0)`,
+    postCount: sql<number>`count(*)`,
+  })
+    .from(scheduledPosts)
+    .where(and(
+      eq(scheduledPosts.status, 'posted'),
+      isNotNull(scheduledPosts.marketingPostId)
+    ))
+    .groupBy(scheduledPosts.marketingPostId)
+    .orderBy(sql`coalesce(sum(${scheduledPosts.likes}), 0) + coalesce(sum(${scheduledPosts.comments}), 0) + coalesce(sum(${scheduledPosts.shares}), 0) desc`);
+
+  return results;
+}
+
+export async function getTopPerformingImages() {
+  const results = await db.select({
+    imageUrl: scheduledPosts.imageUrl,
+    totalLikes: sql<number>`coalesce(sum(${scheduledPosts.likes}), 0)`,
+    totalComments: sql<number>`coalesce(sum(${scheduledPosts.comments}), 0)`,
+    totalShares: sql<number>`coalesce(sum(${scheduledPosts.shares}), 0)`,
+    totalEngagement: sql<number>`coalesce(sum(${scheduledPosts.likes}), 0) + coalesce(sum(${scheduledPosts.comments}), 0) + coalesce(sum(${scheduledPosts.shares}), 0)`,
+    totalImpressions: sql<number>`coalesce(sum(${scheduledPosts.impressions}), 0)`,
+    totalReach: sql<number>`coalesce(sum(${scheduledPosts.reach}), 0)`,
+    postCount: sql<number>`count(*)`,
+  })
+    .from(scheduledPosts)
+    .where(and(
+      eq(scheduledPosts.status, 'posted'),
+      isNotNull(scheduledPosts.imageUrl)
+    ))
+    .groupBy(scheduledPosts.imageUrl)
+    .orderBy(sql`coalesce(sum(${scheduledPosts.likes}), 0) + coalesce(sum(${scheduledPosts.comments}), 0) + coalesce(sum(${scheduledPosts.shares}), 0) desc`);
+
+  return results;
+}
+
+export async function getTopPerformingCombinations() {
+  const results = await db.select({
+    id: contentBundles.id,
+    imageUrl: contentBundles.imageUrl,
+    message: contentBundles.message,
+    platform: contentBundles.platform,
+    status: contentBundles.status,
+    impressions: contentBundles.impressions,
+    reach: contentBundles.reach,
+    clicks: contentBundles.clicks,
+    likes: contentBundles.likes,
+    comments: contentBundles.comments,
+    shares: contentBundles.shares,
+    saves: contentBundles.saves,
+    engagementScore: sql<number>`coalesce(${contentBundles.likes}, 0) + coalesce(${contentBundles.comments}, 0) + coalesce(${contentBundles.shares}, 0)`,
+  })
+    .from(contentBundles)
+    .where(eq(contentBundles.tenantId, 'garagebot'))
+    .orderBy(sql`coalesce(${contentBundles.likes}, 0) + coalesce(${contentBundles.comments}, 0) + coalesce(${contentBundles.shares}, 0) desc`);
+
+  return results;
+}
+
+export async function getPerformanceByTimeSlot() {
+  const results = await db.select({
+    hour: sql<number>`extract(hour from ${scheduledPosts.postedAt})`,
+    avgLikes: sql<number>`coalesce(avg(${scheduledPosts.likes}), 0)`,
+    avgComments: sql<number>`coalesce(avg(${scheduledPosts.comments}), 0)`,
+    avgShares: sql<number>`coalesce(avg(${scheduledPosts.shares}), 0)`,
+    avgEngagement: sql<number>`coalesce(avg(${scheduledPosts.likes}), 0) + coalesce(avg(${scheduledPosts.comments}), 0) + coalesce(avg(${scheduledPosts.shares}), 0)`,
+    avgImpressions: sql<number>`coalesce(avg(${scheduledPosts.impressions}), 0)`,
+    avgReach: sql<number>`coalesce(avg(${scheduledPosts.reach}), 0)`,
+    postCount: sql<number>`count(*)`,
+  })
+    .from(scheduledPosts)
+    .where(and(
+      eq(scheduledPosts.status, 'posted'),
+      isNotNull(scheduledPosts.postedAt)
+    ))
+    .groupBy(sql`extract(hour from ${scheduledPosts.postedAt})`)
+    .orderBy(sql`extract(hour from ${scheduledPosts.postedAt})`);
+
+  return results;
 }

@@ -10,7 +10,7 @@ import { comparePrice } from "./services/price-comparison";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
 import { db } from "@db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 
 const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
@@ -2463,7 +2463,7 @@ ${pages.map(p => `  <url>
         userId: req.user?.claims?.sub || null,
         sessionId: req.sessionID,
         query,
-        vehicleYear: year,
+        vehicleYear: year ? parseInt(year) : null,
         vehicleMake: make,
         vehicleModel: model,
         category: vehicleType,
@@ -8258,6 +8258,99 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
+  // Marketing Analytics - Top Performing Content
+  app.get("/api/marketing/analytics/top-content", isAuthenticated, async (req: any, res) => {
+    try {
+      const topContent = await db.select({
+        marketingPostId: scheduledPosts.marketingPostId,
+        content: scheduledPosts.content,
+        totalImpressions: sql<number>`COALESCE(SUM(${scheduledPosts.impressions}), 0)`,
+        totalReach: sql<number>`COALESCE(SUM(${scheduledPosts.reach}), 0)`,
+        totalClicks: sql<number>`COALESCE(SUM(${scheduledPosts.clicks}), 0)`,
+        totalLikes: sql<number>`COALESCE(SUM(${scheduledPosts.likes}), 0)`,
+        totalComments: sql<number>`COALESCE(SUM(${scheduledPosts.comments}), 0)`,
+        totalShares: sql<number>`COALESCE(SUM(${scheduledPosts.shares}), 0)`,
+        postCount: sql<number>`COUNT(*)`,
+        engagement: sql<number>`COALESCE(SUM(${scheduledPosts.likes}), 0) + COALESCE(SUM(${scheduledPosts.comments}), 0) + COALESCE(SUM(${scheduledPosts.shares}), 0)`,
+      })
+      .from(scheduledPosts)
+      .where(and(eq(scheduledPosts.status, 'posted'), sql`${scheduledPosts.marketingPostId} IS NOT NULL`))
+      .groupBy(scheduledPosts.marketingPostId, scheduledPosts.content)
+      .orderBy(sql`COALESCE(SUM(${scheduledPosts.likes}), 0) + COALESCE(SUM(${scheduledPosts.comments}), 0) + COALESCE(SUM(${scheduledPosts.shares}), 0) DESC`)
+      .limit(10);
+      res.json(topContent);
+    } catch (error) {
+      console.error("[Marketing] Top content error:", error);
+      res.json([]);
+    }
+  });
+
+  // Marketing Analytics - Top Performing Images
+  app.get("/api/marketing/analytics/top-images", isAuthenticated, async (req: any, res) => {
+    try {
+      const topImages = await db.select({
+        imageUrl: scheduledPosts.imageUrl,
+        totalImpressions: sql<number>`COALESCE(SUM(${scheduledPosts.impressions}), 0)`,
+        totalReach: sql<number>`COALESCE(SUM(${scheduledPosts.reach}), 0)`,
+        totalClicks: sql<number>`COALESCE(SUM(${scheduledPosts.clicks}), 0)`,
+        totalLikes: sql<number>`COALESCE(SUM(${scheduledPosts.likes}), 0)`,
+        totalComments: sql<number>`COALESCE(SUM(${scheduledPosts.comments}), 0)`,
+        totalShares: sql<number>`COALESCE(SUM(${scheduledPosts.shares}), 0)`,
+        postCount: sql<number>`COUNT(*)`,
+        engagement: sql<number>`COALESCE(SUM(${scheduledPosts.likes}), 0) + COALESCE(SUM(${scheduledPosts.comments}), 0) + COALESCE(SUM(${scheduledPosts.shares}), 0)`,
+      })
+      .from(scheduledPosts)
+      .where(and(eq(scheduledPosts.status, 'posted'), sql`${scheduledPosts.imageUrl} IS NOT NULL`))
+      .groupBy(scheduledPosts.imageUrl)
+      .orderBy(sql`COALESCE(SUM(${scheduledPosts.likes}), 0) + COALESCE(SUM(${scheduledPosts.comments}), 0) + COALESCE(SUM(${scheduledPosts.shares}), 0) DESC`)
+      .limit(10);
+      res.json(topImages);
+    } catch (error) {
+      console.error("[Marketing] Top images error:", error);
+      res.json([]);
+    }
+  });
+
+  // Marketing Analytics - Top Performing Bundles (Image+Message combinations)
+  app.get("/api/marketing/analytics/top-bundles", isAuthenticated, async (req: any, res) => {
+    try {
+      const topBundles = await db.select()
+        .from(contentBundles)
+        .where(eq(contentBundles.tenantId, 'garagebot'))
+        .orderBy(sql`COALESCE(${contentBundles.likes}, 0) + COALESCE(${contentBundles.comments}, 0) + COALESCE(${contentBundles.shares}, 0) DESC`)
+        .limit(10);
+      res.json(topBundles);
+    } catch (error) {
+      console.error("[Marketing] Top bundles error:", error);
+      res.json([]);
+    }
+  });
+
+  // Marketing Analytics - Performance by Time Slot
+  app.get("/api/marketing/analytics/time-slots", isAuthenticated, async (req: any, res) => {
+    try {
+      const timeSlots = await db.select({
+        hour: sql<number>`EXTRACT(HOUR FROM ${scheduledPosts.postedAt})`,
+        avgImpressions: sql<number>`COALESCE(AVG(${scheduledPosts.impressions}), 0)`,
+        avgReach: sql<number>`COALESCE(AVG(${scheduledPosts.reach}), 0)`,
+        avgClicks: sql<number>`COALESCE(AVG(${scheduledPosts.clicks}), 0)`,
+        avgLikes: sql<number>`COALESCE(AVG(${scheduledPosts.likes}), 0)`,
+        avgComments: sql<number>`COALESCE(AVG(${scheduledPosts.comments}), 0)`,
+        avgShares: sql<number>`COALESCE(AVG(${scheduledPosts.shares}), 0)`,
+        postCount: sql<number>`COUNT(*)`,
+        avgEngagement: sql<number>`COALESCE(AVG(${scheduledPosts.likes}), 0) + COALESCE(AVG(${scheduledPosts.comments}), 0) + COALESCE(AVG(${scheduledPosts.shares}), 0)`,
+      })
+      .from(scheduledPosts)
+      .where(and(eq(scheduledPosts.status, 'posted'), sql`${scheduledPosts.postedAt} IS NOT NULL`))
+      .groupBy(sql`EXTRACT(HOUR FROM ${scheduledPosts.postedAt})`)
+      .orderBy(sql`EXTRACT(HOUR FROM ${scheduledPosts.postedAt})`)
+      res.json(timeSlots);
+    } catch (error) {
+      console.error("[Marketing] Time slots error:", error);
+      res.json([]);
+    }
+  });
+
   // ============== SHOP MARKETING HUB ROUTES (TENANT-SPACED) ==============
   
   // Check if shop has Marketing Hub subscription
@@ -8614,184 +8707,71 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   // Seed comprehensive marketing content
   app.post("/api/marketing/seed", isAuthenticated, async (req: any, res) => {
     try {
-      // Comprehensive hashtag sets for maximum visibility
-      const ECOSYSTEM_HASHTAGS = ['#GarageBot', '#DWTL', '#DWSC', '#TrustShield', '#DarkWaveStudios'];
-      const AUTO_HASHTAGS = ['#AutoParts', '#CarRepair', '#DIYMechanic', '#AutoRepair', '#CarMaintenance', '#MechanicLife', '#CarParts', '#AutoShop', '#GarageTips', '#CarCare'];
-      const VEHICLE_HASHTAGS = ['#Cars', '#Trucks', '#Motorcycles', '#ATV', '#Boats', '#RV', '#ClassicCars', '#CarEnthusiast', '#Automotive', '#VehicleMaintenance'];
-      const TECH_HASHTAGS = ['#TechStartup', '#AI', '#SaaS', '#SmallBusiness', '#Entrepreneur', '#Innovation', '#TechNews', '#DigitalTransformation'];
-      const DIY_HASHTAGS = ['#DIY', '#Howto', '#Tutorial', '#FixIt', '#SaveMoney', '#WeekendWarrior', '#HomeGarage', '#ProjectCar'];
-      const SHOP_HASHTAGS = ['#AutoShopOwner', '#MechanicsGarage', '#ShopManagement', '#AutoBusiness', '#ShopTech', '#RepairShop', '#AutoService'];
-      
       const marketingContent = [
-        // GarageBot.io focused posts
-        {
-          content: "Stop overpaying for auto repairs! GarageBot compares prices from 50+ retailers to find you the best deals on parts. Your wallet will thank you.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, ...AUTO_HASHTAGS.slice(0,5), '#SaveMoney', '#SmartShopping'],
-          category: "parts-search",
-          tone: "promotional"
-        },
-        {
-          content: "🔧 DIY mechanic tip: Always check multiple retailers before buying parts. GarageBot searches 50+ stores instantly so you never overpay again!",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, ...DIY_HASHTAGS, ...AUTO_HASHTAGS.slice(0,3)],
-          category: "diy-tips",
-          tone: "educational"
-        },
-        {
-          content: "Your vehicle deserves the best. GarageBot's AI-powered search finds OEM and aftermarket parts with guaranteed fitment for cars, trucks, motorcycles, boats, ATVs & RVs.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, ...VEHICLE_HASHTAGS, '#OEMParts', '#AftermarketParts'],
-          category: "vehicle-types",
-          tone: "professional"
-        },
-        {
-          content: "🚗 Managing a fleet? GarageBot Pro lets you track unlimited vehicles, get AI repair estimates, and access exclusive dealer pricing. Try it free!",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#FleetManagement', '#FleetMaintenance', ...AUTO_HASHTAGS.slice(0,3), ...TECH_HASHTAGS.slice(0,3)],
-          category: "pro-features",
-          tone: "promotional"
-        },
-        {
-          content: "Auto shop owners: Compete with AutoLeap & Shopmonkey at 1/4 the price! GarageBot's Mechanics Garage portal handles estimates, invoicing, scheduling & more. $49/mo.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, ...SHOP_HASHTAGS, '#ShopOwner', '#AutoIndustry', '#BusinessTools'],
-          category: "mechanics-garage",
-          tone: "promotional"
-        },
-        {
-          content: "💡 Did you know? Most people overpay 30-50% on auto parts by only checking one retailer. GarageBot compares 50+ stores in seconds!",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, ...AUTO_HASHTAGS, '#MoneyTips', '#ConsumerTips'],
-          category: "education",
-          tone: "educational"
-        },
-        {
-          content: "VIN decoding + instant parts lookup = never order the wrong part again. GarageBot's Vehicle Passport ensures guaranteed fitment every time.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#VIN', '#VehicleHistory', ...AUTO_HASHTAGS.slice(0,4)],
-          category: "vin-features",
-          tone: "professional"
-        },
-        {
-          content: "🏍️ Motorcycle riders! GarageBot isn't just for cars. Find parts for your bike from 50+ retailers with guaranteed fitment.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#Motorcycles', '#BikerLife', '#MotorcycleParts', '#RideOrDie', '#TwoWheels', '#BikeLife'],
-          category: "motorcycles",
-          tone: "friendly"
-        },
-        {
-          content: "Weekend project? Get AI-generated repair guides with step-by-step instructions, tool lists, and video tutorials. GarageBot makes DIY repairs easy!",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, ...DIY_HASHTAGS, '#WeekendProject', '#GarageTime'],
-          category: "diy-guides",
-          tone: "friendly"
-        },
-        {
-          content: "⛵ Boat owners rejoice! GarageBot searches marine parts from top retailers. Keep your vessel running smooth all season.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#Boating', '#MarineParts', '#BoatLife', '#SailingLife', '#BoatMaintenance', '#MarineRepair'],
-          category: "boats",
-          tone: "friendly"
-        },
-        // DWTL.io focused posts
-        {
-          content: "DWTL.io - The Trust Layer powering secure digital identity across the DarkWave ecosystem. One login. All apps. Zero friction.",
-          platform: "all",
-          targetSite: "dwtl",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#DigitalIdentity', '#SSO', '#CyberSecurity', '#TechInnovation', '#WebSecurity'],
-          category: "identity",
-          tone: "professional"
-        },
-        {
-          content: "🔐 Tired of managing 50 different logins? DWTL.io brings single sign-on to the DarkWave ecosystem. Secure, seamless, simple.",
-          platform: "all",
-          targetSite: "dwtl",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#SSO', '#SingleSignOn', '#PasswordManagement', '#TechLife', '#Security'],
-          category: "sso",
-          tone: "promotional"
-        },
-        // DWSC.io focused posts
-        {
-          content: "DWSC.io - DarkWave Service Cloud. Enterprise-grade infrastructure for the modern web. Reliable. Scalable. Secure.",
-          platform: "all",
-          targetSite: "dwsc",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#CloudComputing', '#CloudServices', '#WebHosting', '#DevOps', '#CloudInfrastructure'],
-          category: "cloud",
-          tone: "professional"
-        },
-        {
-          content: "☁️ Building the next big thing? DWSC.io provides the cloud infrastructure you need to scale. Join the DarkWave ecosystem today!",
-          platform: "all",
-          targetSite: "dwsc",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#Startup', '#CloudNative', '#TechStartup', '#ScaleUp', '#WebDev', '#CloudFirst'],
-          category: "startup",
-          tone: "promotional"
-        },
-        // TrustShield.tech focused posts
-        {
-          content: "TrustShield.tech - Blockchain-verified authenticity for businesses and consumers. Prove what's real in a world of fakes.",
-          platform: "all",
-          targetSite: "trustshield",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#Blockchain', '#Web3', '#Authenticity', '#NFT', '#CryptoTech', '#Verification'],
-          category: "blockchain",
-          tone: "professional"
-        },
-        {
-          content: "🛡️ Fight counterfeits with TrustShield.tech! Blockchain verification ensures your products and documents are the real deal.",
-          platform: "all",
-          targetSite: "trustshield",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#AntiCounterfeit', '#Blockchain', '#ProductAuthenticity', '#BrandProtection', '#Crypto'],
-          category: "verification",
-          tone: "promotional"
-        },
-        // Cross-ecosystem posts
-        {
-          content: "The DarkWave ecosystem: GarageBot for auto parts, DWTL for identity, DWSC for cloud, TrustShield for verification. Building the future, one app at a time.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, ...TECH_HASHTAGS, '#Ecosystem', '#TechPlatform'],
-          category: "ecosystem",
-          tone: "professional"
-        },
-        {
-          content: "🚀 Entrepreneurs: The DarkWave ecosystem has everything you need. Parts aggregation, cloud hosting, secure identity, blockchain verification. All integrated.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#Entrepreneur', '#StartupLife', '#TechEcosystem', '#BuildInPublic', '#FounderLife'],
-          category: "entrepreneurs",
-          tone: "promotional"
-        },
-        // Seasonal/timely posts
-        {
-          content: "🌧️ Rainy season prep: Check your wipers, tires & brakes! GarageBot helps you find the best prices on safety essentials.",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#RainySeason', '#CarSafety', '#WinterPrep', ...AUTO_HASHTAGS.slice(0,4)],
-          category: "seasonal",
-          tone: "friendly"
-        },
-        {
-          content: "Road trip ready? ☀️ Use GarageBot to stock up on filters, fluids & belts before you hit the highway. Compare 50+ retailers instantly!",
-          platform: "all",
-          targetSite: "garagebot",
-          hashtags: [...ECOSYSTEM_HASHTAGS, '#RoadTrip', '#SummerDriving', '#CarPrep', ...VEHICLE_HASHTAGS.slice(0,4)],
-          category: "seasonal",
-          tone: "friendly"
-        }
+        { content: "Did you know the average car owner overpays $47 per brake job by not comparing prices? GarageBot searches 50+ retailers instantly so you never overpay again.", platform: "all", hashtags: ["GarageBot", "AutoParts", "SaveMoney", "BrakeParts", "SmartShopping"], targetSite: "garagebot", category: "cars", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "Weekend project alert! Changing your own oil saves $30-$60 every time. Search GarageBot for the best oil filter prices across 50+ stores. Your wallet will thank you.", platform: "all", hashtags: ["DIY", "OilChange", "WeekendWarrior", "GarageBot", "AutoRepair"], targetSite: "garagebot", category: "diy", contentType: "evergreen", tone: "friendly", cta: "shop-now" },
+        { content: "CHALLENGE: Can you name this part? It sits between your engine and transmission, wears out around 60K miles, and costs 3x more at the dealer. Drop your answer below!", platform: "all", hashtags: ["CarTrivia", "GarageBot", "NameThatPart", "AutoChallenge", "MechanicLife"], targetSite: "garagebot", category: "gamified", contentType: "gamified", tone: "friendly", cta: "learn-more" },
+        { content: "Boat season is coming! Marine parts can cost 40% more at specialty shops vs online retailers. GarageBot compares prices from West Marine, Bass Pro, and 50+ more stores.", platform: "all", hashtags: ["BoatLife", "MarineParts", "GarageBot", "BoatSeason", "Boating"], targetSite: "garagebot", category: "marine", contentType: "seasonal", tone: "promotional", cta: "shop-now" },
+        { content: "Pro tip: Your ATV air filter should be checked after every 5 rides in dusty conditions. A clogged filter reduces power by up to 10%. Find replacements from $8 on GarageBot.", platform: "all", hashtags: ["ATV", "UTV", "OffRoad", "GarageBot", "TrailRiding", "MaintenanceTips"], targetSite: "garagebot", category: "atv", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "Winter is coming for your RV! Don't forget antifreeze for your water lines, fresh wiper blades, and tire pressure checks. Search all three on GarageBot in seconds.", platform: "all", hashtags: ["RVLife", "WinterPrep", "RVMaintenance", "GarageBot", "Winterize"], targetSite: "garagebot", category: "rv", contentType: "seasonal", tone: "friendly", cta: "visit-site" },
+        { content: "QUIZ TIME: What's the most common reason a riding mower won't start in spring? A) Dead battery B) Old fuel C) Dirty carburetor. Answer: ALL THREE. GarageBot has parts for each fix.", platform: "all", hashtags: ["SmallEngines", "LawnMower", "GarageBot", "SpringPrep", "QuizTime"], targetSite: "garagebot", category: "small-engines", contentType: "gamified", tone: "friendly", cta: "shop-now" },
+        { content: "Tractor maintenance isn't optional — it's survival. Hydraulic fluid, PTO seals, and air filters keep your equipment running when it matters most. Compare prices at GarageBot.", platform: "all", hashtags: ["FarmLife", "Tractor", "Agriculture", "GarageBot", "HeavyEquipment"], targetSite: "garagebot", category: "tractor", contentType: "evergreen", tone: "professional", cta: "shop-now" },
+        { content: "FPV drone motors burning out? The #1 mistake is running the wrong prop size. Check our guide and find replacement motors from top RC retailers on GarageBot.", platform: "all", hashtags: ["FPV", "Drones", "RCHobby", "GarageBot", "DroneLife", "QuadBuild"], targetSite: "garagebot", category: "drones", contentType: "educational", tone: "friendly", cta: "learn-more" },
+        { content: "Right Part. First Time. Every Engine. From your daily driver to your RC car collection — GarageBot searches 50+ retailers so you always find the best price.", platform: "all", hashtags: ["GarageBot", "RightPartFirstTime", "AutoParts", "EveryEngine", "PriceComparison"], targetSite: "garagebot", category: "brand", contentType: "evergreen", tone: "professional", cta: "visit-site" },
+        { content: "Your motorcycle chain needs adjustment every 500 miles. Too loose = dangerous slap. Too tight = premature sprocket wear. Find chains and sprockets on GarageBot from $15.", platform: "all", hashtags: ["Motorcycle", "BikerLife", "ChainMaintenance", "GarageBot", "RideOrDie"], targetSite: "garagebot", category: "motorcycle", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "CHALLENGE: Estimate how much you'd save per YEAR if you compared prices before every parts purchase. Most GarageBot users report saving $200-$400 annually. What's your number?", platform: "all", hashtags: ["GarageBot", "MoneySaver", "AutoParts", "Challenge", "SmartShopping"], targetSite: "garagebot", category: "brand", contentType: "gamified", tone: "friendly", cta: "visit-site" },
+        { content: "Generator won't start when you need it most? Check the carburetor, spark plug, and fuel valve first. GarageBot finds parts from Honda, Generac, and Champion dealers instantly.", platform: "all", hashtags: ["Generator", "PowerOutage", "Preparedness", "GarageBot", "SmallEngine"], targetSite: "garagebot", category: "generator", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "Summer road trip checklist: Coolant topped off? Tires rotated? AC filter fresh? Belts inspected? GarageBot helps you prep for the road without overpaying.", platform: "all", hashtags: ["SummerRoadTrip", "RoadTrip", "CarMaintenance", "GarageBot", "Summer"], targetSite: "garagebot", category: "cars", contentType: "seasonal", tone: "friendly", cta: "shop-now" },
+        { content: "Slot car enthusiasts: Finding the right replacement motor or guide pins shouldn't take hours of searching. GarageBot covers hobby retailers too. One search. Done.", platform: "all", hashtags: ["SlotCars", "ScaleRacing", "RCHobby", "GarageBot", "HobbyLife"], targetSite: "garagebot", category: "slot-cars", contentType: "evergreen", tone: "friendly", cta: "visit-site" },
+        { content: "Heavy equipment downtime costs $500-$2,000 PER HOUR. Don't wait for the dealer to find parts. GarageBot searches CAT, John Deere, and Komatsu parts suppliers instantly.", platform: "all", hashtags: ["HeavyEquipment", "Construction", "CAT", "JohnDeere", "GarageBot"], targetSite: "garagebot", category: "heavy-equipment", contentType: "promotional", tone: "urgent", cta: "shop-now" },
+        { content: "Go-kart racing tip: A clean air filter alone can add 1-2 HP on a Briggs 206. That's the difference between podium and mid-pack. Find filters from $6 on GarageBot.", platform: "all", hashtags: ["GoKart", "KartRacing", "Briggs206", "GarageBot", "RacingTips"], targetSite: "garagebot", category: "go-kart", contentType: "educational", tone: "friendly", cta: "shop-now" },
+        { content: "Your golf cart batteries have a lifespan of 4-6 years. When they start losing range, don't overpay at the pro shop. Compare battery prices across retailers on GarageBot.", platform: "all", hashtags: ["GolfCart", "GolfLife", "ElectricVehicle", "GarageBot", "BatteryReplacement"], targetSite: "garagebot", category: "golf-cart", contentType: "evergreen", tone: "professional", cta: "shop-now" },
+        { content: "Model aircraft builders: Servos, ESCs, receivers — one bad component grounds your whole build. GarageBot searches HobbyKing, Tower Hobbies, and more for the exact part you need.", platform: "all", hashtags: ["ModelAircraft", "RCPlane", "RCHobby", "GarageBot", "BuildAndFly"], targetSite: "garagebot", category: "model-aircraft", contentType: "evergreen", tone: "friendly", cta: "shop-now" },
+        { content: "Spring cleaning for your engine: Replace spark plugs, check belts, flush coolant, and inspect brakes. GarageBot makes finding all these parts in one place effortless.", platform: "all", hashtags: ["SpringMaintenance", "CarCare", "GarageBot", "AutoParts", "SpringCleaning"], targetSite: "garagebot", category: "cars", contentType: "seasonal", tone: "friendly", cta: "shop-now" },
+        { content: "Snowmobile season prep: Check your track tension, inspect wear bars, and replace spark plugs before first ride. Compare prices across Arctic Cat and Polaris part suppliers on GarageBot.", platform: "all", hashtags: ["Snowmobile", "WinterSports", "ArcticCat", "Polaris", "GarageBot"], targetSite: "garagebot", category: "snowmobile", contentType: "seasonal", tone: "professional", cta: "shop-now" },
+        { content: "TRIVIA: What common household item can clean corroded battery terminals? A penny! But for new terminals and cables, GarageBot compares prices from 50+ auto parts stores.", platform: "all", hashtags: ["CarTrivia", "BatteryTips", "GarageBot", "DIYAuto", "AutoHacks"], targetSite: "garagebot", category: "cars", contentType: "gamified", tone: "friendly", cta: "learn-more" },
+        { content: "Jet ski impeller worn out? A damaged impeller can reduce top speed by 10+ mph. Don't let your summer fun fade — find OEM and aftermarket replacements on GarageBot.", platform: "all", hashtags: ["JetSki", "PWC", "WaveRunner", "GarageBot", "SummerFun", "WaterSports"], targetSite: "garagebot", category: "jet-ski", contentType: "seasonal", tone: "promotional", cta: "shop-now" },
+        { content: "RC car tip: Worn-out shocks cause inconsistent handling and slower lap times. Quality replacement shocks start at $12. Search GarageBot's hobby retailer network.", platform: "all", hashtags: ["RCCars", "RCRacing", "Traxxas", "GarageBot", "HobbyLife"], targetSite: "garagebot", category: "rc-cars", contentType: "educational", tone: "friendly", cta: "shop-now" },
+        { content: "Fun fact: The average American spends 17 minutes per part searching individual retailer websites. GarageBot does it in under 10 seconds across 50+ stores.", platform: "all", hashtags: ["GarageBot", "TimeSaver", "AutoParts", "SmartSearch", "Efficiency"], targetSite: "garagebot", category: "brand", contentType: "evergreen", tone: "professional", cta: "visit-site" },
+        { content: "Exotic car owners: Finding OEM parts for your Lamborghini, Ferrari, or McLaren doesn't have to mean dealer-only pricing. GarageBot searches specialty suppliers too.", platform: "all", hashtags: ["ExoticCars", "Supercar", "Lamborghini", "Ferrari", "GarageBot"], targetSite: "garagebot", category: "exotic", contentType: "evergreen", tone: "professional", cta: "shop-now" },
+        { content: "Classic car restoration tip: NOS (New Old Stock) parts are gold. GarageBot searches vintage parts suppliers alongside modern retailers so you find what others can't.", platform: "all", hashtags: ["ClassicCars", "HotRod", "Restoration", "VintageParts", "GarageBot"], targetSite: "garagebot", category: "classic", contentType: "educational", tone: "friendly", cta: "shop-now" },
+        { content: "Diesel truck owners: Your fuel filter is your engine's first line of defense. Replace it every 15K miles. Compare Motorcraft, Fleetguard, and Baldwin prices on GarageBot.", platform: "all", hashtags: ["DieselTruck", "Powerstroke", "Cummins", "Duramax", "GarageBot"], targetSite: "garagebot", category: "diesel", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "CHALLENGE: Tag a friend who ALWAYS overpays for car parts because they only check one store. Show them GarageBot and save them hundreds this year!", platform: "all", hashtags: ["GarageBot", "TagAFriend", "AutoParts", "SaveMoney", "Challenge"], targetSite: "garagebot", category: "brand", contentType: "gamified", tone: "friendly", cta: "visit-site" },
+        { content: "Aviation maintenance isn't just about safety — it's the law. Find AN hardware, gaskets, and certified replacement parts from aviation suppliers on GarageBot.", platform: "all", hashtags: ["Aviation", "PilotLife", "AircraftMaintenance", "GarageBot", "GeneralAviation"], targetSite: "garagebot", category: "aviation", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "Kit car builders know: Every bolt, hose, and bracket matters. GarageBot helps you source parts from specialty and mainstream retailers without the endless browser tabs.", platform: "all", hashtags: ["KitCar", "FactoryFive", "CobraKit", "GarageBot", "BuildYourDream"], targetSite: "garagebot", category: "kit-car", contentType: "evergreen", tone: "friendly", cta: "shop-now" },
+        { content: "Fall maintenance reminder: Check your tire tread depth before wet roads arrive. The penny test works — if you see all of Lincoln's head, it's time. Find tires on GarageBot.", platform: "all", hashtags: ["FallMaintenance", "TireSafety", "GarageBot", "AutoCare", "SafeDriving"], targetSite: "garagebot", category: "cars", contentType: "seasonal", tone: "professional", cta: "shop-now" },
+        { content: "Meet Buddy — your AI-powered parts expert inside GarageBot. Ask Buddy anything: 'What brake pads fit my 2019 F-150?' and get instant answers with price comparisons.", platform: "all", hashtags: ["BuddyAI", "GarageBot", "AIAssistant", "AutoParts", "SmartTech"], targetSite: "garagebot", category: "ai", contentType: "promotional", tone: "friendly", cta: "learn-more" },
+        { content: "Marine engine winterization: Flush with fresh water, fog the cylinders, stabilize fuel, and change the lower unit oil. Find all supplies compared across retailers on GarageBot.", platform: "all", hashtags: ["MarineEngine", "Winterization", "BoatMaintenance", "GarageBot", "BoatLife"], targetSite: "garagebot", category: "marine", contentType: "seasonal", tone: "professional", cta: "shop-now" },
+        { content: "Your truck's suspension works harder than you think — especially if you tow. Worn shocks increase stopping distance by up to 20%. Compare replacement shocks on GarageBot.", platform: "all", hashtags: ["Trucks", "Towing", "Suspension", "GarageBot", "TruckLife"], targetSite: "garagebot", category: "trucks", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "QUIZ: How many spark plugs does a V8 engine have? If you said 8, you're right — but some HEMI engines have 16! Find the right plugs for YOUR engine on GarageBot.", platform: "all", hashtags: ["EngineTrivia", "SparkPlugs", "V8", "HEMI", "GarageBot", "CarQuiz"], targetSite: "garagebot", category: "cars", contentType: "gamified", tone: "friendly", cta: "shop-now" },
+        { content: "Power equipment pros: Chainsaw chains, trimmer line, and blower filters — GarageBot searches Stihl, Husqvarna, and Echo dealers so you spend less time shopping, more time working.", platform: "all", hashtags: ["PowerEquipment", "Chainsaw", "Landscaping", "GarageBot", "ProTools"], targetSite: "garagebot", category: "small-engines", contentType: "evergreen", tone: "professional", cta: "shop-now" },
+        { content: "Mechanics Garage: Run your own shop? GarageBot's Pro tools help you manage inventory, find the best wholesale prices, and keep your customers happy. Join the Founders Circle.", platform: "all", hashtags: ["MechanicsGarage", "AutoShop", "GarageBot", "ShopOwner", "ProMechanic"], targetSite: "garagebot", category: "mechanics", contentType: "promotional", tone: "professional", cta: "learn-more" },
+        { content: "Don't let a dead battery ruin your morning. Most car batteries last 3-5 years. Check your battery age and compare replacements from 50+ retailers on GarageBot.", platform: "all", hashtags: ["CarBattery", "DeadBattery", "GarageBot", "AutoParts", "BeReady"], targetSite: "garagebot", category: "cars", contentType: "evergreen", tone: "friendly", cta: "shop-now" },
+        { content: "Drone pilots: Calibrate your ESCs before every new build. Inconsistent throttle response = unstable flight. Find quality ESCs from trusted hobby retailers on GarageBot.", platform: "all", hashtags: ["Drones", "FPV", "ESC", "DroneBuilding", "GarageBot", "TechHobby"], targetSite: "garagebot", category: "drones", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "Summer boat checklist: Impeller \u2713 Fuel filter \u2713 Spark plugs \u2713 Lower unit oil \u2713 Stop searching 10 websites — GarageBot compares them all in one search.", platform: "all", hashtags: ["BoatLife", "SummerBoating", "MarineParts", "GarageBot", "LakeLife"], targetSite: "garagebot", category: "marine", contentType: "seasonal", tone: "friendly", cta: "shop-now" },
+        { content: "Your vehicle tells a story. GarageBot's Vehicle Passport with VIN decoding gives you complete service history, maintenance schedules, and recall alerts. Know your ride.", platform: "all", hashtags: ["VINDecoder", "VehiclePassport", "GarageBot", "CarHistory", "SmartOwnership"], targetSite: "garagebot", category: "brand", contentType: "promotional", tone: "professional", cta: "learn-more" },
+        { content: "ATV trail tip: After muddy rides, always clean your air filter and check your CV boots for tears. Prevention costs $20. Repair costs $500+. Find parts on GarageBot.", platform: "all", hashtags: ["ATV", "TrailRiding", "MudLife", "GarageBot", "OffRoad"], targetSite: "garagebot", category: "atv", contentType: "educational", tone: "friendly", cta: "shop-now" },
+        { content: "CHALLENGE: What's the most miles you've gotten out of a set of brake pads? Share your number! Pro tip: Compare ceramic vs semi-metallic prices on GarageBot before your next swap.", platform: "all", hashtags: ["BrakeChallenge", "GarageBot", "BrakePads", "CarMaintenance", "HighMileage"], targetSite: "garagebot", category: "gamified", contentType: "gamified", tone: "friendly", cta: "shop-now" },
+        { content: "RV water pump making noise? It might be time for a new one. Don't pay campground prices — GarageBot compares RV parts from Camping World, Amazon, and specialty suppliers.", platform: "all", hashtags: ["RVLife", "RVRepair", "CampingLife", "GarageBot", "RVParts"], targetSite: "garagebot", category: "rv", contentType: "evergreen", tone: "friendly", cta: "shop-now" },
+        { content: "The Genesis Hallmark: Early GarageBot adopters receive a blockchain-verified digital certificate on Solana. It's your proof of being part of the revolution. Claim yours.", platform: "all", hashtags: ["GenesisHallmark", "Blockchain", "Solana", "GarageBot", "EarlyAdopter"], targetSite: "garagebot", category: "blockchain", contentType: "promotional", tone: "professional", cta: "learn-more" },
+        { content: "Motorcycle riders: Your chain and sprocket kit should be replaced as a set — never mix old and new. Find complete kits from $45 across 50+ retailers on GarageBot.", platform: "all", hashtags: ["Motorcycle", "ChainAndSprocket", "BikerMaintenance", "GarageBot", "TwoWheels"], targetSite: "garagebot", category: "motorcycle", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "Winter tire season is here! All-season vs winter tires isn't even close in snow. GarageBot compares prices from Tire Rack, Discount Tire, and more.", platform: "all", hashtags: ["WinterTires", "SnowTires", "WinterDriving", "GarageBot", "SafetyFirst"], targetSite: "garagebot", category: "cars", contentType: "seasonal", tone: "professional", cta: "shop-now" },
+        { content: "Tractor PTO shaft maintenance: Grease it every 8 hours of use. A dry PTO wears out bearings fast and replacements aren't cheap. Compare prices on GarageBot.", platform: "all", hashtags: ["Tractor", "FarmEquipment", "PTO", "GarageBot", "FarmLife"], targetSite: "garagebot", category: "tractor", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "TRIVIA: What does 'OEM' stand for? Original Equipment Manufacturer! OEM parts match what came on your vehicle. Aftermarket parts are alternatives. GarageBot shows you both.", platform: "all", hashtags: ["OEM", "Aftermarket", "AutoTrivia", "GarageBot", "PartsKnowledge"], targetSite: "garagebot", category: "cars", contentType: "gamified", tone: "educational", cta: "learn-more" },
+        { content: "Generator maintenance 101: Run it for 30 minutes every month with a load. Stale fuel and dry seals are the #1 killer. Find maintenance kits on GarageBot.", platform: "all", hashtags: ["Generator", "EmergencyPrep", "MaintenanceTips", "GarageBot", "PowerReady"], targetSite: "garagebot", category: "generator", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "Buddy AI just got smarter! Now Buddy can identify parts from your vehicle's VIN, suggest maintenance schedules, and find the best prices — all in one conversation.", platform: "all", hashtags: ["BuddyAI", "GarageBot", "AIUpgrade", "SmartParts", "TechInnovation"], targetSite: "garagebot", category: "ai", contentType: "promotional", tone: "friendly", cta: "learn-more" },
+        { content: "Go-kart clutch slipping? Check your engagement RPM and spring tension before replacing. New clutches start at $25. Compare options across hobby and motorsport retailers on GarageBot.", platform: "all", hashtags: ["GoKart", "KartClutch", "Motorsport", "GarageBot", "RacingParts"], targetSite: "garagebot", category: "go-kart", contentType: "educational", tone: "friendly", cta: "shop-now" },
+        { content: "DarkWave Studios ecosystem: GarageBot for parts, Trust Layer for security, ORBIT for staffing. One login, infinite possibilities. Built different.", platform: "all", hashtags: ["DarkWaveStudios", "GarageBot", "TrustLayer", "ORBIT", "Ecosystem"], targetSite: "garagebot", category: "darkwave", contentType: "promotional", tone: "professional", cta: "visit-site" },
+        { content: "Golf cart speed controller acting up? Before replacing it ($200+), check your solenoid and throttle sensor first. Find all three parts compared on GarageBot.", platform: "all", hashtags: ["GolfCart", "ElectricVehicle", "Troubleshooting", "GarageBot", "DIYFix"], targetSite: "garagebot", category: "golf-cart", contentType: "educational", tone: "friendly", cta: "shop-now" },
+        { content: "Snowmobile track studs: More studs = more traction, but too many = more drag. Find the sweet spot and compare stud kits on GarageBot from $30.", platform: "all", hashtags: ["Snowmobile", "TrackStuds", "WinterRiding", "GarageBot", "SnowSports"], targetSite: "garagebot", category: "snowmobile", contentType: "educational", tone: "friendly", cta: "shop-now" },
+        { content: "Every 3,000 miles or every 3 months — that's the classic oil change interval. Modern synthetic oils can go 7,500-10,000. Know your oil and save. Compare on GarageBot.", platform: "all", hashtags: ["OilChange", "SyntheticOil", "CarMaintenance", "GarageBot", "EngineHealth"], targetSite: "garagebot", category: "cars", contentType: "educational", tone: "professional", cta: "shop-now" },
+        { content: "RC car race day prep: Fresh batteries, clean bearings, check diff fluid, and always bring spare parts. GarageBot's hobby search covers Traxxas, Arrma, Losi, and more.", platform: "all", hashtags: ["RCRacing", "RCCars", "Traxxas", "Arrma", "GarageBot"], targetSite: "garagebot", category: "rc-cars", contentType: "evergreen", tone: "friendly", cta: "shop-now" },
+        { content: "Jet ski pre-season: Replace the wear ring if you've lost thrust, check the jet pump for debris, and flush the cooling system. All parts compared on GarageBot.", platform: "all", hashtags: ["JetSki", "PreSeason", "PWC", "GarageBot", "WaterSports"], targetSite: "garagebot", category: "jet-ski", contentType: "seasonal", tone: "professional", cta: "shop-now" },
+        { content: "Why search 50 websites when GarageBot does it for you? One search box. Every part. Every engine. Real prices. Real links. No guessing.", platform: "all", hashtags: ["GarageBot", "OneSearch", "AutoParts", "PriceComparison", "EveryEngine"], targetSite: "garagebot", category: "brand", contentType: "evergreen", tone: "professional", cta: "visit-site" },
       ];
 
-      // Clear existing and insert new (scoped to garagebot tenant only)
+      console.log("Seeding 60 posts and vehicle category images...");
+
       await db.delete(marketingPosts).where(eq(marketingPosts.tenantId, 'garagebot'));
       for (const post of marketingContent) {
         await db.insert(marketingPosts).values({
@@ -8800,32 +8780,45 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
           targetSite: post.targetSite,
           hashtags: post.hashtags,
           category: post.category,
+          contentType: post.contentType,
           tone: post.tone,
+          cta: post.cta,
           tenantId: 'garagebot',
           isActive: true,
         });
       }
       
-      // Seed marketing images - includes Hatch Show Print style posters
       const marketingImagesList = [
-        // Lifestyle/product images
-        { filename: 'garagebot-mechanic-hero.png', filePath: '/marketing/garagebot-mechanic-hero.png', category: 'hero', subject: 'mechanic', style: 'product', altText: 'Professional mechanic working on car engine' },
-        { filename: 'garagebot-price-compare.png', filePath: '/marketing/garagebot-price-compare.png', category: 'feature', subject: 'comparison', style: 'product', altText: 'Price comparison across 50+ retailers' },
-        { filename: 'garagebot-all-vehicles.png', filePath: '/marketing/garagebot-all-vehicles.png', category: 'vehicles', subject: 'all-types', style: 'product', altText: 'Cars trucks motorcycles ATVs boats RVs lineup' },
-        { filename: 'garagebot-mobile-app.png', filePath: '/marketing/garagebot-mobile-app.png', category: 'app', subject: 'mobile', style: 'product', altText: 'GarageBot mobile app with retailer logos' },
-        { filename: 'garagebot-diy-mechanic.png', filePath: '/marketing/garagebot-diy-mechanic.png', category: 'diy', subject: 'diy', style: 'lifestyle', altText: 'Weekend DIY mechanic in home garage' },
-        { filename: 'garagebot-auto-shop.png', filePath: '/marketing/garagebot-auto-shop.png', category: 'shop', subject: 'professional', style: 'product', altText: 'Professional auto repair shop with digital displays' },
-        // Hatch Show Print style posters
-        { filename: 'hatch-garagebot-main.png', filePath: '/marketing/hatch-garagebot-main.png', category: 'brand', subject: 'garagebot', style: 'hatch-print', altText: 'GarageBot vintage letterpress poster' },
-        { filename: 'hatch-garagebot-slogan.png', filePath: '/marketing/hatch-garagebot-slogan.png', category: 'brand', subject: 'slogan', style: 'hatch-print', altText: 'Right Part First Time vintage poster' },
-        { filename: 'hatch-trustlayer-main.png', filePath: '/marketing/hatch-trustlayer-main.png', category: 'brand', subject: 'trustlayer', style: 'hatch-print', altText: 'Trust Layer vintage letterpress poster' },
-        { filename: 'hatch-garagebot-retailers.png', filePath: '/marketing/hatch-garagebot-retailers.png', category: 'feature', subject: 'retailers', style: 'hatch-print', altText: '50+ Retailers vintage poster' },
-        { filename: 'hatch-garagebot-diy.png', filePath: '/marketing/hatch-garagebot-diy.png', category: 'feature', subject: 'diy-guides', style: 'hatch-print', altText: 'DIY Repair Guides vintage poster' },
-        { filename: 'hatch-mechanics-garage.png', filePath: '/marketing/hatch-mechanics-garage.png', category: 'brand', subject: 'mechanics', style: 'hatch-print', altText: 'Mechanics Garage vintage poster' },
-        { filename: 'hatch-darkwave-studios.png', filePath: '/marketing/hatch-darkwave-studios.png', category: 'brand', subject: 'darkwave', style: 'hatch-print', altText: 'DarkWave Studios vintage poster' },
-        { filename: 'hatch-every-engine.png', filePath: '/marketing/hatch-every-engine.png', category: 'feature', subject: 'vehicles', style: 'hatch-print', altText: 'Every Engine vintage poster' },
-        { filename: 'hatch-ai-powered.png', filePath: '/marketing/hatch-ai-powered.png', category: 'feature', subject: 'ai', style: 'hatch-print', altText: 'AI Powered vintage poster' },
-        { filename: 'hatch-blockchain.png', filePath: '/marketing/hatch-blockchain.png', category: 'feature', subject: 'blockchain', style: 'hatch-print', altText: 'Blockchain Verified vintage poster' },
+        { filename: 'cars_and_trucks.png', filePath: '/generated_images/cars_and_trucks.png', category: 'vehicles', subject: 'garagebot', style: 'product', altText: 'Cars and trucks parts' },
+        { filename: 'atv_and_utv.png', filePath: '/generated_images/atv_and_utv.png', category: 'vehicles', subject: 'garagebot', style: 'action-shot', altText: 'ATV and UTV off-road vehicles' },
+        { filename: 'boat_marine.png', filePath: '/generated_images/boat_marine.png', category: 'vehicles', subject: 'garagebot', style: 'lifestyle', altText: 'Boat and marine vessels' },
+        { filename: 'rv_trailer.png', filePath: '/generated_images/rv_trailer.png', category: 'vehicles', subject: 'garagebot', style: 'lifestyle', altText: 'RV and travel trailer' },
+        { filename: 'tractor_farm.png', filePath: '/generated_images/tractor_farm.png', category: 'vehicles', subject: 'garagebot', style: 'action-shot', altText: 'Farm tractor and equipment' },
+        { filename: 'heavy_equipment.png', filePath: '/generated_images/heavy_equipment.png', category: 'vehicles', subject: 'garagebot', style: 'product', altText: 'Heavy construction equipment' },
+        { filename: 'generator_power.png', filePath: '/generated_images/generator_power.png', category: 'parts', subject: 'garagebot', style: 'product', altText: 'Power generator' },
+        { filename: 'small_engines_equipment.png', filePath: '/generated_images/small_engines_equipment.png', category: 'parts', subject: 'garagebot', style: 'product', altText: 'Small engine equipment' },
+        { filename: 'aviation_aircraft.png', filePath: '/generated_images/aviation_aircraft.png', category: 'vehicles', subject: 'garagebot', style: 'action-shot', altText: 'Aviation and aircraft' },
+        { filename: 'rc_hobby_vehicles.png', filePath: '/generated_images/rc_hobby_vehicles.png', category: 'hobby', subject: 'garagebot', style: 'action-shot', altText: 'RC hobby vehicles' },
+        { filename: 'drones_fpv.png', filePath: '/generated_images/drones_fpv.png', category: 'hobby', subject: 'garagebot', style: 'action-shot', altText: 'FPV drones and racing' },
+        { filename: 'model_aircraft.png', filePath: '/generated_images/model_aircraft.png', category: 'hobby', subject: 'garagebot', style: 'product', altText: 'Model aircraft and RC planes' },
+        { filename: 'slot_cars.png', filePath: '/generated_images/slot_cars.png', category: 'hobby', subject: 'garagebot', style: 'action-shot', altText: 'Slot cars and scale racing' },
+        { filename: 'go_kart_racing.png', filePath: '/generated_images/go_kart_racing.png', category: 'vehicles', subject: 'garagebot', style: 'action-shot', altText: 'Go-kart racing' },
+        { filename: 'golf_cart.png', filePath: '/generated_images/golf_cart.png', category: 'vehicles', subject: 'garagebot', style: 'lifestyle', altText: 'Golf cart' },
+        { filename: 'snowmobile_snow.png', filePath: '/generated_images/snowmobile_snow.png', category: 'vehicles', subject: 'garagebot', style: 'action-shot', altText: 'Snowmobile in winter' },
+        { filename: 'jet_ski_watercraft.png', filePath: '/generated_images/jet_ski_watercraft.png', category: 'vehicles', subject: 'garagebot', style: 'action-shot', altText: 'Jet ski personal watercraft' },
+        { filename: 'exotic_supercar.png', filePath: '/generated_images/exotic_supercar.png', category: 'vehicles', subject: 'garagebot', style: 'product', altText: 'Exotic supercar' },
+        { filename: 'classic_hot_rod.png', filePath: '/generated_images/classic_hot_rod.png', category: 'vehicles', subject: 'garagebot', style: 'lifestyle', altText: 'Classic hot rod car' },
+        { filename: 'diesel_commercial_truck.png', filePath: '/generated_images/diesel_commercial_truck.png', category: 'vehicles', subject: 'garagebot', style: 'product', altText: 'Diesel commercial truck' },
+        { filename: 'kit_car_build.png', filePath: '/generated_images/kit_car_build.png', category: 'vehicles', subject: 'garagebot', style: 'before-after', altText: 'Kit car build project' },
+        { filename: 'brake_parts.png', filePath: '/generated_images/brake_parts.png', category: 'parts', subject: 'parts', style: 'product', altText: 'Brake pads and rotors' },
+        { filename: 'engine_block.png', filePath: '/generated_images/engine_block.png', category: 'parts', subject: 'parts', style: 'detail-closeup', altText: 'Engine block assembly' },
+        { filename: 'suspension_parts.png', filePath: '/generated_images/suspension_parts.png', category: 'parts', subject: 'parts', style: 'product', altText: 'Suspension components' },
+        { filename: 'tires_and_wheels.png', filePath: '/generated_images/tires_and_wheels.png', category: 'parts', subject: 'parts', style: 'product', altText: 'Tires and wheels' },
+        { filename: 'buddy_ai_assistant.png', filePath: '/generated_images/buddy_ai_assistant.png', category: 'feature', subject: 'ai', style: 'product', altText: 'Buddy AI assistant mascot' },
+        { filename: 'car_battery.png', filePath: '/generated_images/car_battery.png', category: 'parts', subject: 'parts', style: 'product', altText: 'Car battery' },
+        { filename: 'exhaust_system.png', filePath: '/generated_images/exhaust_system.png', category: 'parts', subject: 'parts', style: 'product', altText: 'Exhaust system' },
+        { filename: 'marine_parts.png', filePath: '/generated_images/marine_parts.png', category: 'parts', subject: 'garagebot', style: 'product', altText: 'Marine boat parts' },
+        { filename: 'garagebot_facebook_cover_16x9.png', filePath: '/generated_images/../attached_assets/garagebot_facebook_cover_16x9.png', category: 'brand', subject: 'garagebot', style: 'product', altText: 'GarageBot.io Facebook cover banner' },
       ];
       
       await db.delete(marketingImages).where(eq(marketingImages.tenantId, 'garagebot'));
@@ -8844,7 +8837,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
         });
       }
       
-      res.json({ success: true, posts: marketingContent.length, images: marketingImagesList.length, message: "Marketing content and images seeded with comprehensive hashtags" });
+      res.json({ success: true, posts: marketingContent.length, images: marketingImagesList.length, message: "60 posts seeded across all vehicle categories with mixed content types" });
     } catch (err) {
       console.error("Seed error:", err);
       res.status(500).json({ error: "Failed to seed marketing content" });

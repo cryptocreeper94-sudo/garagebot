@@ -277,6 +277,26 @@ export default function MarketingHub() {
     queryFn: () => apiRequest("GET", "/api/marketing/bundles").then(r => r.json()).catch(() => []),
   });
 
+  const { data: topContent = [] } = useQuery<any[]>({
+    queryKey: ["/api/marketing/analytics/top-content"],
+    queryFn: () => apiRequest("GET", "/api/marketing/analytics/top-content").then(r => r.json()).catch(() => []),
+  });
+
+  const { data: topImages = [] } = useQuery<any[]>({
+    queryKey: ["/api/marketing/analytics/top-images"],
+    queryFn: () => apiRequest("GET", "/api/marketing/analytics/top-images").then(r => r.json()).catch(() => []),
+  });
+
+  const { data: topBundles = [] } = useQuery<any[]>({
+    queryKey: ["/api/marketing/analytics/top-bundles"],
+    queryFn: () => apiRequest("GET", "/api/marketing/analytics/top-bundles").then(r => r.json()).catch(() => []),
+  });
+
+  const { data: timeSlots = [] } = useQuery<any[]>({
+    queryKey: ["/api/marketing/analytics/time-slots"],
+    queryFn: () => apiRequest("GET", "/api/marketing/analytics/time-slots").then(r => r.json()).catch(() => []),
+  });
+
   // Filtered images for DAM
   const filteredImages = useMemo(() => {
     return images.filter(img => {
@@ -546,7 +566,7 @@ export default function MarketingHub() {
               })}
             </div>
             <div className="mt-4 p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-              <strong>Auto-Schedule:</strong> Posts at 8am, 10am, 12pm, 2pm, 4pm, 6pm, 8pm daily
+              <strong>Auto-Schedule:</strong> Posts every 3 hours: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm daily
             </div>
           </CardContent>
         </Card>
@@ -904,6 +924,7 @@ export default function MarketingHub() {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4 mt-4">
+            {/* Overview Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="pt-6">
@@ -944,9 +965,10 @@ export default function MarketingHub() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Engagement Breakdown */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Engagement Breakdown</CardTitle>
+                  <CardTitle className="text-lg">Engagement Breakdown</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -969,9 +991,11 @@ export default function MarketingHub() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Posts by Platform */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Posts by Platform</CardTitle>
+                  <CardTitle className="text-lg">Posts by Platform</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -986,14 +1010,166 @@ export default function MarketingHub() {
               </Card>
             </div>
 
+            {/* Top Performing Messages */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <TrendingUp className="w-5 h-5 text-green-400" />
+                  Top Performing Messages
+                </CardTitle>
+                <CardDescription>Messages ranked by total engagement (likes + comments + shares)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {topContent.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">No performance data yet. Posts will appear here once they start getting engagement.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {topContent.map((item: any, index: number) => (
+                      <div key={index} className="p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-yellow-500/20 text-yellow-400' : index === 1 ? 'bg-gray-400/20 text-gray-300' : index === 2 ? 'bg-amber-700/20 text-amber-600' : 'bg-muted text-muted-foreground'}`}>
+                              #{index + 1}
+                            </div>
+                            <p className="text-sm line-clamp-2 flex-1">{item.content}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-sm font-bold text-green-400">{Number(item.engagement).toLocaleString()} eng</div>
+                            <div className="text-xs text-muted-foreground">{Number(item.totalImpressions).toLocaleString()} imp</div>
+                            <div className="text-xs text-muted-foreground">{Number(item.postCount)} posts</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Top Performing Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <ImageIcon className="w-5 h-5 text-blue-400" />
+                  Top Performing Images
+                </CardTitle>
+                <CardDescription>Images ranked by engagement when used in posts</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {topImages.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">No image performance data yet.</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {topImages.map((item: any, index: number) => (
+                      <div key={index} className="relative group">
+                        <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                          <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+                        </div>
+                        <div className={`absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index === 0 ? 'bg-yellow-500 text-black' : index === 1 ? 'bg-gray-400 text-black' : index === 2 ? 'bg-amber-700 text-white' : 'bg-black/60 text-white'}`}>
+                          {index + 1}
+                        </div>
+                        <div className="mt-1 text-center">
+                          <div className="text-xs font-bold text-green-400">{Number(item.engagement).toLocaleString()} eng</div>
+                          <div className="text-xs text-muted-foreground">{Number(item.postCount)} uses</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Best Posting Times */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Clock className="w-5 h-5 text-purple-400" />
+                  Best Posting Times
+                </CardTitle>
+                <CardDescription>Average engagement by time of day</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {timeSlots.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">No time slot data yet. Engagement data will appear as posts accumulate.</p>
+                ) : (
+                  <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+                    {timeSlots.map((slot: any, index: number) => {
+                      const maxEng = Math.max(...timeSlots.map((s: any) => Number(s.avgEngagement) || 0), 1);
+                      const pct = ((Number(slot.avgEngagement) || 0) / maxEng) * 100;
+                      const hour = Number(slot.hour);
+                      const label = hour === 0 ? '12am' : hour < 12 ? `${hour}am` : hour === 12 ? '12pm' : `${hour - 12}pm`;
+                      return (
+                        <div key={index} className="text-center">
+                          <div className="h-24 flex items-end justify-center mb-1">
+                            <div className="w-8 rounded-t bg-primary/60 transition-all" style={{ height: `${Math.max(pct, 5)}%` }} />
+                          </div>
+                          <div className="text-xs font-medium">{label}</div>
+                          <div className="text-xs text-muted-foreground">{Number(slot.postCount)} posts</div>
+                          <div className="text-xs text-green-400">{Number(slot.avgEngagement).toFixed(0)} avg</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Top Bundles (Image+Message Combinations) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Layers className="w-5 h-5 text-cyan-400" />
+                  Top Image+Message Combinations
+                </CardTitle>
+                <CardDescription>Best performing content bundles by total engagement</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {topBundles.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">No bundle performance data yet. Create content bundles and they'll be ranked here.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {topBundles.map((bundle: any, index: number) => {
+                      const eng = (bundle.likes || 0) + (bundle.comments || 0) + (bundle.shares || 0);
+                      return (
+                        <div key={bundle.id} className="flex gap-4 p-3 bg-muted/50 rounded-lg">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${index === 0 ? 'bg-yellow-500/20 text-yellow-400' : index === 1 ? 'bg-gray-400/20 text-gray-300' : index === 2 ? 'bg-amber-700/20 text-amber-600' : 'bg-muted text-muted-foreground'}`}>
+                            #{index + 1}
+                          </div>
+                          {bundle.imageUrl && (
+                            <div className="w-16 h-16 rounded overflow-hidden bg-muted shrink-0">
+                              <img src={bundle.imageUrl} alt="" className="w-full h-full object-cover" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm line-clamp-2">{bundle.message}</p>
+                            <div className="flex gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">{bundle.platform}</Badge>
+                              {getStatusBadge(bundle.status)}
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-sm font-bold text-green-400">{eng.toLocaleString()} eng</div>
+                            <div className="text-xs text-muted-foreground">{(bundle.impressions || 0).toLocaleString()} imp</div>
+                            <div className="text-xs text-muted-foreground">{(bundle.clicks || 0).toLocaleString()} clicks</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Post History */}
             <Card>
               <CardHeader>
-                <CardTitle>Recent Posts</CardTitle>
+                <CardTitle className="text-lg">Recent Posts</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {history.slice(0, 10).map((item) => (
+                  {history.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-6">No post history yet.</p>
+                  ) : history.slice(0, 10).map((item) => (
                     <div key={item.id} className="flex items-start justify-between gap-4 p-3 bg-muted/50 rounded-lg">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -1005,7 +1181,7 @@ export default function MarketingHub() {
                         {item.error && <p className="text-xs text-red-400 mt-1">{item.error}</p>}
                       </div>
                       <div className="text-right text-xs text-muted-foreground">
-                        <div>{item.impressions || 0} imp</div>
+                        <div>{item.impressions || 0} imp · {item.likes || 0} likes · {item.shares || 0} shares</div>
                         <div>{item.postedAt ? new Date(item.postedAt).toLocaleDateString() : 'Pending'}</div>
                       </div>
                     </div>
