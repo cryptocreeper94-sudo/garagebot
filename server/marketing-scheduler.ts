@@ -25,10 +25,26 @@ let lastPostHour = -1;
 async function ensureMetaIntegration() {
   const pageId = process.env.META_PAGE_ID;
   const pageAccessToken = process.env.META_PAGE_ACCESS_TOKEN;
+  const instagramAccountId = process.env.META_INSTAGRAM_ACCOUNT_ID;
+  const instagramUsername = process.env.META_INSTAGRAM_USERNAME;
 
   if (!pageId || !pageAccessToken) {
     console.log('[Marketing] META_PAGE_ID or META_PAGE_ACCESS_TOKEN not set, skipping Meta integration setup');
     return;
+  }
+
+  const integrationData: any = {
+    facebookPageId: pageId,
+    facebookPageAccessToken: pageAccessToken,
+    facebookConnected: true,
+    facebookPageName: 'GarageBot.io',
+    updatedAt: new Date(),
+  };
+
+  if (instagramAccountId) {
+    integrationData.instagramAccountId = instagramAccountId;
+    integrationData.instagramConnected = true;
+    integrationData.instagramUsername = instagramUsername || 'garagebot.io';
   }
 
   const [existing] = await db.select().from(socialIntegrations)
@@ -36,24 +52,15 @@ async function ensureMetaIntegration() {
 
   if (existing) {
     await db.update(socialIntegrations)
-      .set({
-        facebookPageId: pageId,
-        facebookPageAccessToken: pageAccessToken,
-        facebookConnected: true,
-        facebookPageName: 'GarageBot.io',
-        updatedAt: new Date(),
-      })
+      .set(integrationData)
       .where(eq(socialIntegrations.tenantId, 'garagebot'));
-    console.log('[Marketing] Updated Meta integration for garagebot');
+    console.log('[Marketing] Updated Meta integration for garagebot (FB + IG)');
   } else {
     await db.insert(socialIntegrations).values({
       tenantId: 'garagebot',
-      facebookPageId: pageId,
-      facebookPageAccessToken: pageAccessToken,
-      facebookConnected: true,
-      facebookPageName: 'GarageBot.io',
+      ...integrationData,
     });
-    console.log('[Marketing] Created Meta integration for garagebot');
+    console.log('[Marketing] Created Meta integration for garagebot (FB + IG)');
   }
 }
 
@@ -170,6 +177,75 @@ async function executeScheduledPosts() {
   }
 }
 
+async function fetchFacebookInsights(post: any, accessToken: string) {
+  const insightsUrl = `https://graph.facebook.com/v21.0/${post.externalPostId}/insights?metric=post_impressions,post_reach,post_clicks&access_token=${accessToken}`;
+  const insightsRes = await fetch(insightsUrl);
+  const insightsData = await insightsRes.json();
+
+  let impressions = post.impressions || 0;
+  let reach = post.reach || 0;
+  let clicks = post.clicks || 0;
+
+  if (insightsData.data && Array.isArray(insightsData.data)) {
+    for (const metric of insightsData.data) {
+      const value = metric.values?.[0]?.value || 0;
+      if (metric.name === 'post_impressions') impressions = value;
+      if (metric.name === 'post_reach') reach = value;
+      if (metric.name === 'post_clicks') clicks = value;
+    }
+  }
+
+  const engagementUrl = `https://graph.facebook.com/v21.0/${post.externalPostId}?fields=likes.summary(true),comments.summary(true),shares&access_token=${accessToken}`;
+  const engagementRes = await fetch(engagementUrl);
+  const engagementData = await engagementRes.json();
+
+  const likes = engagementData.likes?.summary?.total_count || post.likes || 0;
+  const comments = engagementData.comments?.summary?.total_count || post.comments || 0;
+  const shares = engagementData.shares?.count || post.shares || 0;
+
+  await db.update(scheduledPosts)
+    .set({ impressions, reach, clicks, likes, comments, shares })
+    .where(eq(scheduledPosts.id, post.id));
+}
+
+async function fetchInstagramInsights(post: any, accessToken: string) {
+  let impressions = post.impressions || 0;
+  let reach = post.reach || 0;
+  let likes = post.likes || 0;
+  let comments = post.comments || 0;
+
+  try {
+    const insightsUrl = `https://graph.facebook.com/v21.0/${post.externalPostId}/insights?metric=impressions,reach&access_token=${accessToken}`;
+    const insightsRes = await fetch(insightsUrl);
+    const insightsData = await insightsRes.json();
+
+    if (insightsData.data && Array.isArray(insightsData.data)) {
+      for (const metric of insightsData.data) {
+        const value = metric.values?.[0]?.value || 0;
+        if (metric.name === 'impressions') impressions = value;
+        if (metric.name === 'reach') reach = value;
+      }
+    }
+  } catch (err) {
+    console.error(`[Marketing IG] Insights API error for ${post.externalPostId}:`, err);
+  }
+
+  try {
+    const fieldsUrl = `https://graph.facebook.com/v21.0/${post.externalPostId}?fields=like_count,comments_count&access_token=${accessToken}`;
+    const fieldsRes = await fetch(fieldsUrl);
+    const fieldsData = await fieldsRes.json();
+
+    if (fieldsData.like_count !== undefined) likes = fieldsData.like_count;
+    if (fieldsData.comments_count !== undefined) comments = fieldsData.comments_count;
+  } catch (err) {
+    console.error(`[Marketing IG] Fields API error for ${post.externalPostId}:`, err);
+  }
+
+  await db.update(scheduledPosts)
+    .set({ impressions, reach, likes, comments })
+    .where(eq(scheduledPosts.id, post.id));
+}
+
 async function fetchMetaInsights() {
   const accessToken = process.env.META_PAGE_ACCESS_TOKEN;
   if (!accessToken) {
@@ -182,43 +258,24 @@ async function fetchMetaInsights() {
       isNotNull(scheduledPosts.externalPostId)
     ));
 
+  let fbCount = 0;
+  let igCount = 0;
+
   for (const post of postedPosts) {
     try {
-      const insightsUrl = `https://graph.facebook.com/v21.0/${post.externalPostId}/insights?metric=post_impressions,post_reach,post_clicks&access_token=${accessToken}`;
-      const insightsRes = await fetch(insightsUrl);
-      const insightsData = await insightsRes.json();
-
-      let impressions = post.impressions || 0;
-      let reach = post.reach || 0;
-      let clicks = post.clicks || 0;
-
-      if (insightsData.data && Array.isArray(insightsData.data)) {
-        for (const metric of insightsData.data) {
-          const value = metric.values?.[0]?.value || 0;
-          if (metric.name === 'post_impressions') impressions = value;
-          if (metric.name === 'post_reach') reach = value;
-          if (metric.name === 'post_clicks') clicks = value;
-        }
+      if (post.platform === 'instagram') {
+        await fetchInstagramInsights(post, accessToken);
+        igCount++;
+      } else {
+        await fetchFacebookInsights(post, accessToken);
+        fbCount++;
       }
-
-      const engagementUrl = `https://graph.facebook.com/v21.0/${post.externalPostId}?fields=likes.summary(true),comments.summary(true),shares&access_token=${accessToken}`;
-      const engagementRes = await fetch(engagementUrl);
-      const engagementData = await engagementRes.json();
-
-      const likes = engagementData.likes?.summary?.total_count || post.likes || 0;
-      const comments = engagementData.comments?.summary?.total_count || post.comments || 0;
-      const shares = engagementData.shares?.count || post.shares || 0;
-
-      await db.update(scheduledPosts)
-        .set({ impressions, reach, clicks, likes, comments, shares })
-        .where(eq(scheduledPosts.id, post.id));
-
     } catch (err) {
-      console.error(`[Marketing] Failed to fetch insights for post ${post.externalPostId}:`, err);
+      console.error(`[Marketing] Failed to fetch insights for ${post.platform} post ${post.externalPostId}:`, err);
     }
   }
 
-  console.log(`[Marketing] Fetched Meta insights for ${postedPosts.length} posts`);
+  console.log(`[Marketing] Fetched insights: ${fbCount} FB, ${igCount} IG posts`);
 }
 
 export function startMarketingScheduler() {
