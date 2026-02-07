@@ -74,7 +74,7 @@ export default function AffiliateDisclosure() {
                       <li><strong className="text-foreground">Impact Radius</strong> — Partnership automation platform</li>
                       <li><strong className="text-foreground">AvantLink</strong> — Technology-driven affiliate marketing network</li>
                       <li><strong className="text-foreground">FlexOffers</strong> — Digital publisher monetization platform</li>
-                      <li><strong className="text-foreground">Awin</strong> — Global affiliate marketing network</li>
+                      <li><strong className="text-foreground">Awin</strong> — Global affiliate marketing network (OEDRO)</li>
                     </ul>
                     <p>We may add or remove affiliate partners at any time. This page will be updated accordingly.</p>
                   </div>

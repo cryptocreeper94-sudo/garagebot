@@ -156,6 +156,7 @@
 - CJ Affiliate (Commission Junction)
 - Impact Radius (Walmart, pending)
 - ShareASale (GARVEE — approved Feb 2026, 10% per lead + $0.50 per sale)
+- Awin (OEDRO — approved Feb 2026, truck accessories & auto parts)
 - Direct retailer partnerships (Rexing, SILAZANE50)
 
 **Placement:** Must be linked from:
