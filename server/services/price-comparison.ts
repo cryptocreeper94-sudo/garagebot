@@ -683,6 +683,7 @@ export async function comparePrice(
     { name: 'Walmart', slug: 'walmart', searchUrl: `https://www.walmart.com/search?q=${encodeURIComponent(fullQuery)}&cat_id=91083${wmZip}`, color: '#0071CE', isAffiliate: false },
     { name: 'Rexing', slug: 'rexing', searchUrl: `https://rexing.com/?s=${encodeURIComponent(fullQuery)}&post_type=product&ref=5357356`, color: '#1A1A2E', isAffiliate: true },
     { name: 'SILAZANE50', slug: 'silazane50', searchUrl: `https://www.anrdoezrs.net/click-101643977-7675405?url=${encodeURIComponent(`https://silazane50usa.com/collections/all?q=${fullQuery}`)}`, color: '#C4A35A', isAffiliate: true },
+    { name: 'GARVEE', slug: 'garvee', searchUrl: `https://www.garvee.com/search?q=${encodeURIComponent(fullQuery)}`, color: '#2D3748', isAffiliate: true },
   ];
 
   console.log(`[PriceCompare] Found ${productsWithPrices.length} products with prices, ${productsWithoutPrices.length} retailer links`);

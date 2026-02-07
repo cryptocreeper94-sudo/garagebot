@@ -155,7 +155,8 @@
 - eBay Partner Network
 - CJ Affiliate (Commission Junction)
 - Impact Radius (Walmart, pending)
-- Direct retailer partnerships
+- ShareASale (GARVEE — approved Feb 2026, 10% per lead + $0.50 per sale)
+- Direct retailer partnerships (Rexing, SILAZANE50)
 
 **Placement:** Must be linked from:
 - Footer (every page)
@@ -389,14 +390,14 @@ Sitemap: https://yourapp.replit.app/sitemap.xml
 - [ ] Google Analytics or equivalent tracking installed
 
 **Major affiliate networks to apply to:**
-| Network | URL | Commission Type |
-|---|---|---|
-| Amazon Associates | affiliate-program.amazon.com | 1-10% per product category |
-| eBay Partner Network | partnernetwork.ebay.com | 1-4% |
-| CJ Affiliate | cj.com | Varies by advertiser |
-| Impact Radius | impact.com | Varies (Walmart 1-4%) |
-| ShareASale | shareasale.com | Varies by merchant |
-| Rakuten Advertising | rakutenadvertising.com | Varies by merchant |
+| Network | URL | Commission Type | GarageBot Status |
+|---|---|---|---|
+| Amazon Associates | affiliate-program.amazon.com | 1-10% per product category | Active |
+| eBay Partner Network | partnernetwork.ebay.com | 1-4% | Active |
+| CJ Affiliate | cj.com | Varies by advertiser | Active |
+| Impact Radius | impact.com | Varies (Walmart 1-4%) | Applied Feb 2026 |
+| ShareASale | shareasale.com | Varies by merchant | Active (GARVEE: 10%/lead + $0.50/sale) |
+| Rakuten Advertising | rakutenadvertising.com | Varies by merchant | Not yet applied |
 
 ---
 
