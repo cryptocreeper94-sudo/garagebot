@@ -11,6 +11,7 @@ import { communityHubService } from "./services/community-hub-service";
 import { initBuddyBot } from "./services/buddy-chat-bot";
 import { seedChatChannels } from "./seedChat";
 import { startMarketingScheduler } from "./marketing-scheduler";
+import { seedMarketingContent } from "./seeds/marketingContent";
 
 const app = express();
 const httpServer = createServer(app);
@@ -157,6 +158,13 @@ async function initStripe() {
     log("Marketing scheduler started (every 3 hours)", "marketing");
   } catch (err: any) {
     log(`Marketing scheduler error: ${err.message}`, "marketing");
+  }
+
+  try {
+    await seedMarketingContent();
+    log("Marketing content seeded", "marketing");
+  } catch (err: any) {
+    log(`Marketing content seed error: ${err.message}`, "marketing");
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
