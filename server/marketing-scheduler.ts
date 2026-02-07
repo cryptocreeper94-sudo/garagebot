@@ -22,20 +22,49 @@ function getBaseUrl(): string {
 let isRunning = false;
 let lastPostHour = -1;
 
+async function fetchPageAccessToken(userToken: string, targetPageId: string): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `https://graph.facebook.com/v21.0/me/accounts?access_token=${encodeURIComponent(userToken)}`
+    );
+    const data = await response.json();
+    if (data.data && Array.isArray(data.data)) {
+      const page = data.data.find((p: any) => p.id === targetPageId);
+      if (page && page.access_token) {
+        console.log(`[Marketing] Obtained Page Access Token for "${page.name}" (${page.id})`);
+        return page.access_token;
+      }
+      console.log(`[Marketing] Page ${targetPageId} not found in /me/accounts (${data.data.length} pages available)`);
+    } else if (data.error) {
+      console.error('[Marketing] Error fetching page token:', data.error.message);
+    }
+  } catch (err) {
+    console.error('[Marketing] Failed to fetch page access token:', err);
+  }
+  return null;
+}
+
 async function ensureMetaIntegration() {
   const pageId = process.env.META_PAGE_ID;
-  const pageAccessToken = process.env.META_PAGE_ACCESS_TOKEN;
+  const userAccessToken = process.env.META_PAGE_ACCESS_TOKEN;
   const instagramAccountId = process.env.META_INSTAGRAM_ACCOUNT_ID;
   const instagramUsername = process.env.META_INSTAGRAM_USERNAME;
 
-  if (!pageId || !pageAccessToken) {
+  if (!pageId || !userAccessToken) {
     console.log('[Marketing] META_PAGE_ID or META_PAGE_ACCESS_TOKEN not set, skipping Meta integration setup');
     return;
   }
 
+  const pageAccessToken = await fetchPageAccessToken(userAccessToken, pageId);
+  if (!pageAccessToken) {
+    console.log('[Marketing] Could not obtain Page Access Token, falling back to stored token');
+  }
+
+  const tokenToUse = pageAccessToken || userAccessToken;
+
   const integrationData: any = {
     facebookPageId: pageId,
-    facebookPageAccessToken: pageAccessToken,
+    facebookPageAccessToken: tokenToUse,
     facebookConnected: true,
     facebookPageName: 'GarageBot.io',
     updatedAt: new Date(),
@@ -242,7 +271,8 @@ async function fetchInstagramInsights(post: any, accessToken: string) {
 }
 
 async function fetchMetaInsights() {
-  const accessToken = process.env.META_PAGE_ACCESS_TOKEN;
+  const integration = await getIntegration();
+  const accessToken = integration?.facebookPageAccessToken || process.env.META_PAGE_ACCESS_TOKEN;
   if (!accessToken) {
     return;
   }
