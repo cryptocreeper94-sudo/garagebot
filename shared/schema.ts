@@ -2272,6 +2272,7 @@ export const marketingPosts = pgTable("marketing_posts", {
   contentType: varchar("content_type", { length: 30 }),
   tone: varchar("tone", { length: 30 }),
   cta: varchar("cta", { length: 30 }),
+  season: varchar("season", { length: 20 }).default("all"),
   isActive: boolean("is_active").default(true),
   usageCount: integer("usage_count").default(0),
   lastUsedAt: timestamp("last_used_at"),

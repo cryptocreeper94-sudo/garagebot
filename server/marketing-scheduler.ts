@@ -14,6 +14,18 @@ function getCSTHour(): number {
   });
   return parseInt(formatter.format(new Date()), 10);
 }
+
+function getCurrentSeason(): string {
+  const monthFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: CST_TIMEZONE,
+    month: 'numeric',
+  });
+  const month = parseInt(monthFormatter.format(new Date()), 10);
+  if (month >= 3 && month <= 5) return 'spring';
+  if (month >= 6 && month <= 8) return 'summer';
+  if (month >= 9 && month <= 11) return 'fall';
+  return 'winter';
+}
 const ECOSYSTEM_URLS = {
   garagebot: 'https://garagebot.io',
   dwtl: 'https://dwtl.io',
@@ -111,10 +123,12 @@ async function getIntegration(tenantId: string = 'garagebot') {
 
 async function getNextPost(platform: string, tenantId: string = 'garagebot') {
   const { or } = await import('drizzle-orm');
+  const season = getCurrentSeason();
   const [post] = await db.select().from(marketingPosts)
     .where(and(
       eq(marketingPosts.tenantId, tenantId),
       or(eq(marketingPosts.platform, platform), eq(marketingPosts.platform, 'all')),
+      or(eq(marketingPosts.season, season), eq(marketingPosts.season, 'all')),
       eq(marketingPosts.isActive, true)
     ))
     .orderBy(asc(marketingPosts.usageCount), asc(marketingPosts.lastUsedAt))
