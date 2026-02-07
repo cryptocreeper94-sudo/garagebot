@@ -267,8 +267,14 @@ export async function activateCampaign(campaignId: string, adSetId?: string, adI
   }
 }
 
-export async function pauseCampaign(campaignId: string): Promise<void> {
+export async function pauseCampaign(campaignId: string, adSetId?: string, adId?: string): Promise<void> {
   await metaApiRequest(`${campaignId}`, 'POST', { status: 'PAUSED' });
+  if (adSetId) {
+    await metaApiRequest(`${adSetId}`, 'POST', { status: 'PAUSED' });
+  }
+  if (adId) {
+    await metaApiRequest(`${adId}`, 'POST', { status: 'PAUSED' });
+  }
 }
 
 export async function deleteCampaign(campaignId: string): Promise<void> {
@@ -373,6 +379,8 @@ export async function createFullCampaign(params: {
     ctaButton: params.ctaButton || 'LEARN_MORE',
     landingUrl: params.landingUrl,
     externalCampaignId: metaCampaignId,
+    externalAdSetId: adSetId,
+    externalAdId: adId,
     startDate: new Date(),
   }).returning();
 

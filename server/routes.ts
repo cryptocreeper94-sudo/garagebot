@@ -9002,7 +9002,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       if (!campaign) return res.status(404).json({ error: "Campaign not found" });
       if (!campaign.externalCampaignId) return res.status(400).json({ error: "Campaign has no Meta campaign ID - it may not have been created on Meta" });
 
-      await activateCampaign(campaign.externalCampaignId);
+      await activateCampaign(campaign.externalCampaignId, campaign.externalAdSetId || undefined, campaign.externalAdId || undefined);
       await db.update(adCampaigns)
         .set({ status: 'active', updatedAt: new Date() })
         .where(eq(adCampaigns.id, req.params.id));
@@ -9023,7 +9023,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       if (!campaign) return res.status(404).json({ error: "Campaign not found" });
       if (!campaign.externalCampaignId) return res.status(400).json({ error: "Campaign has no Meta campaign ID" });
 
-      await pauseCampaign(campaign.externalCampaignId);
+      await pauseCampaign(campaign.externalCampaignId, campaign.externalAdSetId || undefined, campaign.externalAdId || undefined);
       await db.update(adCampaigns)
         .set({ status: 'paused', updatedAt: new Date() })
         .where(eq(adCampaigns.id, req.params.id));

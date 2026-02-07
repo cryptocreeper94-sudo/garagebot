@@ -2433,6 +2433,8 @@ export const adCampaigns = pgTable("ad_campaigns", {
   costPerClick: decimal("cost_per_click", { precision: 10, scale: 4 }),
   costPerConversion: decimal("cost_per_conversion", { precision: 10, scale: 2 }),
   externalCampaignId: varchar("external_campaign_id", { length: 100 }),
+  externalAdSetId: varchar("external_adset_id", { length: 100 }),
+  externalAdId: varchar("external_ad_id", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
