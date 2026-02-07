@@ -8,17 +8,30 @@ import FormData from 'form-data';
 const META_API_VERSION = 'v21.0';
 const META_BASE_URL = `https://graph.facebook.com/${META_API_VERSION}`;
 
-let cachedPageToken: string | null = null;
-
-async function getPageTokenFromDb(): Promise<string> {
-  if (cachedPageToken) return cachedPageToken;
-  const [integration] = await db.select().from(socialIntegrations)
-    .where(eq(socialIntegrations.tenantId, 'garagebot')).limit(1);
-  if (integration?.facebookPageAccessToken) {
-    cachedPageToken = integration.facebookPageAccessToken;
-    return cachedPageToken;
-  }
+function getUserAccessToken(): string {
   return process.env.META_PAGE_ACCESS_TOKEN || '';
+}
+
+let adsPermissionAvailable: boolean | null = null;
+
+export async function checkAdsPermission(): Promise<boolean> {
+  const token = getUserAccessToken();
+  if (!token) return false;
+  try {
+    const resp = await fetch(`${META_BASE_URL}/me/permissions?access_token=${token}`);
+    const data = await resp.json();
+    const perms = (data.data || []).map((p: any) => p.permission);
+    const hasAds = perms.includes('ads_management');
+    adsPermissionAvailable = hasAds;
+    if (!hasAds) {
+      console.log('[Meta Ads] Token missing ads_management permission — ad campaigns will be created once permission is granted');
+      console.log('[Meta Ads] Current permissions:', perms.join(', '));
+      console.log('[Meta Ads] To fix: In Meta App Dashboard, add "Marketing API" product, then generate a new token with ads_management checked');
+    }
+    return hasAds;
+  } catch {
+    return false;
+  }
 }
 
 function getConfig() {
@@ -86,9 +99,9 @@ export function setCustomTargeting(targeting: any) {
 }
 
 async function metaApiRequest(endpoint: string, method: string = 'GET', body?: any): Promise<any> {
-  const pageAccessToken = await getPageTokenFromDb();
-  if (!pageAccessToken) {
-    throw new Error('Page Access Token is not configured - ensure Meta integration is set up');
+  const accessToken = getUserAccessToken();
+  if (!accessToken) {
+    throw new Error('META_PAGE_ACCESS_TOKEN not configured');
   }
 
   const url = `${META_BASE_URL}/${endpoint}`;
@@ -102,13 +115,13 @@ async function metaApiRequest(endpoint: string, method: string = 'GET', body?: a
       options.body = body as any;
     } else {
       (options.headers as Record<string, string>)['Content-Type'] = 'application/json';
-      options.body = JSON.stringify({ ...body, access_token: pageAccessToken });
+      options.body = JSON.stringify({ ...body, access_token: accessToken });
     }
   }
 
   if (method === 'GET') {
     const separator = endpoint.includes('?') ? '&' : '?';
-    const response = await fetch(`${url}${separator}access_token=${pageAccessToken}`);
+    const response = await fetch(`${url}${separator}access_token=${accessToken}`);
     const data = await response.json();
     if (data.error) {
       throw new Error(`Meta API Error: ${data.error.message} (code: ${data.error.code})`);
@@ -170,7 +183,7 @@ export async function createMetaAdSet(params: {
 }
 
 export async function uploadAdImage(imageUrl: string): Promise<string> {
-  const pageAccessToken = await getPageTokenFromDb();
+  const accessToken = getUserAccessToken();
   const accountPath = getAccountPath();
 
   const isLocalFile = !imageUrl.startsWith('http');
@@ -199,7 +212,7 @@ export async function uploadAdImage(imageUrl: string): Promise<string> {
   const formData = new FormData();
   formData.append('filename', filename);
   formData.append('bytes', imageBuffer, { filename, contentType: 'image/png' });
-  formData.append('access_token', pageAccessToken);
+  formData.append('access_token', accessToken);
 
   const url = `${META_BASE_URL}/${accountPath}/adimages`;
   const response = await fetch(url, {
@@ -416,9 +429,23 @@ export async function createInitialCampaigns(): Promise<any[]> {
     .where(eq(adCampaigns.tenantId, 'garagebot'));
   
   if (existingCampaigns.length > 0) {
-    console.log('[Meta Ads] Initial campaigns already exist, skipping creation');
-    return existingCampaigns;
+    const hasActiveMeta = existingCampaigns.some(c => c.externalCampaignId);
+    if (hasActiveMeta) {
+      console.log('[Meta Ads] Initial campaigns already exist, skipping creation');
+      return existingCampaigns;
+    }
+    await db.delete(adCampaigns).where(
+      and(eq(adCampaigns.tenantId, 'garagebot'), eq(adCampaigns.status, 'draft'))
+    );
+    console.log('[Meta Ads] Cleared stale draft campaigns, retrying creation...');
   }
+
+  const hasPermission = await checkAdsPermission();
+  if (!hasPermission) {
+    return [];
+  }
+
+  console.log('[Meta Ads] ads_management permission confirmed, creating campaigns...');
 
   try {
     const fbCampaign = await createFullCampaign({
