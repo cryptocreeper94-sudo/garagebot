@@ -132,48 +132,43 @@ async function executeScheduledPosts() {
   const integration = await getIntegration();
   const twitter = new TwitterConnector();
   
-  for (const platform of ['all', 'facebook', 'instagram', 'x']) {
-    const post = await getNextPost(platform === 'all' ? 'all' : platform);
-    if (!post) continue;
-    
-    const message = buildMessage(post.content, post.targetSite || 'garagebot', post.hashtags || []);
-    const image = await getNextImage();
-    const imageUrl = image ? `${getBaseUrl()}${image.filePath}` : undefined;
-    
-    if (platform === 'all' || platform === 'facebook') {
-      if (integration?.facebookConnected && integration.facebookPageId && integration.facebookPageAccessToken) {
-        const result = await postToFacebook(integration.facebookPageId, integration.facebookPageAccessToken, message, imageUrl);
-        await recordPost('facebook', message, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
-        console.log(`[Marketing FB] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
-      }
-    }
-    
-    if (platform === 'all' || platform === 'instagram') {
-      if (integration?.instagramConnected && integration.instagramAccountId && imageUrl) {
-        const result = await postToInstagram(integration.instagramAccountId, integration.facebookPageAccessToken!, message, imageUrl);
-        await recordPost('instagram', message, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
-        console.log(`[Marketing IG] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
-      }
-    }
-    
-    if (platform === 'all' || platform === 'x') {
-      if (twitter.isConfigured()) {
-        const twitterMessage = message.length > 280 ? message.substring(0, 277) + '...' : message;
-        const result = await twitter.post(twitterMessage);
-        await recordPost('x', twitterMessage, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
-        console.log(`[Marketing X] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
-      }
-    }
-    
-    await db.update(marketingPosts)
-      .set({ usageCount: sql`${marketingPosts.usageCount} + 1`, lastUsedAt: new Date() })
-      .where(eq(marketingPosts.id, post.id));
-    
-    if (image) {
-      await db.update(marketingImages)
-        .set({ usageCount: sql`${marketingImages.usageCount} + 1`, lastUsedAt: new Date() })
-        .where(eq(marketingImages.id, image.id));
-    }
+  const post = await getNextPost('all');
+  if (!post) {
+    console.log('[Marketing] No active posts available');
+    return;
+  }
+  
+  const message = buildMessage(post.content, post.targetSite || 'garagebot', post.hashtags || []);
+  const image = await getNextImage();
+  const imageUrl = image ? `${getBaseUrl()}${image.filePath}` : undefined;
+  
+  if (integration?.facebookConnected && integration.facebookPageId && integration.facebookPageAccessToken) {
+    const result = await postToFacebook(integration.facebookPageId, integration.facebookPageAccessToken, message, imageUrl);
+    await recordPost('facebook', message, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
+    console.log(`[Marketing FB] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
+  }
+  
+  if (integration?.instagramConnected && integration.instagramAccountId && imageUrl) {
+    const result = await postToInstagram(integration.instagramAccountId, integration.facebookPageAccessToken!, message, imageUrl);
+    await recordPost('instagram', message, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
+    console.log(`[Marketing IG] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
+  }
+  
+  if (twitter.isConfigured()) {
+    const twitterMessage = message.length > 280 ? message.substring(0, 277) + '...' : message;
+    const result = await twitter.post(twitterMessage);
+    await recordPost('x', twitterMessage, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
+    console.log(`[Marketing X] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
+  }
+  
+  await db.update(marketingPosts)
+    .set({ usageCount: sql`${marketingPosts.usageCount} + 1`, lastUsedAt: new Date() })
+    .where(eq(marketingPosts.id, post.id));
+  
+  if (image) {
+    await db.update(marketingImages)
+      .set({ usageCount: sql`${marketingImages.usageCount} + 1`, lastUsedAt: new Date() })
+      .where(eq(marketingImages.id, image.id));
   }
 }
 
