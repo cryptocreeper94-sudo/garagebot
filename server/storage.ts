@@ -1526,7 +1526,7 @@ export class DatabaseStorage implements IStorage {
         )
       );
     
-    const guideIds = [...new Set(fitments.map(f => f.guideId))];
+    const guideIds = Array.from(new Set(fitments.map(f => f.guideId)));
     if (guideIds.length === 0) return [];
     
     return await db.select().from(repairGuides)
@@ -2532,7 +2532,7 @@ export class DatabaseStorage implements IStorage {
   async deletePartnerApiCredential(id: string): Promise<boolean> {
     const result = await db.delete(partnerApiCredentials)
       .where(eq(partnerApiCredentials.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async incrementPartnerApiRequestCount(id: string): Promise<void> {
@@ -2625,7 +2625,7 @@ export class DatabaseStorage implements IStorage {
   async deleteShopLocation(id: string): Promise<boolean> {
     const result = await db.delete(shopLocations)
       .where(eq(shopLocations.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Shop Analytics for Partner API
