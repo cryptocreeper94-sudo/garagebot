@@ -314,7 +314,16 @@ export function startMarketingScheduler() {
   
   isRunning = true;
 
-  ensureMetaIntegration().catch(err => console.error('[Marketing] Meta integration error:', err));
+  ensureMetaIntegration()
+    .then(async () => {
+      try {
+        const { createInitialCampaigns } = await import('./meta-ads-service');
+        await createInitialCampaigns();
+      } catch (err) {
+        console.error('[Meta Ads] Auto-init campaigns error:', err);
+      }
+    })
+    .catch(err => console.error('[Marketing] Meta integration error:', err));
   
   setInterval(() => {
     executeScheduledPosts().catch(err => console.error('[Marketing] Error:', err));

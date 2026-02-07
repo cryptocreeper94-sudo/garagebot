@@ -1,5 +1,5 @@
 import { db } from '@db';
-import { adCampaigns } from '@shared/schema';
+import { adCampaigns, socialIntegrations } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
@@ -7,6 +7,19 @@ import FormData from 'form-data';
 
 const META_API_VERSION = 'v21.0';
 const META_BASE_URL = `https://graph.facebook.com/${META_API_VERSION}`;
+
+let cachedPageToken: string | null = null;
+
+async function getPageTokenFromDb(): Promise<string> {
+  if (cachedPageToken) return cachedPageToken;
+  const [integration] = await db.select().from(socialIntegrations)
+    .where(eq(socialIntegrations.tenantId, 'garagebot')).limit(1);
+  if (integration?.facebookPageAccessToken) {
+    cachedPageToken = integration.facebookPageAccessToken;
+    return cachedPageToken;
+  }
+  return process.env.META_PAGE_ACCESS_TOKEN || '';
+}
 
 function getConfig() {
   return {
@@ -73,9 +86,9 @@ export function setCustomTargeting(targeting: any) {
 }
 
 async function metaApiRequest(endpoint: string, method: string = 'GET', body?: any): Promise<any> {
-  const { pageAccessToken } = getConfig();
+  const pageAccessToken = await getPageTokenFromDb();
   if (!pageAccessToken) {
-    throw new Error('META_PAGE_ACCESS_TOKEN is not configured');
+    throw new Error('Page Access Token is not configured - ensure Meta integration is set up');
   }
 
   const url = `${META_BASE_URL}/${endpoint}`;
@@ -157,7 +170,7 @@ export async function createMetaAdSet(params: {
 }
 
 export async function uploadAdImage(imageUrl: string): Promise<string> {
-  const { pageAccessToken } = getConfig();
+  const pageAccessToken = await getPageTokenFromDb();
   const accountPath = getAccountPath();
 
   const isLocalFile = !imageUrl.startsWith('http');
@@ -419,6 +432,16 @@ export async function createInitialCampaigns(): Promise<any[]> {
     });
     results.push(fbCampaign);
     console.log('[Meta Ads] Created Facebook awareness campaign');
+
+    if (fbCampaign.meta) {
+      try {
+        await activateCampaign(fbCampaign.meta.campaignId, fbCampaign.meta.adSetId, fbCampaign.meta.adId);
+        await db.update(adCampaigns).set({ status: 'active' }).where(eq(adCampaigns.id, fbCampaign.id));
+        console.log('[Meta Ads] Activated Facebook campaign - $10/day budget');
+      } catch (activateErr: any) {
+        console.error('[Meta Ads] Created FB campaign but failed to activate:', activateErr.message);
+      }
+    }
   } catch (err: any) {
     console.error('[Meta Ads] Failed to create FB campaign:', err.message);
     const [dbOnly] = await db.insert(adCampaigns).values({
@@ -449,6 +472,16 @@ export async function createInitialCampaigns(): Promise<any[]> {
     });
     results.push(igCampaign);
     console.log('[Meta Ads] Created Instagram awareness campaign');
+
+    if (igCampaign.meta) {
+      try {
+        await activateCampaign(igCampaign.meta.campaignId, igCampaign.meta.adSetId, igCampaign.meta.adId);
+        await db.update(adCampaigns).set({ status: 'active' }).where(eq(adCampaigns.id, igCampaign.id));
+        console.log('[Meta Ads] Activated Instagram campaign - $10/day budget');
+      } catch (activateErr: any) {
+        console.error('[Meta Ads] Created IG campaign but failed to activate:', activateErr.message);
+      }
+    }
   } catch (err: any) {
     console.error('[Meta Ads] Failed to create IG campaign:', err.message);
     const [dbOnly] = await db.insert(adCampaigns).values({
