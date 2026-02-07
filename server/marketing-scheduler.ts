@@ -332,6 +332,13 @@ export function startMarketingScheduler() {
   setInterval(() => {
     fetchMetaInsights().catch(err => console.error('[Marketing] Insights fetch error:', err));
   }, 30 * 60 * 1000);
+
+  setInterval(async () => {
+    try {
+      const { createInitialCampaigns } = await import('./meta-ads-service');
+      await createInitialCampaigns();
+    } catch {}
+  }, 3 * 60 * 60 * 1000);
   
   executeScheduledPosts().catch(err => console.error('[Marketing] Initial run error:', err));
 }
