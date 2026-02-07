@@ -8926,6 +8926,183 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
+  // ============== Meta Ads Campaign Routes ==============
+  
+  app.post("/api/marketing/ads/create-campaign", isAuthenticated, async (req: any, res) => {
+    try {
+      const { createFullCampaign, getCurrentTargeting } = await import('./meta-ads-service');
+      const { name, platform, dailyBudget, adCopy, adImageUrl, ctaButton, landingUrl, objective } = req.body;
+
+      if (!name || !platform || !adCopy || !adImageUrl) {
+        return res.status(400).json({ error: "name, platform, adCopy, and adImageUrl are required" });
+      }
+
+      const budget = parseFloat(dailyBudget) || 10;
+      const results: any[] = [];
+
+      const platforms = platform === 'both' ? ['facebook', 'instagram'] as const : [platform as 'facebook' | 'instagram'];
+
+      for (const plat of platforms) {
+        try {
+          const campaign = await createFullCampaign({
+            name,
+            platform: plat,
+            dailyBudget: budget,
+            adCopy,
+            adImageUrl,
+            ctaButton: ctaButton || 'LEARN_MORE',
+            landingUrl: landingUrl || 'https://garagebot.io',
+            objective: objective || 'OUTCOME_AWARENESS',
+            targeting: getCurrentTargeting(),
+          });
+          results.push(campaign);
+        } catch (err: any) {
+          const [dbOnly] = await db.insert(adCampaigns).values({
+            tenantId: 'garagebot',
+            name: `${name} - ${plat === 'facebook' ? 'FB' : 'IG'}`,
+            platform: plat,
+            status: 'error',
+            objective: objective || 'OUTCOME_AWARENESS',
+            dailyBudget: budget.toString(),
+            targetAudience: getCurrentTargeting(),
+            adImageUrl,
+            adCopy,
+            ctaButton: ctaButton || 'LEARN_MORE',
+            landingUrl: landingUrl || 'https://garagebot.io',
+          }).returning();
+          results.push({ ...dbOnly, error: err.message });
+        }
+      }
+
+      res.json({ campaigns: results, success: true });
+    } catch (err: any) {
+      console.error("[Meta Ads] Create campaign error:", err);
+      res.status(500).json({ error: err.message || "Failed to create campaign" });
+    }
+  });
+
+  app.get("/api/marketing/ads/campaigns", isAuthenticated, async (req: any, res) => {
+    try {
+      const campaigns = await db.select().from(adCampaigns)
+        .where(eq(adCampaigns.tenantId, 'garagebot'))
+        .orderBy(desc(adCampaigns.createdAt));
+      res.json(campaigns);
+    } catch (err: any) {
+      console.error("[Meta Ads] List campaigns error:", err);
+      res.status(500).json({ error: "Failed to list campaigns" });
+    }
+  });
+
+  app.post("/api/marketing/ads/campaigns/:id/activate", isAuthenticated, async (req: any, res) => {
+    try {
+      const { activateCampaign } = await import('./meta-ads-service');
+      const [campaign] = await db.select().from(adCampaigns)
+        .where(and(eq(adCampaigns.id, req.params.id), eq(adCampaigns.tenantId, 'garagebot')));
+
+      if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+      if (!campaign.externalCampaignId) return res.status(400).json({ error: "Campaign has no Meta campaign ID - it may not have been created on Meta" });
+
+      await activateCampaign(campaign.externalCampaignId);
+      await db.update(adCampaigns)
+        .set({ status: 'active', updatedAt: new Date() })
+        .where(eq(adCampaigns.id, req.params.id));
+
+      res.json({ success: true, status: 'active' });
+    } catch (err: any) {
+      console.error("[Meta Ads] Activate error:", err);
+      res.status(500).json({ error: err.message || "Failed to activate campaign" });
+    }
+  });
+
+  app.post("/api/marketing/ads/campaigns/:id/pause", isAuthenticated, async (req: any, res) => {
+    try {
+      const { pauseCampaign } = await import('./meta-ads-service');
+      const [campaign] = await db.select().from(adCampaigns)
+        .where(and(eq(adCampaigns.id, req.params.id), eq(adCampaigns.tenantId, 'garagebot')));
+
+      if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+      if (!campaign.externalCampaignId) return res.status(400).json({ error: "Campaign has no Meta campaign ID" });
+
+      await pauseCampaign(campaign.externalCampaignId);
+      await db.update(adCampaigns)
+        .set({ status: 'paused', updatedAt: new Date() })
+        .where(eq(adCampaigns.id, req.params.id));
+
+      res.json({ success: true, status: 'paused' });
+    } catch (err: any) {
+      console.error("[Meta Ads] Pause error:", err);
+      res.status(500).json({ error: err.message || "Failed to pause campaign" });
+    }
+  });
+
+  app.post("/api/marketing/ads/campaigns/:id/delete", isAuthenticated, async (req: any, res) => {
+    try {
+      const { deleteCampaign } = await import('./meta-ads-service');
+      const [campaign] = await db.select().from(adCampaigns)
+        .where(and(eq(adCampaigns.id, req.params.id), eq(adCampaigns.tenantId, 'garagebot')));
+
+      if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+
+      if (campaign.externalCampaignId) {
+        try {
+          await deleteCampaign(campaign.externalCampaignId);
+        } catch (e: any) {
+          console.warn("[Meta Ads] Could not archive on Meta:", e.message);
+        }
+      }
+
+      await db.update(adCampaigns)
+        .set({ status: 'archived', updatedAt: new Date() })
+        .where(eq(adCampaigns.id, req.params.id));
+
+      res.json({ success: true, status: 'archived' });
+    } catch (err: any) {
+      console.error("[Meta Ads] Delete error:", err);
+      res.status(500).json({ error: err.message || "Failed to delete campaign" });
+    }
+  });
+
+  app.post("/api/marketing/ads/refresh-insights", isAuthenticated, async (req: any, res) => {
+    try {
+      const { refreshAllInsights } = await import('./meta-ads-service');
+      const result = await refreshAllInsights();
+      res.json(result);
+    } catch (err: any) {
+      console.error("[Meta Ads] Refresh insights error:", err);
+      res.status(500).json({ error: err.message || "Failed to refresh insights" });
+    }
+  });
+
+  app.get("/api/marketing/ads/targeting", isAuthenticated, async (req: any, res) => {
+    try {
+      const { getCurrentTargeting } = await import('./meta-ads-service');
+      res.json(getCurrentTargeting());
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to get targeting" });
+    }
+  });
+
+  app.put("/api/marketing/ads/targeting", isAuthenticated, async (req: any, res) => {
+    try {
+      const { setCustomTargeting } = await import('./meta-ads-service');
+      setCustomTargeting(req.body);
+      res.json({ success: true, targeting: req.body });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to update targeting" });
+    }
+  });
+
+  app.post("/api/marketing/ads/init-campaigns", isAuthenticated, async (req: any, res) => {
+    try {
+      const { createInitialCampaigns } = await import('./meta-ads-service');
+      const campaigns = await createInitialCampaigns();
+      res.json({ campaigns, success: true });
+    } catch (err: any) {
+      console.error("[Meta Ads] Init campaigns error:", err);
+      res.status(500).json({ error: err.message || "Failed to create initial campaigns" });
+    }
+  });
+
   // Analytics Tracking Endpoints
   app.post("/api/analytics/session", async (req, res) => {
     try {

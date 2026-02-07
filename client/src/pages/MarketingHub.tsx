@@ -199,6 +199,424 @@ const TARGET_AUDIENCES = [
   { id: "general-auto", label: "General Auto Owners" },
 ];
 
+interface AdCampaign {
+  id: string;
+  name: string;
+  platform: string;
+  status: string;
+  objective: string;
+  dailyBudget: string;
+  totalSpent: string;
+  impressions: number;
+  reach: number;
+  clicks: number;
+  conversions: number;
+  costPerClick: string | null;
+  adImageUrl: string | null;
+  adCopy: string | null;
+  ctaButton: string | null;
+  landingUrl: string | null;
+  externalCampaignId: string | null;
+  targetAudience: any;
+  createdAt: string;
+  error?: string;
+}
+
+const HATCH_IMAGES = [
+  { path: '/generated_images/hatch_garagebot_right_part.png', label: 'Right Part' },
+  { path: '/generated_images/hatch_garagebot_search.png', label: 'Search' },
+  { path: '/generated_images/hatch_garagebot_diy.png', label: 'DIY' },
+  { path: '/generated_images/hatch_garagebot_all_vehicles.png', label: 'All Vehicles' },
+  { path: '/generated_images/hatch_garagebot_nashville.png', label: 'Nashville' },
+  { path: '/generated_images/hatch_garagebot_buddy.png', label: 'Buddy' },
+];
+
+const CTA_OPTIONS = [
+  { value: 'LEARN_MORE', label: 'Learn More' },
+  { value: 'SIGN_UP', label: 'Sign Up' },
+  { value: 'SHOP_NOW', label: 'Shop Now' },
+  { value: 'CONTACT_US', label: 'Contact Us' },
+];
+
+function AdCampaignsTab({ images, posts }: { images: MarketingImage[]; posts: MarketingPost[] }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showTargeting, setShowTargeting] = useState(false);
+
+  const [newCampaign, setNewCampaign] = useState({
+    name: 'GarageBot Awareness',
+    platform: 'both',
+    dailyBudget: '10',
+    adCopy: '',
+    adImageUrl: HATCH_IMAGES[0].path,
+    ctaButton: 'LEARN_MORE',
+    landingUrl: 'https://garagebot.io',
+    objective: 'OUTCOME_AWARENESS',
+  });
+
+  const { data: campaigns = [], isLoading: campaignsLoading } = useQuery<AdCampaign[]>({
+    queryKey: ['/api/marketing/ads/campaigns'],
+    queryFn: () => apiRequest('GET', '/api/marketing/ads/campaigns').then(r => r.json()),
+  });
+
+  const { data: targeting } = useQuery<any>({
+    queryKey: ['/api/marketing/ads/targeting'],
+    queryFn: () => apiRequest('GET', '/api/marketing/ads/targeting').then(r => r.json()),
+  });
+
+  const createCampaignMutation = useMutation({
+    mutationFn: (data: typeof newCampaign) => apiRequest('POST', '/api/marketing/ads/create-campaign', data),
+    onSuccess: async (response) => {
+      const result = await response.json();
+      queryClient.invalidateQueries({ queryKey: ['/api/marketing/ads/campaigns'] });
+      const hasErrors = result.campaigns?.some((c: any) => c.error);
+      toast({
+        title: hasErrors ? 'Campaigns created with warnings' : 'Campaigns created!',
+        description: hasErrors ? 'Some campaigns may need Meta API credentials to fully activate' : `Created ${result.campaigns?.length || 1} campaign(s) on Meta`,
+      });
+      setShowCreateForm(false);
+    },
+    onError: (err: any) => {
+      toast({ title: 'Failed to create campaign', description: err.message, variant: 'destructive' });
+    },
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: (id: string) => apiRequest('POST', `/api/marketing/ads/campaigns/${id}/activate`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/marketing/ads/campaigns'] });
+      toast({ title: 'Campaign activated!' });
+    },
+    onError: (err: any) => toast({ title: 'Activation failed', description: err.message, variant: 'destructive' }),
+  });
+
+  const pauseMutation = useMutation({
+    mutationFn: (id: string) => apiRequest('POST', `/api/marketing/ads/campaigns/${id}/pause`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/marketing/ads/campaigns'] });
+      toast({ title: 'Campaign paused' });
+    },
+    onError: (err: any) => toast({ title: 'Pause failed', description: err.message, variant: 'destructive' }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest('POST', `/api/marketing/ads/campaigns/${id}/delete`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/marketing/ads/campaigns'] });
+      toast({ title: 'Campaign archived' });
+    },
+    onError: (err: any) => toast({ title: 'Delete failed', description: err.message, variant: 'destructive' }),
+  });
+
+  const refreshInsightsMutation = useMutation({
+    mutationFn: () => apiRequest('POST', '/api/marketing/ads/refresh-insights'),
+    onSuccess: async (response) => {
+      const result = await response.json();
+      queryClient.invalidateQueries({ queryKey: ['/api/marketing/ads/campaigns'] });
+      toast({ title: 'Insights refreshed', description: `Updated ${result.updated} campaign(s)` });
+    },
+    onError: () => toast({ title: 'Refresh failed', variant: 'destructive' }),
+  });
+
+  const initCampaignsMutation = useMutation({
+    mutationFn: () => apiRequest('POST', '/api/marketing/ads/init-campaigns'),
+    onSuccess: async (response) => {
+      const result = await response.json();
+      queryClient.invalidateQueries({ queryKey: ['/api/marketing/ads/campaigns'] });
+      toast({ title: 'Initial campaigns created', description: `Created ${result.campaigns?.length || 0} campaign(s)` });
+    },
+    onError: (err: any) => toast({ title: 'Init failed', description: err.message, variant: 'destructive' }),
+  });
+
+  const activeCampaigns = campaigns.filter(c => c.status === 'active');
+  const totalDailyBudget = activeCampaigns.reduce((s, c) => s + parseFloat(c.dailyBudget || '0'), 0);
+  const totalSpent = campaigns.reduce((s, c) => s + parseFloat(c.totalSpent || '0'), 0);
+  const totalImpressions = campaigns.reduce((s, c) => s + (c.impressions || 0), 0);
+  const totalReach = campaigns.reduce((s, c) => s + (c.reach || 0), 0);
+  const totalClicks = campaigns.reduce((s, c) => s + (c.clicks || 0), 0);
+
+  const visibleCampaigns = campaigns.filter(c => c.status !== 'archived');
+
+  const hatchAndMarketingImages = [
+    ...HATCH_IMAGES.map(h => ({ filePath: h.path, label: h.label })),
+    ...images.filter(img => img.style === 'hatch-print' || img.category === 'marketing').slice(0, 6).map(img => ({ filePath: img.filePath, label: img.filename })),
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="p-4 bg-muted/50 rounded-lg border border-muted">
+          <div className="text-sm text-muted-foreground">Active Campaigns</div>
+          <div className="text-2xl font-bold text-cyan-400" data-testid="text-active-campaigns">{activeCampaigns.length}</div>
+        </div>
+        <div className="p-4 bg-muted/50 rounded-lg border border-muted">
+          <div className="text-sm text-muted-foreground">Daily Budget</div>
+          <div className="text-2xl font-bold text-green-400" data-testid="text-daily-budget">${totalDailyBudget.toFixed(2)}</div>
+        </div>
+        <div className="p-4 bg-muted/50 rounded-lg border border-muted">
+          <div className="text-sm text-muted-foreground">Total Spend</div>
+          <div className="text-2xl font-bold text-purple-400" data-testid="text-total-spend">${totalSpent.toFixed(2)}</div>
+        </div>
+        <div className="p-4 bg-muted/50 rounded-lg border border-muted">
+          <div className="text-sm text-muted-foreground">Impressions</div>
+          <div className="text-2xl font-bold text-blue-400" data-testid="text-impressions">{totalImpressions.toLocaleString()}</div>
+        </div>
+        <div className="p-4 bg-muted/50 rounded-lg border border-muted">
+          <div className="text-sm text-muted-foreground">Clicks</div>
+          <div className="text-2xl font-bold text-orange-400" data-testid="text-clicks">{totalClicks.toLocaleString()}</div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 flex-wrap">
+        <Button onClick={() => setShowCreateForm(!showCreateForm)} data-testid="btn-create-campaign">
+          <Plus className="w-4 h-4 mr-2" />
+          Create Campaign
+        </Button>
+        <Button variant="outline" onClick={() => initCampaignsMutation.mutate()} disabled={initCampaignsMutation.isPending} data-testid="btn-init-campaigns">
+          {initCampaignsMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+          Auto-Create Initial
+        </Button>
+        <Button variant="outline" onClick={() => refreshInsightsMutation.mutate()} disabled={refreshInsightsMutation.isPending} data-testid="btn-refresh-insights">
+          {refreshInsightsMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+          Refresh Insights
+        </Button>
+        <Button variant="outline" onClick={() => setShowTargeting(!showTargeting)} data-testid="btn-show-targeting">
+          <Target className="w-4 h-4 mr-2" />
+          Targeting
+        </Button>
+      </div>
+
+      <AnimatePresence>
+        {showCreateForm && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Plus className="w-5 h-5" />
+                  Create Ad Campaign
+                </CardTitle>
+                <CardDescription>Launch a paid campaign on Facebook and/or Instagram via Meta Marketing API</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Campaign Name</Label>
+                    <Input value={newCampaign.name} onChange={(e) => setNewCampaign({ ...newCampaign, name: e.target.value })} placeholder="GarageBot Awareness" className="mt-1" data-testid="input-campaign-name" />
+                  </div>
+                  <div>
+                    <Label>Platform</Label>
+                    <Select value={newCampaign.platform} onValueChange={(v) => setNewCampaign({ ...newCampaign, platform: v })}>
+                      <SelectTrigger className="mt-1" data-testid="select-ad-platform">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="facebook">Facebook Only</SelectItem>
+                        <SelectItem value="instagram">Instagram Only</SelectItem>
+                        <SelectItem value="both">Both (FB + IG)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>Daily Budget ($)</Label>
+                    <Input type="number" value={newCampaign.dailyBudget} onChange={(e) => setNewCampaign({ ...newCampaign, dailyBudget: e.target.value })} min="1" max="100" className="mt-1" data-testid="input-daily-budget" />
+                  </div>
+                  <div>
+                    <Label>CTA Button</Label>
+                    <Select value={newCampaign.ctaButton} onValueChange={(v) => setNewCampaign({ ...newCampaign, ctaButton: v })}>
+                      <SelectTrigger className="mt-1" data-testid="select-cta">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CTA_OPTIONS.map(c => (
+                          <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Landing URL</Label>
+                    <Input value={newCampaign.landingUrl} onChange={(e) => setNewCampaign({ ...newCampaign, landingUrl: e.target.value })} placeholder="https://garagebot.io" className="mt-1" data-testid="input-landing-url" />
+                  </div>
+                </div>
+                <div>
+                  <Label>Ad Copy</Label>
+                  <Textarea value={newCampaign.adCopy} onChange={(e) => setNewCampaign({ ...newCampaign, adCopy: e.target.value })} placeholder="Write compelling ad copy..." rows={3} className="mt-1" data-testid="input-ad-copy" />
+                  {posts.length > 0 && (
+                    <div className="mt-2">
+                      <span className="text-xs text-muted-foreground">Quick fill from library:</span>
+                      <div className="flex gap-1 mt-1 flex-wrap">
+                        {posts.slice(0, 3).map(post => (
+                          <Button key={post.id} variant="ghost" size="sm" className="text-xs h-auto py-1" onClick={() => setNewCampaign({ ...newCampaign, adCopy: post.content })} data-testid={`btn-fill-post-${post.id}`}>
+                            {post.content.slice(0, 40)}...
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <Label>Ad Image</Label>
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-2">
+                    {hatchAndMarketingImages.map((img, i) => (
+                      <div key={i} onClick={() => setNewCampaign({ ...newCampaign, adImageUrl: img.filePath })} className={`aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${newCampaign.adImageUrl === img.filePath ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-muted'}`} data-testid={`img-select-${i}`}>
+                        <img src={img.filePath} alt={img.label} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button onClick={() => createCampaignMutation.mutate(newCampaign)} disabled={!newCampaign.name || !newCampaign.adCopy || !newCampaign.adImageUrl || createCampaignMutation.isPending} data-testid="btn-submit-campaign">
+                    {createCampaignMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+                    Create Campaign
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowCreateForm(false)}>Cancel</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showTargeting && targeting && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="w-5 h-5" />
+                  Audience Targeting
+                </CardTitle>
+                <CardDescription>Current targeting configuration for Meta ad campaigns</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <div className="text-sm font-medium text-muted-foreground">Age Range</div>
+                    <div className="text-lg font-bold">{targeting.age_min} - {targeting.age_max}</div>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <div className="text-sm font-medium text-muted-foreground">Location</div>
+                    <div className="text-lg font-bold">{targeting.geo_locations?.countries?.join(', ') || 'US'}</div>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <div className="text-sm font-medium text-muted-foreground">Interests</div>
+                    <div className="text-lg font-bold">{targeting.flexible_spec?.[0]?.interests?.length || 0} categories</div>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium mb-2">Interest Categories</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {targeting.flexible_spec?.[0]?.interests?.map((interest: any) => (
+                      <Badge key={interest.id} variant="secondary" className="text-xs">{interest.name}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="w-5 h-5" />
+            Campaigns ({visibleCampaigns.length})
+          </CardTitle>
+          <CardDescription>Manage your paid ad campaigns on Facebook and Instagram</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {campaignsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : visibleCampaigns.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <DollarSign className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p className="font-medium">No campaigns yet</p>
+              <p className="text-sm mt-1">Create your first campaign or use Auto-Create to set up initial awareness campaigns</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {visibleCampaigns.map((campaign) => (
+                <div key={campaign.id} className="p-4 border rounded-lg hover:border-primary/30 transition-colors" data-testid={`card-campaign-${campaign.id}`}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {campaign.adImageUrl && (
+                        <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                          <img src={campaign.adImageUrl} alt="" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">{campaign.name}</div>
+                        <div className="flex items-center gap-2 mt-1">
+                          {campaign.platform === 'facebook' ? (
+                            <Badge className="bg-blue-600/20 text-blue-400 text-xs"><Facebook className="w-3 h-3 mr-1" />Facebook</Badge>
+                          ) : (
+                            <Badge className="bg-pink-500/20 text-pink-400 text-xs"><Instagram className="w-3 h-3 mr-1" />Instagram</Badge>
+                          )}
+                          {campaign.status === 'active' && <Badge className="bg-green-500/20 text-green-400 text-xs"><CheckCircle className="w-3 h-3 mr-1" />Active</Badge>}
+                          {campaign.status === 'paused' && <Badge className="bg-yellow-500/20 text-yellow-400 text-xs"><Clock className="w-3 h-3 mr-1" />Paused</Badge>}
+                          {campaign.status === 'draft' && <Badge variant="secondary" className="text-xs">Draft</Badge>}
+                          {campaign.status === 'error' && <Badge variant="destructive" className="text-xs"><XCircle className="w-3 h-3 mr-1" />Error</Badge>}
+                          <span className="text-xs text-muted-foreground">${parseFloat(campaign.dailyBudget || '0').toFixed(2)}/day</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {(campaign.status === 'paused' || campaign.status === 'draft') && campaign.externalCampaignId && (
+                        <Button size="sm" variant="outline" className="text-green-400 border-green-400/30 hover:bg-green-400/10" onClick={() => activateMutation.mutate(campaign.id)} disabled={activateMutation.isPending} data-testid={`btn-activate-${campaign.id}`}>
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      {campaign.status === 'active' && (
+                        <Button size="sm" variant="outline" className="text-yellow-400 border-yellow-400/30 hover:bg-yellow-400/10" onClick={() => pauseMutation.mutate(campaign.id)} disabled={pauseMutation.isPending} data-testid={`btn-pause-${campaign.id}`}>
+                          <Clock className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      <Button size="sm" variant="outline" className="text-red-400 border-red-400/30 hover:bg-red-400/10" onClick={() => deleteMutation.mutate(campaign.id)} disabled={deleteMutation.isPending} data-testid={`btn-delete-${campaign.id}`}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-3 pt-3 border-t border-muted">
+                    <div>
+                      <div className="text-xs text-muted-foreground">Impressions</div>
+                      <div className="text-sm font-medium">{(campaign.impressions || 0).toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">Reach</div>
+                      <div className="text-sm font-medium">{(campaign.reach || 0).toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">Clicks</div>
+                      <div className="text-sm font-medium">{(campaign.clicks || 0).toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">Spend</div>
+                      <div className="text-sm font-medium">${parseFloat(campaign.totalSpent || '0').toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">CPC</div>
+                      <div className="text-sm font-medium">{campaign.costPerClick ? `$${parseFloat(campaign.costPerClick).toFixed(2)}` : '—'}</div>
+                    </div>
+                  </div>
+                  {campaign.adCopy && (
+                    <div className="mt-2 text-xs text-muted-foreground line-clamp-2">{campaign.adCopy}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function MarketingHub() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -1193,54 +1611,7 @@ export default function MarketingHub() {
 
           {/* Paid Ads Tab */}
           <TabsContent value="ads" className="space-y-4 mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5" />
-                  Paid Advertising
-                </CardTitle>
-                <CardDescription>Manage paid ad campaigns with budget allocation and audience targeting</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Daily Budget</div>
-                    <div className="text-2xl font-bold text-green-400">$0.00</div>
-                  </div>
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Spend</div>
-                    <div className="text-2xl font-bold text-purple-400">$0.00</div>
-                  </div>
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Active Campaigns</div>
-                    <div className="text-2xl font-bold text-blue-400">0</div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h4 className="font-medium">Target Audiences</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {TARGET_AUDIENCES.map(audience => (
-                      <div key={audience.id} className="p-3 border rounded-lg hover:border-primary cursor-pointer transition-colors">
-                        <div className="font-medium text-sm">{audience.label}</div>
-                        <div className="text-xs text-muted-foreground">Click to create campaign</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-6">
-                  <h4 className="font-medium mb-3">Budget Ranges</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    {BUDGET_RANGES.filter(b => b.id !== "none").map(budget => (
-                      <div key={budget.id} className="p-3 border rounded-lg text-center hover:border-primary cursor-pointer transition-colors">
-                        <div className="font-bold text-primary">{budget.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <AdCampaignsTab images={images} posts={posts} />
           </TabsContent>
         </Tabs>
 
