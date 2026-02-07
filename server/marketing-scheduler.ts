@@ -3,7 +3,17 @@ import { marketingPosts, marketingImages, socialIntegrations, scheduledPosts, co
 import { eq, and, asc, sql, desc, isNotNull } from 'drizzle-orm';
 import { TwitterConnector, postToFacebook, postToInstagram } from './social-connectors';
 
-const POSTING_HOURS = [0, 3, 6, 9, 12, 15, 18, 21];
+const POSTING_HOURS_CST = [0, 3, 6, 9, 12, 15, 18, 21];
+const CST_TIMEZONE = 'America/Chicago';
+
+function getCSTHour(): number {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: CST_TIMEZONE,
+    hour: 'numeric',
+    hour12: false,
+  });
+  return parseInt(formatter.format(new Date()), 10);
+}
 const ECOSYSTEM_URLS = {
   garagebot: 'https://garagebot.io',
   dwtl: 'https://dwtl.io',
@@ -148,15 +158,14 @@ async function recordPost(
 }
 
 async function executeScheduledPosts() {
-  const now = new Date();
-  const hour = now.getHours();
+  const hour = getCSTHour();
   
-  if (!POSTING_HOURS.includes(hour) || hour === lastPostHour) {
+  if (!POSTING_HOURS_CST.includes(hour) || hour === lastPostHour) {
     return;
   }
   
   lastPostHour = hour;
-  console.log(`[Marketing] Executing scheduled posts for hour ${hour}`);
+  console.log(`[Marketing] Executing scheduled posts for CST hour ${hour}`);
   
   const integration = await getIntegration();
   const twitter = new TwitterConnector();
@@ -310,7 +319,7 @@ export function startMarketingScheduler() {
   }
   
   console.log('[Marketing] Starting scheduler...');
-  console.log('[Marketing] Posts scheduled every 3 hours: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm');
+  console.log('[Marketing] Posts scheduled every 3 hours CST: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm');
   
   isRunning = true;
 
@@ -360,7 +369,7 @@ export async function getMarketingStats() {
     activeImages: Number(imagesCount.count),
     totalPosted: Number(postedCount.count),
     totalFailed: Number(failedCount.count),
-    postingHours: POSTING_HOURS,
+    postingHours: POSTING_HOURS_CST,
   };
 }
 

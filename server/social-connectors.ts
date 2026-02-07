@@ -81,6 +81,16 @@ export class TwitterConnector {
   }
 }
 
+async function isImageAccessible(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) });
+    const contentType = res.headers.get('content-type') || '';
+    return res.ok && contentType.startsWith('image/');
+  } catch {
+    return false;
+  }
+}
+
 export async function postToFacebook(
   pageId: string,
   pageToken: string,
@@ -91,9 +101,17 @@ export async function postToFacebook(
     return { success: false, error: 'Facebook not configured - connect your Page in Marketing Hub' };
   }
   try {
+    let useImage = false;
+    if (imageUrl) {
+      useImage = await isImageAccessible(imageUrl);
+      if (!useImage) {
+        console.log(`[Marketing FB] Image not accessible (${imageUrl}), posting text-only`);
+      }
+    }
+
     let url: string;
     let body: any;
-    if (imageUrl) {
+    if (useImage && imageUrl) {
       url = `https://graph.facebook.com/v21.0/${pageId}/photos`;
       body = { url: imageUrl, message, access_token: pageToken };
     } else {
@@ -109,6 +127,23 @@ export async function postToFacebook(
     if (data.id || data.post_id) {
       return { success: true, externalId: data.id || data.post_id };
     }
+
+    if (useImage && data.error?.code === 324) {
+      console.log('[Marketing FB] Image rejected by Meta, retrying as text-only post');
+      const fallbackUrl = `https://graph.facebook.com/v21.0/${pageId}/feed`;
+      const fallbackBody = { message, access_token: pageToken };
+      const fallbackRes = await fetch(fallbackUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fallbackBody),
+      });
+      const fallbackData = await fallbackRes.json();
+      if (fallbackData.id || fallbackData.post_id) {
+        return { success: true, externalId: fallbackData.id || fallbackData.post_id };
+      }
+      return { success: false, error: JSON.stringify(fallbackData) };
+    }
+
     return { success: false, error: JSON.stringify(data) };
   } catch (error) {
     return { success: false, error: String(error) };
@@ -125,7 +160,11 @@ export async function postToInstagram(
     return { success: false, error: 'Instagram not configured - connect your account in Marketing Hub' };
   }
   if (!imageUrl) {
-    return { success: false, error: 'Instagram requires an image' };
+    return { success: false, error: 'Instagram requires an image — skipping this post' };
+  }
+  const imageOk = await isImageAccessible(imageUrl);
+  if (!imageOk) {
+    return { success: false, error: `Instagram image not publicly accessible (${imageUrl}) — skipping` };
   }
   try {
     const containerResponse = await fetch(
@@ -138,6 +177,9 @@ export async function postToInstagram(
     );
     const containerData = await containerResponse.json();
     if (!containerData.id) {
+      if (containerData.error?.code === 10 || containerData.error?.code === 200) {
+        return { success: false, error: 'Instagram needs instagram_content_publish permission — regenerate token with this permission checked' };
+      }
       return { success: false, error: JSON.stringify(containerData) };
     }
     const publishResponse = await fetch(
