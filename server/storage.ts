@@ -14,7 +14,8 @@ import {
   vendorReviews, wishlists, wishlistItems, projects, projectParts, smsPreferences,
   seoPages, analyticsSessions, analyticsPageViews, analyticsEvents,
   partnerApiCredentials, partnerApiLogs, shopLocations, blogPosts,
-  warranties, warrantyClaims, fuelLogs, vehicleExpenses, priceHistory, emergencyContacts, maintenanceSchedules
+  warranties, warrantyClaims, fuelLogs, vehicleExpenses, priceHistory, emergencyContacts, maintenanceSchedules,
+  partListings, partListingMessages
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -57,7 +58,8 @@ import type {
   VehicleExpense, InsertVehicleExpense,
   PriceHistory, InsertPriceHistory,
   EmergencyContact, InsertEmergencyContact,
-  MaintenanceSchedule, InsertMaintenanceSchedule
+  MaintenanceSchedule, InsertMaintenanceSchedule,
+  PartListing, InsertPartListing, PartListingMessage, InsertPartListingMessage
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -458,6 +460,22 @@ export interface IStorage {
   updateMaintenanceSchedule(id: string, updates: Partial<MaintenanceSchedule>): Promise<MaintenanceSchedule | undefined>;
   completeMaintenanceTask(id: string, completedMileage: number): Promise<MaintenanceSchedule | undefined>;
   deleteMaintenanceSchedule(id: string): Promise<boolean>;
+
+  // Part Listings Marketplace
+  getPartListings(filters?: { make?: string; model?: string; year?: number; category?: string; search?: string; vehicleType?: string; sellerId?: string; status?: string }): Promise<PartListing[]>;
+  getPartListing(id: string): Promise<PartListing | undefined>;
+  getPartListingsBySeller(sellerId: string): Promise<PartListing[]>;
+  createPartListing(listing: InsertPartListing): Promise<PartListing>;
+  updatePartListing(id: string, updates: Partial<PartListing>): Promise<PartListing | undefined>;
+  deletePartListing(id: string): Promise<boolean>;
+  incrementPartListingViews(id: string): Promise<void>;
+  incrementPartListingContacts(id: string): Promise<void>;
+
+  // Part Listing Messages
+  getPartListingMessages(userId: string): Promise<PartListingMessage[]>;
+  getPartListingMessagesByListing(listingId: string): Promise<PartListingMessage[]>;
+  createPartListingMessage(message: InsertPartListingMessage): Promise<PartListingMessage>;
+  markPartListingMessageRead(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2861,6 +2879,87 @@ export class DatabaseStorage implements IStorage {
   async deleteMaintenanceSchedule(id: string): Promise<boolean> {
     const result = await db.delete(maintenanceSchedules).where(eq(maintenanceSchedules.id, id));
     return (result?.rowCount ?? 0) > 0;
+  }
+
+  async getPartListings(filters?: { make?: string; model?: string; year?: number; category?: string; search?: string; vehicleType?: string; sellerId?: string; status?: string }): Promise<PartListing[]> {
+    const conditions: any[] = [];
+    if (filters?.status) {
+      conditions.push(eq(partListings.status, filters.status));
+    } else {
+      conditions.push(eq(partListings.status, 'active'));
+    }
+    if (filters?.make) conditions.push(ilike(partListings.fitmentMake, `%${filters.make}%`));
+    if (filters?.model) conditions.push(ilike(partListings.fitmentModel, `%${filters.model}%`));
+    if (filters?.year) conditions.push(eq(partListings.fitmentYear, filters.year));
+    if (filters?.category) conditions.push(eq(partListings.category, filters.category));
+    if (filters?.vehicleType) conditions.push(eq(partListings.vehicleType, filters.vehicleType));
+    if (filters?.sellerId) conditions.push(eq(partListings.sellerId, filters.sellerId));
+    if (filters?.search) {
+      conditions.push(or(
+        ilike(partListings.title, `%${filters.search}%`),
+        ilike(partListings.description, `%${filters.search}%`),
+        ilike(partListings.partNumber, `%${filters.search}%`)
+      ));
+    }
+    return db.select().from(partListings)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(desc(partListings.createdAt))
+      .limit(100);
+  }
+
+  async getPartListing(id: string): Promise<PartListing | undefined> {
+    const [listing] = await db.select().from(partListings).where(eq(partListings.id, id));
+    return listing;
+  }
+
+  async getPartListingsBySeller(sellerId: string): Promise<PartListing[]> {
+    return db.select().from(partListings)
+      .where(eq(partListings.sellerId, sellerId))
+      .orderBy(desc(partListings.createdAt));
+  }
+
+  async createPartListing(listing: InsertPartListing): Promise<PartListing> {
+    const [created] = await db.insert(partListings).values(listing).returning();
+    return created;
+  }
+
+  async updatePartListing(id: string, updates: Partial<PartListing>): Promise<PartListing | undefined> {
+    const [updated] = await db.update(partListings).set({ ...updates, updatedAt: new Date() }).where(eq(partListings.id, id)).returning();
+    return updated;
+  }
+
+  async deletePartListing(id: string): Promise<boolean> {
+    const result = await db.delete(partListings).where(eq(partListings.id, id));
+    return (result?.rowCount ?? 0) > 0;
+  }
+
+  async incrementPartListingViews(id: string): Promise<void> {
+    await db.update(partListings).set({ views: sql`${partListings.views} + 1` }).where(eq(partListings.id, id));
+  }
+
+  async incrementPartListingContacts(id: string): Promise<void> {
+    await db.update(partListings).set({ contactCount: sql`${partListings.contactCount} + 1` }).where(eq(partListings.id, id));
+  }
+
+  async getPartListingMessages(userId: string): Promise<PartListingMessage[]> {
+    return db.select().from(partListingMessages)
+      .where(or(eq(partListingMessages.senderId, userId), eq(partListingMessages.recipientId, userId)))
+      .orderBy(desc(partListingMessages.createdAt));
+  }
+
+  async getPartListingMessagesByListing(listingId: string): Promise<PartListingMessage[]> {
+    return db.select().from(partListingMessages)
+      .where(eq(partListingMessages.listingId, listingId))
+      .orderBy(asc(partListingMessages.createdAt));
+  }
+
+  async createPartListingMessage(message: InsertPartListingMessage): Promise<PartListingMessage> {
+    const [created] = await db.insert(partListingMessages).values(message).returning();
+    return created;
+  }
+
+  async markPartListingMessageRead(id: string): Promise<void> {
+    await db.update(partListingMessages).set({ isRead: true }).where(eq(partListingMessages.id, id));
   }
 }
 

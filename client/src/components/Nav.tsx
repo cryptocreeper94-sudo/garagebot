@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check, Coffee, MessageCircle, Truck, Gamepad2, HeadphonesIcon } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check, Coffee, MessageCircle, Truck, Gamepad2, HeadphonesIcon, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
@@ -355,6 +355,14 @@ export default function Nav() {
                       </div>
                     </Link>
                     
+                    <Link href="/marketplace" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/marketplace' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-marketplace">
+                        <Tag className="w-5 h-5" />
+                        <span className="font-medium">Parts Marketplace</span>
+                        <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px] font-mono ml-auto">NEW</Badge>
+                      </div>
+                    </Link>
+
                     <Link href="/shade-tree" onClick={() => setIsOpen(false)}>
                       <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/shade-tree' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-shade-tree">
                         <Wrench className="w-5 h-5" />
