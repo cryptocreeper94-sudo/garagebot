@@ -10,6 +10,7 @@ import { createChatRouter } from "./chat-routes";
 import { communityHubService } from "./services/community-hub-service";
 import { initBuddyBot } from "./services/buddy-chat-bot";
 import { seedChatChannels } from "./seedChat";
+import { startMarketingScheduler } from "./marketing-scheduler";
 
 const app = express();
 const httpServer = createServer(app);
@@ -149,6 +150,13 @@ async function initStripe() {
     log("Buddy AI bot initialized", "chat");
   } catch (err: any) {
     log(`Chat init error: ${err.message}`, "chat");
+  }
+
+  try {
+    startMarketingScheduler();
+    log("Marketing scheduler started (every 3 hours)", "marketing");
+  } catch (err: any) {
+    log(`Marketing scheduler error: ${err.message}`, "marketing");
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

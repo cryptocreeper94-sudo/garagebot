@@ -103,6 +103,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Marketing Hub & Social Media Integration
 - **Add-on**: Premium add-on for Mechanics Garage shops supporting various social media platforms with features like Digital Asset Management, content scheduling, analytics, and AI content generation via OpenAI GPT-4o.
+- **GarageBot Marketing Hub** (`/marketing-hub`): Auto-posting to Facebook (GarageBot.io page) every 3 hours via Meta Graph API. 60+ unique posts covering all vehicle categories (cars, trucks, motorcycles, ATVs, boats, RVs, tractors, heavy equipment, generators, small engines, aviation, RC, drones, model aircraft, slot cars, go-karts, golf carts, snowmobiles, jet skis, exotics, classics, diesel, kit cars). Content types: educational, gamified challenges, evergreen, seasonal, promotional. No repeats for at least a week.
+- **Meta Integration**: App ID `1444186517216202`, Page ID `900725646468208` (GarageBot.io), Ad Account `751302398036834` (DarkWave Studios). Credentials stored as secrets: META_APP_ID, META_APP_SECRET, META_PAGE_ID, META_PAGE_ACCESS_TOKEN, META_AD_ACCOUNT_ID. Auto-connected via `ensureMetaIntegration()` on scheduler startup.
+- **Analytics**: Tracks top-performing messages, images, and image+message combinations. Pulls real engagement data from Meta Graph API every 30 minutes. Performance by time slot analysis. API endpoints: `/api/marketing/analytics/top-content`, `/api/marketing/analytics/top-images`, `/api/marketing/analytics/top-bundles`, `/api/marketing/analytics/time-slots`.
+- **Key Files**: `server/marketing-scheduler.ts`, `server/social-connectors.ts`, `client/src/pages/MarketingHub.tsx`.
 
 # External Dependencies
 
