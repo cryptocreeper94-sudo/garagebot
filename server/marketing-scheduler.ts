@@ -1,6 +1,6 @@
 import { db } from '@db';
 import { marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles } from '@shared/schema';
-import { eq, and, asc, sql, desc, isNotNull } from 'drizzle-orm';
+import { eq, and, asc, sql, desc, isNotNull, inArray } from 'drizzle-orm';
 import { TwitterConnector, postToFacebook, postToInstagram } from './social-connectors';
 
 const POSTING_HOURS_CST = [0, 3, 6, 9, 12, 15, 18, 21];
@@ -136,7 +136,55 @@ async function getNextPost(platform: string, tenantId: string = 'garagebot') {
   return post;
 }
 
-async function getNextImage(tenantId: string = 'garagebot') {
+const POST_CATEGORY_TO_IMAGE_FILENAMES: Record<string, string[]> = {
+  'cars': ['cars_and_trucks.png', 'engine_block.png', 'brake_parts.png', 'suspension_parts.png', 'exhaust_system.png', 'tires_and_wheels.png', 'car_battery.png'],
+  'trucks': ['cars_and_trucks.png', 'diesel_commercial_truck.png', 'engine_block.png', 'tires_and_wheels.png', 'brake_parts.png'],
+  'diy': ['hatch_garagebot_diy.png', 'engine_block.png', 'brake_parts.png', 'cars_and_trucks.png'],
+  'gamified': ['hatch_garagebot_search.png', 'hatch_garagebot_buddy.png', 'engine_block.png', 'cars_and_trucks.png'],
+  'marine': ['boat_marine.png', 'marine_parts.png'],
+  'atv': ['atv_and_utv.png'],
+  'rv': ['rv_trailer.png'],
+  'small-engines': ['small_engines_equipment.png'],
+  'generator': ['generator_power.png'],
+  'tractor': ['hatch_garagebot_all_vehicles.png'],
+  'heavy-equipment': ['hatch_garagebot_right_part.png'],
+  'motorcycle': ['motorcycle.png'],
+  'drones': ['drones_fpv.png'],
+  'rc-cars': ['rc_hobby_vehicles.png'],
+  'model-aircraft': ['model_aircraft.png'],
+  'slot-cars': ['slot_cars.png'],
+  'aviation': ['aviation_aircraft.png'],
+  'exotic': ['exotic_supercar.png'],
+  'classic': ['classic_hot_rod.png'],
+  'diesel': ['diesel_commercial_truck.png'],
+  'kit-car': ['kit_car_build.png'],
+  'go-kart': ['go_kart_racing.png'],
+  'golf-cart': ['golf_cart.png'],
+  'snowmobile': ['snowmobile_snow.png'],
+  'jet-ski': ['jet_ski_watercraft.png'],
+  'brand': ['hatch_garagebot_buddy.png', 'hatch_garagebot_search.png', 'hatch_garagebot_nashville.png', 'garagebot_facebook_cover_16x9.png'],
+  'ai': ['buddy_ai_assistant.png'],
+  'blockchain': ['hatch_garagebot_search.png'],
+  'darkwave': ['hatch_garagebot_buddy.png'],
+  'mechanics': ['hatch_garagebot_diy.png', 'engine_block.png', 'brake_parts.png'],
+};
+
+async function getNextImage(postCategory?: string, tenantId: string = 'garagebot') {
+  if (postCategory) {
+    const matchingFilenames = POST_CATEGORY_TO_IMAGE_FILENAMES[postCategory];
+    if (matchingFilenames && matchingFilenames.length > 0) {
+      const [matchedImage] = await db.select().from(marketingImages)
+        .where(and(
+          eq(marketingImages.tenantId, tenantId),
+          eq(marketingImages.isActive, true),
+          inArray(marketingImages.filename, matchingFilenames)
+        ))
+        .orderBy(asc(marketingImages.usageCount), asc(marketingImages.lastUsedAt))
+        .limit(1);
+      if (matchedImage) return matchedImage;
+    }
+  }
+
   const [image] = await db.select().from(marketingImages)
     .where(and(eq(marketingImages.tenantId, tenantId), eq(marketingImages.isActive, true)))
     .orderBy(asc(marketingImages.usageCount), asc(marketingImages.lastUsedAt))
@@ -191,7 +239,7 @@ async function executeScheduledPosts() {
   }
   
   const message = buildMessage(post.content, post.targetSite || 'garagebot', post.hashtags || []);
-  const image = await getNextImage();
+  const image = await getNextImage(post.category || undefined);
   const imageUrl = image ? `${getBaseUrl()}${image.filePath}` : undefined;
   
   if (integration?.facebookConnected && integration.facebookPageId && integration.facebookPageAccessToken) {
