@@ -300,6 +300,44 @@ export default function Dashboard() {
 
         <div className="divider-gradient" />
 
+        {/* Parts Marketplace Section */}
+        <div className="mt-12 mb-8">
+          <Card className="card-3d relative overflow-hidden bg-gradient-to-r from-cyan-500/10 via-blue-500/5 to-purple-500/10 border-cyan-500/30 p-8">
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8">
+              <div className="w-24 h-24 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center shrink-0">
+                <Tag className="w-12 h-12 text-cyan-400" />
+              </div>
+              <div className="flex-1 text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
+                  <h3 className="text-2xl font-tech font-bold uppercase">Parts Marketplace</h3>
+                  <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-[10px] font-mono">
+                    LIVE
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground mb-4 max-w-2xl">
+                  Buy and sell parts from fellow gearheads. Search by make, model, and year to find exactly what you need, 
+                  or list your spare parts to reach thousands of enthusiasts.
+                </p>
+                <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                  <a href="/marketplace" data-testid="link-browse-marketplace">
+                    <Button className="font-tech uppercase bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                      <Tag className="w-4 h-4 mr-2" />
+                      Browse Marketplace
+                    </Button>
+                  </a>
+                  <a href="/pro" data-testid="link-sell-parts-upgrade">
+                    <Button variant="ghost" className="font-mono text-xs text-muted-foreground hover:text-cyan-400">
+                      Sell Parts (Basic+) →
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="divider-gradient" />
+
         {/* Coming Soon Features Section */}
         <div className="mt-12">
           <div className="section-header-premium">
