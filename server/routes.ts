@@ -3758,16 +3758,22 @@ ${pages.map(p => `  <url>
       const userId = req.user?.claims?.sub || (req.session as any).userId;
       const user = await storage.getUser(userId);
       
-      const isPro = user?.subscriptionTier === 'pro' && 
+      const tier = user?.subscriptionTier || 'free';
+      const isPro = tier === 'pro' && 
         (!user?.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
-      const isAdFree = isPro || (user?.adFreeSubscription === true && 
+      const isBasic = (tier === 'basic' || isPro) &&
+        (!user?.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
+      const isAdFree = isPro || isBasic || (user?.adFreeSubscription === true && 
         (!user?.adFreeExpiresAt || new Date(user.adFreeExpiresAt) > new Date()));
+      const canSellParts = isBasic || isPro;
       
       res.json({
         isPro,
+        isBasic,
         isAdFree,
-        tier: user?.subscriptionTier || 'free',
-        status: isPro ? 'active' : 'inactive',
+        canSellParts,
+        tier,
+        status: isPro ? 'active' : isBasic ? 'active' : isAdFree ? 'active' : 'inactive',
         expiresAt: user?.subscriptionExpiresAt || null,
         isFounder: user?.isFounder || false,
         adFreeSubscription: user?.adFreeSubscription || false,
@@ -3782,25 +3788,37 @@ ${pages.map(p => `  <url>
   app.post('/api/subscription/checkout', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub || (req.session as any).userId;
-      const { billingPeriod } = req.body;
+      const { billingPeriod, tier } = req.body;
       const user = await storage.getUser(userId);
       
       if (!user) {
         return res.status(400).json({ error: "User not found" });
       }
+
+      const subscriptionTier = tier || 'pro';
       
-      const priceId = billingPeriod === 'annual' 
-        ? process.env.STRIPE_PRO_ANNUAL_PRICE_ID 
-        : process.env.STRIPE_PRO_MONTHLY_PRICE_ID;
+      let priceId: string | undefined;
+      if (subscriptionTier === 'ad-free') {
+        priceId = billingPeriod === 'annual'
+          ? process.env.STRIPE_AD_FREE_ANNUAL_PRICE_ID
+          : process.env.STRIPE_AD_FREE_MONTHLY_PRICE_ID;
+      } else if (subscriptionTier === 'basic') {
+        priceId = billingPeriod === 'annual'
+          ? process.env.STRIPE_BASIC_ANNUAL_PRICE_ID
+          : process.env.STRIPE_BASIC_MONTHLY_PRICE_ID;
+      } else {
+        priceId = billingPeriod === 'annual' 
+          ? process.env.STRIPE_PRO_ANNUAL_PRICE_ID 
+          : process.env.STRIPE_PRO_MONTHLY_PRICE_ID;
+      }
       
       if (!priceId) {
-        return res.status(500).json({ error: "Stripe price not configured" });
+        return res.status(500).json({ error: "Stripe price not configured for this tier" });
       }
       
       const stripe = await getUncachableStripeClient();
       const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
       
-      // Get or create Stripe customer
       let customerId = user.stripeCustomerId;
       if (!customerId) {
         const customer = await stripe.customers.create({
@@ -3811,23 +3829,24 @@ ${pages.map(p => `  <url>
         await storage.updateUser(userId, { stripeCustomerId: customerId });
       }
       
-      // Create checkout session for subscription
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
         mode: 'subscription',
-        success_url: `${baseUrl}/pro?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${baseUrl}/pro?success=true&tier=${subscriptionTier}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pro?canceled=true`,
         metadata: {
           userId,
           billingPeriod,
-          isFounder: 'true', // Mark as founder during Launch Edition
+          subscriptionType: subscriptionTier,
+          isFounder: subscriptionTier === 'pro' ? 'true' : 'false',
         },
         subscription_data: {
           metadata: {
             userId,
-            isFounder: 'true',
+            subscriptionType: subscriptionTier,
+            isFounder: subscriptionTier === 'pro' ? 'true' : 'false',
           }
         }
       });
@@ -3836,67 +3855,6 @@ ${pages.map(p => `  <url>
     } catch (error) {
       console.error("Subscription checkout error:", error);
       res.status(500).json({ error: "Failed to create checkout session" });
-    }
-  });
-
-  app.post('/api/subscription/ad-free/checkout', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
-      const user = await storage.getUser(userId);
-
-      if (!user) {
-        return res.status(400).json({ error: "User not found" });
-      }
-
-      if (user.subscriptionTier === 'pro') {
-        return res.status(400).json({ error: "Pro subscribers are already ad-free" });
-      }
-
-      if (user.adFreeSubscription) {
-        return res.status(400).json({ error: "Already subscribed to ad-free" });
-      }
-
-      const priceId = process.env.STRIPE_AD_FREE_PRICE_ID;
-      if (!priceId) {
-        return res.status(500).json({ error: "Ad-free price not configured" });
-      }
-
-      const stripe = await getUncachableStripeClient();
-      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
-
-      let customerId = user.stripeCustomerId;
-      if (!customerId) {
-        const customer = await stripe.customers.create({
-          email: user.email || undefined,
-          metadata: { userId, username: user.username }
-        });
-        customerId = customer.id;
-        await storage.updateUser(userId, { stripeCustomerId: customerId });
-      }
-
-      const session = await stripe.checkout.sessions.create({
-        customer: customerId,
-        payment_method_types: ['card'],
-        line_items: [{ price: priceId, quantity: 1 }],
-        mode: 'subscription',
-        success_url: `${baseUrl}/pro?ad_free_success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/pro?canceled=true`,
-        metadata: {
-          userId,
-          subscriptionType: 'ad-free',
-        },
-        subscription_data: {
-          metadata: {
-            userId,
-            subscriptionType: 'ad-free',
-          }
-        }
-      });
-
-      res.json({ checkoutUrl: session.url });
-    } catch (error) {
-      console.error("Ad-free checkout error:", error);
-      res.status(500).json({ error: "Failed to create ad-free checkout session" });
     }
   });
 
@@ -10526,6 +10484,15 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     try {
       const userId = req.user?.claims?.sub || (req.session as any)?.userId;
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const user = await storage.getUser(userId);
+      const tier = user?.subscriptionTier || 'free';
+      const isActiveSubscription = (tier === 'basic' || tier === 'pro') &&
+        (!user?.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
+      if (!isActiveSubscription) {
+        return res.status(403).json({ error: "Marketplace selling requires a Basic or Pro subscription", requiresUpgrade: true });
+      }
+
       const result = insertPartListingSchema.safeParse({ ...req.body, sellerId: userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });

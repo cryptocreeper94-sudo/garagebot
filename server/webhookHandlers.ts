@@ -87,11 +87,16 @@ export class WebhookHandlers {
     const subscriptionType = session.metadata?.subscriptionType;
     
     if (session.mode === 'subscription' && subscriptionId) {
+      const billingPeriod = session.metadata?.billingPeriod || 'monthly';
+      const expiresAt = new Date();
+      if (billingPeriod === 'annual') {
+        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+      } else {
+        expiresAt.setMonth(expiresAt.getMonth() + 1);
+      }
+
       if (subscriptionType === 'ad-free') {
         console.log('Ad-free checkout complete:', subscriptionId, 'userId:', userId);
-        
-        const expiresAt = new Date();
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
         
         await storage.updateUser(userId, {
           adFreeSubscription: true,
@@ -101,32 +106,42 @@ export class WebhookHandlers {
         
         console.log('User updated to ad-free:', userId);
         
-        const amount = session.amount_total ? session.amount_total / 100 : 5;
+        const amount = session.amount_total ? session.amount_total / 100 : 3;
         orbitClient.reportSubscriptionRevenue(userId, amount, 'ad-free').catch(err => {
           console.error('[ORBIT] Failed to report ad-free subscription revenue:', err);
         });
-      } else {
-        console.log('Checkout complete for subscription:', subscriptionId, 'userId:', userId, 'isFounder:', isFounder);
+      } else if (subscriptionType === 'basic') {
+        console.log('Basic checkout complete:', subscriptionId, 'userId:', userId);
         
-        const billingPeriod = session.metadata?.billingPeriod || 'monthly';
-        const expiresAt = new Date();
-        if (billingPeriod === 'annual') {
-          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-        } else {
-          expiresAt.setMonth(expiresAt.getMonth() + 1);
-        }
+        await storage.updateUser(userId, {
+          subscriptionTier: 'basic',
+          stripeSubscriptionId: subscriptionId,
+          subscriptionExpiresAt: expiresAt,
+          adFreeSubscription: true,
+          adFreeExpiresAt: expiresAt,
+        });
+        
+        console.log('User updated to Basic:', userId);
+        
+        const amount = session.amount_total ? session.amount_total / 100 : 6;
+        orbitClient.reportSubscriptionRevenue(userId, amount, 'basic').catch(err => {
+          console.error('[ORBIT] Failed to report basic subscription revenue:', err);
+        });
+      } else {
+        console.log('Checkout complete for Pro subscription:', subscriptionId, 'userId:', userId, 'isFounder:', isFounder);
         
         await storage.updateUser(userId, {
           subscriptionTier: 'pro',
           stripeSubscriptionId: subscriptionId,
           subscriptionExpiresAt: expiresAt,
           isFounder: isFounder,
+          adFreeSubscription: true,
+          adFreeExpiresAt: expiresAt,
         });
         
         console.log('User updated to Pro:', userId, 'Founder:', isFounder);
         
-        const amount = session.amount_total ? session.amount_total / 100 : 
-          (billingPeriod === 'annual' ? 299 : 29.99);
+        const amount = session.amount_total ? session.amount_total / 100 : 10;
         orbitClient.reportSubscriptionRevenue(userId, amount, 'pro').catch(err => {
           console.error('[ORBIT] Failed to report subscription revenue:', err);
         });
@@ -153,12 +168,22 @@ export class WebhookHandlers {
           adFreeExpiresAt: periodEnd,
           adFreeStripeSubscriptionId: subscription.id,
         });
+      } else if (subscriptionType === 'basic') {
+        await storage.updateUser(userId, {
+          subscriptionTier: 'basic',
+          stripeSubscriptionId: subscription.id,
+          subscriptionExpiresAt: periodEnd,
+          adFreeSubscription: true,
+          adFreeExpiresAt: periodEnd,
+        });
       } else {
         await storage.updateUser(userId, {
           subscriptionTier: 'pro',
           stripeSubscriptionId: subscription.id,
           subscriptionExpiresAt: periodEnd,
           isFounder: isFounder,
+          adFreeSubscription: true,
+          adFreeExpiresAt: periodEnd,
         });
       }
     } else {
@@ -169,9 +194,15 @@ export class WebhookHandlers {
           await storage.updateUser(userId, {
             adFreeSubscription: false,
           });
+        } else if (subscriptionType === 'basic') {
+          await storage.updateUser(userId, {
+            subscriptionTier: 'free',
+            adFreeSubscription: false,
+          });
         } else {
           await storage.updateUser(userId, {
             subscriptionTier: 'free',
+            adFreeSubscription: false,
           });
         }
       }
@@ -191,11 +222,21 @@ export class WebhookHandlers {
         adFreeStripeSubscriptionId: null,
         adFreeExpiresAt: null,
       });
+    } else if (subscriptionType === 'basic') {
+      await storage.updateUser(userId, {
+        subscriptionTier: 'free',
+        stripeSubscriptionId: null,
+        subscriptionExpiresAt: null,
+        adFreeSubscription: false,
+        adFreeExpiresAt: null,
+      });
     } else {
       await storage.updateUser(userId, {
         subscriptionTier: 'free',
         stripeSubscriptionId: null,
         subscriptionExpiresAt: null,
+        adFreeSubscription: false,
+        adFreeExpiresAt: null,
       });
     }
   }

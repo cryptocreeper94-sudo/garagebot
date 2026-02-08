@@ -679,6 +679,14 @@ export default function PartsMarketplace() {
     queryFn: async () => { const r = await fetch('/api/marketplace/stats'); return r.json(); },
   });
 
+  const { data: subscription } = useQuery({
+    queryKey: ['/api/subscription/status'],
+    queryFn: async () => { const r = await fetch('/api/subscription/status'); if (!r.ok) return null; return r.json(); },
+    enabled: !!user,
+  });
+
+  const canSellParts = subscription?.canSellParts || false;
+
   const { data: selectedListing } = useQuery({
     queryKey: ['/api/marketplace/listings', selectedListingId],
     queryFn: async () => {
@@ -719,20 +727,32 @@ export default function PartsMarketplace() {
             <div className="flex gap-2">
               {user && (
                 <>
-                  <button
-                    onClick={() => setShowMyListings(true)}
-                    className="px-4 py-2 rounded-xl text-sm bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all flex items-center gap-2"
-                    data-testid="button-my-listings"
-                  >
-                    <Package className="w-4 h-4" /> My Listings
-                  </button>
-                  <button
-                    onClick={() => setShowCreate(true)}
-                    className="px-4 py-2 rounded-xl text-sm bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2"
-                    data-testid="button-sell-part"
-                  >
-                    <Plus className="w-4 h-4" /> Sell a Part
-                  </button>
+                  {canSellParts && (
+                    <button
+                      onClick={() => setShowMyListings(true)}
+                      className="px-4 py-2 rounded-xl text-sm bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all flex items-center gap-2"
+                      data-testid="button-my-listings"
+                    >
+                      <Package className="w-4 h-4" /> My Listings
+                    </button>
+                  )}
+                  {canSellParts ? (
+                    <button
+                      onClick={() => setShowCreate(true)}
+                      className="px-4 py-2 rounded-xl text-sm bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2"
+                      data-testid="button-sell-part"
+                    >
+                      <Plus className="w-4 h-4" /> Sell a Part
+                    </button>
+                  ) : (
+                    <a
+                      href="/pro"
+                      className="px-4 py-2 rounded-xl text-sm bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold hover:from-amber-400 hover:to-orange-500 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2"
+                      data-testid="button-upgrade-to-sell"
+                    >
+                      <Star className="w-4 h-4" /> Upgrade to Sell
+                    </a>
+                  )}
                 </>
               )}
             </div>
@@ -904,7 +924,7 @@ export default function PartsMarketplace() {
             <p className="text-slate-500 max-w-md mx-auto mb-6">
               {search || hasActiveFilters ? 'Try adjusting your search or filters.' : 'Be the first to list a part!'}
             </p>
-            {user && (
+            {user && canSellParts && (
               <button
                 onClick={() => setShowCreate(true)}
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20 inline-flex items-center gap-2"
@@ -912,6 +932,15 @@ export default function PartsMarketplace() {
               >
                 <Plus className="w-5 h-5" /> List a Part
               </button>
+            )}
+            {user && !canSellParts && (
+              <a
+                href="/pro"
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold hover:from-amber-400 hover:to-orange-500 transition-all shadow-lg shadow-amber-500/20 inline-flex items-center gap-2"
+                data-testid="button-upgrade-to-list"
+              >
+                <Star className="w-5 h-5" /> Upgrade to Basic to List Parts
+              </a>
             )}
           </motion.div>
         ) : (
@@ -936,7 +965,7 @@ export default function PartsMarketplace() {
             </div>
             <h3 className="text-xl font-bold text-white font-rajdhani mb-2">Got Spare Parts?</h3>
             <p className="text-slate-400 max-w-md mx-auto mb-6">
-              Sign up to list your parts for sale. Reach thousands of gearheads looking for exactly what you have.
+              Sign up and subscribe to our Basic plan ($6/mo) to list your parts for sale. Reach thousands of gearheads looking for exactly what you have.
             </p>
             <a
               href="/auth"
@@ -944,6 +973,25 @@ export default function PartsMarketplace() {
               data-testid="link-signup-to-sell"
             >
               Sign Up to Sell
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </GlassCard>
+        )}
+        {user && !canSellParts && (
+          <GlassCard className="mt-12 p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
+              <Star className="w-8 h-8 text-amber-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white font-rajdhani mb-2">Unlock Marketplace Selling</h3>
+            <p className="text-slate-400 max-w-md mx-auto mb-6">
+              Upgrade to Basic ($6/mo) or Pro ($10/mo) to list parts for sale. Basic includes ad-free browsing and marketplace access. Pro adds unlimited vehicles, AI features, and more.
+            </p>
+            <a
+              href="/pro"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold hover:from-amber-400 hover:to-orange-500 transition-all shadow-lg shadow-amber-500/20"
+              data-testid="link-upgrade-to-sell"
+            >
+              View Plans
               <ChevronRight className="w-4 h-4" />
             </a>
           </GlassCard>
