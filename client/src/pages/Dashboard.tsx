@@ -25,7 +25,17 @@ import {
   Blocks,
   Car,
   ExternalLink,
-  Tag
+  Tag,
+  Compass,
+  Heart,
+  FolderOpen,
+  Coffee,
+  MessageCircle,
+  Gamepad2,
+  Truck,
+  Fuel,
+  Calendar,
+  ChevronRight
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -334,6 +344,56 @@ export default function Dashboard() {
               </div>
             </div>
           </Card>
+        </div>
+
+        <div className="divider-gradient" />
+
+        {/* Feature Spotlight Section */}
+        <div className="mt-12 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                <Compass className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-tech font-bold uppercase text-white">Discover Features</h2>
+                <p className="text-xs text-muted-foreground font-mono">30+ tools at your fingertips</p>
+              </div>
+            </div>
+            <a href="/explore">
+              <Button variant="outline" size="sm" className="font-tech uppercase text-xs border-primary/30 hover:border-primary hover:bg-primary/10 hover:text-primary gap-1 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_20px_rgba(6,182,212,0.2)] transition-all" data-testid="button-explore-all">
+                See All <ChevronRight className="w-3 h-3" />
+              </Button>
+            </a>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { name: "My Garage", desc: "Vehicles & VIN decode", icon: Car, href: "/garage", color: "text-purple-400", glow: "rgba(168,85,247,0.3)" },
+              { name: "Wishlists", desc: "Save & share parts", icon: Heart, href: "/wishlists", color: "text-pink-400", glow: "rgba(244,114,182,0.3)" },
+              { name: "Build Projects", desc: "Track your builds", icon: FolderOpen, href: "/projects", color: "text-amber-400", glow: "rgba(251,191,36,0.3)" },
+              { name: "DIY Guides", desc: "Step-by-step repairs", icon: Wrench, href: "/diy-guides", color: "text-emerald-400", glow: "rgba(52,211,153,0.3)" },
+              { name: "Break Room", desc: "News, tools & more", icon: Coffee, href: "/break-room", color: "text-amber-400", glow: "rgba(251,191,36,0.3)" },
+              { name: "Signal Chat", desc: "Community chat", icon: MessageCircle, href: "/chat", color: "text-blue-400", glow: "rgba(96,165,250,0.3)" },
+              { name: "Fuel Tracker", desc: "Track MPG & costs", icon: Fuel, href: "/garage", color: "text-orange-400", glow: "rgba(251,146,60,0.3)" },
+              { name: "Maintenance", desc: "Service schedules", icon: Calendar, href: "/garage", color: "text-cyan-400", glow: "rgba(6,182,212,0.3)" },
+              { name: "Shade Tree", desc: "DIY community", icon: Star, href: "/shade-tree", color: "text-yellow-400", glow: "rgba(250,204,21,0.3)" },
+              { name: "CDL Directory", desc: "Trucking & CDL", icon: Truck, href: "/cdl-directory", color: "text-blue-400", glow: "rgba(96,165,250,0.3)" },
+              { name: "Insurance", desc: "Compare rates", icon: Shield, href: "/insurance", color: "text-green-400", glow: "rgba(74,222,128,0.3)" },
+              { name: "Auto Trivia", desc: "Test your knowledge", icon: Gamepad2, href: "/trivia", color: "text-pink-400", glow: "rgba(244,114,182,0.3)" },
+            ].map((feature) => (
+              <a key={feature.name} href={feature.href} data-testid={`spotlight-${feature.name.toLowerCase().replace(/\s+/g, "-")}`}>
+                <Card
+                  className="glass-card card-3d p-3 cursor-pointer group h-full relative overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(90deg, transparent, ${feature.glow}, transparent)` }} />
+                  <feature.icon className={`w-6 h-6 ${feature.color} mb-2 group-hover:scale-110 transition-transform duration-300`} />
+                  <p className="font-tech text-xs font-bold uppercase tracking-wide group-hover:text-primary transition-colors duration-300">{feature.name}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{feature.desc}</p>
+                </Card>
+              </a>
+            ))}
+          </div>
         </div>
 
         <div className="divider-gradient" />
