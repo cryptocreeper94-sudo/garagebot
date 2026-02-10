@@ -133,3 +133,22 @@ Preferred communication style: Simple, everyday language.
     - **Payroll/HR**: UKG Pro, ADP Workforce Now, Gusto, Paychex Flex
     - **Scheduling/Communication**: Google Calendar, Twilio, Mailchimp
     - **Parts/Inventory**: PartsTech, Nexpart
+
+# Upcoming Features & Roadmap
+
+## Rental Cars (Planned)
+- **Purpose**: Add rental car affiliate integration so users can rent vehicles directly through GarageBot.
+- **Status**: Planning phase — affiliate partner TBD (to be added with next batch of affiliates).
+- **Scope**: New category in the platform alongside parts search, potentially its own page or integrated into Break Room / vehicle services.
+
+## Pending Affiliate Additions (Feb 2026)
+- ~5-6 new affiliate partners accepted, awaiting integration.
+- One affiliate is a rental car service — will be the first rental car partner.
+- Affiliates to be added once Jason has access to the partner details.
+- Will follow existing affiliate link pattern used by Amazon Associates, eBay Partner Network, CJ Affiliate.
+
+## Social Media / Marketing Notes
+- Facebook page (GarageBot.io) getting ~9,000 views in first days of ad spend.
+- Meta Page Access Token was regenerated on Feb 8, 2026 after previous token was blocked by Meta ("API access blocked").
+- Auto-posting scheduler running every 3 hours CST. Instagram posting requires `instagram_content_publish` permission (not yet granted).
+- Boosted posts running manually alongside automated scheduler.
