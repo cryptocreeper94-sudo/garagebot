@@ -1,6 +1,6 @@
 # Overview
 
-GarageBot is a comprehensive parts aggregator platform designed to unify inventory from over 50 retailers into a single searchable interface. Its primary purpose is to ensure users find the "Right Part. First Time. Every Engine." for ALL motorized vehicles and equipment, including a dedicated **Motorized Hobby** section. The platform aims to revolutionize the parts market by offering advanced search capabilities, AI-powered recommendations, vehicle fleet management with VIN decoding, and integrated DIY repair guides. It also features a robust e-commerce system with Stripe payments, a Genesis Hallmark NFT system for early adopters, and a Pro "Founders Circle" subscription for enhanced functionalities. The business vision is to become the go-to platform for both casual users, professional mechanics, and hobby enthusiasts.
+GarageBot is a comprehensive parts aggregator platform designed to unify inventory from 65+ retailers into a single searchable interface. Its primary purpose is to ensure users find the "Right Part. First Time. Every Engine." for ALL motorized vehicles and equipment, including a dedicated Motorized Hobby section. The platform aims to revolutionize the parts market by offering advanced search capabilities, AI-powered recommendations, vehicle fleet management with VIN decoding, and integrated DIY repair guides. It also features a robust e-commerce system with Stripe payments, a Genesis Hallmark NFT system for early adopters, and a Pro "Founders Circle" subscription for enhanced functionalities. The business vision is to become the go-to platform for both casual users, professional mechanics, and hobby enthusiasts.
 
 # User Preferences
 
@@ -50,10 +50,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Payment Processing
 - **Provider**: Stripe, integrated using Stripe Elements React components and Stripe's backend SDK.
-- **Ad-Free Subscription**: $5/month tier removes all ads; Pro users automatically ad-free. Checkout at `POST /api/subscription/ad-free/checkout`. Webhook lifecycle handles active/trialing (enable), past_due/unpaid/paused/incomplete (disable), deleted (cancel). Schema fields: `adFreeSubscription`, `adFreeExpiresAt`, `adFreeStripeSubscriptionId`.
+- **Ad-Free Subscription**: $5/month tier removes all ads; Pro users automatically ad-free.
 
 ## Ad Monetization
-- **Google AdSense**: Publisher ID `ca-pub-7386731030203849` via `VITE_ADSENSE_PUBLISHER_ID`. Ad components (`AdSense.tsx`, `AdSenseSlot.tsx`) check user subscription status; ads hidden for Pro and ad-free subscribers. Placements on Dashboard, Results, DIY Guides, Blog, Break Room — never on login/signup/checkout flows. Upgrade prompt shown to free users near ad placements.
+- **Google AdSense**: Ads are shown to free users on Dashboard, Results, DIY Guides, Blog, Break Room, but never on login/signup/checkout flows. Ads are hidden for Pro and ad-free subscribers.
 
 ## Build & Deployment
 - **Development Environment**: Client (Vite) and backend (tsx) development servers with Hot Module Replacement (HMR).
@@ -80,34 +80,30 @@ Preferred communication style: Simple, everyday language.
 - **Purpose**: Provides B2B API access for Mechanics Garage shops with API Key + Secret authentication, granular scopes, and rate limiting.
 
 ## Weather Radar System
-- **Integration**: `WeatherRadar.tsx` component utilizing Leaflet map and RainViewer radar tiles with NOAA Weather Alerts API for severe weather warnings.
+- **Integration**: Utilizes Leaflet map and RainViewer radar tiles with NOAA Weather Alerts API for severe weather warnings.
 
 ## CDL & Trucking Company Directory
 - **Functionality**: A portable directory (`/cdl-directory`) of trucking companies and CDL programs with search, filter, and interest/referral forms.
 
 ## Signal Chat (Community Messaging)
-- **Route**: `/chat` — Full-featured community chat integrated into GarageBot.
-- **Backend**: 17+ database tables (communities, channels, members, messages, bots, reactions, attachments, DMs, polls, roles, threads, pins, etc.), CommunityHubService with 36 CRUD methods, 24+ REST API endpoints, WebSocket layer at `/ws/chat` with dual auth (session-based + JWT cross-app SSO).
-- **Trust Layer SSO**: Cross-app identity via `chat_users`, `chat_channels`, `chat_messages` tables matching DarkWave Studios format. JWT tokens (HS256, 7-day expiry, `iss: "trust-layer-sso"`), Trust Layer IDs (`tl-{base36}-{random}`), bcryptjs password hashing (12 salt rounds).
-- **SSO Auth Endpoints**: `POST /api/chat/auth/register`, `POST /api/chat/auth/login`, `GET /api/chat/auth/me` — all matching DarkWave Studios API format exactly.
-- **WebSocket JWT Auth**: Supports `{ type: "join", token: "<jwt>", channelId: "<id>" }` for cross-app SSO alongside session cookie auth. Also supports `switch_channel` and `message` types matching DarkWave protocol.
-- **Frontend**: SignalChat page with real-time messaging via `useSignalChat` hook, Deep Space themed UI with glassmorphism and cyan accents.
-- **Buddy AI Bot**: Auto-responds in `#garagebot-support` channel using OpenAI GPT-4o-mini, flags messages for human escalation when needed (billing, refund, security, etc.).
-- **Auto-Seeding**: GarageBot community seeded on startup. Trust Layer SSO channels (general, announcements, darkwavestudios-support, garagebot-support, tlid-marketing, guardian-ai) seeded via `server/seedChat.ts`.
+- **Route**: `/chat` — Full-featured community chat integrated into GarageBot with a WebSocket layer.
+- **Backend**: Extensive database tables (e.g., communities, channels, messages), CommunityHubService, REST API endpoints, and WebSocket support.
+- **Trust Layer SSO**: Cross-app identity via JWT tokens and Trust Layer IDs, matching DarkWave Studios API format.
+- **Frontend**: SignalChat page with real-time messaging via `useSignalChat` hook, Deep Space themed UI.
+- **Buddy AI Bot**: Auto-responds in `#garagebot-support` channel using OpenAI GPT-4o-mini.
 - **Auth Gating**: Unauthenticated users see a login prompt; authenticated users auto-join the GarageBot community.
-- **Key Files**: `server/trustlayer-sso.ts`, `server/seedChat.ts`, `server/services/community-hub-service.ts`, `server/services/chat-websocket.ts`, `server/services/buddy-chat-bot.ts`, `server/chat-routes.ts`, `client/src/pages/SignalChat.tsx`, `client/src/hooks/useSignalChat.ts`, `shared/chat-types.ts`.
-- **Handoff Doc**: `attached_assets/GARAGEBOT-SSO-HANDOFF.txt` — full handoff document for dwtl.io agent with schema, endpoints, WebSocket protocol, and cross-app SSO flow.
 
 ## Shade Tree Mechanics (DIY Community)
 - **Purpose**: A community hub (`/shade-tree`) for DIY enthusiasts, providing categorized repair guides, community tips, and estimated savings.
 
 ## Marketing Hub & Social Media Integration
-- **Add-on**: Premium add-on for Mechanics Garage shops supporting various social media platforms with features like Digital Asset Management, content scheduling, analytics, and AI content generation via OpenAI GPT-4o.
-- **GarageBot Marketing Hub** (`/marketing-hub`): Auto-posting to Facebook (GarageBot.io page) every 3 hours via Meta Graph API. 60+ unique posts covering all vehicle categories (cars, trucks, motorcycles, ATVs, boats, RVs, tractors, heavy equipment, generators, small engines, aviation, RC, drones, model aircraft, slot cars, go-karts, golf carts, snowmobiles, jet skis, exotics, classics, diesel, kit cars). Content types: educational, gamified challenges, evergreen, seasonal, promotional. No repeats for at least a week.
-- **Meta Integration**: App ID `1444186517216202`, Page ID `900725646468208` (GarageBot.io), Ad Account `751302398036834` (DarkWave Studios), Instagram `@garagebot.io` (ID `17841480455608384`). Credentials stored as secrets: META_APP_ID, META_APP_SECRET, META_PAGE_ID, META_PAGE_ACCESS_TOKEN, META_AD_ACCOUNT_ID, META_INSTAGRAM_ACCOUNT_ID, META_INSTAGRAM_USERNAME. Auto-connected via `ensureMetaIntegration()` on scheduler startup (FB + IG).
-- **Meta Ads Campaigns**: Paid ad campaign management via Meta Marketing API. Create awareness campaigns on Facebook and Instagram with configurable targeting (age 18-65, US, 28+ interest categories covering auto, motorcycle, boat, RV, ATV, RC, drone, DIY, classic car, truck, off-road, marine, small engine, aviation, etc.). Default $10/day per platform budget. Campaign CRUD: create, activate, pause, delete, refresh insights. Stores Meta campaign/ad set/ad IDs for full lifecycle management. API: `/api/marketing/ads/*`. Key file: `server/meta-ads-service.ts`.
-- **Analytics**: Tracks top-performing messages, images, and image+message combinations. Pulls real engagement data from Meta Graph API every 30 minutes (separate FB/IG metric fetching). Performance by time slot analysis. API endpoints: `/api/marketing/analytics/top-content`, `/api/marketing/analytics/top-images`, `/api/marketing/analytics/top-bundles`, `/api/marketing/analytics/time-slots`.
-- **Key Files**: `server/marketing-scheduler.ts`, `server/social-connectors.ts`, `client/src/pages/MarketingHub.tsx`.
+- **Add-on**: Premium add-on for Mechanics Garage shops supporting various social media platforms.
+- **GarageBot Marketing Hub** (`/marketing-hub`): Auto-posting to Facebook (GarageBot.io page) every 3 hours via Meta Graph API with 60+ unique posts.
+- **Meta Ads Campaigns**: Manages paid ad campaigns via Meta Marketing API with configurable targeting.
+- **Analytics**: Tracks top-performing content and provides performance insights from Meta Graph API.
+
+## Rental Cars
+- **Route**: `/rentals` — Full rental car comparison page with partners like Carla Car Rental, Expedia, and Hotels.com.
 
 # External Dependencies
 
@@ -118,13 +114,8 @@ Preferred communication style: Simple, everyday language.
 - **AI**: OpenAI GPT-4.
 - **Blockchain**: Solana (via Helius API).
 - **Weather Radar**: RainViewer API, NOAA Weather Alerts API.
-- **ORBIT Staffing OS**: `https://orbitstaffing.replit.app` for payroll and staffing platform integration.
-    - **App ID**: `dw_app_garagebot`
-    - **Ecosystem Endpoints**: Status, sync for workers, contractors, timesheets, certifications, 1099/W2 data, shop workers, payroll, activity logs, code snippets.
-    - **Payroll Engine Endpoints**: Status, overtime rules (all 50 states), overtime calculation.
-    - **Financial Hub**: `POST /api/financial-hub/ingest`.
-    - **Webhooks**: Endpoint at `/webhooks/orbit` for `payroll.completed`, `worker.created`, etc.
-    - **Payroll Capabilities**: Federal/state/local tax calculations, FICA, garnishments, direct deposit via Stripe Connect ACH, W-2/1099-NEC generation.
+- **ORBIT Staffing OS**: `https://orbitstaffing.replit.app` for payroll and staffing platform integration, including worker management, timesheets, and payroll processing.
+- **Meta Graph API**: For Facebook auto-posting and ad campaign management.
 
 ## Unified Business Integrations Hub
 - **Purpose**: Allows Mechanics Garage shops to connect their existing business software via OAuth.
@@ -133,22 +124,3 @@ Preferred communication style: Simple, everyday language.
     - **Payroll/HR**: UKG Pro, ADP Workforce Now, Gusto, Paychex Flex
     - **Scheduling/Communication**: Google Calendar, Twilio, Mailchimp
     - **Parts/Inventory**: PartsTech, Nexpart
-
-# Upcoming Features & Roadmap
-
-## Rental Cars (Planned)
-- **Purpose**: Add rental car affiliate integration so users can rent vehicles directly through GarageBot.
-- **Status**: Planning phase — affiliate partner TBD (to be added with next batch of affiliates).
-- **Scope**: New category in the platform alongside parts search, potentially its own page or integrated into Break Room / vehicle services.
-
-## Pending Affiliate Additions (Feb 2026)
-- ~5-6 new affiliate partners accepted, awaiting integration.
-- One affiliate is a rental car service — will be the first rental car partner.
-- Affiliates to be added once Jason has access to the partner details.
-- Will follow existing affiliate link pattern used by Amazon Associates, eBay Partner Network, CJ Affiliate.
-
-## Social Media / Marketing Notes
-- Facebook page (GarageBot.io) getting ~9,000 views in first days of ad spend.
-- Meta Page Access Token was regenerated on Feb 8, 2026 after previous token was blocked by Meta ("API access blocked").
-- Auto-posting scheduler running every 3 hours CST. Instagram posting requires `instagram_content_publish` permission (not yet granted).
-- Boosted posts running manually alongside automated scheduler.

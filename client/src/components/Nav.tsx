@@ -433,6 +433,14 @@ export default function Nav() {
                       </div>
                     </Link>
                     
+                    <Link href="/rentals" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/rentals' ? 'bg-cyan-500/10 text-cyan-400' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-rentals">
+                        <Car className="w-5 h-5 text-cyan-400" />
+                        <span className="font-medium">Rental Cars</span>
+                        <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-[9px] font-mono ml-auto">NEW</Badge>
+                      </div>
+                    </Link>
+                    
                     <Link href="/insurance" onClick={() => setIsOpen(false)}>
                       <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/insurance' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-insurance">
                         <Shield className="w-5 h-5" />

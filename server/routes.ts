@@ -10716,6 +10716,33 @@ function getVendorSearchPathWithVehicle(
         return `/search/parts?keyword=${encodeURIComponent(searchTerm)}&year=${year}&make=${encodeURIComponent(make!)}&model=${encodeURIComponent(model!)}`;
       }
       return `/search/parts?keyword=${encodeURIComponent(searchTerm)}`;
+
+    case 'carla-car-rental':
+      return `/?pickup=${encodeURIComponent(searchTerm || 'airport')}`;
+
+    case 'cj-pony-parts':
+      if (hasVehicle) {
+        return `/search?q=${encodeURIComponent(`${year} ${make} ${model} ${searchTerm}`)}`;
+      }
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
+
+    case 'expedia':
+      return `/carsearch?loc=${encodeURIComponent(searchTerm || '')}`;
+
+    case 'garvee':
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
+
+    case 'hotels-com':
+      return `/search?q=${encodeURIComponent(searchTerm || '')}`;
+
+    case 'mavis-tires':
+      if (hasVehicle) {
+        return `/tires/search?year=${year}&make=${encodeURIComponent(make!)}&model=${encodeURIComponent(model!)}`;
+      }
+      return `/tires/search?q=${encodeURIComponent(searchTerm)}`;
+
+    case 'rexing':
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
       
     default:
       if (hasVehicle && searchTerm) {
