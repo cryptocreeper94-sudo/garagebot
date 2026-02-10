@@ -56,6 +56,7 @@ import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import PartsMarketplace from "@/pages/PartsMarketplace";
 import Explore from "@/pages/Explore";
+import Rentals from "@/pages/Rentals";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -105,6 +106,7 @@ function Router() {
       <Route path="/contact">{() => <Contact />}</Route>
       <Route path="/marketplace">{() => <PartsMarketplace />}</Route>
       <Route path="/explore">{() => <Explore />}</Route>
+      <Route path="/rentals">{() => <Rentals />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );

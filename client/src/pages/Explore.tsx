@@ -309,12 +309,23 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     ],
   },
   {
-    title: "Insurance & Financial",
-    description: "Compare rates and manage automotive finances",
+    title: "Insurance, Travel & Financial",
+    description: "Compare rates, rent cars, and manage automotive finances",
     icon: Shield,
     color: "text-green-400",
     gradient: "from-green-500 to-emerald-500",
     features: [
+      {
+        name: "Rental Cars",
+        description: "Compare prices across 1,000+ rental companies worldwide. Economy to luxury, airport to downtown — best deal every time.",
+        href: "/rentals",
+        icon: Car,
+        color: "text-cyan-400",
+        glowColor: "rgba(6,182,212,0.4)",
+        badge: "NEW",
+        badgeColor: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+        subFeatures: ["1,000+ Companies", "Price Comparison", "Free Cancellation", "150+ Countries"],
+      },
       {
         name: "Insurance Comparison",
         description: "Compare quotes from top insurance providers. Find the best rates for auto, motorcycle, boat, RV, and more.",

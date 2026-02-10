@@ -379,8 +379,8 @@ export default function Dashboard() {
               { name: "Maintenance", desc: "Service schedules", icon: Calendar, href: "/garage", color: "text-cyan-400", glow: "rgba(6,182,212,0.3)" },
               { name: "Shade Tree", desc: "DIY community", icon: Star, href: "/shade-tree", color: "text-yellow-400", glow: "rgba(250,204,21,0.3)" },
               { name: "CDL Directory", desc: "Trucking & CDL", icon: Truck, href: "/cdl-directory", color: "text-blue-400", glow: "rgba(96,165,250,0.3)" },
+              { name: "Rental Cars", desc: "Compare 1,000+ cos", icon: Car, href: "/rentals", color: "text-cyan-400", glow: "rgba(6,182,212,0.3)" },
               { name: "Insurance", desc: "Compare rates", icon: Shield, href: "/insurance", color: "text-green-400", glow: "rgba(74,222,128,0.3)" },
-              { name: "Auto Trivia", desc: "Test your knowledge", icon: Gamepad2, href: "/trivia", color: "text-pink-400", glow: "rgba(244,114,182,0.3)" },
             ].map((feature) => (
               <a key={feature.name} href={feature.href} data-testid={`spotlight-${feature.name.toLowerCase().replace(/\s+/g, "-")}`}>
                 <Card
