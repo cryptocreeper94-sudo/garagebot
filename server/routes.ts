@@ -10743,6 +10743,12 @@ function getVendorSearchPathWithVehicle(
 
     case 'rexing':
       return `/search?q=${encodeURIComponent(searchTerm)}`;
+
+    case 'tire-rack':
+      if (hasVehicle) {
+        return `/tires/TireSearchResults.jsp?width=&ratio=&diameter=&vehicle=${encodeURIComponent(`${year} ${make} ${model}`)}&q=${encodeURIComponent(searchTerm)}`;
+      }
+      return `/tires/TireSearchResults.jsp?q=${encodeURIComponent(searchTerm)}`;
       
     default:
       if (hasVehicle && searchTerm) {
