@@ -57,7 +57,7 @@ export default function TermsOfService() {
                 <div className="space-y-3 text-muted-foreground">
                   <p>GarageBot provides:</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li><strong>Parts Aggregation:</strong> Search across 40+ automotive retailers. We are an aggregator and do not sell parts directly.</li>
+                    <li><strong>Parts Aggregation:</strong> Search across 68+ automotive retailers. We are an aggregator and do not sell parts directly.</li>
                     <li><strong>My Garage:</strong> Store and manage your vehicles, service history, and specifications.</li>
                     <li><strong>Genesis Hallmark:</strong> Blockchain-verified vehicle identity and ownership records.</li>
                     <li><strong>DIY Repair Guides:</strong> AI-generated step-by-step maintenance instructions.</li>
