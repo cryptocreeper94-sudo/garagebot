@@ -10749,6 +10749,12 @@ function getVendorSearchPathWithVehicle(
         return `/tires/TireSearchResults.jsp?width=&ratio=&diameter=&vehicle=${encodeURIComponent(`${year} ${make} ${model}`)}&q=${encodeURIComponent(searchTerm)}`;
       }
       return `/tires/TireSearchResults.jsp?q=${encodeURIComponent(searchTerm)}`;
+
+    case 'dunford':
+      if (hasVehicle) {
+        return `/search?q=${encodeURIComponent(`${year} ${make} ${model} ${searchTerm}`)}`;
+      }
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
       
     default:
       if (hasVehicle && searchTerm) {
