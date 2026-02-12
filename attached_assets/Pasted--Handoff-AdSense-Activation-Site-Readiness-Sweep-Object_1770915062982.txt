@@ -1,0 +1,117 @@
+📦 Handoff: AdSense Activation & Site Readiness Sweep
+Objective: Move all domains from “Getting ready” to “Ready” and enable active ad serving across all properties.
+
+1. Primary Blocker (Must Fix First)
+All domains currently show:
+
+Status: Getting ready
+
+ads.txt: Not found
+
+Google will not activate ad serving until ads.txt is correctly installed and detected.
+
+2. Required Actions (Per Domain)
+Perform these steps for each domain:
+
+garagebot.io
+
+darkwavestudios.io
+
+happyeats.app
+
+tldriverconnect.com
+
+A. Create ads.txt file
+File contents must be:
+
+Code
+google.com, ca-pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+Replace ca-pub-XXXXXXXXXXXXXXXX with the correct publisher ID.
+
+B. Upload ads.txt to the root directory
+The file must resolve publicly at:
+
+Code
+https://DOMAIN/ads.txt
+Verify by visiting the URL in a browser.
+
+C. Confirm HTTPS accessibility
+Google will not detect the file if:
+
+Redirect loops exist
+
+The file is behind auth
+
+The file is served from a subdirectory
+
+3. AdSense Dashboard Tasks
+A. Re-check site status
+After ads.txt is live, return to:
+
+AdSense → Sites
+
+Confirm each domain transitions from:
+
+Getting ready → Ready
+
+This may take 1–12 hours.
+
+B. Enable Auto Ads
+Once a domain shows Ready:
+
+Go to Ads → Your sites
+
+Select the domain
+
+Toggle Auto ads → ON
+
+Save
+
+Auto Ads must be ON for Google to begin serving ads unless manual ad units are placed.
+
+4. Verification Checklist (Agent Must Complete)
+A. ads.txt
+[ ] File exists at root
+
+[ ] File contains correct publisher ID
+
+[ ] File is publicly accessible
+
+[ ] No redirects or 404s
+
+B. AdSense Dashboard
+[ ] Domain status = Ready
+
+[ ] Auto Ads = ON
+
+[ ] No policy violations
+
+[ ] No “Needs attention” flags
+
+C. Site Code
+[ ] Global AdSense script is present in <head>
+
+[ ] Script uses correct client ID
+
+[ ] No CSP rules blocking Google scripts
+
+5. Expected Outcome
+Once ads.txt is detected and Auto Ads is enabled:
+
+Google will activate ad serving
+
+Ads begin appearing within 10 minutes to 24 hours
+
+Full propagation may take up to 48 hours
+
+6. Notes for Agent
+Do not modify site code unless instructed
+
+Do not create manual ad units unless requested
+
+The only required tasks are:
+
+Fix ads.txt
+
+Verify domain readiness
+
