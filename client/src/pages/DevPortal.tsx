@@ -998,7 +998,7 @@ export default function DevPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-7 mb-4 max-w-4xl">
+          <TabsList className="grid w-full grid-cols-8 mb-4 max-w-5xl">
             <TabsTrigger value="features" className="font-tech uppercase text-xs">
               <ClipboardList className="w-3 h-3 mr-1" /> Features
             </TabsTrigger>
@@ -1016,6 +1016,9 @@ export default function DevPortal() {
             </TabsTrigger>
             <TabsTrigger value="affiliates" className="font-tech uppercase text-xs">
               <DollarSign className="w-3 h-3 mr-1" /> Affiliates
+            </TabsTrigger>
+            <TabsTrigger value="logos" className="font-tech uppercase text-xs">
+              <Globe className="w-3 h-3 mr-1" /> Logos
             </TabsTrigger>
             <TabsTrigger value="buddy" className="font-tech uppercase text-xs">
               <Bot className="w-3 h-3 mr-1" /> Buddy
@@ -2130,8 +2133,91 @@ export default function DevPortal() {
               })}
             </div>
           </TabsContent>
+
+          <TabsContent value="logos" className="space-y-4">
+            <Card className="bg-gradient-to-br from-primary/10 to-cyan-500/5 border-primary/30 p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <Globe className="w-5 h-5 text-cyan-400" />
+                <div>
+                  <h3 className="font-tech text-lg text-white">Vendor Logo Checklist</h3>
+                  <p className="text-xs text-muted-foreground">Upload logos for each vendor. Recommended: PNG, 200x200px minimum, transparent background preferred.</p>
+                </div>
+              </div>
+              <VendorLogoChecklist />
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
+    </div>
+  );
+}
+
+function VendorLogoChecklist() {
+  const { data: vendors = [] } = useQuery<Array<{ id: string; name: string; slug: string; logoUrl: string | null; websiteUrl: string; affiliateNetwork: string; commissionRate: string }>>({
+    queryKey: ["/api/vendors/logo-status"],
+  });
+
+  const vendorsWithLogos = vendors.filter(v => v.logoUrl);
+  const vendorsMissingLogos = vendors.filter(v => !v.logoUrl);
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-center">
+          <p className="text-2xl font-bold text-green-400">{vendorsWithLogos.length}</p>
+          <p className="text-xs text-green-400/70">Have Logos</p>
+        </div>
+        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-center">
+          <p className="text-2xl font-bold text-amber-400">{vendorsMissingLogos.length}</p>
+          <p className="text-xs text-amber-400/70">Need Logos</p>
+        </div>
+      </div>
+
+      {vendorsMissingLogos.length > 0 && (
+        <div>
+          <h4 className="font-tech text-sm text-amber-400 mb-2 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" /> Missing Logos ({vendorsMissingLogos.length})
+          </h4>
+          <div className="space-y-1 max-h-[500px] overflow-y-auto pr-2">
+            {vendorsMissingLogos.map(vendor => (
+              <div key={vendor.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-amber-500/30 transition-colors" data-testid={`logo-missing-${vendor.slug}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded bg-gray-700/50 flex items-center justify-center text-xs font-bold text-gray-400">
+                    {vendor.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm text-white font-medium">{vendor.name}</p>
+                    <p className="text-[10px] text-gray-500">{vendor.slug} | {vendor.affiliateNetwork || 'Direct'} | {vendor.commissionRate ? `${vendor.commissionRate}%` : 'N/A'}</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400">Needs Logo</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {vendorsWithLogos.length > 0 && (
+        <div>
+          <h4 className="font-tech text-sm text-green-400 mb-2 flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4" /> Have Logos ({vendorsWithLogos.length})
+          </h4>
+          <div className="space-y-1 max-h-[300px] overflow-y-auto pr-2">
+            {vendorsWithLogos.map(vendor => (
+              <div key={vendor.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-800/50 border border-gray-700/50" data-testid={`logo-have-${vendor.slug}`}>
+                <div className="flex items-center gap-3">
+                  <img src={vendor.logoUrl!} alt={vendor.name} className="w-8 h-8 rounded object-contain bg-white/10" />
+                  <div>
+                    <p className="text-sm text-white font-medium">{vendor.name}</p>
+                    <p className="text-[10px] text-gray-500">{vendor.slug}</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-[10px] border-green-500/30 text-green-400">Has Logo</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
