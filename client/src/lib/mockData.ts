@@ -561,6 +561,127 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "Direct",
     logoColor: "#3366CC"
   },
+  // ============================================
+  // NEW CJ / AWIN AFFILIATE PARTNERS (Feb 2026)
+  // ============================================
+  {
+    id: "carla-car-rental",
+    name: "Carla Car Rental",
+    slug: "carla-car-rental",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7466061?url=https%3A%2F%2Fwww.carlacarrental.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "rv"],
+    priority: 85,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#2563EB"
+  },
+  {
+    id: "cj-pony-parts",
+    name: "CJ Pony Parts",
+    slug: "cj-pony-parts",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-6969901?url=https%3A%2F%2Fwww.cjponyparts.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics"],
+    priority: 82,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#B91C1C"
+  },
+  {
+    id: "expedia",
+    name: "Expedia",
+    slug: "expedia",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-5261370?url=https%3A%2F%2Fwww.expedia.com%2FCarSearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars"],
+    priority: 80,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#FBBF24"
+  },
+  {
+    id: "garvee",
+    name: "GARVEE",
+    slug: "garvee",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7305404?url=https%3A%2F%2Fwww.garvee.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "diesel", "rv", "atvs"],
+    priority: 78,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#059669"
+  },
+  {
+    id: "hotels-com",
+    name: "Hotels.com",
+    slug: "hotels-com",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-1702763?url=https%3A%2F%2Fwww.hotels.com%2FCarSearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars"],
+    priority: 79,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#DC2626"
+  },
+  {
+    id: "mavis-tires",
+    name: "Mavis Tires",
+    slug: "mavis-tires",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-6806019?url=https%3A%2F%2Fwww.mavis.com%2Ftires%2Fsearch%3Fq%3D{query}",
+    storeLocatorUrl: "https://www.mavis.com/locations",
+    hasLocalPickup: true,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 88,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#1D4ED8"
+  },
+  {
+    id: "tire-rack",
+    name: "Tire Rack",
+    slug: "tire-rack",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-2498?url=https%3A%2F%2Fwww.tirerack.com%2Ftires%2FTireSearchResults.jsp%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv", "motorcycles"],
+    priority: 90,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#991B1B"
+  },
+  {
+    id: "dunford",
+    name: "Dunford, Inc.",
+    slug: "dunford",
+    searchTemplate: "https://www.awin1.com/cread.php?awinmid=18794&awinaffid=101643977&ued=https%3A%2F%2Fwww.dunfordinc.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 82,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AWIN",
+    logoColor: "#7C3AED"
+  },
+  {
+    id: "ottocast",
+    name: "Ottocast",
+    slug: "ottocast",
+    searchTemplate: "https://www.awin1.com/cread.php?awinmid=66499&awinaffid=101643977&ued=https%3A%2F%2Fwww.ottocast.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 80,
+    supportsOEM: true,
+    supportsAftermarket: false,
+    affiliateNetwork: "AWIN",
+    logoColor: "#0EA5E9"
+  },
 ];
 
 // Helper function to generate search URL for a vendor

@@ -2185,6 +2185,24 @@ ${pages.map(p => `  <url>
   });
 
   // Vendors API (public)
+  app.get("/api/vendors/logo-status", async (req, res) => {
+    try {
+      const vendors = await storage.getActiveVendors();
+      const logoStatus = vendors.map((v: any) => ({
+        id: v.id,
+        name: v.name,
+        slug: v.slug,
+        logoUrl: v.logoUrl || v.logo_url || null,
+        websiteUrl: v.websiteUrl || v.website_url || '',
+        affiliateNetwork: v.affiliateNetwork || v.affiliate_network || '',
+        commissionRate: v.commissionRate || v.commission_rate || '',
+      }));
+      res.json(logoStatus);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch vendor logo status" });
+    }
+  });
+
   app.get("/api/vendors", async (req, res) => {
     try {
       const vendors = await storage.getActiveVendors();
