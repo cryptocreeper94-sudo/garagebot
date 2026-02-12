@@ -10755,6 +10755,9 @@ function getVendorSearchPathWithVehicle(
         return `/search?q=${encodeURIComponent(`${year} ${make} ${model} ${searchTerm}`)}`;
       }
       return `/search?q=${encodeURIComponent(searchTerm)}`;
+
+    case 'ottocast':
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
       
     default:
       if (hasVehicle && searchTerm) {
