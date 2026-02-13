@@ -102,6 +102,22 @@ function playSpinSound(ctx: AudioContext) {
   });
 }
 
+const HAPTIC_PATTERNS: Record<SoundType, number[]> = {
+  search: [15],
+  addToCart: [10, 30, 10],
+  success: [10, 20, 30],
+  click: [8],
+  spin: [5, 10, 5, 10, 5, 10, 15, 25],
+};
+
+function triggerHaptic(type: SoundType) {
+  try {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(HAPTIC_PATTERNS[type] || [10]);
+    }
+  } catch {}
+}
+
 const SOUND_PLAYERS: Record<SoundType, (ctx: AudioContext) => void> = {
   search: playSearchSound,
   addToCart: playAddToCartSound,
@@ -140,6 +156,7 @@ export default function useSoundEffects(): SoundEffectsReturn {
 
   const playSound = useCallback(
     (type: SoundType) => {
+      triggerHaptic(type);
       if (!soundEnabled) return;
       const ctx = getContext();
       if (!ctx) return;

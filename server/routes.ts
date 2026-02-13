@@ -2113,17 +2113,36 @@ ${pages.map(p => `  <url>
       
       const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
       
+      const customerEmail = req.user?.claims?.email || '';
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: lineItems,
         mode: 'payment',
         success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/checkout/cancel`,
+        customer_email: customerEmail || undefined,
         metadata: {
           cartId: cart.id,
           userId: userId || 'guest',
         },
       });
+
+      if (customerEmail) {
+        try {
+          const { sendOrderConfirmationEmail } = await import('./services/emailService');
+          const subtotal = items.reduce((sum: number, item: any) => sum + parseFloat(item.unitPrice) * item.quantity, 0);
+          sendOrderConfirmationEmail({
+            orderNumber: session.id.slice(-8).toUpperCase(),
+            customerName: req.user?.claims?.name || 'Customer',
+            customerEmail,
+            items: items.map((item: any) => ({ name: item.productName, quantity: item.quantity, price: parseFloat(item.unitPrice) })),
+            subtotal,
+            tax: 0,
+            total: subtotal,
+          }).catch(e => console.error('[Checkout] Order email failed:', e));
+        } catch {}
+      }
       
       res.json({ url: session.url, sessionId: session.id });
     } catch (error: any) {
@@ -3869,6 +3888,14 @@ ${pages.map(p => `  <url>
         }
       });
       
+      if (user.email) {
+        try {
+          const { sendProSubscriptionEmail } = await import('./services/emailService');
+          const planName = `${subscriptionTier.charAt(0).toUpperCase() + subscriptionTier.slice(1)} ${billingPeriod === 'annual' ? 'Annual' : 'Monthly'}`;
+          sendProSubscriptionEmail(user.email, user.username, planName).catch(e => console.error('[Subscription] Pro email failed:', e));
+        } catch {}
+      }
+
       res.json({ checkoutUrl: session.url });
     } catch (error) {
       console.error("Subscription checkout error:", error);
@@ -10612,6 +10639,10 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
         return res.json({ message: "Welcome back! You've been re-subscribed." });
       }
       await storage.subscribeNewsletter({ email: email.toLowerCase(), firstName: firstName || null, source: source || "footer" });
+      try {
+        const { sendNewsletterConfirmationEmail } = await import('./services/emailService');
+        sendNewsletterConfirmationEmail(email.toLowerCase()).catch(e => console.error('[Newsletter] Confirmation email failed:', e));
+      } catch {}
       res.json({ message: "You're in! Watch for deals, tips & DIY guides in your inbox." });
     } catch (error) {
       console.error("Newsletter subscribe error:", error);

@@ -13,7 +13,7 @@ const SUPPORT_CHANNEL_NAME = "garagebot-support";
 
 const BUDDY_SYSTEM_PROMPT = `You are Buddy, the friendly and knowledgeable AI support assistant for GarageBot - a parts aggregator platform for ALL motorized vehicles and equipment. You help users with:
 
-1. Finding parts across 50+ retailers
+1. Finding parts across 68+ retailers
 2. Vehicle management and VIN decoding  
 3. DIY repair guides and maintenance tips
 4. Account and subscription questions (Free, Pro Founders Circle)
