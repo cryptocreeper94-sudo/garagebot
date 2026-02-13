@@ -2257,7 +2257,7 @@ export default function MechanicsGarage() {
                   </tr>
                   <tr>
                     <td className="py-3 px-4 font-medium">Parts Vendors Integrated</td>
-                    <td className="py-3 px-4 text-center font-bold text-green-400">40+</td>
+                    <td className="py-3 px-4 text-center font-bold text-green-400">68+</td>
                     <td className="py-3 px-4 text-center text-muted-foreground">Limited</td>
                     <td className="py-3 px-4 text-center text-muted-foreground">15+</td>
                     <td className="py-3 px-4 text-center text-muted-foreground">10+</td>
@@ -2325,7 +2325,7 @@ export default function MechanicsGarage() {
             </Card>
             <Card className="p-4 bg-primary/5 border-primary/20 text-center">
               <Wrench className="w-8 h-8 text-primary mx-auto mb-2" />
-              <h3 className="font-tech font-bold uppercase text-sm mb-1">40+ Parts Vendors</h3>
+              <h3 className="font-tech font-bold uppercase text-sm mb-1">68+ Parts Vendors</h3>
               <p className="text-xs text-muted-foreground">More sources than any competitor</p>
             </Card>
             <Card className="p-4 bg-blue-500/5 border-blue-500/20 text-center">

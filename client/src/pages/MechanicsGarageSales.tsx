@@ -68,7 +68,7 @@ const COMPARISON = [
   { feature: "Monthly Price", us: "$49", them: "$179+" },
   { feature: "Repair Orders", us: "Unlimited", them: "Unlimited" },
   { feature: "Users", us: "Unlimited", them: "Per-seat pricing" },
-  { feature: "Parts Search (50+ retailers)", us: true, them: false },
+  { feature: "Parts Search (68+ retailers)", us: true, them: false },
   { feature: "AI Assistant (Buddy)", us: true, them: false },
   { feature: "DIY Guides Library", us: true, them: false },
   { feature: "Marketing Hub", us: "Add-on", them: "$345+/mo" },
@@ -262,7 +262,7 @@ export default function MechanicsGarageSales() {
           >
             {[
               { value: "$49", label: "per month", sublabel: "vs $179+ competitors" },
-              { value: "40+", label: "parts retailers", sublabel: "instant search" },
+              { value: "68+", label: "parts retailers", sublabel: "instant search" },
               { value: "∞", label: "users", sublabel: "no per-seat fees" },
               { value: "24/7", label: "customer booking", sublabel: "online scheduling" }
             ].map((stat, i) => (

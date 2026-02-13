@@ -40,19 +40,19 @@ interface FeatureCategory {
 const FEATURE_CATEGORIES: FeatureCategory[] = [
   {
     title: "Parts & Shopping",
-    description: "Search, compare, save, and buy parts across 50+ retailers",
+    description: "Search, compare, save, and buy parts across 68+ retailers",
     icon: ShoppingCart,
     color: "text-cyan-400",
     gradient: "from-cyan-500 to-blue-600",
     features: [
       {
         name: "Parts Search",
-        description: "Search 15M+ parts across 50+ retailers with AI-powered results, price comparison, and local pickup availability.",
+        description: "Search 15M+ parts across 68+ retailers with AI-powered results, price comparison, and local pickup availability.",
         href: "/",
         icon: Search,
         color: "text-cyan-400",
         glowColor: "rgba(6,182,212,0.4)",
-        subFeatures: ["50+ Retailers", "Price Comparison", "Local Pickup", "Vehicle-Aware"],
+        subFeatures: ["68+ Retailers", "Price Comparison", "Local Pickup", "Vehicle-Aware"],
       },
       {
         name: "Parts Marketplace",
@@ -139,7 +139,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
       },
       {
         name: "Price Watch",
-        description: "Set alerts on parts you need. Get notified when prices drop at any of the 50+ retailers we monitor.",
+        description: "Set alerts on parts you need. Get notified when prices drop at any of the 68+ retailers we monitor.",
         href: "/garage",
         icon: TrendingDown,
         color: "text-cyan-400",

@@ -476,7 +476,7 @@ ${pages.map(p => `  <url>
       (req.session as any).recoveryExpires = Date.now() + 10 * 60 * 1000; // 10 min
       
       // TODO: Send via Twilio when approved
-      console.log(`Recovery code for ${phone}: ${code}`);
+      // Recovery code generated for phone verification
       
       res.json({ success: true, message: "Recovery code sent (pending Twilio)" });
     } catch (error) {
@@ -3080,7 +3080,7 @@ ${pages.map(p => `  <url>
   });
 
   // Seed vendors endpoint (for initial setup) - COMPREHENSIVE LIST
-  app.post("/api/admin/seed-vendors", async (req, res) => {
+  app.post("/api/admin/seed-vendors", isAuthenticated, async (req: any, res) => {
     try {
       const defaultVendors = [
         // ============ AUTOMOTIVE - MAJOR RETAILERS ============
@@ -4171,7 +4171,7 @@ ${pages.map(p => `  <url>
   // ============ Dev Portal Tasks ============
   
   // Get all dev tasks
-  app.get('/api/dev/tasks', async (req, res) => {
+  app.get('/api/dev/tasks', isAuthenticated, async (req: any, res) => {
     try {
       const tasks = await storage.getDevTasks();
       res.json(tasks);
@@ -4182,7 +4182,7 @@ ${pages.map(p => `  <url>
   });
 
   // Initialize default tasks
-  app.post('/api/dev/tasks/init', async (req, res) => {
+  app.post('/api/dev/tasks/init', isAuthenticated, async (req: any, res) => {
     try {
       const { tasks } = req.body;
       const results = [];
@@ -4198,7 +4198,7 @@ ${pages.map(p => `  <url>
   });
 
   // Create a new dev task
-  app.post('/api/dev/tasks', async (req, res) => {
+  app.post('/api/dev/tasks', isAuthenticated, async (req: any, res) => {
     try {
       const task = await storage.createDevTask(req.body);
       res.json(task);
@@ -4209,7 +4209,7 @@ ${pages.map(p => `  <url>
   });
 
   // Update a dev task
-  app.patch('/api/dev/tasks/:id', async (req, res) => {
+  app.patch('/api/dev/tasks/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const task = await storage.updateDevTask(id, req.body);
@@ -4221,7 +4221,7 @@ ${pages.map(p => `  <url>
   });
 
   // Delete a dev task
-  app.delete('/api/dev/tasks/:id', async (req, res) => {
+  app.delete('/api/dev/tasks/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteDevTask(id);
@@ -5074,7 +5074,7 @@ ${pages.map(p => `  <url>
   // ============================================
 
   // Get all integration credentials (masks sensitive data)
-  app.get('/api/dev/credentials', async (req, res) => {
+  app.get('/api/dev/credentials', isAuthenticated, async (req: any, res) => {
     try {
       const credentials = await storage.getIntegrationCredentials();
       // Mask actual credentials for display
@@ -5093,8 +5093,8 @@ ${pages.map(p => `  <url>
     }
   });
 
-  // Get single credential (unmasks data for admin use)
-  app.get('/api/dev/credentials/:key', async (req, res) => {
+  // Get single credential (admin use - requires auth)
+  app.get('/api/dev/credentials/:key', isAuthenticated, async (req: any, res) => {
     try {
       const credential = await storage.getIntegrationCredential(req.params.key);
       if (!credential) {
@@ -5108,7 +5108,7 @@ ${pages.map(p => `  <url>
   });
 
   // Upsert integration credential
-  app.post('/api/dev/credentials', async (req, res) => {
+  app.post('/api/dev/credentials', isAuthenticated, async (req: any, res) => {
     try {
       const credential = await storage.upsertIntegrationCredential(req.body);
       res.json(credential);
@@ -5119,7 +5119,7 @@ ${pages.map(p => `  <url>
   });
 
   // Update integration credential
-  app.patch('/api/dev/credentials/:key', async (req, res) => {
+  app.patch('/api/dev/credentials/:key', isAuthenticated, async (req: any, res) => {
     try {
       const credential = await storage.updateIntegrationCredential(req.params.key, req.body);
       if (!credential) {
@@ -5133,7 +5133,7 @@ ${pages.map(p => `  <url>
   });
 
   // Delete integration credential
-  app.delete('/api/dev/credentials/:key', async (req, res) => {
+  app.delete('/api/dev/credentials/:key', isAuthenticated, async (req: any, res) => {
     try {
       await storage.deleteIntegrationCredential(req.params.key);
       res.json({ success: true });
@@ -5159,7 +5159,7 @@ ${pages.map(p => `  <url>
   });
 
   // Create affiliate network
-  app.post('/api/affiliates/networks', async (req, res) => {
+  app.post('/api/affiliates/networks', isAuthenticated, async (req: any, res) => {
     try {
       const result = insertAffiliateNetworkSchema.safeParse(req.body);
       if (!result.success) {
@@ -5204,7 +5204,7 @@ ${pages.map(p => `  <url>
   });
 
   // Create affiliate partner
-  app.post('/api/affiliates/partners', async (req, res) => {
+  app.post('/api/affiliates/partners', isAuthenticated, async (req: any, res) => {
     try {
       const result = insertAffiliatePartnerSchema.safeParse(req.body);
       if (!result.success) {
@@ -5219,7 +5219,7 @@ ${pages.map(p => `  <url>
   });
 
   // Update affiliate partner
-  app.patch('/api/affiliates/partners/:id', async (req, res) => {
+  app.patch('/api/affiliates/partners/:id', isAuthenticated, async (req: any, res) => {
     try {
       const partner = await storage.updateAffiliatePartner(req.params.id, req.body);
       res.json(partner);
@@ -5372,7 +5372,7 @@ ${pages.map(p => `  <url>
   });
 
   // Create commission (webhook endpoint for networks)
-  app.post('/api/affiliates/commissions', async (req, res) => {
+  app.post('/api/affiliates/commissions', isAuthenticated, async (req: any, res) => {
     try {
       const result = insertAffiliateCommissionSchema.safeParse(req.body);
       if (!result.success) {
@@ -5387,7 +5387,7 @@ ${pages.map(p => `  <url>
   });
 
   // Update commission status
-  app.patch('/api/affiliates/commissions/:id/status', async (req, res) => {
+  app.patch('/api/affiliates/commissions/:id/status', isAuthenticated, async (req: any, res) => {
     try {
       const { status } = req.body;
       const commission = await storage.updateCommissionStatus(req.params.id, status);
@@ -5421,7 +5421,7 @@ ${pages.map(p => `  <url>
   });
 
   // Seed initial affiliate partners (for development)
-  app.post('/api/affiliates/seed', async (req, res) => {
+  app.post('/api/affiliates/seed', isAuthenticated, async (req: any, res) => {
     try {
       // Create default networks
       const amazonNetwork = await storage.createAffiliateNetwork({
@@ -5759,7 +5759,7 @@ ${pages.map(p => `  <url>
   // ADMIN: SEED VEHICLE CATEGORIES
   // ============================================
   
-  app.post("/api/admin/seed-vehicle-categories", async (req, res) => {
+  app.post("/api/admin/seed-vehicle-categories", isAuthenticated, async (req: any, res) => {
     try {
       const categories = [
         {
@@ -5971,7 +5971,7 @@ ${pages.map(p => `  <url>
   // ADMIN: SEED PART TERMINOLOGY
   // ============================================
   
-  app.post("/api/admin/seed-terminology", async (req, res) => {
+  app.post("/api/admin/seed-terminology", isAuthenticated, async (req: any, res) => {
     try {
       const terminology = [
         {
@@ -6126,7 +6126,7 @@ ${pages.map(p => `  <url>
   // ADMIN: SEED DIY REPAIR GUIDES
   // ============================================
   
-  app.post("/api/admin/seed-diy-guides", async (req, res) => {
+  app.post("/api/admin/seed-diy-guides", isAuthenticated, async (req: any, res) => {
     try {
       const guides = [
         {
@@ -7553,7 +7553,7 @@ ${pages.map(p => `  <url>
   const devHubClient = createDevHubClient();
 
   // Test DarkWave Hub connection
-  app.get("/api/dev-hub/connect", async (req, res) => {
+  app.get("/api/dev-hub/connect", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured", configured: false });
     }
@@ -7566,7 +7566,7 @@ ${pages.map(p => `  <url>
   });
 
   // Push code snippet to hub
-  app.post("/api/dev-hub/snippet", async (req, res) => {
+  app.post("/api/dev-hub/snippet", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7580,7 +7580,7 @@ ${pages.map(p => `  <url>
   });
 
   // Get snippets from hub
-  app.get("/api/dev-hub/snippets", async (req, res) => {
+  app.get("/api/dev-hub/snippets", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7594,7 +7594,7 @@ ${pages.map(p => `  <url>
   });
 
   // Sync W-2 employees and workers
-  app.post("/api/dev-hub/sync-workers", async (req, res) => {
+  app.post("/api/dev-hub/sync-workers", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7608,7 +7608,7 @@ ${pages.map(p => `  <url>
   });
 
   // Sync 1099 contractors
-  app.post("/api/dev-hub/sync-contractors", async (req, res) => {
+  app.post("/api/dev-hub/sync-contractors", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7622,7 +7622,7 @@ ${pages.map(p => `  <url>
   });
 
   // Sync 1099 payment data
-  app.post("/api/dev-hub/sync-1099", async (req, res) => {
+  app.post("/api/dev-hub/sync-1099", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7636,7 +7636,7 @@ ${pages.map(p => `  <url>
   });
 
   // Sync W-2 payroll data
-  app.post("/api/dev-hub/sync-w2", async (req, res) => {
+  app.post("/api/dev-hub/sync-w2", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7650,7 +7650,7 @@ ${pages.map(p => `  <url>
   });
 
   // Sync timesheets
-  app.post("/api/dev-hub/sync-timesheets", async (req, res) => {
+  app.post("/api/dev-hub/sync-timesheets", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7664,7 +7664,7 @@ ${pages.map(p => `  <url>
   });
 
   // Sync certifications (ASE, EPA 608, etc.)
-  app.post("/api/dev-hub/sync-certs", async (req, res) => {
+  app.post("/api/dev-hub/sync-certs", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7678,7 +7678,7 @@ ${pages.map(p => `  <url>
   });
 
   // Get activity logs from hub
-  app.get("/api/dev-hub/logs", async (req, res) => {
+  app.get("/api/dev-hub/logs", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7692,7 +7692,7 @@ ${pages.map(p => `  <url>
   });
 
   // Log activity to hub
-  app.post("/api/dev-hub/log", async (req, res) => {
+  app.post("/api/dev-hub/log", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }

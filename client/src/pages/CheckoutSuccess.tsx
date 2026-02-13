@@ -12,7 +12,6 @@ export default function CheckoutSuccess() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
-    console.log('Checkout session completed:', sessionId);
   }, []);
 
   return (

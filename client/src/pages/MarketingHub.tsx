@@ -1733,7 +1733,7 @@ export default function MarketingHub() {
               <div>
                 <Label>What should the post be about?</Label>
                 <Textarea
-                  placeholder="e.g., Promote our 50+ retailer price comparison feature for brake pads..."
+                  placeholder="e.g., Promote our 68+ retailer price comparison feature for brake pads..."
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
                   rows={4}
