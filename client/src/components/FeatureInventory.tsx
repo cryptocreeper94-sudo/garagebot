@@ -52,7 +52,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     icon: "🔍",
     color: "green",
     features: [
-      { id: "universal-search", name: "Universal Parts Search", description: "Search 50+ retailers simultaneously", status: "complete", route: "/" },
+      { id: "universal-search", name: "Universal Parts Search", description: "Search 68+ retailers simultaneously", status: "complete", route: "/" },
       { id: "vehicle-selectors", name: "Year/Make/Model Selectors", description: "Filter parts by vehicle fitment", status: "complete", route: "/" },
       { id: "vehicle-types", name: "16 Vehicle Type Support", description: "Cars, trucks, boats, ATVs, motorcycles, RC, drones, model aircraft, slot cars, & more", status: "complete", route: "/" },
       { id: "category-grid", name: "24+ Part Categories", description: "Organized part category navigation including hobby categories", status: "complete", route: "/" },

@@ -97,7 +97,7 @@ export default function AffiliateDisclosure() {
                       <li>All prices shown on GarageBot are <strong className="text-foreground">real-time prices</strong> pulled directly from retailer websites and APIs</li>
                       <li>We do <strong className="text-foreground">not inflate prices</strong> — the price you see on GarageBot is the same price listed on the retailer's own site</li>
                       <li>Our commission is paid by the retailer, not by you</li>
-                      <li>We aggregate pricing from 58+ retailers to help you find the best deal</li>
+                      <li>We aggregate pricing from 68+ retailers to help you find the best deal</li>
                     </ul>
                   </div>
                 </div>

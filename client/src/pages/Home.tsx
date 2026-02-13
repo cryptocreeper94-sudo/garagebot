@@ -125,7 +125,7 @@ export default function Home() {
                 {/* Status Badge */}
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-mono tracking-wider mb-3 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_12px_var(--color-primary)]" />
-                  SYSTEM ONLINE // 50+ RETAILERS
+                  SYSTEM ONLINE // 68+ RETAILERS
                 </div>
                 
                 {/* Full Welcome Title */}
@@ -155,7 +155,7 @@ export default function Home() {
                   <Link href="/results">
                     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 cursor-pointer hover:border-primary/50 hover:bg-primary/10 transition-all group icon-bounce">
                       <Database className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-[10px] font-medium">50+ Retailers</span>
+                      <span className="text-[10px] font-medium">68+ Retailers</span>
                     </div>
                   </Link>
                   <Link href="/diy-guides">
@@ -517,7 +517,7 @@ export default function Home() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-xs font-mono tracking-wider mb-6 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              SYSTEM ONLINE // 50+ RETAILERS
+              SYSTEM ONLINE // 68+ RETAILERS
             </div>
             
             {/* Welcome Title */}
@@ -542,7 +542,7 @@ export default function Home() {
               <Link href="/results">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/30 border border-white/10">
                   <Database className="w-4 h-4 text-primary" />
-                  <span className="text-xs">50+ Retailers</span>
+                  <span className="text-xs">68+ Retailers</span>
                 </div>
               </Link>
               <Link href="/diy-guides">
@@ -697,7 +697,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mb-3">
-                Tell Buddy what you need - he'll find the right part across 50+ retailers.
+                Tell Buddy what you need - he'll find the right part across 68+ retailers.
               </p>
               <Button onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()} className="w-full btn-cyber font-tech uppercase text-xs" data-testid="button-chat-buddy-mobile">
                 <MessageCircle className="w-4 h-4 mr-2" />
@@ -725,7 +725,7 @@ export default function Home() {
                       <span className="px-1.5 py-0.5 text-[9px] font-mono uppercase bg-green-500/20 text-green-400 border border-green-500/30 rounded">FREE</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Join 50+ retailers. Get featured, earn badges, compete for Vendor of the Month!
+                      Join 68+ retailers. Get featured, earn badges, compete for Vendor of the Month!
                     </p>
                   </div>
                   <ArrowRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
@@ -801,6 +801,48 @@ export default function Home() {
       <section className="py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <VehicleShowcase />
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-12 px-4" data-testid="section-how-it-works">
+        <div className="max-w-5xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono mb-4">
+              <Zap className="w-3 h-3" />
+              HOW IT WORKS
+            </div>
+            <h2 className="text-2xl md:text-3xl font-tech font-bold uppercase text-white">
+              Find Parts in{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-400">3 Simple Steps</span>
+            </h2>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { step: 1, icon: Search, title: "Search Once", desc: "Enter your part name, number, or vehicle info. GarageBot searches 68+ retailers simultaneously.", color: "from-cyan-500/20 to-cyan-600/10", iconColor: "text-cyan-400", borderColor: "border-cyan-500/30" },
+              { step: 2, icon: TrendingUp, title: "Compare Prices", desc: "See prices, availability, and shipping from every store side-by-side. No more tab-hopping.", color: "from-green-500/20 to-green-600/10", iconColor: "text-green-400", borderColor: "border-green-500/30" },
+              { step: 3, icon: CheckCircle2, title: "Buy & Save", desc: "Click through to buy from the store with the best deal. Average users save $50-$200 per repair.", color: "from-purple-500/20 to-purple-600/10", iconColor: "text-purple-400", borderColor: "border-purple-500/30" },
+            ].map((item, i) => (
+              <motion.div key={item.step} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}>
+                <Card className={`glass-card card-3d p-6 h-full ${item.borderColor} relative overflow-hidden`} data-testid={`card-how-step-${item.step}`}>
+                  <div className="absolute top-3 right-3 text-4xl font-black text-white/5 font-tech">{item.step}</div>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4`}>
+                    <item.icon className={`w-6 h-6 ${item.iconColor}`} />
+                  </div>
+                  <h3 className="font-tech text-lg font-bold uppercase text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.5 }} className="text-center mt-8">
+            <Link href="/results">
+              <Button className="btn-cyber font-tech uppercase px-8" data-testid="button-try-search-cta">
+                <Search className="w-4 h-4 mr-2" />
+                Try a Search Now
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 

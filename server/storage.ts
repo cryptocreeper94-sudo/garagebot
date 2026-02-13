@@ -15,7 +15,7 @@ import {
   seoPages, analyticsSessions, analyticsPageViews, analyticsEvents,
   partnerApiCredentials, partnerApiLogs, shopLocations, blogPosts,
   warranties, warrantyClaims, fuelLogs, vehicleExpenses, priceHistory, emergencyContacts, maintenanceSchedules,
-  partListings, partListingMessages
+  partListings, partListingMessages, newsletterSubscribers
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -59,7 +59,8 @@ import type {
   PriceHistory, InsertPriceHistory,
   EmergencyContact, InsertEmergencyContact,
   MaintenanceSchedule, InsertMaintenanceSchedule,
-  PartListing, InsertPartListing, PartListingMessage, InsertPartListingMessage
+  PartListing, InsertPartListing, PartListingMessage, InsertPartListingMessage,
+  NewsletterSubscriber, InsertNewsletterSubscriber
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -476,6 +477,10 @@ export interface IStorage {
   getPartListingMessagesByListing(listingId: string): Promise<PartListingMessage[]>;
   createPartListingMessage(message: InsertPartListingMessage): Promise<PartListingMessage>;
   markPartListingMessageRead(id: string): Promise<void>;
+
+  // Newsletter
+  subscribeNewsletter(data: InsertNewsletterSubscriber): Promise<NewsletterSubscriber>;
+  getNewsletterSubscriberByEmail(email: string): Promise<NewsletterSubscriber | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2960,6 +2965,16 @@ export class DatabaseStorage implements IStorage {
 
   async markPartListingMessageRead(id: string): Promise<void> {
     await db.update(partListingMessages).set({ isRead: true }).where(eq(partListingMessages.id, id));
+  }
+
+  async subscribeNewsletter(data: InsertNewsletterSubscriber): Promise<NewsletterSubscriber> {
+    const [created] = await db.insert(newsletterSubscribers).values(data).returning();
+    return created;
+  }
+
+  async getNewsletterSubscriberByEmail(email: string): Promise<NewsletterSubscriber | undefined> {
+    const [sub] = await db.select().from(newsletterSubscribers).where(eq(newsletterSubscribers.email, email.toLowerCase()));
+    return sub;
   }
 }
 

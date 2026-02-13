@@ -106,7 +106,7 @@ export default function VendorSignup() {
 
           <Card className="glass-ultra border-primary/20 p-6">
             <p className="text-muted-foreground mb-6">
-              Join our network of 50+ retailers and reach millions of customers searching for auto parts. Fill out the form below and our partnerships team will be in touch.
+              Join our network of 68+ retailers and reach millions of customers searching for auto parts. Fill out the form below and our partnerships team will be in touch.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">

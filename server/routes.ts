@@ -4,7 +4,7 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations, insertPartListingSchema, updatePartListingSchema, insertPartListingMessageSchema, partListings } from "@shared/schema";
+import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations, insertPartListingSchema, updatePartListingSchema, insertPartListingMessageSchema, partListings, newsletterSubscribers } from "@shared/schema";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
 import { comparePrice } from "./services/price-comparison";
 import { fromZodError } from "zod-validation-error";
@@ -10593,6 +10593,29 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       res.json({ active: Number(activeResult?.count || 0), total: Number(totalResult?.count || 0) });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  // Newsletter subscription
+  app.post("/api/newsletter/subscribe", async (req, res) => {
+    try {
+      const { email, firstName, source } = req.body;
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "Valid email is required" });
+      }
+      const existing = await storage.getNewsletterSubscriberByEmail(email.toLowerCase());
+      if (existing) {
+        if (existing.isActive) {
+          return res.json({ message: "You're already subscribed!", alreadySubscribed: true });
+        }
+        await db.update(newsletterSubscribers).set({ isActive: true, unsubscribedAt: null }).where(eq(newsletterSubscribers.email, email.toLowerCase()));
+        return res.json({ message: "Welcome back! You've been re-subscribed." });
+      }
+      await storage.subscribeNewsletter({ email: email.toLowerCase(), firstName: firstName || null, source: source || "footer" });
+      res.json({ message: "You're in! Watch for deals, tips & DIY guides in your inbox." });
+    } catch (error) {
+      console.error("Newsletter subscribe error:", error);
+      res.status(500).json({ error: "Failed to subscribe" });
     }
   });
 
