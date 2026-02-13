@@ -7706,7 +7706,7 @@ ${pages.map(p => `  <url>
   });
 
   // Get workers for a specific shop (Mechanics Garage integration)
-  app.get("/api/dev-hub/shops/:shopId/workers", async (req, res) => {
+  app.get("/api/dev-hub/shops/:shopId/workers", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
@@ -7719,7 +7719,7 @@ ${pages.map(p => `  <url>
   });
 
   // Get payroll summary for a shop
-  app.get("/api/dev-hub/shops/:shopId/payroll", async (req, res) => {
+  app.get("/api/dev-hub/shops/:shopId/payroll", isAuthenticated, async (req: any, res) => {
     if (!devHubClient) {
       return res.status(503).json({ error: "DarkWave Hub not configured" });
     }
