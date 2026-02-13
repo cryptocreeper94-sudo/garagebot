@@ -82,7 +82,7 @@ export default function About() {
                 <div>
                   <h2 className="text-xl font-tech uppercase mb-3">What GarageBot Does</h2>
                   <div className="space-y-3 text-muted-foreground">
-                    <p>GarageBot aggregates <strong className="text-foreground">58+ retailers</strong> into a single, powerful search platform with real-time price comparison. We cover <strong className="text-foreground">ALL motorized vehicles</strong>:</p>
+                    <p>GarageBot aggregates <strong className="text-foreground">68+ retailers</strong> into a single, powerful search platform with real-time price comparison. We cover <strong className="text-foreground">ALL motorized vehicles</strong>:</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-4">
                       {[
                         "Cars", "Trucks", "Motorcycles", "ATVs",

@@ -3247,3 +3247,17 @@ export type PartListing = typeof partListings.$inferSelect;
 export type InsertPartListing = z.infer<typeof insertPartListingSchema>;
 export type PartListingMessage = typeof partListingMessages.$inferSelect;
 export type InsertPartListingMessage = z.infer<typeof insertPartListingMessageSchema>;
+
+export const newsletterSubscribers = pgTable("newsletter_subscribers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().unique(),
+  firstName: text("first_name"),
+  source: text("source").default("footer"),
+  isActive: boolean("is_active").default(true),
+  subscribedAt: timestamp("subscribed_at").defaultNow(),
+  unsubscribedAt: timestamp("unsubscribed_at"),
+});
+
+export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSubscribers).omit({ id: true, isActive: true, subscribedAt: true, unsubscribedAt: true });
+export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+export type InsertNewsletterSubscriber = z.infer<typeof insertNewsletterSubscriberSchema>;

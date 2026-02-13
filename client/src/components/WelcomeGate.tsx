@@ -33,7 +33,7 @@ By accessing or using GarageBot ("the Platform"), you agree to be bound by these
 
 2. PLATFORM SERVICES
 GarageBot provides:
-• Parts Aggregation: Search across 50+ automotive and motorized vehicle retailers. We are an aggregator and do not sell parts directly.
+• Parts Aggregation: Search across 68+ automotive and motorized vehicle retailers. We are an aggregator and do not sell parts directly.
 • My Garage: Store and manage your vehicles, service history, and specifications.
 • Genesis Hallmark: Blockchain-verified vehicle identity and ownership records on the Solana network.
 • DIY Repair Guides: AI-generated step-by-step maintenance and repair instructions.
@@ -411,7 +411,7 @@ export default function WelcomeGate() {
                       Get Your Free <span className="text-primary">Garage</span>
                     </h2>
                     <p className="text-sm text-muted-foreground">
-                      Search 50+ retailers, save vehicles, get AI recommendations
+                      Search 68+ retailers, save vehicles, get AI recommendations
                     </p>
                   </>
                 )}

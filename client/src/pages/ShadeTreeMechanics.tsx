@@ -516,7 +516,7 @@ export default function ShadeTreeMechanics() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2">Find the Right Part</h3>
                   <p className="text-zinc-400 mb-4">
-                    Search 50+ retailers at once. Compare prices, check availability, and get the best deal on quality parts.
+                    Search 68+ retailers at once. Compare prices, check availability, and get the best deal on quality parts.
                   </p>
                   <Link href="/">
                     <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-black">
