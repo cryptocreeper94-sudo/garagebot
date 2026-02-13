@@ -242,6 +242,18 @@ export default function Home() {
                         </Button>
                       </div>
                     </form>
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {["OBD Scanner", "Brake Pads", "Oil Filter", "Spark Plugs", "Battery", "Wiper Blades"].map(term => (
+                        <button
+                          key={term}
+                          onClick={() => { setSearchQuery(term); const params = new URLSearchParams(); params.set('q', term); if (selectedYear) params.set('year', selectedYear); if (selectedMake) params.set('make', selectedMake); if (selectedModel) params.set('model', selectedModel); setLocation(`/results?${params.toString()}`); }}
+                          className="px-2 py-0.5 text-[9px] font-mono rounded-full border border-white/10 text-muted-foreground hover:border-primary/40 hover:text-primary transition-all"
+                          data-testid={`quick-search-${term.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                          {term}
+                        </button>
+                      ))}
+                    </div>
                   </TabsContent>
 
                   <TabsContent value="web3" className="flex-1 space-y-2 mt-0">
@@ -631,6 +643,18 @@ export default function Home() {
                   </Button>
                 </div>
               </form>
+              <div className="flex flex-wrap gap-1.5 mt-2 px-1">
+                {["OBD Scanner", "Brake Pads", "Oil Filter", "Battery", "Spark Plugs", "Wiper Blades"].map(term => (
+                  <button
+                    key={term}
+                    onClick={() => { setSearchQuery(term); const params = new URLSearchParams(); params.set('q', term); if (selectedYear) params.set('year', selectedYear); if (selectedMake) params.set('make', selectedMake); if (selectedModel) params.set('model', selectedModel); setLocation(`/results?${params.toString()}`); }}
+                    className="px-2 py-0.5 text-[9px] font-mono rounded-full border border-white/10 text-muted-foreground hover:border-primary/40 hover:text-primary transition-all"
+                    data-testid={`quick-search-mobile-${term.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
             </Card>
           </motion.div>
           
