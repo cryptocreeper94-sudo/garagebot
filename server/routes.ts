@@ -7734,6 +7734,430 @@ ${pages.map(p => `  <url>
   });
 
   // ============================================
+  // INBOUND AFFILIATE PROGRAM (GB-XXXXXX)
+  // ============================================
+
+  function generateAffiliateCode(): string {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "GB-";
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  app.post("/api/affiliate-program/enroll", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id || req.session?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const existing = await storage.getAffiliateAccountByUserId(userId);
+      if (existing) return res.status(400).json({ error: "Already enrolled", account: existing });
+
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      let code = generateAffiliateCode();
+      let attempts = 0;
+      while (await storage.getAffiliateAccountByCode(code) && attempts < 10) {
+        code = generateAffiliateCode();
+        attempts++;
+      }
+
+      const { paypalEmail } = req.body;
+      const account = await storage.createAffiliateAccount({
+        userId,
+        code,
+        trustLayerId: user.trustLayerId || undefined,
+        status: "active",
+        paypalEmail: paypalEmail || undefined,
+      });
+
+      res.json({ success: true, account });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to enroll in affiliate program" });
+    }
+  });
+
+  app.get("/api/affiliate-program/me", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id || req.session?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const account = await storage.getAffiliateAccountByUserId(userId);
+      if (!account) return res.status(404).json({ error: "Not enrolled in affiliate program" });
+
+      const referrals = await storage.getAffiliateReferralsByAffiliateId(account.id);
+      const earnings = await storage.getAffiliateEarningsByAffiliateId(account.id);
+      const payouts = await storage.getAffiliatePayoutsByAffiliateId(account.id);
+
+      const totalReferrals = referrals.length;
+      const qualifiedReferrals = referrals.filter(r => r.qualifiedAt).length;
+      const activeProReferrals = referrals.filter(r => r.isProMember).length;
+      const totalReferredRevenue = referrals.reduce((sum, r) => sum + parseFloat(r.totalPurchaseAmount || "0"), 0);
+
+      res.json({
+        account,
+        referrals,
+        earnings: earnings.slice(0, 50),
+        payouts,
+        stats: {
+          totalReferrals,
+          qualifiedReferrals,
+          activeProReferrals,
+          totalReferredRevenue: totalReferredRevenue.toFixed(2),
+          totalEarnings: account.totalEarnings,
+          availableBalance: account.availableBalance,
+          totalPaidOut: account.totalPaidOut,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get affiliate data" });
+    }
+  });
+
+  app.patch("/api/affiliate-program/me", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id || req.session?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const account = await storage.getAffiliateAccountByUserId(userId);
+      if (!account) return res.status(404).json({ error: "Not enrolled" });
+
+      const { paypalEmail } = req.body;
+      const updated = await storage.updateAffiliateAccount(account.id, { paypalEmail });
+      res.json({ success: true, account: updated });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update affiliate account" });
+    }
+  });
+
+  app.get("/api/affiliate-program/resolve/:code", async (req, res) => {
+    try {
+      const { code } = req.params;
+      const account = await storage.getAffiliateAccountByCode(code.toUpperCase());
+      if (!account || account.status !== "active") {
+        return res.status(404).json({ error: "Invalid affiliate code" });
+      }
+      res.json({ valid: true, code: account.code });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to resolve affiliate code" });
+    }
+  });
+
+  app.post("/api/affiliate-program/track-referral", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id || req.session?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const { affiliateCode } = req.body;
+      if (!affiliateCode) return res.status(400).json({ error: "Missing affiliate code" });
+
+      const account = await storage.getAffiliateAccountByCode(affiliateCode.toUpperCase());
+      if (!account || account.status !== "active") {
+        return res.status(404).json({ error: "Invalid affiliate code" });
+      }
+
+      if (account.userId === userId) {
+        return res.status(400).json({ error: "Cannot refer yourself" });
+      }
+
+      const existing = await storage.getAffiliateReferralByUser(account.id, userId);
+      if (existing) {
+        return res.json({ success: true, message: "Already tracked" });
+      }
+
+      await storage.createAffiliateReferral({
+        affiliateId: account.id,
+        referredUserId: userId,
+      });
+
+      await storage.updateUser(userId, { referredByUserId: account.userId });
+
+      res.json({ success: true, message: "Referral tracked" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to track referral" });
+    }
+  });
+
+  app.post("/api/affiliate-program/record-purchase", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id || req.session?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const user = await storage.getUser(userId);
+      if (!user || user.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { targetUserId, orderAmount, gbCommission } = req.body;
+      if (!targetUserId || !orderAmount || !gbCommission) {
+        return res.status(400).json({ error: "Missing required fields: targetUserId, orderAmount, gbCommission" });
+      }
+
+      const parsedOrder = parseFloat(orderAmount);
+      const parsedComm = parseFloat(gbCommission);
+      if (isNaN(parsedOrder) || isNaN(parsedComm) || parsedOrder <= 0 || parsedComm <= 0) {
+        return res.status(400).json({ error: "Invalid order amounts" });
+      }
+
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser?.referredByUserId) {
+        return res.json({ success: true, message: "No referrer" });
+      }
+
+      const affiliateAccount = await storage.getAffiliateAccountByUserId(targetUser.referredByUserId);
+      if (!affiliateAccount || affiliateAccount.status !== "active") {
+        return res.json({ success: true, message: "Referrer not an active affiliate" });
+      }
+
+      const referral = await storage.getAffiliateReferralByUser(affiliateAccount.id, targetUserId);
+      if (!referral) return res.json({ success: true, message: "No referral record" });
+
+      const newPurchaseTotal = parseFloat(referral.totalPurchaseAmount || "0") + parseFloat(orderAmount);
+      await storage.updateAffiliateReferral(referral.id, {
+        totalPurchaseAmount: newPurchaseTotal.toFixed(2),
+        lastPurchaseAt: new Date(),
+        qualifiedAt: newPurchaseTotal >= 100 && !referral.qualifiedAt ? new Date() : referral.qualifiedAt,
+      });
+
+      if (newPurchaseTotal >= 100) {
+        const affiliateEarning = parseFloat(gbCommission) * 0.10;
+        if (affiliateEarning > 0) {
+          await storage.createAffiliateEarning({
+            affiliateId: affiliateAccount.id,
+            referralId: referral.id,
+            eventType: "purchase_commission",
+            amount: affiliateEarning.toFixed(2),
+            sourceAmount: gbCommission,
+            description: `10% of $${gbCommission} GarageBot commission (order: $${orderAmount})`,
+          });
+
+          const newTotal = parseFloat(affiliateAccount.totalEarnings || "0") + affiliateEarning;
+          const newBalance = parseFloat(affiliateAccount.availableBalance || "0") + affiliateEarning;
+          await storage.updateAffiliateAccount(affiliateAccount.id, {
+            totalEarnings: newTotal.toFixed(2),
+            availableBalance: newBalance.toFixed(2),
+          });
+
+          const newCommEarned = parseFloat(referral.totalCommissionEarned || "0") + affiliateEarning;
+          await storage.updateAffiliateReferral(referral.id, {
+            totalCommissionEarned: newCommEarned.toFixed(2),
+          });
+        }
+      }
+
+      res.json({ success: true, qualified: newPurchaseTotal >= 100 });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to record purchase" });
+    }
+  });
+
+  app.post("/api/affiliate-program/record-pro-conversion", isAuthenticated, async (req: any, res) => {
+    try {
+      const callerId = req.user?.id || req.session?.userId;
+      if (!callerId) return res.status(401).json({ error: "Not authenticated" });
+
+      const caller = await storage.getUser(callerId);
+      if (!caller || caller.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { referredUserId } = req.body;
+      if (!referredUserId) return res.status(400).json({ error: "Missing referredUserId" });
+
+      const targetUser = await storage.getUser(referredUserId);
+      if (!targetUser?.referredByUserId) {
+        return res.json({ success: true, message: "No referrer" });
+      }
+
+      const affiliateAccount = await storage.getAffiliateAccountByUserId(targetUser.referredByUserId);
+      if (!affiliateAccount || affiliateAccount.status !== "active") {
+        return res.json({ success: true, message: "Referrer not active affiliate" });
+      }
+
+      const referral = await storage.getAffiliateReferralByUser(affiliateAccount.id, referredUserId);
+      if (!referral) return res.json({ success: true, message: "No referral" });
+
+      if (referral.isProMember) {
+        return res.json({ success: true, message: "Pro bonus already recorded for this referral" });
+      }
+
+      const totalSpend = parseFloat(referral.totalPurchaseAmount || "0");
+      if (totalSpend < 100) {
+        return res.json({ success: true, message: "Referral not yet qualified ($100 threshold)" });
+      }
+
+      await storage.updateAffiliateReferral(referral.id, {
+        isProMember: true,
+        proStartedAt: new Date(),
+      });
+
+      await storage.createAffiliateEarning({
+        affiliateId: affiliateAccount.id,
+        referralId: referral.id,
+        eventType: "pro_bonus",
+        amount: "5.00",
+        description: `$5 Pro conversion bonus for referred user`,
+      });
+
+      const newTotal = parseFloat(affiliateAccount.totalEarnings || "0") + 5;
+      const newBalance = parseFloat(affiliateAccount.availableBalance || "0") + 5;
+      await storage.updateAffiliateAccount(affiliateAccount.id, {
+        totalEarnings: newTotal.toFixed(2),
+        availableBalance: newBalance.toFixed(2),
+      });
+
+      res.json({ success: true, message: "Pro conversion bonus recorded" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to record pro conversion" });
+    }
+  });
+
+  app.post("/api/affiliate-program/payout-request", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id || req.session?.userId;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const account = await storage.getAffiliateAccountByUserId(userId);
+      if (!account) return res.status(404).json({ error: "Not enrolled" });
+
+      const balance = parseFloat(account.availableBalance || "0");
+      if (balance < 20) {
+        return res.status(400).json({ error: `Minimum payout is $20. Current balance: $${balance.toFixed(2)}` });
+      }
+
+      if (!account.paypalEmail) {
+        return res.status(400).json({ error: "Please set a PayPal email before requesting payout" });
+      }
+
+      const payout = await storage.createAffiliatePayoutInbound({
+        affiliateId: account.id,
+        amount: balance.toFixed(2),
+        status: "pending",
+        method: "paypal",
+      });
+
+      await storage.updateAffiliateAccount(account.id, {
+        availableBalance: "0.00",
+      });
+
+      res.json({ success: true, payout });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to request payout" });
+    }
+  });
+
+  app.get("/api/affiliate-program/admin/accounts", isAuthenticated, async (req: any, res) => {
+    try {
+      const callerId = req.user?.id || req.session?.userId;
+      const caller = callerId ? await storage.getUser(callerId) : null;
+      if (!caller || caller.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      const accounts = await storage.getAllAffiliateAccounts();
+      const threshold = await storage.getAffiliateAccountsAtPayoutThreshold();
+      res.json({ accounts, pendingPayoutAlerts: threshold.map(a => a.code) });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get affiliate accounts" });
+    }
+  });
+
+  app.get("/api/affiliate-program/admin/payouts", isAuthenticated, async (req: any, res) => {
+    try {
+      const callerId = req.user?.id || req.session?.userId;
+      const caller = callerId ? await storage.getUser(callerId) : null;
+      if (!caller || caller.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      const payouts = await storage.getAllAffiliatePayoutsInbound();
+      res.json(payouts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get payouts" });
+    }
+  });
+
+  app.patch("/api/affiliate-program/admin/payouts/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const callerId = req.user?.id || req.session?.userId;
+      const caller = callerId ? await storage.getUser(callerId) : null;
+      if (!caller || caller.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      const { status, adminNotes } = req.body;
+      const updates: any = { status, adminNotes };
+      if (status === "approved") updates.approvedAt = new Date();
+      if (status === "paid") updates.paidAt = new Date();
+      const payout = await storage.updateAffiliatePayoutInbound(req.params.id, updates);
+      res.json({ success: true, payout });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update payout" });
+    }
+  });
+
+  app.get("/api/affiliate-program/trustlayer/:code", isAuthenticated, async (req: any, res) => {
+    try {
+      const account = await storage.getAffiliateAccountByCode(req.params.code.toUpperCase());
+      if (!account) return res.status(404).json({ error: "Affiliate not found" });
+
+      const user = await storage.getUser(account.userId);
+      const referrals = await storage.getAffiliateReferralsByAffiliateId(account.id);
+      const earnings = await storage.getAffiliateEarningsByAffiliateId(account.id);
+
+      res.json({
+        handoff: {
+          format: "GarageBot Affiliate v1.0",
+          app: "GarageBot",
+          appUrl: "https://garagebot.io",
+          affiliateCode: account.code,
+          codePrefix: "GB-",
+          codeFormat: "GB-XXXXXX (6 alphanumeric uppercase)",
+          userId: account.userId,
+          trustLayerId: account.trustLayerId || user?.trustLayerId || null,
+          userName: user?.firstName || user?.username || null,
+          userEmail: user?.email || null,
+          status: account.status,
+          enrolledAt: account.createdAt,
+          stats: {
+            totalEarnings: account.totalEarnings,
+            availableBalance: account.availableBalance,
+            totalPaidOut: account.totalPaidOut,
+            totalReferrals: referrals.length,
+            qualifiedReferrals: referrals.filter(r => r.qualifiedAt).length,
+            activeProReferrals: referrals.filter(r => r.isProMember).length,
+            totalReferredRevenue: referrals.reduce((s, r) => s + parseFloat(r.totalPurchaseAmount || "0"), 0).toFixed(2),
+          },
+          commissionRules: {
+            purchaseCommission: "10% of GarageBot's affiliate commission",
+            proConversionBonus: "$5.00 one-time per Pro subscriber conversion",
+            proRecurring: "$2.00/month per active Pro referral",
+            qualificationThreshold: "$100 total referred purchase amount",
+            minimumPayout: "$20.00",
+            payoutMethod: "PayPal",
+          },
+          recentEarnings: earnings.slice(0, 10).map(e => ({
+            eventType: e.eventType,
+            amount: e.amount,
+            sourceAmount: e.sourceAmount,
+            description: e.description,
+            timestamp: e.createdAt,
+          })),
+          referrals: referrals.map(r => ({
+            referredUserId: r.referredUserId,
+            totalPurchases: r.totalPurchaseAmount,
+            commissionEarned: r.totalCommissionEarned,
+            qualified: !!r.qualifiedAt,
+            isProMember: r.isProMember,
+            referredAt: r.referredAt,
+          })),
+        },
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate Trust Layer handoff" });
+    }
+  });
+
+  // ============================================
   // COMMUNITY FEATURES - Reviews, Wishlists, Projects
   // ============================================
 

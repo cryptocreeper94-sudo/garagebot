@@ -3261,3 +3261,85 @@ export const newsletterSubscribers = pgTable("newsletter_subscribers", {
 export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSubscribers).omit({ id: true, isActive: true, subscribedAt: true, unsubscribedAt: true });
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
 export type InsertNewsletterSubscriber = z.infer<typeof insertNewsletterSubscriberSchema>;
+
+// ============================================
+// INBOUND AFFILIATE PROGRAM (GB-XXXXXX)
+// ============================================
+
+export const affiliateAccounts = pgTable("affiliate_accounts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  code: text("code").notNull().unique(),
+  trustLayerId: text("trust_layer_id"),
+  status: text("status").default("active"),
+  totalEarnings: text("total_earnings").default("0.00"),
+  availableBalance: text("available_balance").default("0.00"),
+  totalPaidOut: text("total_paid_out").default("0.00"),
+  paypalEmail: text("paypal_email"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_affiliate_accounts_user").on(table.userId),
+  index("IDX_affiliate_accounts_code").on(table.code),
+]);
+
+export const affiliateReferrals = pgTable("affiliate_referrals", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  affiliateId: varchar("affiliate_id").notNull().references(() => affiliateAccounts.id, { onDelete: "cascade" }),
+  referredUserId: varchar("referred_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  totalPurchaseAmount: text("total_purchase_amount").default("0.00"),
+  totalCommissionEarned: text("total_commission_earned").default("0.00"),
+  qualifiedAt: timestamp("qualified_at"),
+  isProMember: boolean("is_pro_member").default(false),
+  proStartedAt: timestamp("pro_started_at"),
+  lastPurchaseAt: timestamp("last_purchase_at"),
+  referredAt: timestamp("referred_at").defaultNow(),
+}, (table) => [
+  index("IDX_affiliate_referrals_affiliate").on(table.affiliateId),
+  index("IDX_affiliate_referrals_user").on(table.referredUserId),
+]);
+
+export const affiliateEarnings = pgTable("affiliate_earnings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  affiliateId: varchar("affiliate_id").notNull().references(() => affiliateAccounts.id, { onDelete: "cascade" }),
+  referralId: varchar("referral_id").references(() => affiliateReferrals.id, { onDelete: "set null" }),
+  eventType: text("event_type").notNull(),
+  amount: text("amount").notNull(),
+  sourceAmount: text("source_amount"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_affiliate_earnings_affiliate").on(table.affiliateId),
+  index("IDX_affiliate_earnings_type").on(table.eventType),
+]);
+
+export const affiliatePayoutsInbound = pgTable("affiliate_payouts_inbound", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  affiliateId: varchar("affiliate_id").notNull().references(() => affiliateAccounts.id, { onDelete: "cascade" }),
+  amount: text("amount").notNull(),
+  status: text("status").default("pending"),
+  method: text("method").default("paypal"),
+  requestedAt: timestamp("requested_at").defaultNow(),
+  approvedAt: timestamp("approved_at"),
+  paidAt: timestamp("paid_at"),
+  adminNotes: text("admin_notes"),
+}, (table) => [
+  index("IDX_affiliate_payouts_affiliate").on(table.affiliateId),
+  index("IDX_affiliate_payouts_status").on(table.status),
+]);
+
+export const insertAffiliateAccountSchema = createInsertSchema(affiliateAccounts).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertAffiliateAccount = z.infer<typeof insertAffiliateAccountSchema>;
+export type AffiliateAccount = typeof affiliateAccounts.$inferSelect;
+
+export const insertAffiliateReferralSchema = createInsertSchema(affiliateReferrals).omit({ id: true, referredAt: true });
+export type InsertAffiliateReferral = z.infer<typeof insertAffiliateReferralSchema>;
+export type AffiliateReferral = typeof affiliateReferrals.$inferSelect;
+
+export const insertAffiliateEarningSchema = createInsertSchema(affiliateEarnings).omit({ id: true, createdAt: true });
+export type InsertAffiliateEarning = z.infer<typeof insertAffiliateEarningSchema>;
+export type AffiliateEarning = typeof affiliateEarnings.$inferSelect;
+
+export const insertAffiliatePayoutInboundSchema = createInsertSchema(affiliatePayoutsInbound).omit({ id: true, requestedAt: true, approvedAt: true, paidAt: true });
+export type InsertAffiliatePayoutInbound = z.infer<typeof insertAffiliatePayoutInboundSchema>;
+export type AffiliatePayoutInbound = typeof affiliatePayoutsInbound.$inferSelect;

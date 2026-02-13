@@ -15,7 +15,8 @@ import {
   seoPages, analyticsSessions, analyticsPageViews, analyticsEvents,
   partnerApiCredentials, partnerApiLogs, shopLocations, blogPosts,
   warranties, warrantyClaims, fuelLogs, vehicleExpenses, priceHistory, emergencyContacts, maintenanceSchedules,
-  partListings, partListingMessages, newsletterSubscribers
+  partListings, partListingMessages, newsletterSubscribers,
+  affiliateAccounts, affiliateReferrals, affiliateEarnings, affiliatePayoutsInbound
 } from "@shared/schema";
 import type { 
   User, UpsertUser, Vehicle, InsertVehicle, Deal, InsertDeal, Hallmark, InsertHallmark, 
@@ -60,7 +61,8 @@ import type {
   EmergencyContact, InsertEmergencyContact,
   MaintenanceSchedule, InsertMaintenanceSchedule,
   PartListing, InsertPartListing, PartListingMessage, InsertPartListingMessage,
-  NewsletterSubscriber, InsertNewsletterSubscriber
+  NewsletterSubscriber, InsertNewsletterSubscriber,
+  AffiliateAccount, InsertAffiliateAccount, AffiliateReferral, InsertAffiliateReferral, AffiliateEarning, InsertAffiliateEarning, AffiliatePayoutInbound, InsertAffiliatePayoutInbound
 } from "@shared/schema";
 import { eq, and, desc, sql, asc, ilike, or, gte, lte, inArray } from "drizzle-orm";
 
@@ -2975,6 +2977,81 @@ export class DatabaseStorage implements IStorage {
   async getNewsletterSubscriberByEmail(email: string): Promise<NewsletterSubscriber | undefined> {
     const [sub] = await db.select().from(newsletterSubscribers).where(eq(newsletterSubscribers.email, email.toLowerCase()));
     return sub;
+  }
+
+  // Inbound Affiliate Program
+  async getAffiliateAccountByUserId(userId: string): Promise<AffiliateAccount | undefined> {
+    const [account] = await db.select().from(affiliateAccounts).where(eq(affiliateAccounts.userId, userId));
+    return account;
+  }
+
+  async getAffiliateAccountByCode(code: string): Promise<AffiliateAccount | undefined> {
+    const [account] = await db.select().from(affiliateAccounts).where(eq(affiliateAccounts.code, code));
+    return account;
+  }
+
+  async createAffiliateAccount(data: InsertAffiliateAccount): Promise<AffiliateAccount> {
+    const [account] = await db.insert(affiliateAccounts).values(data).returning();
+    return account;
+  }
+
+  async updateAffiliateAccount(id: string, updates: Partial<AffiliateAccount>): Promise<AffiliateAccount | undefined> {
+    const [updated] = await db.update(affiliateAccounts).set({ ...updates, updatedAt: new Date() }).where(eq(affiliateAccounts.id, id)).returning();
+    return updated;
+  }
+
+  async getAllAffiliateAccounts(): Promise<AffiliateAccount[]> {
+    return db.select().from(affiliateAccounts).orderBy(desc(affiliateAccounts.createdAt));
+  }
+
+  async getAffiliateReferralsByAffiliateId(affiliateId: string): Promise<AffiliateReferral[]> {
+    return db.select().from(affiliateReferrals).where(eq(affiliateReferrals.affiliateId, affiliateId)).orderBy(desc(affiliateReferrals.referredAt));
+  }
+
+  async getAffiliateReferralByUser(affiliateId: string, referredUserId: string): Promise<AffiliateReferral | undefined> {
+    const [ref] = await db.select().from(affiliateReferrals).where(and(eq(affiliateReferrals.affiliateId, affiliateId), eq(affiliateReferrals.referredUserId, referredUserId)));
+    return ref;
+  }
+
+  async createAffiliateReferral(data: InsertAffiliateReferral): Promise<AffiliateReferral> {
+    const [ref] = await db.insert(affiliateReferrals).values(data).returning();
+    return ref;
+  }
+
+  async updateAffiliateReferral(id: string, updates: Partial<AffiliateReferral>): Promise<AffiliateReferral | undefined> {
+    const [updated] = await db.update(affiliateReferrals).set(updates).where(eq(affiliateReferrals.id, id)).returning();
+    return updated;
+  }
+
+  async createAffiliateEarning(data: InsertAffiliateEarning): Promise<AffiliateEarning> {
+    const [earning] = await db.insert(affiliateEarnings).values(data).returning();
+    return earning;
+  }
+
+  async getAffiliateEarningsByAffiliateId(affiliateId: string): Promise<AffiliateEarning[]> {
+    return db.select().from(affiliateEarnings).where(eq(affiliateEarnings.affiliateId, affiliateId)).orderBy(desc(affiliateEarnings.createdAt));
+  }
+
+  async createAffiliatePayoutInbound(data: InsertAffiliatePayoutInbound): Promise<AffiliatePayoutInbound> {
+    const [payout] = await db.insert(affiliatePayoutsInbound).values(data).returning();
+    return payout;
+  }
+
+  async getAffiliatePayoutsByAffiliateId(affiliateId: string): Promise<AffiliatePayoutInbound[]> {
+    return db.select().from(affiliatePayoutsInbound).where(eq(affiliatePayoutsInbound.affiliateId, affiliateId)).orderBy(desc(affiliatePayoutsInbound.requestedAt));
+  }
+
+  async getAllAffiliatePayoutsInbound(): Promise<AffiliatePayoutInbound[]> {
+    return db.select().from(affiliatePayoutsInbound).orderBy(desc(affiliatePayoutsInbound.requestedAt));
+  }
+
+  async updateAffiliatePayoutInbound(id: string, updates: Partial<AffiliatePayoutInbound>): Promise<AffiliatePayoutInbound | undefined> {
+    const [updated] = await db.update(affiliatePayoutsInbound).set(updates).where(eq(affiliatePayoutsInbound.id, id)).returning();
+    return updated;
+  }
+
+  async getAffiliateAccountsAtPayoutThreshold(): Promise<AffiliateAccount[]> {
+    return db.select().from(affiliateAccounts).where(and(eq(affiliateAccounts.status, "active"), sql`CAST(${affiliateAccounts.availableBalance} AS DECIMAL) >= 20`));
   }
 }
 

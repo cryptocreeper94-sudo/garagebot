@@ -1,6 +1,6 @@
 # Overview
 
-GarageBot is a comprehensive parts aggregator platform designed to unify inventory from 65+ retailers into a single searchable interface. Its primary purpose is to ensure users find the "Right Part. First Time. Every Engine." for ALL motorized vehicles and equipment, including a dedicated Motorized Hobby section. The platform aims to revolutionize the parts market by offering advanced search capabilities, AI-powered recommendations, vehicle fleet management with VIN decoding, and integrated DIY repair guides. It also features a robust e-commerce system with Stripe payments, a Genesis Hallmark NFT system for early adopters, and a Pro "Founders Circle" subscription for enhanced functionalities. The business vision is to become the go-to platform for both casual users, professional mechanics, and hobby enthusiasts.
+GarageBot is a comprehensive parts aggregator platform designed to unify inventory from 68+ retailers into a single searchable interface. Its primary purpose is to ensure users find the "Right Part. First Time. Every Engine." for ALL motorized vehicles and equipment, including a dedicated Motorized Hobby section. The platform aims to revolutionize the parts market by offering advanced search capabilities, AI-powered recommendations, vehicle fleet management with VIN decoding, and integrated DIY repair guides. It also features a robust e-commerce system with Stripe payments, a Genesis Hallmark NFT system for early adopters, and a Pro "Founders Circle" subscription for enhanced functionalities. The business vision is to become the go-to platform for both casual users, professional mechanics, and hobby enthusiasts.
 
 # User Preferences
 
@@ -124,3 +124,13 @@ Preferred communication style: Simple, everyday language.
     - **Payroll/HR**: UKG Pro, ADP Workforce Now, Gusto, Paychex Flex
     - **Scheduling/Communication**: Google Calendar, Twilio, Mailchimp
     - **Parts/Inventory**: PartsTech, Nexpart
+
+## Inbound Affiliate Program (GB-XXXXXX)
+- **Route**: `/affiliates` — Full affiliate program page with enrollment, dashboard, and Trust Layer handoff.
+- **Code Format**: `GB-XXXXXX` (6 alphanumeric uppercase, no ambiguous chars like 0/O/1/I).
+- **Commission Rules**: 10% of GarageBot's affiliate commission on referred user purchases, $5 one-time Pro conversion bonus, $2/month recurring per active Pro referral.
+- **Thresholds**: $100 total referred purchase amount before affiliate starts earning. $20 minimum payout balance before payout request.
+- **Payouts**: PayPal, admin-approved. Admin gets alerts when affiliates reach $20 threshold.
+- **Trust Layer**: Handoff endpoint at `/api/affiliate-program/trustlayer/:code` returns full JSON payload for cross-ecosystem tracking.
+- **Database Tables**: `affiliate_accounts`, `affiliate_referrals`, `affiliate_earnings`, `affiliate_payouts_inbound`.
+- **API**: All routes prefixed with `/api/affiliate-program/`.
