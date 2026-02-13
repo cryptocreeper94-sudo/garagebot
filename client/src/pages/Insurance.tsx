@@ -122,7 +122,6 @@ export default function Insurance() {
 
   const handleGetQuote = (provider: InsuranceProvider) => {
     // Track click for analytics
-    console.log(`Affiliate click: ${provider.name}`);
     // Only open if we have a valid affiliate URL
     if (provider.affiliateUrl && provider.affiliateUrl !== "#") {
       window.open(provider.affiliateUrl, "_blank");

@@ -793,7 +793,7 @@ export default function Home() {
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px]">
                       <CheckCircle2 className="w-3 h-3 text-green-400" />
-                      <span>40+ Parts Vendors</span>
+                      <span>68+ Parts Vendors</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px]">
                       <CheckCircle2 className="w-3 h-3 text-green-400" />

@@ -228,7 +228,7 @@ export default function Investors() {
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                      <span><strong>Parts Aggregator MVP:</strong> 50+ retailers integrated with unified search</span>
+                      <span><strong>Parts Aggregator MVP:</strong> 68+ retailers integrated with unified search</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />

@@ -36,7 +36,6 @@ export default function AdSenseSlot({
         ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
       }
     } catch (e) {
-      console.log("AdSense not loaded yet");
     }
   }, [user]);
 
