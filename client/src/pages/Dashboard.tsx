@@ -554,9 +554,20 @@ export default function Dashboard() {
 
             {/* Assets List */}
             {loadingAssets ? (
-              <Card className="bg-card/30 border-white/10 p-6">
-                <div className="text-center py-4 text-muted-foreground">Loading your blockchain assets...</div>
-              </Card>
+              <div className="space-y-3">
+                {[1,2,3].map(i => (
+                  <div key={i} className="glass-card rounded-xl border border-white/5 p-4 animate-pulse">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-2/3 rounded bg-white/[0.06]" />
+                        <div className="h-3 w-1/3 rounded bg-white/[0.04]" />
+                      </div>
+                      <div className="h-6 w-20 rounded-full bg-green-500/10" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : myBlockchainAssets.length === 0 ? (
               <Card className="bg-card/30 border-white/10 p-6">
                 <div className="text-center py-8">

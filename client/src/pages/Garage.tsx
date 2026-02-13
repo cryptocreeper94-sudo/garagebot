@@ -222,8 +222,22 @@ export default function Garage() {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans">
         <Nav />
-        <div className="container mx-auto px-4 pt-24 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="container mx-auto px-4 pt-24 space-y-6">
+          <div className="h-10 w-64 rounded-lg bg-white/[0.04] animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1,2,3].map(i => (
+              <div key={i} className="glass-card rounded-xl border border-white/5 p-6 space-y-4 animate-pulse">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10" />
+                  <div className="space-y-2 flex-1">
+                    <div className="h-4 w-3/4 rounded bg-white/[0.06]" />
+                    <div className="h-3 w-1/2 rounded bg-white/[0.04]" />
+                  </div>
+                </div>
+                <div className="h-20 rounded-lg bg-white/[0.03]" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

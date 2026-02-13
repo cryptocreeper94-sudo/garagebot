@@ -503,7 +503,17 @@ function PriceComparisonSection({ data, isLoading, searchQuery, requireAuth }: {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[1,2,3,4].map(i => (
-            <div key={i} className="h-32 rounded-xl bg-white/[0.02] border border-white/5 animate-pulse" />
+            <div key={i} className="h-32 glass-card rounded-xl border border-white/5 animate-pulse p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-24 rounded bg-white/[0.06]" />
+                <div className="h-5 w-16 rounded bg-green-500/10" />
+              </div>
+              <div className="h-3 w-3/4 rounded bg-white/[0.04]" />
+              <div className="flex items-center justify-between pt-2">
+                <div className="h-3 w-20 rounded bg-white/[0.03]" />
+                <div className="h-8 w-20 rounded-lg bg-primary/10" />
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -1107,7 +1117,11 @@ export default function Results() {
                     <p className="text-[10px] text-muted-foreground">Searching {vehicleLabel ? `parts for ${vehicleLabel}` : 'all retailers'}...</p>
                     <div className="mt-6 grid grid-cols-3 gap-2">
                       {[1,2,3].map(i => (
-                        <div key={i} className="h-24 glass-card rounded-lg border border-white/5 animate-pulse" />
+                        <div key={i} className="h-24 glass-card rounded-lg border border-white/5 animate-pulse p-3 space-y-2">
+                          <div className="h-3 w-3/4 mx-auto rounded bg-white/[0.06]" />
+                          <div className="h-8 w-full rounded bg-primary/5" />
+                          <div className="h-2 w-1/2 mx-auto rounded bg-white/[0.04]" />
+                        </div>
                       ))}
                     </div>
                   </div>
