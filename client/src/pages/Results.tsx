@@ -52,13 +52,13 @@ function isAffiliatePartner(vendor: VendorInfo): boolean {
 }
 
 const SCANNING_MESSAGES = [
-  "Connecting to 58 retailers...",
+  "Connecting to 68+ retailers...",
   "Checking AutoZone inventory...",
   "Scanning Amazon Automotive...",
   "Searching RockAuto catalog...",
   "Querying eBay Motors...",
   "Matching vehicle fitment...",
-  "Comparing prices...",
+  "Comparing prices across stores...",
   "Building direct links...",
 ];
 
@@ -789,20 +789,51 @@ export default function Results() {
 
   const hasSearchQuery = !!(query || partNumber || category);
 
+  const { data: aiParsed } = useQuery<{
+    query: string;
+    partType?: string;
+    vehicleType?: string;
+    year?: string;
+    make?: string;
+    model?: string;
+    description?: string;
+    searchTerms: string[];
+  }>({
+    queryKey: ['ai-parse', query],
+    queryFn: async () => {
+      const res = await fetch('/api/ai/parse-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      if (!res.ok) return { query, searchTerms: [query] };
+      return res.json();
+    },
+    enabled: !!query && query.length > 2 && !partNumber,
+    staleTime: 10 * 60 * 1000,
+    retry: 0,
+  });
+
+  const optimizedQuery = aiParsed?.partType || query;
+  const aiYear = aiParsed?.year || year;
+  const aiMake = aiParsed?.make || make;
+  const aiModel = aiParsed?.model || model;
+  const aiVehicleType = aiParsed?.vehicleType || vehicleType;
+
   const { data: searchResults } = useQuery({
-    queryKey: ['search', query, partNumber, year, make, model, category],
+    queryKey: ['search', query, partNumber, aiYear, aiMake, aiModel, category],
     queryFn: async () => {
       const res = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: query || partNumber,
+          query: optimizedQuery || partNumber,
           partNumber,
-          year: year ? parseInt(year) : undefined,
-          make,
-          model,
+          year: aiYear ? parseInt(aiYear) : undefined,
+          make: aiMake,
+          model: aiModel,
           category,
-          vehicleType,
+          vehicleType: aiVehicleType,
         }),
       });
       if (!res.ok) throw new Error('Failed to search');
@@ -812,18 +843,18 @@ export default function Results() {
   });
 
   const { data: priceData, isLoading: priceLoading } = useQuery<PriceComparisonData>({
-    queryKey: ['prices', query, partNumber, year, make, model, vehicleType, zipCode],
+    queryKey: ['prices', optimizedQuery, partNumber, aiYear, aiMake, aiModel, aiVehicleType, zipCode],
     queryFn: async () => {
       const res = await fetch('/api/prices/compare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          query: query || partNumber || category,
-          year,
-          make,
-          model,
-          vehicleType,
+          query: optimizedQuery || partNumber || category,
+          year: aiYear,
+          make: aiMake,
+          model: aiModel,
+          vehicleType: aiVehicleType,
           zipCode: zipCode || undefined,
         }),
       });
@@ -934,6 +965,27 @@ export default function Results() {
         </div>
 
         <div className="container mx-auto px-4 mt-6">
+          {aiParsed && aiParsed.partType && aiParsed.partType !== query && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3 rounded-lg bg-primary/5 border border-primary/20 flex items-center gap-3 flex-wrap"
+              data-testid="ai-search-interpretation"
+            >
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-primary" />
+                <span className="text-xs font-tech text-primary uppercase">AI Smart Search</span>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                Searching for <span className="text-white font-medium">"{aiParsed.partType}"</span>
+                {aiParsed.description && <span> ({aiParsed.description})</span>}
+                {aiParsed.year && aiParsed.make && (
+                  <span> for <span className="text-green-400">{aiParsed.year} {aiParsed.make} {aiParsed.model || ''}</span></span>
+                )}
+              </span>
+            </motion.div>
+          )}
+
           <div className="grid grid-cols-12 gap-6">
             <div className="hidden lg:block col-span-3">
               <div className="sticky top-24 space-y-4">
