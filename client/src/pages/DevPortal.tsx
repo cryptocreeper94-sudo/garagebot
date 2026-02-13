@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
   BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList,
   Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch, Blocks, Car,
-  MessageCircle, Send, Bot, Loader2, BarChart3
+  MessageCircle, Send, Bot, Loader2, BarChart3, Megaphone, Search, Filter
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { FeatureInventory } from "@/components/FeatureInventory";
@@ -425,6 +425,395 @@ Founder, GarageBot.io
 https://garagebot.io`
   }
 };
+
+const AFFILIATE_OUTREACH_VENDORS = [
+  {
+    name: "SkyGeek",
+    category: "Aviation",
+    website: "https://skygeek.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "support@skygeek.com",
+    phone: "",
+    notes: "Aviation parts & pilot supplies. No public affiliate program. Contact directly or promote via Amazon Associates.",
+    action: "Email to inquire about partnership",
+    priority: "medium" as const,
+  },
+  {
+    name: "Aircraft Spruce",
+    category: "Aviation",
+    website: "https://www.aircraftspruce.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "info@aircraftspruce.com",
+    phone: "(877) 477-7823",
+    notes: "Largest aviation parts supplier since 1965. No affiliate program but has wholesale/dealer program and international affiliates program.",
+    action: "Contact for dealer/partner program",
+    priority: "high" as const,
+  },
+  {
+    name: "Wicks Aircraft Supply",
+    category: "Aviation",
+    website: "https://www.wicksaircraft.com",
+    hasProgram: false,
+    network: "Amazon Associates (indirect)",
+    contact: "info@wicksaircraft.com",
+    phone: "(800) 221-9425",
+    notes: "Aircraft parts for wood, aluminum, tube & fabric, composites. Sells on Amazon - can promote via Amazon Associates. No direct affiliate program.",
+    action: "Promote via Amazon Associates or contact directly",
+    priority: "low" as const,
+  },
+  {
+    name: "Chief Aircraft",
+    category: "Aviation",
+    website: "https://www.chiefaircraft.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website contact form",
+    phone: "(800) 447-3408",
+    notes: "General aviation parts, pilot supplies, avionics, RC models. FAA-approved repair station. No public affiliate program.",
+    action: "Call to inquire about partner program",
+    priority: "low" as const,
+  },
+  {
+    name: "Preferred Airparts",
+    category: "Aviation",
+    website: "https://www.preferredairparts.com",
+    hasProgram: false,
+    network: "eBay (indirect)",
+    contact: "Via website",
+    phone: "(800) 433-0814",
+    notes: "New surplus & used aircraft parts. Cessna/Piper specialist. 35-85% off list. Sells on eBay - promote via eBay Partner Network.",
+    action: "Promote via eBay Partner Network or contact directly",
+    priority: "low" as const,
+  },
+  {
+    name: "MarineEngine.com",
+    category: "Marine",
+    website: "https://www.marineengine.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website contact form",
+    phone: "(231) 627-0300",
+    notes: "Boat parts & marine engine retailer. Outboard motors, inboard engines, sterndrives, repair manuals. No affiliate program found.",
+    action: "Contact to propose referral partnership",
+    priority: "medium" as const,
+  },
+  {
+    name: "Wholesale Marine",
+    category: "Marine",
+    website: "https://www.wholesalemarine.com",
+    hasProgram: true,
+    network: "AvantLink",
+    contact: "https://www.wholesalemarine.com/affiliate-program/",
+    phone: "",
+    notes: "Has active affiliate program via AvantLink! 2-5% commission, 14-day cookie, $200+ avg order. Similar inventory to MarineEngine.com.",
+    action: "Sign up via AvantLink network",
+    priority: "high" as const,
+  },
+  {
+    name: "Car-Part.com",
+    category: "Auto Parts (Used/Recycled)",
+    website: "https://www.car-part.com",
+    hasProgram: false,
+    network: "None (B2B marketplace)",
+    contact: "info@car-part.com",
+    phone: "(859) 344-1925",
+    keyContact: "Jeff Schroder (Founder & CEO)",
+    notes: "World's largest recycled auto parts marketplace. 200M+ used parts, 3,100+ recyclers. B2B focused. Has web services API.",
+    action: "Contact CEO for API/data partnership",
+    priority: "high" as const,
+  },
+  {
+    name: "VMC Chinese Parts",
+    category: "Powersports (Chinese ATV/UTV)",
+    website: "https://www.vmcchineseparts.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "support@vmcchineseparts.com",
+    phone: "(618) 529-2593",
+    notes: "Specializes in Chinese-built ATV, UTV, scooter, go-kart, dirt bike parts. 5,000+ SKUs. Based in Carbondale, IL. No affiliate program.",
+    action: "Email to propose referral commission arrangement",
+    priority: "medium" as const,
+  },
+  {
+    name: "PPL Motorhomes",
+    category: "RV",
+    website: "https://www.pplmotorhomes.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website contact form",
+    phone: "(800) 755-4775",
+    notes: "RV consignment sales + RV Parts Superstore. Locations in TX, FL, OK. No affiliate program found. Focus on consignment model.",
+    action: "Call to inquire about referral partnership",
+    priority: "low" as const,
+  },
+  {
+    name: "RV Parts Country",
+    category: "RV",
+    website: "https://www.rvpartscountry.com",
+    hasProgram: false,
+    network: "Possibly ShareASale",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "RV parts and accessories retailer. Has an 'Affiliate Partner Links' page but no formal signup. May be on ShareASale - check when account is approved.",
+    action: "Check ShareASale for listing; contact directly if not found",
+    priority: "medium" as const,
+  },
+  {
+    name: "Steiner Tractor Parts",
+    category: "Classic/Restoration (Tractors)",
+    website: "https://www.steinertractor.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "Vintage/antique tractor restoration parts since 1977. 760+ page catalog, 7,000+ parts. Brands: John Deere, Ford, Case, IH, etc. No affiliate program.",
+    action: "Contact to propose content partnership",
+    priority: "low" as const,
+  },
+  {
+    name: "Mower Parts Group",
+    category: "Lawn/Outdoor",
+    website: "https://mowerpartsgroup.com",
+    hasProgram: false,
+    network: "Amazon (indirect)",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "Online lawn mower parts retailer. Sells on Amazon - can promote via Amazon Associates. No direct affiliate program found.",
+    action: "Promote via Amazon Associates",
+    priority: "low" as const,
+  },
+  {
+    name: "Power Mower Sales",
+    category: "Lawn/Outdoor",
+    website: "https://powermowersales.com",
+    hasProgram: true,
+    network: "Direct",
+    contact: "https://powermowersales.com",
+    phone: "",
+    notes: "Has 5% commission affiliate program! In business since 1966. Lawn mower parts, outdoor power equipment. Also runs Generac-parts.com and Snapper.parts.",
+    action: "Sign up on their website for 5% commission program",
+    priority: "high" as const,
+  },
+  {
+    name: "TruckPro",
+    category: "Heavy Duty",
+    website: "https://www.truckpro.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website",
+    phone: "",
+    notes: "Largest independent heavy-duty truck/trailer parts distributor. 150+ locations, 33 states. 4M+ parts online. Owned by Platinum Equity.",
+    action: "Contact corporate for B2B partnership",
+    priority: "medium" as const,
+  },
+  {
+    name: "FinditParts",
+    category: "Heavy Duty",
+    website: "https://www.finditparts.com",
+    hasProgram: true,
+    network: "CJ Affiliate / FlexOffers / VigLink",
+    contact: "https://www.flexoffers.com/affiliate-programs/finditparts-affiliate-program/",
+    phone: "",
+    notes: "Has active affiliate program on multiple networks! Largest online heavy-duty truck parts marketplace. 7M+ parts, 800+ manufacturers. Apply via FlexOffers or CJ.",
+    action: "Sign up via FlexOffers or CJ Affiliate",
+    priority: "high" as const,
+  },
+  {
+    name: "Vander Haag's",
+    category: "Heavy Duty (Salvage)",
+    website: "https://www.vanderhaags.com",
+    hasProgram: false,
+    network: "eBay (indirect)",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "Family-owned truck parts salvage since 1939. 11 Midwest locations, 360+ employees. New, used, rebuilt truck parts. Sells on eBay. 2024 Distributor of Year.",
+    action: "Promote via eBay Partner Network or contact directly",
+    priority: "low" as const,
+  },
+  {
+    name: "Messick's Farm Equipment",
+    category: "Farm/Tractor",
+    website: "https://www.messicks.com",
+    hasProgram: false,
+    network: "eBay (indirect)",
+    contact: "Via website",
+    phone: "(800) 222-3373",
+    notes: "PA-based farm equipment dealer. 1.3M+ parts, 250+ brands (Kubota, New Holland, Case IH). Sells on eBay (13K+ items sold). No affiliate program.",
+    action: "Promote via eBay Partner Network or contact directly",
+    priority: "low" as const,
+  },
+  {
+    name: "Diesel Parts Direct",
+    category: "Heavy Duty (Diesel)",
+    website: "https://www.dieselpartsdirect.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "40+ years diesel engine parts experience. A+ BBB rating. Cat, Cummins, Detroit Diesel, John Deere. No affiliate program found.",
+    action: "Contact to propose referral partnership",
+    priority: "low" as const,
+  },
+  {
+    name: "AllPartsStore",
+    category: "Farm/Tractor",
+    website: "https://www.allpartsstore.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website",
+    phone: "",
+    notes: "Agricultural/industrial equipment parts (tractors, combines, turf/lawn care). Appears to be John Deere affiliated. No public affiliate program.",
+    action: "Contact for dealer/partner program",
+    priority: "low" as const,
+  },
+  {
+    name: "RockAuto",
+    category: "Auto Parts",
+    website: "https://www.rockauto.com",
+    hasProgram: false,
+    network: "Forum discount codes only",
+    contact: "https://www.rockauto.com/help/",
+    phone: "",
+    notes: "No formal affiliate program. Partners with automotive forums via discount codes. Approach as content/forum partnership.",
+    action: "Submit partnership request via Help page",
+    priority: "high" as const,
+  },
+  {
+    name: "O'Reilly Auto Parts",
+    category: "Auto Parts",
+    website: "https://www.oreillyauto.com",
+    hasProgram: false,
+    network: "None (Sponsorship/B2B only)",
+    contact: "sponsorships@oreillyauto.com",
+    contactAlt: "CoOps@oreillyauto.com",
+    phone: "(888) 876-6759",
+    notes: "No online affiliate program. Has sponsorship and cooperative programs for business partnerships.",
+    action: "Email sponsorship team for B2B partnership",
+    priority: "high" as const,
+  },
+  {
+    name: "AutoZone",
+    category: "Auto Parts",
+    website: "https://www.autozone.com",
+    hasProgram: true,
+    network: "Impact ($30/mo minimum)",
+    contact: "https://impact.com/partners/",
+    phone: "",
+    notes: "Affiliate program available on Impact network. NOTE: Impact has a $30/month minimum subscription cost. Consider if volume justifies cost.",
+    action: "Evaluate if traffic volume justifies Impact subscription",
+    priority: "medium" as const,
+  },
+  {
+    name: "Snowmobile.com",
+    category: "Outdoor/Powersports",
+    website: "https://www.snowmobile.com",
+    hasProgram: false,
+    network: "Amazon Associates (indirect)",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "Content/media site, not a retailer. They use Amazon Associates themselves. For snowmobile parts, consider Aurora Off Road (5% commission, 30-day cookie) instead.",
+    action: "Skip - use Aurora Off Road or Amazon instead",
+    priority: "low" as const,
+  },
+  {
+    name: "Aurora Off Road",
+    category: "Outdoor/Powersports (Snowmobile)",
+    website: "https://www.auroraoffroad.com",
+    hasProgram: true,
+    network: "Direct (In-house)",
+    contact: "https://www.auroraoffroad.com/main/affiliate-program/",
+    phone: "",
+    notes: "Snowmobile parts & accessories. 5% commission + 2.5% sub-affiliate, 30-day cookie, monthly payout ($25 min). Great replacement for Snowmobile.com.",
+    action: "Sign up directly on their affiliate program page",
+    priority: "high" as const,
+  },
+  {
+    name: "Dennis Kirk",
+    category: "Powersports",
+    website: "https://www.denniskirk.com",
+    hasProgram: false,
+    network: "AvantLink (check when approved)",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "185,000+ snowmobile, motorcycle, ATV parts & accessories. Listed in AvantLink network - check when AvantLink account is approved.",
+    action: "Apply via AvantLink once network account is approved",
+    priority: "medium" as const,
+  },
+  {
+    name: "Sixity Powersports",
+    category: "Multi-category (Powersports)",
+    website: "https://www.sixity.com",
+    hasProgram: true,
+    network: "FlexOffers / Pepperjam",
+    contact: "https://www.sixity.com/affiliate-program",
+    phone: "",
+    notes: "100,000+ motorcycle, ATV, snowmobile, auto parts. Active affiliate program via FlexOffers. Good multi-vehicle coverage.",
+    action: "Sign up via FlexOffers network",
+    priority: "high" as const,
+  },
+  {
+    name: "Sky Supply USA",
+    category: "Aviation",
+    website: "https://skysupplyusa.com",
+    hasProgram: true,
+    network: "Direct",
+    contact: "https://skysupplyusa.com/pages/Affiliate-Program.html",
+    phone: "",
+    notes: "Aviation parts supplier with active affiliate program. Good alternative to SkyGeek for aviation coverage.",
+    action: "Sign up on their affiliate program page",
+    priority: "medium" as const,
+  },
+  {
+    name: "Diesel Laptops",
+    category: "Heavy Duty (Diagnostics)",
+    website: "https://www.diesellaptops.com",
+    hasProgram: true,
+    network: "Direct",
+    contact: "https://www.diesellaptops.com/pages/affiliate-program-referral",
+    phone: "",
+    notes: "Up to 15% commission on diesel diagnostic tools and software. Great complement to heavy-duty parts coverage.",
+    action: "Sign up on their affiliate program page",
+    priority: "medium" as const,
+  },
+  {
+    name: "BuyAutoParts.com",
+    category: "Auto Parts",
+    website: "https://www.buyautoparts.com",
+    hasProgram: true,
+    network: "AvantLink / CJ Affiliate",
+    contact: "https://www.buyautoparts.com/affiliate-program.html",
+    phone: "",
+    notes: "200,000+ replacement parts. 5-8% commission, 7-day cookie. 95% convert within 3 days. Good for used/recycled parts gap.",
+    action: "Sign up via AvantLink or CJ Affiliate",
+    priority: "high" as const,
+  },
+  {
+    name: "Lawnmower Pros",
+    category: "Lawn/Outdoor",
+    website: "https://www.lawnmowerpros.com",
+    hasProgram: true,
+    network: "Direct",
+    contact: "https://www.lawnmowerpros.com/information/affiliate-program.asp",
+    phone: "",
+    notes: "Lawn mower parts with direct affiliate program. Good addition to lawn/outdoor equipment coverage.",
+    action: "Sign up on their affiliate program page",
+    priority: "medium" as const,
+  },
+  {
+    name: "Marine Products Pro Shop",
+    category: "Marine",
+    website: "https://www.marineproductsshop.com",
+    hasProgram: true,
+    network: "AvantLink",
+    contact: "Apply via AvantLink",
+    phone: "",
+    notes: "Up to 13% commission, 120-day cookie, $250 avg order. Apply through AvantLink network. Excellent marine coverage addition.",
+    action: "Apply via AvantLink once network account is approved",
+    priority: "high" as const,
+  },
+];
 
 const DEV_PIN = "0424";
 
@@ -998,7 +1387,7 @@ export default function DevPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-8 mb-4 max-w-5xl">
+          <TabsList className="grid w-full grid-cols-9 mb-4 max-w-5xl">
             <TabsTrigger value="features" className="font-tech uppercase text-xs">
               <ClipboardList className="w-3 h-3 mr-1" /> Features
             </TabsTrigger>
@@ -1016,6 +1405,9 @@ export default function DevPortal() {
             </TabsTrigger>
             <TabsTrigger value="affiliates" className="font-tech uppercase text-xs">
               <DollarSign className="w-3 h-3 mr-1" /> Affiliates
+            </TabsTrigger>
+            <TabsTrigger value="outreach" className="font-tech uppercase text-xs">
+              <Megaphone className="w-3 h-3 mr-1" /> Outreach
             </TabsTrigger>
             <TabsTrigger value="logos" className="font-tech uppercase text-xs">
               <Globe className="w-3 h-3 mr-1" /> Logos
@@ -1868,6 +2260,210 @@ export default function DevPortal() {
                 <p className="text-[10px] text-muted-foreground">Custom deals</p>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="outreach" className="space-y-4">
+            {(() => {
+              const withProgram = AFFILIATE_OUTREACH_VENDORS.filter(v => v.hasProgram);
+              const withoutProgram = AFFILIATE_OUTREACH_VENDORS.filter(v => !v.hasProgram);
+              const highPriority = AFFILIATE_OUTREACH_VENDORS.filter(v => v.priority === 'high');
+              const categories = Array.from(new Set(AFFILIATE_OUTREACH_VENDORS.map(v => v.category)));
+              
+              return (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <Card className="md:col-span-8 bg-gradient-to-br from-orange-500/10 to-primary/5 border-orange-500/30 p-4">
+                      <h2 className="font-tech text-lg text-orange-400 mb-2 flex items-center gap-2">
+                        <Megaphone className="w-5 h-5" /> Affiliate Outreach Command Center
+                      </h2>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Complete contact list for all {AFFILIATE_OUTREACH_VENDORS.length} vendors needing affiliate connections. 
+                        Research completed Feb 2026 with signup links, networks, contact info, and recommended actions.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {categories.map(cat => (
+                          <Badge key={cat} variant="outline" className="text-xs border-orange-500/30 text-orange-300">
+                            {cat}
+                          </Badge>
+                        ))}
+                      </div>
+                    </Card>
+                    <Card className="md:col-span-4 glass-card border-primary/20 p-4">
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div>
+                          <p className="font-tech text-xl text-green-400">{withProgram.length}</p>
+                          <p className="text-[10px] text-muted-foreground">Has Program</p>
+                        </div>
+                        <div>
+                          <p className="font-tech text-xl text-yellow-400">{withoutProgram.length}</p>
+                          <p className="text-[10px] text-muted-foreground">Need Outreach</p>
+                        </div>
+                        <div>
+                          <p className="font-tech text-xl text-red-400">{highPriority.length}</p>
+                          <p className="text-[10px] text-muted-foreground">High Priority</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+
+                  <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/5 border-green-500/30 p-4">
+                    <h3 className="font-tech text-sm text-green-400 mb-3 flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4" /> Ready to Sign Up (Active Programs Found)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {withProgram.map(vendor => (
+                        <div key={vendor.name} className="bg-background/50 rounded-lg p-3 border border-green-500/20">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-tech text-sm font-bold">{vendor.name}</span>
+                            <Badge className="text-[10px] bg-green-500/20 text-green-400 border-green-500/30">
+                              {vendor.priority.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <p className="text-[10px] text-orange-300 mb-1">{vendor.category}</p>
+                          <p className="text-xs text-muted-foreground mb-2">{vendor.notes}</p>
+                          <div className="flex items-center gap-1 text-xs text-cyan-300 mb-2">
+                            <Link2 className="w-3 h-3" /> {vendor.network}
+                          </div>
+                          <div className="flex gap-2">
+                            {vendor.contact.startsWith('http') ? (
+                              <Button asChild size="sm" className="text-xs flex-1 bg-green-600 hover:bg-green-700">
+                                <a href={vendor.contact} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="w-3 h-3 mr-1" /> Sign Up
+                                </a>
+                              </Button>
+                            ) : (
+                              <Button asChild size="sm" variant="outline" className="text-xs flex-1">
+                                <a href={`mailto:${vendor.contact}`}>
+                                  <Mail className="w-3 h-3 mr-1" /> Contact
+                                </a>
+                              </Button>
+                            )}
+                            <Button asChild size="sm" variant="outline" className="text-xs">
+                              <a href={vendor.website} target="_blank" rel="noopener noreferrer">
+                                <Globe className="w-3 h-3" />
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-yellow-500/10 to-amber-500/5 border-yellow-500/30 p-4">
+                    <h3 className="font-tech text-sm text-yellow-400 mb-3 flex items-center gap-2">
+                      <Mail className="w-4 h-4" /> Need Direct Outreach (No Public Program)
+                    </h3>
+                    <div className="space-y-2">
+                      {withoutProgram.map(vendor => (
+                        <div key={vendor.name} className="bg-background/50 rounded-lg p-3 border border-yellow-500/10 flex flex-col md:flex-row md:items-center gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="font-tech text-sm font-bold">{vendor.name}</span>
+                              <Badge variant="outline" className={`text-[10px] ${
+                                vendor.priority === 'high' ? 'border-red-500/50 text-red-400' :
+                                vendor.priority === 'medium' ? 'border-yellow-500/50 text-yellow-400' :
+                                'border-gray-500/50 text-gray-400'
+                              }`}>
+                                {vendor.priority.toUpperCase()}
+                              </Badge>
+                              <Badge variant="outline" className="text-[10px] border-orange-500/30 text-orange-300">
+                                {vendor.category}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mb-1">{vendor.notes}</p>
+                            <p className="text-[10px] text-cyan-300">{vendor.network}</p>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {vendor.phone && (
+                              <Button asChild size="sm" variant="outline" className="text-xs">
+                                <a href={`tel:${vendor.phone.replace(/[^0-9]/g, '')}`}>
+                                  <Phone className="w-3 h-3 mr-1" /> {vendor.phone}
+                                </a>
+                              </Button>
+                            )}
+                            {vendor.contact.startsWith('http') ? (
+                              <Button asChild size="sm" variant="outline" className="text-xs">
+                                <a href={vendor.contact} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="w-3 h-3 mr-1" /> Contact
+                                </a>
+                              </Button>
+                            ) : vendor.contact.includes('@') ? (
+                              <Button asChild size="sm" variant="outline" className="text-xs">
+                                <a href={`mailto:${vendor.contact}`}>
+                                  <Mail className="w-3 h-3 mr-1" /> Email
+                                </a>
+                              </Button>
+                            ) : (
+                              <Badge variant="outline" className="text-xs">{vendor.contact}</Badge>
+                            )}
+                            <Button asChild size="sm" variant="outline" className="text-xs">
+                              <a href={vendor.website} target="_blank" rel="noopener noreferrer">
+                                <Globe className="w-3 h-3" />
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card className="glass-card border-primary/20 p-4">
+                    <h3 className="font-tech text-sm text-primary mb-3 flex items-center gap-2">
+                      <Rocket className="w-4 h-4" /> Recommended Signup Order
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                      <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                        <p className="font-tech text-xs text-green-400 mb-2">PHASE 1: Quick Wins</p>
+                        <ul className="space-y-1 text-xs text-muted-foreground">
+                          <li>1. Power Mower Sales (direct, 5%)</li>
+                          <li>2. Aurora Off Road (direct, 5%)</li>
+                          <li>3. FinditParts (FlexOffers/CJ)</li>
+                          <li>4. Sixity Powersports (FlexOffers)</li>
+                        </ul>
+                      </div>
+                      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+                        <p className="font-tech text-xs text-yellow-400 mb-2">PHASE 2: AvantLink Batch</p>
+                        <ul className="space-y-1 text-xs text-muted-foreground">
+                          <li>5. Wholesale Marine (AvantLink)</li>
+                          <li>6. Marine Products Pro Shop (AvantLink)</li>
+                          <li>7. BuyAutoParts.com (AvantLink/CJ)</li>
+                          <li>8. Dennis Kirk (AvantLink)</li>
+                        </ul>
+                      </div>
+                      <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+                        <p className="font-tech text-xs text-orange-400 mb-2">PHASE 3: Direct Outreach</p>
+                        <ul className="space-y-1 text-xs text-muted-foreground">
+                          <li>9. Aircraft Spruce (dealer pgm)</li>
+                          <li>10. RockAuto (forum partnership)</li>
+                          <li>11. O'Reilly (sponsorship)</li>
+                          <li>12. Car-Part.com (API partner)</li>
+                        </ul>
+                      </div>
+                      <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                        <p className="font-tech text-xs text-purple-400 mb-2">PHASE 4: Niche Coverage</p>
+                        <ul className="space-y-1 text-xs text-muted-foreground">
+                          <li>13. Sky Supply USA (direct)</li>
+                          <li>14. Diesel Laptops (15%!)</li>
+                          <li>15. Lawnmower Pros (direct)</li>
+                          <li>16. VMC Chinese Parts (propose)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="bg-amber-500/10 border border-amber-500/30 p-4">
+                    <h3 className="font-tech text-sm text-amber-400 mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" /> Impact Network Note
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      AutoZone's affiliate program is on the Impact network which has a <strong className="text-amber-400">$30/month minimum subscription</strong>. 
+                      This was ruled out for now. Revisit once GarageBot has enough traffic to justify the cost. 
+                      Bass Pro Shops and Camping World are also on Impact but may be available via CJ or other networks too.
+                    </p>
+                  </Card>
+                </>
+              );
+            })()}
           </TabsContent>
 
           <TabsContent value="buddy" className="space-y-4">
