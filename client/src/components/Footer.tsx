@@ -185,6 +185,7 @@ export default function Footer() {
             <Link href="/terms" className="hover:text-primary transition-colors" data-testid="footer-link-terms">Terms</Link>
             <Link href="/privacy" className="hover:text-primary transition-colors" data-testid="footer-link-privacy">Privacy</Link>
             <Link href="/affiliate-disclosure" className="hover:text-primary transition-colors" data-testid="footer-link-affiliate">Affiliates</Link>
+            <Link href="/affiliates" className="hover:text-primary transition-colors" data-testid="footer-link-affiliate-program">Affiliate Program</Link>
             <span className="text-border">|</span>
             <Link href="/investors" className="hover:text-primary transition-colors" data-testid="footer-link-investors">Investors</Link>
             <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
