@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTorqueTenant } from "@/hooks/useTorqueTenant";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "wouter";
 import {
@@ -49,6 +50,7 @@ const BUSINESS_HOURS = [
 ];
 
 export default function TorqueOnboard() {
+  useTorqueTenant();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [step, setStep] = useState(1);

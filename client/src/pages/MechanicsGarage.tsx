@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
+import TorqueNav from "@/components/TorqueNav";
+import { useTorqueTenant } from "@/hooks/useTorqueTenant";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1100,7 +1100,7 @@ function OrbitStaffingTab({ shopId, shopState, toast }: { shopId: string; shopSt
             </div>
             <h3 className="text-3xl font-tech font-bold uppercase mb-3" data-testid="text-orbit-title">ORBIT Staffing OS</h3>
             <p className="text-muted-foreground mb-6 text-lg">
-              Complete payroll, employee management, tax compliance, and HR - all built into your shop dashboard. Never leave GarageBot.
+              Complete payroll, employee management, tax compliance, and HR - all built into your shop dashboard. Never leave TORQUE.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {[
@@ -2037,6 +2037,7 @@ function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
 }
 
 export default function MechanicsGarage() {
+  useTorqueTenant();
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -2197,7 +2198,7 @@ export default function MechanicsGarage() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans">
-        <Nav />
+        <TorqueNav />
         <div className="max-w-6xl mx-auto px-4 pt-24 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
@@ -2208,7 +2209,7 @@ export default function MechanicsGarage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background text-foreground font-sans">
-        <Nav />
+        <TorqueNav />
         <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
           <div className="text-center mb-12">
             <Wrench className="w-24 h-24 mx-auto mb-6 text-primary/30" />
@@ -2241,7 +2242,7 @@ export default function MechanicsGarage() {
                 <thead>
                   <tr className="border-b border-muted">
                     <th className="text-left py-3 px-4 font-tech uppercase text-xs">Feature</th>
-                    <th className="text-center py-3 px-4 font-tech uppercase text-xs text-primary">GarageBot</th>
+                    <th className="text-center py-3 px-4 font-tech uppercase text-xs text-primary">TORQUE</th>
                     <th className="text-center py-3 px-4 font-tech uppercase text-xs text-muted-foreground">AutoLeap</th>
                     <th className="text-center py-3 px-4 font-tech uppercase text-xs text-muted-foreground">Tekmetric</th>
                     <th className="text-center py-3 px-4 font-tech uppercase text-xs text-muted-foreground">Shopmonkey</th>
@@ -2342,14 +2343,14 @@ export default function MechanicsGarage() {
             <p className="text-xs text-muted-foreground mt-2">No credit card required for demo</p>
           </div>
         </div>
-        <Footer />
+        <TorqueFooter />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
-      <Nav />
+      <TorqueNav />
       <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
         {/* Demo Mode Banner */}
         <motion.div
@@ -3642,7 +3643,35 @@ export default function MechanicsGarage() {
           </div>
         )}
       </div>
-      <Footer />
+      <TorqueFooter />
     </div>
+  );
+}
+
+function TorqueFooter() {
+  return (
+    <footer className="border-t border-primary/10 bg-[#0a0e1a]/80 mt-12" data-testid="torque-footer">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/torque-icon-192.png" alt="TORQUE" className="w-8 h-8 rounded-lg" />
+            <div>
+              <span className="font-tech font-bold uppercase text-sm text-foreground">TORQUE</span>
+              <span className="text-muted-foreground text-xs ml-2">Shop Management OS</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+            <Shield className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Powered by Trust Layer</span>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
+            <a href="/terms" className="hover:text-foreground transition-colors">Terms</a>
+            <a href="mailto:support@garagebot.io" className="hover:text-foreground transition-colors">Support</a>
+            <a href="/" className="hover:text-foreground transition-colors">GarageBot.io</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
