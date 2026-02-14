@@ -68,7 +68,8 @@ function AnalyticsTracker() {
 function Router() {
   return (
     <Switch>
-      <Route path="/">{() => <Home />}</Route>
+      <Route path="/">{() => <Explore />}</Route>
+      <Route path="/home">{() => <Home />}</Route>
       <Route path="/results">{() => <Results />}</Route>
       <Route path="/garage">{() => <Garage />}</Route>
       <Route path="/wishlists">{() => <Wishlists />}</Route>
@@ -108,6 +109,7 @@ function Router() {
       <Route path="/contact">{() => <Contact />}</Route>
       <Route path="/marketplace">{() => <PartsMarketplace />}</Route>
       <Route path="/explore">{() => <Explore />}</Route>
+      <Route path="/hub">{() => <Explore />}</Route>
       <Route path="/rentals">{() => <Rentals />}</Route>
       <Route path="/affiliates">{() => <AffiliateProgram />}</Route>
       <Route path="/command-center">{() => <CommandCenter />}</Route>
