@@ -1,10 +1,31 @@
 import { Car, Battery, Disc, Zap, Cog, Wrench, Fuel, Thermometer, Bike, Ship, Truck, Mountain, Waves, Gauge, Crown, Hammer, Sparkles, Lightbulb, Droplets, Navigation, Settings, PaintBucket, Sofa, CircleDot, Flame, Cable, Drill, Fan, Leaf, Gamepad2, Plane, Radio, Trophy, Joystick } from "lucide-react";
 
 // Vendor search URL templates - {query}, {year}, {make}, {model}, {zip} are placeholders
+export type VendorCategory = 
+  | "Major Auto Parts Chains"
+  | "Online Auto Parts"
+  | "Powersports & Motorcycle"
+  | "Marine & Watercraft"
+  | "Performance & Racing"
+  | "Diesel & Commercial"
+  | "RV & Trailer"
+  | "Classic & Restoration"
+  | "Off-Road & 4x4"
+  | "Tires & Wheels"
+  | "Small Engine & Outdoor"
+  | "Vehicle Electronics"
+  | "Coatings & Detailing"
+  | "RC & Hobby"
+  | "Drones & FPV"
+  | "Travel & Rental"
+  | "Tools & Equipment";
+
 export interface VendorInfo {
   id: string;
   name: string;
   slug: string;
+  description: string;
+  vendorCategory: VendorCategory;
   searchTemplate: string;
   storeLocatorUrl?: string;
   hasLocalPickup: boolean;
@@ -88,11 +109,12 @@ export function getVendorFaviconUrl(vendor: VendorInfo, size: number = 64): stri
 }
 
 export const VENDORS: VendorInfo[] = [
-  // Major Auto Parts Retailers - LOCAL PICKUP AVAILABLE
   {
     id: "autozone",
     name: "AutoZone",
     slug: "autozone",
+    description: "America's leading auto parts retailer with 6,000+ stores. Same-day pickup, free battery testing, and a massive inventory of OEM and aftermarket parts for cars, trucks, and SUVs.",
+    vendorCategory: "Major Auto Parts Chains",
     searchTemplate: "https://www.autozone.com/searchresult?searchText={query}",
     storeLocatorUrl: "https://www.autozone.com/locations",
     hasLocalPickup: true,
@@ -107,6 +129,8 @@ export const VENDORS: VendorInfo[] = [
     id: "oreilly",
     name: "O'Reilly Auto Parts",
     slug: "oreilly",
+    description: "Trusted nationwide chain with 5,800+ locations. Known for knowledgeable staff, free diagnostics, loaner tool programs, and fast in-store pickup on thousands of parts.",
+    vendorCategory: "Major Auto Parts Chains",
     searchTemplate: "https://www.oreillyauto.com/shop/b/{query}",
     storeLocatorUrl: "https://www.oreillyauto.com/store-finder",
     hasLocalPickup: true,
@@ -121,6 +145,8 @@ export const VENDORS: VendorInfo[] = [
     id: "advanceauto",
     name: "Advance Auto Parts",
     slug: "advance",
+    description: "Major retailer with 4,700+ stores offering same-day delivery, free in-store services, and a deep catalog of quality replacement parts for domestic and import vehicles.",
+    vendorCategory: "Major Auto Parts Chains",
     searchTemplate: "https://shop.advanceautoparts.com/web/SearchResults?searchTerm={query}",
     storeLocatorUrl: "https://stores.advanceautoparts.com",
     hasLocalPickup: true,
@@ -135,6 +161,8 @@ export const VENDORS: VendorInfo[] = [
     id: "napa",
     name: "NAPA Auto Parts",
     slug: "napa",
+    description: "Professional-grade parts supplier trusted by mechanics for 100+ years. 6,000+ stores with commercial delivery, premium brands, and hard-to-find parts for all vehicle types.",
+    vendorCategory: "Major Auto Parts Chains",
     searchTemplate: "https://www.napaonline.com/en/search?q={query}",
     storeLocatorUrl: "https://www.napaonline.com/en/auto-parts-stores-near-me",
     hasLocalPickup: true,
@@ -145,11 +173,12 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "Direct",
     logoColor: "#003DA5"
   },
-  // Online-Only Major Retailers
   {
     id: "rockauto",
     name: "RockAuto",
     slug: "rockauto",
+    description: "The internet's go-to discount auto parts warehouse. Massive catalog with unbeatable prices, detailed part diagrams, and brands from economy to OE-quality — all shipped direct.",
+    vendorCategory: "Online Auto Parts",
     searchTemplate: "https://www.rockauto.com/en/catalog/?a={query}",
     hasLocalPickup: false,
     categories: ["cars", "classics", "diesel", "rv"],
@@ -163,6 +192,8 @@ export const VENDORS: VendorInfo[] = [
     id: "amazon",
     name: "Amazon Automotive",
     slug: "amazon",
+    description: "World's largest online marketplace with millions of auto parts listings. Prime shipping, easy returns, garage vehicle fit checker, and competitive pricing across every category.",
+    vendorCategory: "Online Auto Parts",
     searchTemplate: "https://www.amazon.com/s?k={query}&i=automotive&tag=garagebot0e-20",
     hasLocalPickup: false,
     categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "powersports", "rc", "drones", "modelaircraft", "slotcars"],
@@ -176,6 +207,8 @@ export const VENDORS: VendorInfo[] = [
     id: "ebay",
     name: "eBay Motors",
     slug: "ebay",
+    description: "Massive marketplace for new, used, and hard-to-find parts. Great for rare components, salvage finds, classic car parts, and auction deals across every vehicle type.",
+    vendorCategory: "Online Auto Parts",
     searchTemplate: "https://www.ebay.com/sch/i.html?_nkw={query}&_sacat=6000&mkcid=1&mkrid=711-53200-19255-0&campid=5339098888&toolid=10001",
     hasLocalPickup: false,
     categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "exotics", "kitcars", "powersports", "rc", "drones", "modelaircraft", "slotcars"],
@@ -189,6 +222,8 @@ export const VENDORS: VendorInfo[] = [
     id: "carparts",
     name: "CarParts.com",
     slug: "carparts",
+    description: "Fast-growing online retailer focused on affordable OEM-quality replacement parts. Free shipping, easy fitment lookup, and a streamlined shopping experience.",
+    vendorCategory: "Online Auto Parts",
     searchTemplate: "https://www.carparts.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["cars", "classics"],
@@ -198,11 +233,57 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "CJ Affiliate",
     logoColor: "#1E90FF"
   },
-  // Powersports Specialists
+  {
+    id: "autopartstoys",
+    name: "AutoPartsToys",
+    slug: "autopartstoys",
+    description: "Affordable online auto parts retailer with a wide selection covering cars, trucks, motorcycles, and powersports. Known for competitive pricing and broad vehicle coverage.",
+    vendorCategory: "Online Auto Parts",
+    searchTemplate: "http://www.awin1.com/awclick.php?mid=90763&id=2752166&ued=https%3A%2F%2Fwww.autopartstoys.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv", "motorcycles", "atvs", "boats", "powersports"],
+    priority: 81,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AWIN",
+    logoColor: "#E63946"
+  },
+  {
+    id: "garvee",
+    name: "GARVEE",
+    slug: "garvee",
+    description: "Online destination for automotive accessories, garage equipment, and vehicle upgrades. From lift kits to air compressors — quality gear at competitive prices.",
+    vendorCategory: "Tools & Equipment",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7305404?url=https%3A%2F%2Fwww.garvee.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "diesel", "rv", "atvs"],
+    priority: 78,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#059669"
+  },
+  {
+    id: "dunford",
+    name: "Dunford, Inc.",
+    slug: "dunford",
+    description: "Specialty supplier of automotive parts, hardware, and accessories. Reliable source for hard-to-find components across cars, trucks, RVs, and diesel applications.",
+    vendorCategory: "Online Auto Parts",
+    searchTemplate: "https://www.awin1.com/cread.php?awinmid=18794&awinaffid=101643977&ued=https%3A%2F%2Fwww.dunfordinc.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 82,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AWIN",
+    logoColor: "#7C3AED"
+  },
   {
     id: "rockymountain",
     name: "Rocky Mountain ATV/MC",
     slug: "rockymountain",
+    description: "Premier powersports parts retailer specializing in dirt bikes, ATVs, and UTVs. Huge selection of OEM and aftermarket parts, gear, and accessories with expert staff.",
+    vendorCategory: "Powersports & Motorcycle",
     searchTemplate: "https://www.rockymountainatvmc.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["motorcycles", "atvs", "powersports"],
@@ -216,6 +297,8 @@ export const VENDORS: VendorInfo[] = [
     id: "denniskirk",
     name: "Dennis Kirk",
     slug: "denniskirk",
+    description: "40+ years in powersports. Massive inventory of motorcycle, ATV, and snowmobile parts, riding gear, and accessories from top brands with fast shipping.",
+    vendorCategory: "Powersports & Motorcycle",
     searchTemplate: "https://www.denniskirk.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["motorcycles", "atvs", "powersports"],
@@ -229,6 +312,8 @@ export const VENDORS: VendorInfo[] = [
     id: "partzilla",
     name: "Partzilla",
     slug: "partzilla",
+    description: "Largest online OEM powersports parts dealer. Official diagrams and genuine parts for Honda, Yamaha, Kawasaki, Suzuki, Polaris, Sea-Doo, and more.",
+    vendorCategory: "Powersports & Motorcycle",
     searchTemplate: "https://www.partzilla.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["motorcycles", "atvs", "boats", "powersports"],
@@ -242,6 +327,8 @@ export const VENDORS: VendorInfo[] = [
     id: "revzilla",
     name: "RevZilla",
     slug: "revzilla",
+    description: "The rider's best friend for motorcycle gear, helmets, jackets, and accessories. Expert video reviews, gear guides, and a passionate community of riders.",
+    vendorCategory: "Powersports & Motorcycle",
     searchTemplate: "https://www.revzilla.com/search?query={query}",
     hasLocalPickup: false,
     categories: ["motorcycles"],
@@ -255,6 +342,8 @@ export const VENDORS: VendorInfo[] = [
     id: "vmcchineseparts",
     name: "VMC Chinese Parts",
     slug: "vmc",
+    description: "Specialist in affordable Chinese ATV, dirt bike, and go-kart parts. The go-to source for replacement components on Chinese-made powersports vehicles.",
+    vendorCategory: "Powersports & Motorcycle",
     searchTemplate: "https://www.vmcchineseparts.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["atvs", "powersports"],
@@ -264,11 +353,27 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "Direct",
     logoColor: "#CC0000"
   },
-  // Marine / Boat
+  {
+    id: "tcmt",
+    name: "TCMT",
+    slug: "tcmt",
+    description: "Direct-to-consumer motorcycle and powersports accessories. Fairings, luggage, windshields, and bolt-on upgrades at factory-direct prices.",
+    vendorCategory: "Powersports & Motorcycle",
+    searchTemplate: "https://tcmtco.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["motorcycles", "atvs", "powersports"],
+    priority: 83,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#FF6B00"
+  },
   {
     id: "westmarine",
     name: "West Marine",
     slug: "westmarine",
+    description: "America's largest boating supply retailer with 240+ stores. Everything from engine parts and electronics to safety gear, with expert advice from boating enthusiasts.",
+    vendorCategory: "Marine & Watercraft",
     searchTemplate: "https://www.westmarine.com/search?q={query}",
     storeLocatorUrl: "https://www.westmarine.com/stores",
     hasLocalPickup: true,
@@ -283,6 +388,8 @@ export const VENDORS: VendorInfo[] = [
     id: "iboats",
     name: "iBoats",
     slug: "iboats",
+    description: "One-stop marine parts shop with OEM parts diagrams, boat covers, propellers, and accessories. Active boating community forum with expert advice.",
+    vendorCategory: "Marine & Watercraft",
     searchTemplate: "https://www.iboats.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["boats"],
@@ -296,6 +403,8 @@ export const VENDORS: VendorInfo[] = [
     id: "boatsnet",
     name: "Boats.net",
     slug: "boatsnet",
+    description: "Genuine OEM marine parts at discounted prices. Official parts diagrams for Mercury, Yamaha, Johnson, Evinrude, and more with fast nationwide shipping.",
+    vendorCategory: "Marine & Watercraft",
     searchTemplate: "https://www.boats.net/search?q={query}",
     hasLocalPickup: false,
     categories: ["boats"],
@@ -305,11 +414,12 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "ShareASale",
     logoColor: "#006699"
   },
-  // Performance / Racing
   {
     id: "summit",
     name: "Summit Racing",
     slug: "summit",
+    description: "The racer's warehouse — legendary supplier of high-performance parts, engines, and racing equipment. From drag strips to circle tracks, Summit has what you need to win.",
+    vendorCategory: "Performance & Racing",
     searchTemplate: "https://www.summitracing.com/search?keyword={query}",
     hasLocalPickup: false,
     categories: ["cars", "classics", "exotics", "kitcars"],
@@ -323,6 +433,8 @@ export const VENDORS: VendorInfo[] = [
     id: "jegs",
     name: "JEGS",
     slug: "jegs",
+    description: "Family-owned performance parts powerhouse since 1960. Deep expertise in drag racing, street performance, and restoration with their own line of trusted parts.",
+    vendorCategory: "Performance & Racing",
     searchTemplate: "https://www.jegs.com/v/Search/{query}",
     hasLocalPickup: false,
     categories: ["cars", "classics", "exotics", "kitcars"],
@@ -332,11 +444,27 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "CJ Affiliate",
     logoColor: "#FFCC00"
   },
-  // Diesel / Commercial
+  {
+    id: "cj-pony-parts",
+    name: "CJ Pony Parts",
+    slug: "cj-pony-parts",
+    description: "The Mustang specialist — 40+ years as the go-to source for Ford Mustang parts and accessories from 1964 to present. Restoration, performance, and styling.",
+    vendorCategory: "Performance & Racing",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-6969901?url=https%3A%2F%2Fwww.cjponyparts.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics"],
+    priority: 82,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#B91C1C"
+  },
   {
     id: "fleetpride",
     name: "FleetPride",
     slug: "fleetpride",
+    description: "Nation's largest independent distributor of heavy-duty truck and trailer parts. 300+ branches with commercial-grade inventory for fleets and owner-operators.",
+    vendorCategory: "Diesel & Commercial",
     searchTemplate: "https://www.fleetpride.com/search?q={query}",
     storeLocatorUrl: "https://www.fleetpride.com/branch-locator",
     hasLocalPickup: true,
@@ -351,6 +479,8 @@ export const VENDORS: VendorInfo[] = [
     id: "findParts",
     name: "FinditParts",
     slug: "finditparts",
+    description: "Online heavy-duty truck parts superstore. Specializing in Class 4-8 commercial vehicle parts with fast delivery and competitive fleet pricing.",
+    vendorCategory: "Diesel & Commercial",
     searchTemplate: "https://www.finditparts.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["diesel"],
@@ -360,11 +490,12 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "Direct",
     logoColor: "#FF6600"
   },
-  // RV / Trailer
   {
     id: "campingworld",
     name: "Camping World",
     slug: "campingworld",
+    description: "America's largest RV and outdoor retailer with 180+ SuperCenters. Full RV service departments, parts, accessories, and everything for life on the road.",
+    vendorCategory: "RV & Trailer",
     searchTemplate: "https://www.campingworld.com/search?q={query}",
     storeLocatorUrl: "https://www.campingworld.com/store-locator",
     hasLocalPickup: true,
@@ -379,6 +510,8 @@ export const VENDORS: VendorInfo[] = [
     id: "etrailer",
     name: "etrailer",
     slug: "etrailer",
+    description: "The trailer and towing experts. Hitches, wiring, cargo carriers, and RV accessories with detailed installation videos and industry-best customer support.",
+    vendorCategory: "RV & Trailer",
     searchTemplate: "https://www.etrailer.com/search.aspx?SearchTerm={query}",
     hasLocalPickup: false,
     categories: ["rv", "cars"],
@@ -388,11 +521,12 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "ShareASale",
     logoColor: "#0066CC"
   },
-  // Classic / Vintage
   {
     id: "classicindustries",
     name: "Classic Industries",
     slug: "classicindustries",
+    description: "The restoration authority for classic Chevy, Pontiac, Ford, and Mopar vehicles. Comprehensive catalogs with thousands of reproduction and NOS parts.",
+    vendorCategory: "Classic & Restoration",
     searchTemplate: "https://www.classicindustries.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["classics"],
@@ -406,6 +540,8 @@ export const VENDORS: VendorInfo[] = [
     id: "lmctruck",
     name: "LMC Truck",
     slug: "lmctruck",
+    description: "Leading supplier of classic truck restoration parts since 1986. Specializing in Chevy, GMC, Ford, and Dodge trucks from the 1940s to 2000s.",
+    vendorCategory: "Classic & Restoration",
     searchTemplate: "https://www.lmctruck.com/search?q={query}",
     hasLocalPickup: false,
     categories: ["classics"],
@@ -415,39 +551,12 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "Direct",
     logoColor: "#336699"
   },
-  // Small Engine / Outdoor
-  {
-    id: "jackssmallengines",
-    name: "Jack's Small Engines",
-    slug: "jacks",
-    searchTemplate: "https://www.jackssmallengines.com/jacks-parts-lookup/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["powersports"],
-    priority: 90,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "ShareASale",
-    logoColor: "#009933"
-  },
-  {
-    id: "tractorsupply",
-    name: "Tractor Supply",
-    slug: "tractorsupply",
-    searchTemplate: "https://www.tractorsupply.com/tsc/search/{query}",
-    storeLocatorUrl: "https://www.tractorsupply.com/wcs/store/finder",
-    hasLocalPickup: true,
-    categories: ["powersports", "diesel"],
-    priority: 85,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "CJ Affiliate",
-    logoColor: "#CC0000"
-  },
-  // Off-Road / 4x4
   {
     id: "4wheelparts",
     name: "4 Wheel Parts",
     slug: "4wheelparts",
+    description: "Off-road specialists with 100+ stores. Lift kits, bumpers, winches, and everything you need to build and outfit your 4x4 for trail or overland adventure.",
+    vendorCategory: "Off-Road & 4x4",
     searchTemplate: "https://www.4wheelparts.com/search?q={query}",
     storeLocatorUrl: "https://www.4wheelparts.com/store-locator",
     hasLocalPickup: true,
@@ -462,6 +571,8 @@ export const VENDORS: VendorInfo[] = [
     id: "extremeterrain",
     name: "ExtremeTerrain",
     slug: "extremeterrain",
+    description: "Jeep and truck accessory experts. Specializing in Wrangler, Gladiator, and off-road mods with detailed install guides, reviews, and fitment guarantee.",
+    vendorCategory: "Off-Road & 4x4",
     searchTemplate: "https://www.extremeterrain.com/search/?q={query}",
     hasLocalPickup: false,
     categories: ["cars"],
@@ -471,239 +582,12 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "CJ Affiliate",
     logoColor: "#FF0000"
   },
-  // Dashcams & Vehicle Electronics
-  {
-    id: "rexing",
-    name: "Rexing",
-    slug: "rexing",
-    searchTemplate: "https://rexing.com/?s={query}&post_type=product&ref=5357356",
-    hasLocalPickup: false,
-    categories: ["cars", "classics", "diesel", "rv", "motorcycles", "atvs", "boats", "powersports"],
-    priority: 80,
-    supportsOEM: false,
-    supportsAftermarket: true,
-    affiliateNetwork: "Rexing Affiliate",
-    logoColor: "#1A1A2E"
-  },
-  // Automotive Coatings & Detailing
-  {
-    id: "silazane50",
-    name: "SILAZANE50",
-    slug: "silazane50",
-    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7675405?url=https%3A%2F%2Fsilazane50usa.com%2Fcollections%2Fall%3Fq%3D{query}",
-    hasLocalPickup: false,
-    categories: ["cars", "classics", "exotics", "motorcycles", "boats", "rv", "diesel", "atvs"],
-    priority: 75,
-    supportsOEM: false,
-    supportsAftermarket: true,
-    affiliateNetwork: "CJ Affiliate",
-    logoColor: "#C4A35A"
-  },
-  // ============================================
-  // MOTORIZED HOBBY - RC, Drones, Model, Slot Cars
-  // ============================================
-  {
-    id: "amainhobbies",
-    name: "AMain Hobbies",
-    slug: "amainhobbies",
-    searchTemplate: "https://www.amainhobbies.com/search?s={query}",
-    hasLocalPickup: false,
-    categories: ["rc", "drones", "modelaircraft", "slotcars"],
-    priority: 95,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "AvantLink",
-    logoColor: "#0066CC"
-  },
-  {
-    id: "horizonhobby",
-    name: "Horizon Hobby",
-    slug: "horizonhobby",
-    searchTemplate: "https://www.horizonhobby.com/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["rc", "drones", "modelaircraft"],
-    priority: 94,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "CJ Affiliate",
-    logoColor: "#003399"
-  },
-  {
-    id: "towerhobbies",
-    name: "Tower Hobbies",
-    slug: "towerhobbies",
-    searchTemplate: "https://www.towerhobbies.com/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["rc", "drones", "modelaircraft", "slotcars"],
-    priority: 93,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "AvantLink",
-    logoColor: "#FF6600"
-  },
-  {
-    id: "hobbyking",
-    name: "HobbyKing",
-    slug: "hobbyking",
-    searchTemplate: "https://hobbyking.com/en_us/catalogsearch/result/?q={query}",
-    hasLocalPickup: false,
-    categories: ["rc", "drones", "modelaircraft"],
-    priority: 90,
-    supportsOEM: false,
-    supportsAftermarket: true,
-    affiliateNetwork: "Direct",
-    logoColor: "#FF0000"
-  },
-  {
-    id: "getfpv",
-    name: "GetFPV",
-    slug: "getfpv",
-    searchTemplate: "https://www.getfpv.com/catalogsearch/result/?q={query}",
-    hasLocalPickup: false,
-    categories: ["drones"],
-    priority: 92,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "Direct",
-    logoColor: "#00CC66"
-  },
-  {
-    id: "redcatracing",
-    name: "Redcat Racing",
-    slug: "redcatracing",
-    searchTemplate: "https://www.redcatracing.com/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["rc"],
-    priority: 88,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "GoAffPro",
-    logoColor: "#CC0000"
-  },
-  {
-    id: "hosimrc",
-    name: "Hosim RC",
-    slug: "hosimrc",
-    searchTemplate: "https://www.hosim.com/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["rc"],
-    priority: 85,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "ShareASale",
-    logoColor: "#0099CC"
-  },
-  {
-    id: "betafpv",
-    name: "BETAFPV",
-    slug: "betafpv",
-    searchTemplate: "https://betafpv.com/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["drones"],
-    priority: 87,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "Direct",
-    logoColor: "#FFD700"
-  },
-  {
-    id: "bezgar",
-    name: "Bezgar",
-    slug: "bezgar",
-    searchTemplate: "https://bezgar.com/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["rc"],
-    priority: 82,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "ShareASale",
-    logoColor: "#FF3300"
-  },
-  {
-    id: "rcplanet",
-    name: "RC Planet",
-    slug: "rcplanet",
-    searchTemplate: "https://www.rcplanet.com/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["rc", "slotcars"],
-    priority: 86,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "Direct",
-    logoColor: "#3366CC"
-  },
-  // ============================================
-  // NEW CJ / AWIN AFFILIATE PARTNERS (Feb 2026)
-  // ============================================
-  {
-    id: "carla-car-rental",
-    name: "Carla Car Rental",
-    slug: "carla-car-rental",
-    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7466061?url=https%3A%2F%2Fwww.carlacarrental.com%2Fsearch%3Fq%3D{query}",
-    hasLocalPickup: false,
-    categories: ["cars", "rv"],
-    priority: 85,
-    supportsOEM: false,
-    supportsAftermarket: false,
-    affiliateNetwork: "CJ Affiliate",
-    logoColor: "#2563EB"
-  },
-  {
-    id: "cj-pony-parts",
-    name: "CJ Pony Parts",
-    slug: "cj-pony-parts",
-    searchTemplate: "https://www.anrdoezrs.net/click-101643977-6969901?url=https%3A%2F%2Fwww.cjponyparts.com%2Fsearch%3Fq%3D{query}",
-    hasLocalPickup: false,
-    categories: ["cars", "classics"],
-    priority: 82,
-    supportsOEM: true,
-    supportsAftermarket: true,
-    affiliateNetwork: "CJ Affiliate",
-    logoColor: "#B91C1C"
-  },
-  {
-    id: "expedia",
-    name: "Expedia",
-    slug: "expedia",
-    searchTemplate: "https://www.anrdoezrs.net/click-101643977-5261370?url=https%3A%2F%2Fwww.expedia.com%2FCarSearch%3Fq%3D{query}",
-    hasLocalPickup: false,
-    categories: ["cars"],
-    priority: 80,
-    supportsOEM: false,
-    supportsAftermarket: false,
-    affiliateNetwork: "CJ Affiliate",
-    logoColor: "#FBBF24"
-  },
-  {
-    id: "garvee",
-    name: "GARVEE",
-    slug: "garvee",
-    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7305404?url=https%3A%2F%2Fwww.garvee.com%2Fsearch%3Fq%3D{query}",
-    hasLocalPickup: false,
-    categories: ["cars", "diesel", "rv", "atvs"],
-    priority: 78,
-    supportsOEM: false,
-    supportsAftermarket: true,
-    affiliateNetwork: "CJ Affiliate",
-    logoColor: "#059669"
-  },
-  {
-    id: "hotels-com",
-    name: "Hotels.com",
-    slug: "hotels-com",
-    searchTemplate: "https://www.anrdoezrs.net/click-101643977-1702763?url=https%3A%2F%2Fwww.hotels.com%2FCarSearch%3Fq%3D{query}",
-    hasLocalPickup: false,
-    categories: ["cars"],
-    priority: 79,
-    supportsOEM: false,
-    supportsAftermarket: false,
-    affiliateNetwork: "CJ Affiliate",
-    logoColor: "#DC2626"
-  },
   {
     id: "mavis-tires",
     name: "Mavis Tires",
     slug: "mavis-tires",
+    description: "Full-service tire and auto care chain with 2,100+ locations. Tire installation, alignment, brakes, and oil changes with competitive pricing and appointments online.",
+    vendorCategory: "Tires & Wheels",
     searchTemplate: "https://www.anrdoezrs.net/click-101643977-6806019?url=https%3A%2F%2Fwww.mavis.com%2Ftires%2Fsearch%3Fq%3D{query}",
     storeLocatorUrl: "https://www.mavis.com/locations",
     hasLocalPickup: true,
@@ -718,6 +602,8 @@ export const VENDORS: VendorInfo[] = [
     id: "tire-rack",
     name: "Tire Rack",
     slug: "tire-rack",
+    description: "America's premier online tire retailer. Independent testing, expert reviews, and a massive selection of tires and wheels with installer network for easy mounting.",
+    vendorCategory: "Tires & Wheels",
     searchTemplate: "https://www.anrdoezrs.net/click-101643977-2498?url=https%3A%2F%2Fwww.tirerack.com%2Ftires%2FTireSearchResults.jsp%3Fq%3D{query}",
     hasLocalPickup: false,
     categories: ["cars", "classics", "diesel", "rv", "motorcycles"],
@@ -728,22 +614,57 @@ export const VENDORS: VendorInfo[] = [
     logoColor: "#991B1B"
   },
   {
-    id: "dunford",
-    name: "Dunford, Inc.",
-    slug: "dunford",
-    searchTemplate: "https://www.awin1.com/cread.php?awinmid=18794&awinaffid=101643977&ued=https%3A%2F%2Fwww.dunfordinc.com%2Fsearch%3Fq%3D{query}",
+    id: "jackssmallengines",
+    name: "Jack's Small Engines",
+    slug: "jacks",
+    description: "Small engine parts authority. Genuine OEM parts for lawn mowers, chainsaws, snow blowers, and outdoor power equipment with interactive parts diagrams.",
+    vendorCategory: "Small Engine & Outdoor",
+    searchTemplate: "https://www.jackssmallengines.com/jacks-parts-lookup/search?q={query}",
     hasLocalPickup: false,
-    categories: ["cars", "classics", "diesel", "rv"],
-    priority: 82,
+    categories: ["powersports"],
+    priority: 90,
     supportsOEM: true,
     supportsAftermarket: true,
-    affiliateNetwork: "AWIN",
-    logoColor: "#7C3AED"
+    affiliateNetwork: "ShareASale",
+    logoColor: "#009933"
+  },
+  {
+    id: "tractorsupply",
+    name: "Tractor Supply",
+    slug: "tractorsupply",
+    description: "Rural lifestyle retailer with 2,000+ stores. Farm equipment parts, ATV accessories, diesel supplies, tools, and everything for country living and working the land.",
+    vendorCategory: "Small Engine & Outdoor",
+    searchTemplate: "https://www.tractorsupply.com/tsc/search/{query}",
+    storeLocatorUrl: "https://www.tractorsupply.com/wcs/store/finder",
+    hasLocalPickup: true,
+    categories: ["powersports", "diesel"],
+    priority: 85,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#CC0000"
+  },
+  {
+    id: "rexing",
+    name: "Rexing",
+    slug: "rexing",
+    description: "Leading dashcam and vehicle electronics brand. HD dash cameras, backup cameras, and connected car accessories for safety and peace of mind on every drive.",
+    vendorCategory: "Vehicle Electronics",
+    searchTemplate: "https://rexing.com/?s={query}&post_type=product&ref=5357356",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv", "motorcycles", "atvs", "boats", "powersports"],
+    priority: 80,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Rexing Affiliate",
+    logoColor: "#1A1A2E"
   },
   {
     id: "ottocast",
     name: "Ottocast",
     slug: "ottocast",
+    description: "Premium wireless CarPlay and Android Auto adapters. Upgrade your vehicle's infotainment system with plug-and-play wireless connectivity solutions.",
+    vendorCategory: "Vehicle Electronics",
     searchTemplate: "https://www.awin1.com/cread.php?awinmid=66499&awinaffid=101643977&ued=https%3A%2F%2Fwww.ottocast.com%2Fsearch%3Fq%3D{query}",
     hasLocalPickup: false,
     categories: ["cars", "classics", "diesel", "rv"],
@@ -754,22 +675,221 @@ export const VENDORS: VendorInfo[] = [
     logoColor: "#0EA5E9"
   },
   {
-    id: "autopartstoys",
-    name: "AutoPartsToys",
-    slug: "autopartstoys",
-    searchTemplate: "http://www.awin1.com/awclick.php?mid=90763&id=2752166&ued=https%3A%2F%2Fwww.autopartstoys.com%2Fsearch%3Fq%3D{query}",
+    id: "silazane50",
+    name: "SILAZANE50",
+    slug: "silazane50",
+    description: "Professional-grade ceramic coatings and paint protection. Long-lasting nano-ceramic technology for showroom shine and protection on any vehicle surface.",
+    vendorCategory: "Coatings & Detailing",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7675405?url=https%3A%2F%2Fsilazane50usa.com%2Fcollections%2Fall%3Fq%3D{query}",
     hasLocalPickup: false,
-    categories: ["cars", "classics", "diesel", "rv", "motorcycles", "atvs", "boats", "powersports"],
-    priority: 81,
+    categories: ["cars", "classics", "exotics", "motorcycles", "boats", "rv", "diesel", "atvs"],
+    priority: 75,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#C4A35A"
+  },
+  {
+    id: "amainhobbies",
+    name: "AMain Hobbies",
+    slug: "amainhobbies",
+    description: "Top-rated RC hobby shop with an enormous selection of RC cars, trucks, planes, boats, and parts. Same-day shipping, competitive prices, and expert hobbyist support.",
+    vendorCategory: "RC & Hobby",
+    searchTemplate: "https://www.amainhobbies.com/search?s={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "drones", "modelaircraft", "slotcars"],
+    priority: 95,
     supportsOEM: true,
     supportsAftermarket: true,
-    affiliateNetwork: "AWIN",
-    logoColor: "#E63946"
+    affiliateNetwork: "AvantLink",
+    logoColor: "#0066CC"
+  },
+  {
+    id: "horizonhobby",
+    name: "Horizon Hobby",
+    slug: "horizonhobby",
+    description: "Home of Arrma, Losi, E-flite, and Blade brands. Premium RC vehicles, aircraft, and boats with industry-leading innovation and Smart technology.",
+    vendorCategory: "RC & Hobby",
+    searchTemplate: "https://www.horizonhobby.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "drones", "modelaircraft"],
+    priority: 94,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#003399"
+  },
+  {
+    id: "towerhobbies",
+    name: "Tower Hobbies",
+    slug: "towerhobbies",
+    description: "Legendary hobby retailer since 1971. Wide selection of RC cars, planes, helicopters, and slot cars with expert product guides and fast shipping.",
+    vendorCategory: "RC & Hobby",
+    searchTemplate: "https://www.towerhobbies.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "drones", "modelaircraft", "slotcars"],
+    priority: 93,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AvantLink",
+    logoColor: "#FF6600"
+  },
+  {
+    id: "hobbyking",
+    name: "HobbyKing",
+    slug: "hobbyking",
+    description: "Global RC hobby superstore with warehouse pricing. Batteries, motors, ESCs, and airframes for RC planes, multirotors, and cars at unbeatable prices.",
+    vendorCategory: "RC & Hobby",
+    searchTemplate: "https://hobbyking.com/en_us/catalogsearch/result/?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "drones", "modelaircraft"],
+    priority: 90,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#FF0000"
+  },
+  {
+    id: "redcatracing",
+    name: "Redcat Racing",
+    slug: "redcatracing",
+    description: "Affordable ready-to-run RC trucks, crawlers, and drift cars. Great entry point for hobbyists with durable builds and easy-to-find replacement parts.",
+    vendorCategory: "RC & Hobby",
+    searchTemplate: "https://www.redcatracing.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc"],
+    priority: 88,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "GoAffPro",
+    logoColor: "#CC0000"
+  },
+  {
+    id: "hosimrc",
+    name: "Hosim RC",
+    slug: "hosimrc",
+    description: "High-speed RC cars and trucks built for fun. Brushless models reaching 40+ MPH with waterproof electronics and durable construction at budget-friendly prices.",
+    vendorCategory: "RC & Hobby",
+    searchTemplate: "https://www.hosim.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc"],
+    priority: 85,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#0099CC"
+  },
+  {
+    id: "bezgar",
+    name: "Bezgar",
+    slug: "bezgar",
+    description: "Family-friendly RC vehicles designed for beginners and kids. Easy-to-drive cars and trucks with fun designs and responsive customer support.",
+    vendorCategory: "RC & Hobby",
+    searchTemplate: "https://bezgar.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc"],
+    priority: 82,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "ShareASale",
+    logoColor: "#FF3300"
+  },
+  {
+    id: "rcplanet",
+    name: "RC Planet",
+    slug: "rcplanet",
+    description: "One of the largest RC hobby shops in the US. Huge selection of RC cars, trucks, slot cars, and parts from Traxxas, Arrma, Team Associated, and more.",
+    vendorCategory: "RC & Hobby",
+    searchTemplate: "https://www.rcplanet.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["rc", "slotcars"],
+    priority: 86,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#3366CC"
+  },
+  {
+    id: "getfpv",
+    name: "GetFPV",
+    slug: "getfpv",
+    description: "The FPV pilot's headquarters. Everything for building and flying FPV racing and freestyle drones — frames, motors, flight controllers, goggles, and more.",
+    vendorCategory: "Drones & FPV",
+    searchTemplate: "https://www.getfpv.com/catalogsearch/result/?q={query}",
+    hasLocalPickup: false,
+    categories: ["drones"],
+    priority: 92,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#00CC66"
+  },
+  {
+    id: "betafpv",
+    name: "BETAFPV",
+    slug: "betafpv",
+    description: "Pioneering micro FPV drones and whoop-class racing quads. Industry leader in tiny whoops, cinelifters, and beginner-friendly FPV kits.",
+    vendorCategory: "Drones & FPV",
+    searchTemplate: "https://betafpv.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["drones"],
+    priority: 87,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#FFD700"
+  },
+  {
+    id: "carla-car-rental",
+    name: "Carla Car Rental",
+    slug: "carla-car-rental",
+    description: "Smart rental car comparison tool that searches 900+ suppliers worldwide. Find the best deals on rental cars, SUVs, and vans in seconds.",
+    vendorCategory: "Travel & Rental",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-7466061?url=https%3A%2F%2Fwww.carlacarrental.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "rv"],
+    priority: 85,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#2563EB"
+  },
+  {
+    id: "expedia",
+    name: "Expedia",
+    slug: "expedia",
+    description: "World-renowned travel platform with car rentals across 60,000+ locations globally. Bundle deals, flexible cancellations, and loyalty rewards on every booking.",
+    vendorCategory: "Travel & Rental",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-5261370?url=https%3A%2F%2Fwww.expedia.com%2FCarSearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars"],
+    priority: 80,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#FBBF24"
+  },
+  {
+    id: "hotels-com",
+    name: "Hotels.com",
+    slug: "hotels-com",
+    description: "Trusted travel brand offering car rentals alongside hotel bookings. Earn rewards on every rental and bundle for extra savings on your road trip.",
+    vendorCategory: "Travel & Rental",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-1702763?url=https%3A%2F%2Fwww.hotels.com%2FCarSearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars"],
+    priority: 79,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#DC2626"
   },
   {
     id: "seats-aero",
     name: "Seats.aero",
     slug: "seats-aero",
+    description: "Award flight search engine that finds the best deals on airline miles and points redemptions. The travel hacker's secret weapon for premium cabin deals.",
+    vendorCategory: "Travel & Rental",
     searchTemplate: "https://seats.aero/search?q={query}",
     hasLocalPickup: false,
     categories: ["cars"],
@@ -779,20 +899,59 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "CJ Affiliate",
     logoColor: "#6366F1"
   },
-  {
-    id: "tcmt",
-    name: "TCMT",
-    slug: "tcmt",
-    searchTemplate: "https://tcmtco.com/search?q={query}",
-    hasLocalPickup: false,
-    categories: ["motorcycles", "atvs", "powersports"],
-    priority: 83,
-    supportsOEM: false,
-    supportsAftermarket: true,
-    affiliateNetwork: "Direct",
-    logoColor: "#FF6B00"
-  },
 ];
+
+export const VENDOR_CATEGORY_ORDER: VendorCategory[] = [
+  "Major Auto Parts Chains",
+  "Online Auto Parts",
+  "Performance & Racing",
+  "Powersports & Motorcycle",
+  "Off-Road & 4x4",
+  "Marine & Watercraft",
+  "Diesel & Commercial",
+  "RV & Trailer",
+  "Classic & Restoration",
+  "Tires & Wheels",
+  "Small Engine & Outdoor",
+  "Vehicle Electronics",
+  "Coatings & Detailing",
+  "Tools & Equipment",
+  "RC & Hobby",
+  "Drones & FPV",
+  "Travel & Rental",
+];
+
+export const VENDOR_CATEGORY_ICONS: Record<VendorCategory, string> = {
+  "Major Auto Parts Chains": "store",
+  "Online Auto Parts": "globe",
+  "Performance & Racing": "flame",
+  "Powersports & Motorcycle": "bike",
+  "Off-Road & 4x4": "mountain",
+  "Marine & Watercraft": "ship",
+  "Diesel & Commercial": "truck",
+  "RV & Trailer": "caravan",
+  "Classic & Restoration": "sparkles",
+  "Tires & Wheels": "circle",
+  "Small Engine & Outdoor": "leaf",
+  "Vehicle Electronics": "zap",
+  "Coatings & Detailing": "paintBucket",
+  "Tools & Equipment": "wrench",
+  "RC & Hobby": "gamepad",
+  "Drones & FPV": "radio",
+  "Travel & Rental": "plane",
+};
+
+export function getVendorsByCategory(): { category: VendorCategory; vendors: VendorInfo[] }[] {
+  const grouped = new Map<VendorCategory, VendorInfo[]>();
+  for (const vendor of VENDORS) {
+    const list = grouped.get(vendor.vendorCategory) || [];
+    list.push(vendor);
+    grouped.set(vendor.vendorCategory, list);
+  }
+  return VENDOR_CATEGORY_ORDER
+    .filter(cat => grouped.has(cat))
+    .map(cat => ({ category: cat, vendors: grouped.get(cat)!.sort((a, b) => b.priority - a.priority) }));
+}
 
 // Helper function to generate search URL for a vendor
 export function generateVendorSearchUrl(
