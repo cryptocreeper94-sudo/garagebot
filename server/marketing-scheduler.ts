@@ -4,6 +4,7 @@ import { eq, and, asc, sql, desc, isNotNull, inArray } from 'drizzle-orm';
 import { TwitterConnector, postToFacebook, postToInstagram } from './social-connectors';
 
 const POSTING_HOURS_CST = [0, 3, 6, 9, 12, 15, 18, 21];
+const TWITTER_POSTING_HOURS_CST = [0, 6, 12, 18];
 const CST_TIMEZONE = 'America/Chicago';
 
 function getCSTHour(): number {
@@ -254,7 +255,7 @@ async function executeScheduledPosts() {
     console.log(`[Marketing IG] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
   }
   
-  if (twitter.isConfigured()) {
+  if (twitter.isConfigured() && TWITTER_POSTING_HOURS_CST.includes(hour)) {
     const twitterMessage = message.length > 280 ? message.substring(0, 277) + '...' : message;
     const result = await twitter.post(twitterMessage);
     await recordPost('x', twitterMessage, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
@@ -381,7 +382,8 @@ export function startMarketingScheduler() {
   }
   
   console.log('[Marketing] Starting scheduler...');
-  console.log('[Marketing] Posts scheduled every 3 hours CST: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm');
+  console.log('[Marketing] FB/IG scheduled every 3 hours CST: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm');
+  console.log('[Marketing] X/Twitter scheduled every 6 hours CST: 12am, 6am, 12pm, 6pm');
   
   isRunning = true;
 
