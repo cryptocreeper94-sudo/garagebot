@@ -94,10 +94,10 @@ const categories: Category[] = [
     gradient: "from-cyan-500 to-blue-500",
     description: "Monitor your platform's performance in real-time. Track traffic, page views, sessions, device breakdowns, geographic data, and affiliate click-through rates.",
     cards: [
-      { label: "Analytics Dashboard", description: "Real-time traffic, sessions, devices & geo data", href: "/dev", icon: BarChart3, image: imgAnalyticsDashboard, badge: "Live", featured: true },
+      { label: "Analytics Dashboard", description: "Real-time traffic, sessions, devices & geo data", href: "/dev?tab=analytics", icon: BarChart3, image: imgAnalyticsDashboard, badge: "Live", featured: true },
       { label: "System Dashboard", description: "API health, server status & traffic charts", href: "/dashboard", icon: Activity, image: imgSystemHealth },
-      { label: "Affiliate Analytics", description: "Click tracking & commission performance reports", href: "/dev", icon: TrendingUp, image: imgAffiliateAnalytics },
-      { label: "SEO Manager", description: "Page meta tags, Open Graph & crawl optimization", href: "/dev", icon: Search, image: imgSeoManager },
+      { label: "Affiliate Analytics", description: "Click tracking & commission performance reports", href: "/dev?tab=affiliates", icon: TrendingUp, image: imgAffiliateAnalytics },
+      { label: "SEO Manager", description: "Page meta tags, Open Graph & crawl optimization", href: "/dev?tab=features", icon: Search, image: imgSeoManager },
     ]
   },
   {
@@ -108,9 +108,9 @@ const categories: Category[] = [
     cards: [
       { label: "Marketing Hub", description: "Meta auto-posting, 60+ posts, 3-hour rotation", href: "/marketing", icon: Megaphone, image: imgMarketingHub, featured: true },
       { label: "Blog Manager", description: "AI-generated posts, publish & feature controls", href: "/blog", icon: FileText, image: imgBlogManager },
-      { label: "Newsletter", description: "Subscriber management & email campaigns", href: "/dev", icon: Mail, image: imgNewsletter },
+      { label: "Newsletter", description: "Subscriber management & email campaigns", href: "/dev?tab=tasks", icon: Mail, image: imgNewsletter, badge: "Roadmap" },
       { label: "Meta Ads Campaigns", description: "Facebook/Instagram ad targeting & management", href: "/marketing", icon: Globe, image: imgMetaAds },
-      { label: "Sponsored Products", description: "Featured placements & promoted listings", href: "/dev", icon: Star, image: imgSponsoredProducts },
+      { label: "Sponsored Products", description: "Featured placements & promoted listings", href: "/dev?tab=tasks", icon: Star, image: imgSponsoredProducts, badge: "Roadmap" },
     ]
   },
   {
@@ -119,10 +119,10 @@ const categories: Category[] = [
     gradient: "from-green-500 to-emerald-500",
     description: "Track and optimize every revenue stream. Manage affiliate networks, process payments, handle Pro subscriptions, and mint Genesis Hallmark NFTs.",
     cards: [
-      { label: "Affiliate Networks", description: "Amazon, CJ, eBay, ShareASale — 50+ retailers", href: "/dev", icon: Link2, image: imgAffiliateNetworks, badge: "Earn", featured: true },
+      { label: "Affiliate Networks", description: "Amazon, CJ, eBay, ShareASale — 50+ retailers", href: "/dev?tab=affiliates", icon: Link2, image: imgAffiliateNetworks, badge: "Earn", featured: true },
       { label: "Inbound Affiliate Program", description: "GB-XXXXXX referral codes, commissions & payouts", href: "/affiliates", icon: Users, image: imgInboundAffiliate, badge: "New" },
       { label: "Pro Memberships", description: "Founders Circle subscriptions & ad-free tiers", href: "/pro", icon: Crown, image: imgProMembership },
-      { label: "Stripe Payments", description: "Payment processing, checkout & subscriptions", href: "/dev", icon: CreditCard, image: imgStripePayments },
+      { label: "Stripe Payments", description: "Payment processing, checkout & subscriptions", href: "/checkout", icon: CreditCard, image: imgStripePayments },
       { label: "Genesis Hallmarks", description: "NFT minting & Solana blockchain verification", href: "/hallmark", icon: Award, image: imgGenesisHallmarks },
       { label: "Referral Program", description: "Points system, invite rewards & Pro bonuses", href: "/invite", icon: Send, image: imgReferralProgram },
     ]
@@ -139,7 +139,7 @@ const categories: Category[] = [
       { label: "Digital Inspections", description: "Vehicle inspection reports & customer sharing", href: "/mechanics-garage", icon: ClipboardList, image: imgDigitalInspections },
       { label: "ORBIT Staffing", description: "Payroll, timesheets, W2/1099 processing", href: "/mechanics-garage", icon: Briefcase, image: imgOrbitStaffing },
       { label: "Business Integrations", description: "QuickBooks, ADP, Gusto, PartsTech & more", href: "/mechanics-garage", icon: Layers, image: imgBusinessIntegrations },
-      { label: "Partner API", description: "B2B API keys, scopes & rate limiting", href: "/dev", icon: Terminal, image: imgPartnerApi },
+      { label: "Partner API", description: "B2B API keys, scopes & rate limiting", href: "/dev?tab=tasks", icon: Terminal, image: imgPartnerApi },
     ]
   },
   {
@@ -152,7 +152,7 @@ const categories: Category[] = [
       { label: "Break Room", description: "News, tools, scanners, speed traps & fuel prices", href: "/break-room", icon: Coffee, image: imgBreakRoom },
       { label: "Shade Tree Mechanics", description: "DIY community hub & repair guides", href: "/shade-tree", icon: Wrench, image: imgShadeTree },
       { label: "Trivia Quiz", description: "Automotive knowledge game", href: "/trivia", icon: Gamepad2, image: imgTriviaQuiz },
-      { label: "Giveaways", description: "Prize drawings & winner management", href: "/dev", icon: Sparkles, image: imgGiveaways },
+      { label: "Giveaways", description: "Prize drawings & winner management", href: "/dev?tab=tasks", icon: Sparkles, image: imgGiveaways, badge: "Roadmap" },
     ]
   },
   {
@@ -191,9 +191,9 @@ const categories: Category[] = [
     description: "Under-the-hood tools for platform management. Access the dev portal, manage releases, handle user accounts, and review investor metrics.",
     cards: [
       { label: "Dev Portal", description: "Full admin panel — roadmap, tasks, configs", href: "/dev", icon: Terminal, image: imgDevPortal, featured: true },
-      { label: "Release Manager", description: "Version tracking & changelogs", href: "/dev", icon: Rocket, image: imgReleaseManager },
-      { label: "Blockchain Verifier", description: "Solana on-chain verification", href: "/dev", icon: Blocks, image: imgBlockchainVerifier },
-      { label: "User Management", description: "Accounts, roles, waitlist & sessions", href: "/dev", icon: Users, image: imgUserManagement },
+      { label: "Release Manager", description: "Version tracking & changelogs", href: "/dev?tab=releases", icon: Rocket, image: imgReleaseManager },
+      { label: "Blockchain Verifier", description: "Solana on-chain verification", href: "/dev?tab=blockchain", icon: Blocks, image: imgBlockchainVerifier },
+      { label: "User Management", description: "Accounts, roles, waitlist & sessions", href: "/dev?tab=features", icon: Users, image: imgUserManagement },
       { label: "Explore Page", description: "Feature discovery & platform showcase", href: "/explore", icon: Compass, image: imgExplorePage },
       { label: "Investor Portal", description: "Business metrics & investment deck", href: "/investors", icon: PieChart, image: imgInvestorPortal },
     ]
