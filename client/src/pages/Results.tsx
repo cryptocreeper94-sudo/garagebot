@@ -14,11 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
-import { VENDORS, VendorInfo, generateVendorSearchUrl, CATEGORIES } from "@/lib/mockData";
+import { VENDORS, VendorInfo, generateVendorSearchUrl, CATEGORIES, getVendorLogoUrl, getVendorFaviconUrl } from "@/lib/mockData";
 import { useAuthGate } from "@/hooks/useAuthGate";
 import { useAuth } from "@/hooks/useAuth";
 
-const AFFILIATE_NETWORKS = ["Amazon Associates", "eBay Partner Network", "CJ Affiliate", "ShareASale", "AvantLink", "Impact", "Rexing Affiliate", "GoAffPro"];
+const AFFILIATE_NETWORKS = ["Amazon Associates", "eBay Partner Network", "CJ Affiliate", "ShareASale", "AvantLink", "Impact", "Rexing Affiliate", "GoAffPro", "AWIN", "Direct"];
 
 interface PriceProduct {
   id: string;
@@ -292,6 +292,62 @@ interface VendorWithUrl {
   isAffiliate: boolean;
 }
 
+function VendorLogo({ vendor, size = "md" }: { vendor: VendorInfo; size?: "sm" | "md" | "lg" }) {
+  const [logoFailed, setLogoFailed] = useState(false);
+  const [faviconFailed, setFaviconFailed] = useState(false);
+  const logoUrl = getVendorLogoUrl(vendor);
+  const faviconUrl = getVendorFaviconUrl(vendor, 64);
+
+  const sizeClasses = {
+    sm: "w-6 h-6",
+    md: "w-10 h-10",
+    lg: "w-12 h-12",
+  };
+
+  const textSizes = {
+    sm: "text-[10px]",
+    md: "text-sm",
+    lg: "text-base",
+  };
+
+  if (!logoFailed && logoUrl) {
+    return (
+      <div className={`${sizeClasses[size]} rounded-lg bg-white overflow-hidden shrink-0 flex items-center justify-center p-0.5`}>
+        <img
+          src={logoUrl}
+          alt={vendor.name}
+          className="w-full h-full object-contain"
+          loading="lazy"
+          onError={() => setLogoFailed(true)}
+        />
+      </div>
+    );
+  }
+
+  if (!faviconFailed && faviconUrl) {
+    return (
+      <div className={`${sizeClasses[size]} rounded-lg bg-white/10 overflow-hidden shrink-0 flex items-center justify-center border border-white/10`}>
+        <img
+          src={faviconUrl}
+          alt={vendor.name}
+          className="w-3/4 h-3/4 object-contain"
+          loading="lazy"
+          onError={() => setFaviconFailed(true)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`${sizeClasses[size]} rounded-lg shrink-0 flex items-center justify-center border border-white/10 ${textSizes[size]} font-bold text-white`}
+      style={{ backgroundColor: vendor.logoColor + "30", borderColor: vendor.logoColor + "40" }}
+    >
+      {vendor.name.charAt(0)}
+    </div>
+  );
+}
+
 function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: { vendorWithUrl: VendorWithUrl; displayQuery: string; requireAuth: (action: () => void, featureName?: string) => void; index: number }) {
   const { vendor, searchUrl, isAffiliate } = vendorWithUrl;
   
@@ -307,16 +363,15 @@ function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: {
       transition={{ delay: index * 0.02 }}
     >
       <div
-        className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50 group ${
-          isAffiliate ? 'bg-primary/[0.03] border-primary/15' : 'bg-white/[0.02] border-white/5'
+        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-200 group hover:scale-[1.01] ${
+          isAffiliate
+            ? 'bg-primary/[0.04] border-primary/20 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)]'
+            : 'bg-white/[0.02] border-white/[0.06] hover:border-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.03)]'
         }`}
         onClick={() => requireAuth(handleClick, "compare prices across retailers")}
         data-testid={`vendor-link-${vendor.slug}`}
       >
-        <div
-          className="w-2 h-8 rounded-full shrink-0"
-          style={{ backgroundColor: vendor.logoColor }}
-        />
+        <VendorLogo vendor={vendor} size="md" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="font-tech font-bold text-sm text-white truncate">{vendor.name}</span>
@@ -350,7 +405,7 @@ function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: {
           className="h-8 px-3 text-[10px] font-tech uppercase text-primary hover:bg-primary hover:text-black shrink-0 gap-1"
           data-testid={`button-go-${vendor.slug}`}
         >
-          Search Store <ExternalLink className="w-3 h-3" />
+          Search <ExternalLink className="w-3 h-3" />
         </Button>
       </div>
     </motion.div>
@@ -361,6 +416,7 @@ function ProductCard({ product, index, requireAuth, searchQuery }: { product: Pr
   const hasPrice = product.price !== null && product.price > 0;
   const hasSale = product.originalPrice && product.price && product.originalPrice > product.price;
   const savings = hasSale ? Math.round(((product.originalPrice! - product.price!) / product.originalPrice!) * 100) : 0;
+  const matchedVendor = VENDORS.find(v => v.slug === product.retailerSlug || v.id === product.retailerSlug);
 
   const handleClick = () => {
     trackClick(product.retailerSlug, searchQuery, product.affiliateUrl, product.isAffiliate ? 'affiliate_product' : 'product_direct');
@@ -409,7 +465,11 @@ function ProductCard({ product, index, requireAuth, searchQuery }: { product: Pr
             )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-1">
-                <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: product.retailerColor }} />
+                {matchedVendor ? (
+                  <VendorLogo vendor={matchedVendor} size="sm" />
+                ) : (
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: product.retailerColor }} />
+                )}
                 <span className="font-mono text-[9px] uppercase tracking-wider" style={{ color: product.retailerColor }}>
                   {product.retailer}
                 </span>
@@ -613,26 +673,33 @@ function PriceComparisonSection({ data, isLoading, searchQuery, requireAuth }: {
           </div>
           <p className="text-[10px] text-muted-foreground mb-2">Click to check prices directly — live price feeds coming soon for these stores</p>
           <div className="flex flex-wrap gap-2">
-            {data.retailerLinks.map((link) => (
-              <Button
-                key={link.slug}
-                variant="outline"
-                size="sm"
-                className="h-8 text-[10px] font-tech uppercase border-white/10 hover:border-primary/40 gap-1.5"
-                onClick={() => {
-                  requireAuth(() => {
-                    trackClick(link.slug, searchQuery, link.searchUrl, link.isAffiliate ? 'affiliate_quick' : 'quick_link');
-                    window.open(link.searchUrl, '_blank', 'noopener,noreferrer');
-                  }, "search retailers");
-                }}
-                data-testid={`quick-link-${link.slug}`}
-              >
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: link.color }} />
-                {link.name}
-                {link.isAffiliate && <Tag className="w-2.5 h-2.5 text-primary" />}
-                <ExternalLink className="w-2.5 h-2.5 opacity-50" />
-              </Button>
-            ))}
+            {data.retailerLinks.map((link) => {
+              const matchedV = VENDORS.find(v => v.slug === link.slug || v.id === link.slug);
+              return (
+                <Button
+                  key={link.slug}
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-[10px] font-tech uppercase border-white/10 hover:border-primary/40 gap-1.5"
+                  onClick={() => {
+                    requireAuth(() => {
+                      trackClick(link.slug, searchQuery, link.searchUrl, link.isAffiliate ? 'affiliate_quick' : 'quick_link');
+                      window.open(link.searchUrl, '_blank', 'noopener,noreferrer');
+                    }, "search retailers");
+                  }}
+                  data-testid={`quick-link-${link.slug}`}
+                >
+                  {matchedV ? (
+                    <VendorLogo vendor={matchedV} size="sm" />
+                  ) : (
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: link.color }} />
+                  )}
+                  {link.name}
+                  {link.isAffiliate && <Tag className="w-2.5 h-2.5 text-primary" />}
+                  <ExternalLink className="w-2.5 h-2.5 opacity-50" />
+                </Button>
+              );
+            })}
           </div>
         </div>
       )}

@@ -8,12 +8,83 @@ export interface VendorInfo {
   searchTemplate: string;
   storeLocatorUrl?: string;
   hasLocalPickup: boolean;
-  categories: string[]; // Which vehicle types this vendor serves
-  priority: number; // Higher = show first
+  categories: string[];
+  priority: number;
   supportsOEM: boolean;
   supportsAftermarket: boolean;
   affiliateNetwork?: string;
-  logoColor: string; // For UI display
+  logoColor: string;
+}
+
+const VENDOR_DOMAINS: Record<string, string> = {
+  autozone: "autozone.com",
+  oreilly: "oreillyauto.com",
+  advanceauto: "advanceautoparts.com",
+  napa: "napaonline.com",
+  rockauto: "rockauto.com",
+  amazon: "amazon.com",
+  ebay: "ebay.com",
+  carparts: "carparts.com",
+  rockymountain: "rockymountainatvmc.com",
+  denniskirk: "denniskirk.com",
+  partzilla: "partzilla.com",
+  revzilla: "revzilla.com",
+  vmcchineseparts: "vmcchineseparts.com",
+  westmarine: "westmarine.com",
+  iboats: "iboats.com",
+  boatsnet: "boats.net",
+  summit: "summitracing.com",
+  jegs: "jegs.com",
+  fleetpride: "fleetpride.com",
+  findParts: "finditparts.com",
+  campingworld: "campingworld.com",
+  etrailer: "etrailer.com",
+  classicindustries: "classicindustries.com",
+  lmctruck: "lmctruck.com",
+  jackssmallengines: "jackssmallengines.com",
+  tractorsupply: "tractorsupply.com",
+  "4wheelparts": "4wheelparts.com",
+  extremeterrain: "extremeterrain.com",
+  rexing: "rexing.com",
+  silazane50: "silazane50usa.com",
+  amainhobbies: "amainhobbies.com",
+  horizonhobby: "horizonhobby.com",
+  towerhobbies: "towerhobbies.com",
+  hobbyking: "hobbyking.com",
+  getfpv: "getfpv.com",
+  redcatracing: "redcatracing.com",
+  hosimrc: "hosim.com",
+  betafpv: "betafpv.com",
+  bezgar: "bezgar.com",
+  rcplanet: "rcplanet.com",
+  "carla-car-rental": "carlacarrental.com",
+  "cj-pony-parts": "cjponyparts.com",
+  expedia: "expedia.com",
+  "hotels-com": "hotels.com",
+  garvee: "garvee.com",
+  "mavis-tires": "mavis.com",
+  "tire-rack": "tirerack.com",
+  dunford: "dunfordinc.com",
+  ottocast: "ottocast.com",
+  autopartstoys: "autopartstoys.com",
+  "seats-aero": "seats.aero",
+  tcmt: "tcmtco.com",
+};
+
+export function getVendorLogoUrl(vendor: VendorInfo, size: number = 128): string {
+  const domain = VENDOR_DOMAINS[vendor.id];
+  if (domain) {
+    return `https://logo.clearbit.com/${domain}`;
+  }
+  return "";
+}
+
+export function getVendorFaviconUrl(vendor: VendorInfo, size: number = 64): string {
+  const domain = VENDOR_DOMAINS[vendor.id];
+  if (domain) {
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`;
+  }
+  return "";
 }
 
 export const VENDORS: VendorInfo[] = [
