@@ -696,6 +696,19 @@ export const VENDORS: VendorInfo[] = [
     logoColor: "#E63946"
   },
   {
+    id: "seats-aero",
+    name: "Seats.aero",
+    slug: "seats-aero",
+    searchTemplate: "https://seats.aero/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars"],
+    priority: 70,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#6366F1"
+  },
+  {
     id: "tcmt",
     name: "TCMT",
     slug: "tcmt",
