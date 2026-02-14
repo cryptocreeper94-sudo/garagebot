@@ -27,6 +27,8 @@ import CheckoutSuccess from "@/pages/CheckoutSuccess";
 import CheckoutCancel from "@/pages/CheckoutCancel";
 import ShopPortal from "@/pages/ShopPortal";
 import MechanicsGarage from "@/pages/MechanicsGarage";
+import TorqueLanding from "@/pages/TorqueLanding";
+import TorqueOnboard from "@/pages/TorqueOnboard";
 import Insurance from "@/pages/Insurance";
 import Auth from "@/pages/Auth";
 import AuthCallback from "@/pages/AuthCallback";
@@ -77,7 +79,10 @@ function Router() {
       <Route path="/wishlist/:shareCode">{() => <SharedWishlist />}</Route>
       <Route path="/projects">{() => <Projects />}</Route>
       <Route path="/shop-portal">{() => <ShopPortal />}</Route>
-      <Route path="/mechanics-garage">{() => <MechanicsGarage />}</Route>
+      <Route path="/torque">{() => <TorqueLanding />}</Route>
+      <Route path="/torque/onboard">{() => <TorqueOnboard />}</Route>
+      <Route path="/torque/app">{() => <MechanicsGarage />}</Route>
+      <Route path="/mechanics-garage">{() => { window.location.replace('/torque/app'); return null; }}</Route>
       <Route path="/mechanics-garage/info">{() => <MechanicsGarageSales />}</Route>
       <Route path="/shade-tree">{() => <ShadeTreeMechanics />}</Route>
       <Route path="/insurance">{() => <Insurance />}</Route>

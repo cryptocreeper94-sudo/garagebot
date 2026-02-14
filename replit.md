@@ -76,8 +76,17 @@ Preferred communication style: Simple, everyday language.
 ## Member Referral Program
 - **System**: Points-based system rewarding user signups and Pro membership conversions, redeemable for Pro membership tiers.
 
+## TORQUE - Shop Management OS
+- **Route**: `/torque` (landing), `/torque/onboard` (5-step setup), `/torque/app` (shop dashboard)
+- **Branding**: "TORQUE — Shop Management OS powered by Trust Layer" — blockchain-verified shop identities
+- **PWA**: Standalone PWA with custom manifest (`/torque-manifest.json`), app icons (192x192, 512x512), splash screen with animated logo
+- **Landing Page**: Premium UI with 3-column bento grid, testimonial carousel, FAQ accordion, animated counters, parallax effects, PWA install prompt
+- **Onboarding**: 5-step ultra-professional setup flow (Shop Info → Team → Services → Integrations → Verify)
+- **Legacy**: `/mechanics-garage` redirects to `/torque/app` for backward compatibility
+- **Formerly**: "Mechanics Garage" — rebranded to TORQUE across all major UI references
+
 ## Partner API System
-- **Purpose**: Provides B2B API access for Mechanics Garage shops with API Key + Secret authentication, granular scopes, and rate limiting.
+- **Purpose**: Provides B2B API access for TORQUE shops with API Key + Secret authentication, granular scopes, and rate limiting.
 
 ## Weather Radar System
 - **Integration**: Utilizes Leaflet map and RainViewer radar tiles with NOAA Weather Alerts API for severe weather warnings.
@@ -97,7 +106,7 @@ Preferred communication style: Simple, everyday language.
 - **Purpose**: A community hub (`/shade-tree`) for DIY enthusiasts, providing categorized repair guides, community tips, and estimated savings.
 
 ## Marketing Hub & Social Media Integration
-- **Add-on**: Premium add-on for Mechanics Garage shops supporting various social media platforms.
+- **Add-on**: Premium add-on for TORQUE shops supporting various social media platforms.
 - **GarageBot Marketing Hub** (`/marketing-hub`): Auto-posting to Facebook (GarageBot.io page) every 3 hours via Meta Graph API with 60+ unique posts.
 - **Meta Ads Campaigns**: Manages paid ad campaigns via Meta Marketing API with configurable targeting.
 - **Analytics**: Tracks top-performing content and provides performance insights from Meta Graph API.
@@ -118,7 +127,7 @@ Preferred communication style: Simple, everyday language.
 - **Meta Graph API**: For Facebook auto-posting and ad campaign management.
 
 ## Unified Business Integrations Hub
-- **Purpose**: Allows Mechanics Garage shops to connect their existing business software via OAuth.
+- **Purpose**: Allows TORQUE shops to connect their existing business software via OAuth.
 - **Supported Integrations**:
     - **Accounting**: QuickBooks Online, FreshBooks, Xero, Sage Business Cloud, Wave Accounting
     - **Payroll/HR**: UKG Pro, ADP Workforce Now, Gusto, Paychex Flex

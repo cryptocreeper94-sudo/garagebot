@@ -1,0 +1,63 @@
+{
+  "id": "/torque",
+  "name": "TORQUE — Shop Management OS",
+  "short_name": "TORQUE",
+  "description": "Professional shop management for all vehicle types. Repair orders, scheduling, estimates, payments, and inventory — powered by Trust Layer.",
+  "start_url": "/torque",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0a0e1a",
+  "theme_color": "#00D9FF",
+  "orientation": "any",
+  "scope": "/torque",
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/torque-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/torque-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/torque-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/torque-splash.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "TORQUE — Shop Management OS"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your shop dashboard",
+      "url": "/torque/app",
+      "icons": [{ "src": "/torque-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Repair Orders",
+      "short_name": "Orders",
+      "description": "Manage repair orders",
+      "url": "/torque/app?tab=orders",
+      "icons": [{ "src": "/torque-icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

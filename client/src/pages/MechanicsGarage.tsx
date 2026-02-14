@@ -951,7 +951,7 @@ function BusinessIntegrationsTab({ shopId, selectedShop, toast }: { shopId: stri
             <div className="flex-1">
               <h4 className="font-tech font-bold text-lg mb-2">Don't Have These Systems?</h4>
               <p className="text-sm text-muted-foreground mb-4">
-                Mechanics Garage includes built-in versions of all these capabilities. Use our integrated tools for invoicing, scheduling, time tracking, and inventory - no additional subscriptions required.
+                TORQUE includes built-in versions of all these capabilities. Use our integrated tools for invoicing, scheduling, time tracking, and inventory - no additional subscriptions required.
               </p>
               <div className="flex flex-wrap gap-2">
                 <Badge className="bg-primary/10 text-primary border-primary/30">Built-in Invoicing</Badge>
@@ -2212,7 +2212,7 @@ export default function MechanicsGarage() {
         <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
           <div className="text-center mb-12">
             <Wrench className="w-24 h-24 mx-auto mb-6 text-primary/30" />
-            <h1 className="text-3xl font-tech font-bold uppercase text-primary mb-4">Mechanics Garage</h1>
+            <h1 className="text-3xl font-tech font-bold uppercase text-primary mb-4">TORQUE</h1>
             <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
               Professional shop management for ALL vehicle types - cars, trucks, boats, ATVs, motorcycles, small engines, and more.
             </p>
@@ -2232,7 +2232,7 @@ export default function MechanicsGarage() {
           {/* Competitive Comparison Section */}
           <Card className="p-6 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 border-primary/20 mb-8">
             <div className="text-center mb-6">
-              <h2 className="text-xl font-tech font-bold uppercase text-primary mb-2">Why Choose Mechanics Garage?</h2>
+              <h2 className="text-xl font-tech font-bold uppercase text-primary mb-2">Why Choose TORQUE?</h2>
               <p className="text-sm text-muted-foreground">Compare us to the industry leaders</p>
             </div>
             
@@ -2435,7 +2435,7 @@ export default function MechanicsGarage() {
             <Card className="glass-card border-primary/20 p-4 h-full">
               <h1 className="text-2xl font-tech font-bold uppercase text-primary flex items-center gap-2" data-testid="text-page-title">
                 <Wrench className="w-5 h-5" />
-                Mechanics Garage
+                TORQUE
               </h1>
               <p className="text-muted-foreground text-xs font-mono">
                 REPAIR ORDERS • ESTIMATES • SCHEDULING
@@ -2453,7 +2453,7 @@ export default function MechanicsGarage() {
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="font-tech text-xl uppercase">Register Your Shop</DialogTitle>
-                <DialogDescription>Add your repair shop to Mechanics Garage</DialogDescription>
+                <DialogDescription>Add your repair shop to TORQUE</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="grid grid-cols-2 gap-4">

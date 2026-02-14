@@ -406,10 +406,10 @@ export default function Nav() {
                       </div>
                     </Link>
                     
-                    <Link href="/shop-portal" onClick={() => setIsOpen(false)}>
-                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/shop-portal' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-shop-portal">
+                    <Link href="/torque" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/torque' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-torque">
                         <Store className="w-5 h-5" />
-                        <span className="font-medium">Mechanics Garage</span>
+                        <span className="font-medium">TORQUE</span>
                       </div>
                     </Link>
                   </div>

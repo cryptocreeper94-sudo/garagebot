@@ -128,17 +128,17 @@ const categories: Category[] = [
     ]
   },
   {
-    title: "Mechanics Garage Suite",
+    title: "TORQUE Shop Management",
     icon: Wrench,
     gradient: "from-orange-500 to-red-500",
-    description: "The complete shop management platform. Register shops, manage repair orders, handle inventory, run inspections, and connect business tools.",
+    description: "The complete shop management OS. Register shops, manage repair orders, handle inventory, run inspections, and connect business tools.",
     cards: [
       { label: "Shop Portal", description: "Shop registration, settings & management", href: "/shop-portal", icon: Building2, image: imgShopPortal, featured: true },
-      { label: "Mechanics Garage", description: "Repair orders, estimates, appointments & POS", href: "/mechanics-garage", icon: Wrench, image: imgMechanicsGarage },
-      { label: "Shop Inventory", description: "Parts inventory management & tracking", href: "/mechanics-garage", icon: Package, image: imgShopInventory },
-      { label: "Digital Inspections", description: "Vehicle inspection reports & customer sharing", href: "/mechanics-garage", icon: ClipboardList, image: imgDigitalInspections },
-      { label: "ORBIT Staffing", description: "Payroll, timesheets, W2/1099 processing", href: "/mechanics-garage", icon: Briefcase, image: imgOrbitStaffing },
-      { label: "Business Integrations", description: "QuickBooks, ADP, Gusto, PartsTech & more", href: "/mechanics-garage", icon: Layers, image: imgBusinessIntegrations },
+      { label: "TORQUE Dashboard", description: "Repair orders, estimates, appointments & POS", href: "/torque/app", icon: Wrench, image: imgMechanicsGarage },
+      { label: "Shop Inventory", description: "Parts inventory management & tracking", href: "/torque/app", icon: Package, image: imgShopInventory },
+      { label: "Digital Inspections", description: "Vehicle inspection reports & customer sharing", href: "/torque/app", icon: ClipboardList, image: imgDigitalInspections },
+      { label: "ORBIT Staffing", description: "Payroll, timesheets, W2/1099 processing", href: "/torque/app", icon: Briefcase, image: imgOrbitStaffing },
+      { label: "Business Integrations", description: "QuickBooks, ADP, Gusto, PartsTech & more", href: "/torque/app", icon: Layers, image: imgBusinessIntegrations },
       { label: "Partner API", description: "B2B API keys, scopes & rate limiting", href: "/dev?tab=tasks", icon: Terminal, image: imgPartnerApi },
     ]
   },

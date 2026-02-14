@@ -155,7 +155,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     icon: Store,
     gradient: "from-amber-500 to-orange-500",
     features: [
-      { name: "Mechanics Garage", description: "Full shop management: work orders, customer CRM, invoicing, inventory, scheduling, and more.", href: "/mechanics-garage", icon: Store, image: imgMechanicsGarage, glowColor: "amber", badge: "PRO", badgeVariant: "pro", featured: true, subFeatures: ["Work Orders", "CRM", "Invoicing", "Inventory"] },
+      { name: "TORQUE", description: "Full shop management OS: work orders, customer CRM, invoicing, inventory, scheduling, and more.", href: "/torque", icon: Store, image: imgMechanicsGarage, glowColor: "amber", badge: "PRO", badgeVariant: "pro", featured: true, subFeatures: ["Work Orders", "CRM", "Invoicing", "Inventory"] },
       { name: "Shop Portal", description: "Set up your shop profile, manage your team, handle reviews, and connect with the community.", href: "/shop-portal", icon: MapPin, image: imgShopPortal, glowColor: "orange", subFeatures: ["Shop Profile", "Team", "Reviews", "Community"] },
       { name: "Become a Vendor", description: "Partner with GarageBot to reach thousands of parts seekers. Free signup for retailers.", href: "/vendor-signup", icon: Globe, image: imgVendorManagement, glowColor: "cyan", badge: "FREE", badgeVariant: "free", subFeatures: ["Free Signup", "Reach Thousands", "Analytics", "Promoted"] },
       { name: "CDL Directory", description: "Directory of trucking companies and CDL training programs with search and interest forms.", href: "/cdl-directory", icon: Truck, image: imgCdlDirectory, glowColor: "blue", subFeatures: ["Companies", "CDL Programs", "Search", "Interest Forms"] },

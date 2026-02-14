@@ -114,7 +114,7 @@ export default function About() {
                       <li><strong className="text-foreground">Buddy AI Assistant</strong> — Your personal parts-finding companion powered by AI. Ask Buddy anything about parts, fitment, or repairs.</li>
                       <li><strong className="text-foreground">Vehicle Passport with VIN Decoding</strong> — Decode any VIN to get full vehicle specs, recall alerts, and personalized part recommendations.</li>
                       <li><strong className="text-foreground">Genesis Hallmark NFTs</strong> — Blockchain-verified digital certificates for your vehicles, creating an immutable ownership and identity record.</li>
-                      <li><strong className="text-foreground">Mechanics Garage</strong> — A complete shop management platform for professional mechanics and DIY enthusiasts.</li>
+                      <li><strong className="text-foreground">TORQUE</strong> — A complete shop management OS for professional mechanics and DIY enthusiasts.</li>
                       <li><strong className="text-foreground">DIY Repair Guides</strong> — AI-generated step-by-step maintenance and repair instructions tailored to your specific vehicle.</li>
                     </ul>
                   </div>
