@@ -166,7 +166,7 @@ const POST_CATEGORY_TO_IMAGE_FILENAMES: Record<string, string[]> = {
   'brand': ['hatch_garagebot_right_part_v2.png', 'hatch_garagebot_50_stores.png', 'hatch_garagebot_buddy.png', 'hatch_garagebot_search.png', 'hatch_garagebot_nashville.png', 'garagebot_facebook_cover_16x9.png'],
   'ai': ['buddy_ai_assistant.png'],
   'blockchain': ['hatch_garagebot_search.png'],
-  'darkwave': ['hatch_garagebot_buddy.png'],
+  'darkwave': ['darkwave_disrupt_signal.jpeg', 'trustlayer_robot_shield.jpeg', 'darkwave_trustlayer_wave.jpeg'],
   'mechanics': ['hatch_garagebot_diy.png', 'engine_block.png', 'brake_parts.png'],
 };
 
