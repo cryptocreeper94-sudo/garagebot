@@ -1,453 +1,554 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import Nav from "@/components/Nav";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import {
   BarChart3, Users, DollarSign, ShoppingCart, Search, Settings,
   Shield, Zap, Globe, Megaphone, FileText, Link2, Blocks,
   Car, MessageCircle, Wrench, Star, Package, Tag, Truck,
-  Fuel, Calendar, ChevronRight, Compass, Heart, Coffee,
+  Calendar, ChevronRight, Compass, Heart, Coffee,
   Gamepad2, BookOpen, Send, Bot, CreditCard, ClipboardList,
-  Database, Activity, Server, Cpu, Terminal, AlertCircle,
-  ExternalLink, Mail, Phone, User, Rocket, Archive, GitBranch,
-  TrendingUp, Eye, Lock, Map, Radio, Newspaper, Award,
-  Building2, Briefcase, PieChart, LayoutDashboard, Layers,
-  Crown, Sparkles, MonitorSmartphone, Receipt, Bell
+  Activity, Server, Cpu, Terminal, Mail,
+  Rocket, GitBranch, TrendingUp, Eye, Lock, Map,
+  Award, Building2, Briefcase, PieChart, LayoutDashboard, Layers,
+  Crown, Sparkles, Bell, LogOut, ArrowLeft, LayoutGrid
 } from "lucide-react";
 
-interface CommandItem {
-  title: string;
+import imgAnalyticsDashboard from "@/assets/images/cc/analytics-dashboard.png";
+import imgSystemHealth from "@/assets/images/cc/system-health.png";
+import imgAffiliateAnalytics from "@/assets/images/cc/affiliate-analytics.png";
+import imgSeoManager from "@/assets/images/cc/seo-manager.png";
+import imgMarketingHub from "@/assets/images/cc/marketing-hub.png";
+import imgBlogManager from "@/assets/images/cc/blog-manager.png";
+import imgNewsletter from "@/assets/images/cc/newsletter.png";
+import imgMetaAds from "@/assets/images/cc/meta-ads.png";
+import imgSponsoredProducts from "@/assets/images/cc/sponsored-products.png";
+import imgAffiliateNetworks from "@/assets/images/cc/affiliate-networks.png";
+import imgInboundAffiliate from "@/assets/images/cc/inbound-affiliate.png";
+import imgProMembership from "@/assets/images/cc/pro-membership.png";
+import imgStripePayments from "@/assets/images/cc/stripe-payments.png";
+import imgGenesisHallmarks from "@/assets/images/cc/genesis-hallmarks.png";
+import imgReferralProgram from "@/assets/images/cc/referral-program.png";
+import imgShopPortal from "@/assets/images/cc/shop-portal.png";
+import imgMechanicsGarage from "@/assets/images/cc/mechanics-garage.png";
+import imgShopInventory from "@/assets/images/cc/shop-inventory.png";
+import imgDigitalInspections from "@/assets/images/cc/digital-inspections.png";
+import imgOrbitStaffing from "@/assets/images/cc/orbit-staffing.png";
+import imgBusinessIntegrations from "@/assets/images/cc/business-integrations.png";
+import imgPartnerApi from "@/assets/images/cc/partner-api.png";
+import imgSignalChat from "@/assets/images/cc/signal-chat.png";
+import imgBreakRoom from "@/assets/images/cc/break-room.png";
+import imgShadeTree from "@/assets/images/cc/shade-tree.png";
+import imgTriviaQuiz from "@/assets/images/cc/trivia-quiz.png";
+import imgGiveaways from "@/assets/images/cc/giveaways.png";
+import imgPartsSearch from "@/assets/images/cc/parts-search.png";
+import imgMyGarage from "@/assets/images/cc/my-garage.png";
+import imgDiyGuides from "@/assets/images/cc/diy-guides.png";
+import imgPartsMarketplace from "@/assets/images/cc/parts-marketplace.png";
+import imgWishlists from "@/assets/images/cc/wishlists.png";
+import imgBuildProjects from "@/assets/images/cc/build-projects.png";
+import imgPriceAlerts from "@/assets/images/cc/price-alerts.png";
+import imgInsurance from "@/assets/images/cc/insurance.png";
+import imgRentalCars from "@/assets/images/cc/rental-cars.png";
+import imgCdlDirectory from "@/assets/images/cc/cdl-directory.png";
+import imgVendorManagement from "@/assets/images/cc/vendor-management.png";
+import imgWeatherRadar from "@/assets/images/cc/weather-radar.png";
+import imgSupportCenter from "@/assets/images/cc/support-center.png";
+import imgDevPortal from "@/assets/images/cc/dev-portal.png";
+import imgReleaseManager from "@/assets/images/cc/release-manager.png";
+import imgBlockchainVerifier from "@/assets/images/cc/blockchain-verifier.png";
+import imgUserManagement from "@/assets/images/cc/user-management.png";
+import imgExplorePage from "@/assets/images/cc/explore-page.png";
+import imgInvestorPortal from "@/assets/images/cc/investor-portal.png";
+
+const GLOW_MAP: Record<string, string> = {
+  "shadow-cyan-500/30": "0 0 25px rgba(6,182,212,0.3)",
+  "shadow-green-500/30": "0 0 25px rgba(34,197,94,0.3)",
+  "shadow-purple-500/30": "0 0 25px rgba(168,85,247,0.3)",
+  "shadow-amber-500/30": "0 0 25px rgba(245,158,11,0.3)",
+  "shadow-blue-500/30": "0 0 25px rgba(59,130,246,0.3)",
+  "shadow-pink-500/30": "0 0 25px rgba(236,72,153,0.3)",
+  "shadow-indigo-500/30": "0 0 25px rgba(99,102,241,0.3)",
+  "shadow-yellow-500/30": "0 0 25px rgba(234,179,8,0.3)",
+  "shadow-orange-500/30": "0 0 25px rgba(249,115,22,0.3)",
+  "shadow-red-500/30": "0 0 25px rgba(239,68,68,0.3)",
+  "shadow-teal-500/30": "0 0 25px rgba(20,184,166,0.3)",
+  "shadow-violet-500/30": "0 0 25px rgba(139,92,246,0.3)",
+  "shadow-sky-500/30": "0 0 25px rgba(14,165,233,0.3)",
+  "shadow-lime-500/30": "0 0 25px rgba(132,204,22,0.3)",
+  "shadow-emerald-500/30": "0 0 25px rgba(16,185,129,0.3)",
+  "shadow-slate-500/30": "0 0 25px rgba(100,116,139,0.3)",
+  "shadow-rose-500/30": "0 0 25px rgba(244,63,94,0.3)",
+};
+
+interface LaunchCard {
+  label: string;
   description: string;
-  route: string;
+  href: string;
   icon: any;
-  color: string;
-  glow: string;
+  image: string;
+  glowColor: string;
   badge?: string;
-  badgeColor?: string;
+  featured?: boolean;
 }
 
-interface CommandCategory {
+interface Category {
   title: string;
-  description: string;
   icon: any;
-  color: string;
   gradient: string;
-  items: CommandItem[];
+  description: string;
+  cards: LaunchCard[];
 }
 
-const COMMAND_CATEGORIES: CommandCategory[] = [
+const categories: Category[] = [
   {
     title: "Analytics & Insights",
-    description: "Traffic, performance, and business intelligence",
     icon: BarChart3,
-    color: "text-cyan-400",
-    gradient: "from-cyan-500/20 to-blue-500/20",
-    items: [
-      { title: "Analytics Dashboard", description: "Real-time traffic, pageviews, sessions, devices, geo data", route: "/dev", icon: BarChart3, color: "text-cyan-400", glow: "rgba(0,229,255,0.2)" },
-      { title: "System Dashboard", description: "API health, server status, blockchain assets, traffic charts", route: "/dashboard", icon: Activity, color: "text-green-400", glow: "rgba(74,222,128,0.2)" },
-      { title: "Affiliate Analytics", description: "Click tracking, commission reports, network performance", route: "/dev", icon: TrendingUp, color: "text-purple-400", glow: "rgba(168,85,247,0.2)" },
-      { title: "SEO Manager", description: "Page meta tags, Open Graph, crawl optimization", route: "/dev", icon: Search, color: "text-amber-400", glow: "rgba(251,191,36,0.2)" },
+    gradient: "from-cyan-500 to-blue-500",
+    description: "Monitor your platform's performance in real-time. Track traffic, page views, sessions, device breakdowns, geographic data, and affiliate click-through rates. Your data command post for making informed decisions.",
+    cards: [
+      { label: "Analytics Dashboard", description: "Real-time traffic, sessions, devices & geo data", href: "/dev", icon: BarChart3, image: imgAnalyticsDashboard, glowColor: "shadow-cyan-500/30", badge: "Live", featured: true },
+      { label: "System Dashboard", description: "API health, server status & traffic charts", href: "/dashboard", icon: Activity, image: imgSystemHealth, glowColor: "shadow-green-500/30" },
+      { label: "Affiliate Analytics", description: "Click tracking & commission performance reports", href: "/dev", icon: TrendingUp, image: imgAffiliateAnalytics, glowColor: "shadow-purple-500/30" },
+      { label: "SEO Manager", description: "Page meta tags, Open Graph & crawl optimization", href: "/dev", icon: Search, image: imgSeoManager, glowColor: "shadow-amber-500/30" },
     ]
   },
   {
     title: "Marketing & Growth",
-    description: "Social media, campaigns, content, and outreach",
     icon: Megaphone,
-    color: "text-purple-400",
-    gradient: "from-purple-500/20 to-pink-500/20",
-    items: [
-      { title: "Marketing Hub", description: "Meta auto-posting, scheduled content, 60+ posts rotation", route: "/marketing", icon: Megaphone, color: "text-purple-400", glow: "rgba(168,85,247,0.2)" },
-      { title: "Blog Manager", description: "AI-generated posts, publish/feature controls, content calendar", route: "/blog", icon: FileText, color: "text-blue-400", glow: "rgba(96,165,250,0.2)" },
-      { title: "Newsletter", description: "Subscriber management and email campaigns", route: "/dev", icon: Mail, color: "text-pink-400", glow: "rgba(244,114,182,0.2)" },
-      { title: "Meta Ads Campaigns", description: "Facebook/Instagram ad management with targeting", route: "/marketing", icon: Globe, color: "text-indigo-400", glow: "rgba(129,140,248,0.2)" },
-      { title: "Sponsored Products", description: "Featured product placements and promoted listings", route: "/dev", icon: Star, color: "text-yellow-400", glow: "rgba(250,204,21,0.2)" },
+    gradient: "from-purple-500 to-pink-500",
+    description: "Grow your audience and drive engagement. Manage social media auto-posting to Facebook, schedule content rotations, run Meta ad campaigns, publish blog content, and manage sponsored product placements.",
+    cards: [
+      { label: "Marketing Hub", description: "Meta auto-posting, 60+ posts, 3-hour rotation", href: "/marketing", icon: Megaphone, image: imgMarketingHub, glowColor: "shadow-purple-500/30", featured: true },
+      { label: "Blog Manager", description: "AI-generated posts, publish & feature controls", href: "/blog", icon: FileText, image: imgBlogManager, glowColor: "shadow-blue-500/30" },
+      { label: "Newsletter", description: "Subscriber management & email campaigns", href: "/dev", icon: Mail, image: imgNewsletter, glowColor: "shadow-pink-500/30" },
+      { label: "Meta Ads Campaigns", description: "Facebook/Instagram ad targeting & management", href: "/marketing", icon: Globe, image: imgMetaAds, glowColor: "shadow-indigo-500/30" },
+      { label: "Sponsored Products", description: "Featured placements & promoted listings", href: "/dev", icon: Star, image: imgSponsoredProducts, glowColor: "shadow-yellow-500/30" },
     ]
   },
   {
     title: "Revenue & Monetization",
-    description: "Payments, affiliates, subscriptions, and earnings",
     icon: DollarSign,
-    color: "text-green-400",
-    gradient: "from-green-500/20 to-emerald-500/20",
-    items: [
-      { title: "Affiliate Networks", description: "Amazon, CJ, eBay, ShareASale — 50+ retailer connections", route: "/dev", icon: Link2, color: "text-green-400", glow: "rgba(74,222,128,0.2)" },
-      { title: "Inbound Affiliate Program", description: "GB-XXXXXX codes, referrals, commissions, payouts", route: "/affiliates", icon: Users, color: "text-cyan-400", glow: "rgba(0,229,255,0.2)", badge: "NEW", badgeColor: "bg-cyan-500" },
-      { title: "Pro Memberships", description: "Founders Circle subscriptions and ad-free tiers", route: "/pro", icon: Crown, color: "text-yellow-400", glow: "rgba(250,204,21,0.2)" },
-      { title: "Stripe Payments", description: "Payment processing, checkout, subscriptions", route: "/dev", icon: CreditCard, color: "text-blue-400", glow: "rgba(96,165,250,0.2)" },
-      { title: "Genesis Hallmarks", description: "NFT minting, Solana blockchain verification", route: "/hallmark", icon: Award, color: "text-amber-400", glow: "rgba(251,191,36,0.2)" },
-      { title: "Referral Program", description: "Points system, invite rewards, Pro conversion bonuses", route: "/invite", icon: Send, color: "text-pink-400", glow: "rgba(244,114,182,0.2)" },
+    gradient: "from-green-500 to-emerald-500",
+    description: "Track and optimize every revenue stream. Manage affiliate networks across 50+ retailers, run the inbound affiliate program (GB-XXXXXX), process Stripe payments, handle Pro subscriptions, and mint Genesis Hallmark NFTs.",
+    cards: [
+      { label: "Affiliate Networks", description: "Amazon, CJ, eBay, ShareASale — 50+ retailers", href: "/dev", icon: Link2, image: imgAffiliateNetworks, glowColor: "shadow-green-500/30", badge: "Earn", featured: true },
+      { label: "Inbound Affiliate Program", description: "GB-XXXXXX referral codes, commissions & payouts", href: "/affiliates", icon: Users, image: imgInboundAffiliate, glowColor: "shadow-cyan-500/30", badge: "New" },
+      { label: "Pro Memberships", description: "Founders Circle subscriptions & ad-free tiers", href: "/pro", icon: Crown, image: imgProMembership, glowColor: "shadow-yellow-500/30" },
+      { label: "Stripe Payments", description: "Payment processing, checkout & subscriptions", href: "/dev", icon: CreditCard, image: imgStripePayments, glowColor: "shadow-blue-500/30" },
+      { label: "Genesis Hallmarks", description: "NFT minting & Solana blockchain verification", href: "/hallmark", icon: Award, image: imgGenesisHallmarks, glowColor: "shadow-amber-500/30" },
+      { label: "Referral Program", description: "Points system, invite rewards & Pro bonuses", href: "/invite", icon: Send, image: imgReferralProgram, glowColor: "shadow-pink-500/30" },
     ]
   },
   {
     title: "Mechanics Garage Suite",
-    description: "Shop management, POS, inventory, and workforce",
     icon: Wrench,
-    color: "text-orange-400",
-    gradient: "from-orange-500/20 to-red-500/20",
-    items: [
-      { title: "Shop Portal", description: "Shop registration, settings, and management console", route: "/shop-portal", icon: Building2, color: "text-orange-400", glow: "rgba(251,146,60,0.2)" },
-      { title: "Mechanics Garage", description: "Repair orders, estimates, appointments, POS system", route: "/mechanics-garage", icon: Wrench, color: "text-red-400", glow: "rgba(248,113,113,0.2)" },
-      { title: "Shop Inventory", description: "Parts inventory management and tracking", route: "/mechanics-garage", icon: Package, color: "text-amber-400", glow: "rgba(251,191,36,0.2)" },
-      { title: "Digital Inspections", description: "Vehicle inspection reports and customer sharing", route: "/mechanics-garage", icon: ClipboardList, color: "text-teal-400", glow: "rgba(45,212,191,0.2)" },
-      { title: "ORBIT Staffing", description: "Payroll, timesheets, employees, W2/1099 processing", route: "/mechanics-garage", icon: Briefcase, color: "text-violet-400", glow: "rgba(139,92,246,0.2)" },
-      { title: "Business Integrations", description: "QuickBooks, ADP, Gusto, Google Calendar, PartsTech", route: "/mechanics-garage", icon: Layers, color: "text-sky-400", glow: "rgba(56,189,248,0.2)" },
-      { title: "Partner API", description: "B2B API keys, scopes, rate limiting, usage logs", route: "/dev", icon: Terminal, color: "text-lime-400", glow: "rgba(163,230,53,0.2)" },
+    gradient: "from-orange-500 to-red-500",
+    description: "The complete shop management platform. Register shops, manage repair orders and estimates, handle inventory, run digital inspections, integrate ORBIT for payroll, and connect business tools like QuickBooks and PartsTech.",
+    cards: [
+      { label: "Shop Portal", description: "Shop registration, settings & management", href: "/shop-portal", icon: Building2, image: imgShopPortal, glowColor: "shadow-orange-500/30", featured: true },
+      { label: "Mechanics Garage", description: "Repair orders, estimates, appointments & POS", href: "/mechanics-garage", icon: Wrench, image: imgMechanicsGarage, glowColor: "shadow-red-500/30" },
+      { label: "Shop Inventory", description: "Parts inventory management & tracking", href: "/mechanics-garage", icon: Package, image: imgShopInventory, glowColor: "shadow-amber-500/30" },
+      { label: "Digital Inspections", description: "Vehicle inspection reports & customer sharing", href: "/mechanics-garage", icon: ClipboardList, image: imgDigitalInspections, glowColor: "shadow-teal-500/30" },
+      { label: "ORBIT Staffing", description: "Payroll, timesheets, W2/1099 processing", href: "/mechanics-garage", icon: Briefcase, image: imgOrbitStaffing, glowColor: "shadow-violet-500/30" },
+      { label: "Business Integrations", description: "QuickBooks, ADP, Gusto, PartsTech & more", href: "/mechanics-garage", icon: Layers, image: imgBusinessIntegrations, glowColor: "shadow-sky-500/30" },
+      { label: "Partner API", description: "B2B API keys, scopes & rate limiting", href: "/dev", icon: Terminal, image: imgPartnerApi, glowColor: "shadow-lime-500/30" },
     ]
   },
   {
     title: "Community & Engagement",
-    description: "Chat, forums, events, and user interaction",
     icon: MessageCircle,
-    color: "text-blue-400",
-    gradient: "from-blue-500/20 to-indigo-500/20",
-    items: [
-      { title: "Signal Chat", description: "Community messaging, channels, DMs, reactions, threads", route: "/chat", icon: MessageCircle, color: "text-blue-400", glow: "rgba(96,165,250,0.2)" },
-      { title: "Break Room", description: "News, tools, scanners, mileage tracker, speed traps, fuel prices", route: "/break-room", icon: Coffee, color: "text-amber-400", glow: "rgba(251,191,36,0.2)" },
-      { title: "Shade Tree Mechanics", description: "DIY community hub, repair guides, savings estimates", route: "/shade-tree", icon: Wrench, color: "text-emerald-400", glow: "rgba(52,211,153,0.2)" },
-      { title: "Trivia Quiz", description: "Automotive knowledge game for engagement", route: "/trivia", icon: Gamepad2, color: "text-pink-400", glow: "rgba(244,114,182,0.2)" },
-      { title: "Giveaways", description: "Prize drawings and winner management", route: "/dev", icon: Sparkles, color: "text-yellow-400", glow: "rgba(250,204,21,0.2)" },
+    gradient: "from-blue-500 to-indigo-500",
+    description: "Build and nurture your community. Manage Signal Chat channels and DMs, curate Break Room content, support the Shade Tree DIY community, run trivia games, and manage prize giveaways to keep users engaged.",
+    cards: [
+      { label: "Signal Chat", description: "Community messaging, channels, DMs & threads", href: "/chat", icon: MessageCircle, image: imgSignalChat, glowColor: "shadow-blue-500/30", featured: true },
+      { label: "Break Room", description: "News, tools, scanners, speed traps & fuel prices", href: "/break-room", icon: Coffee, image: imgBreakRoom, glowColor: "shadow-amber-500/30" },
+      { label: "Shade Tree Mechanics", description: "DIY community hub & repair guides", href: "/shade-tree", icon: Wrench, image: imgShadeTree, glowColor: "shadow-emerald-500/30" },
+      { label: "Trivia Quiz", description: "Automotive knowledge game", href: "/trivia", icon: Gamepad2, image: imgTriviaQuiz, glowColor: "shadow-pink-500/30" },
+      { label: "Giveaways", description: "Prize drawings & winner management", href: "/dev", icon: Sparkles, image: imgGiveaways, glowColor: "shadow-yellow-500/30" },
     ]
   },
   {
     title: "Vehicle & Parts",
-    description: "Search, garage, guides, marketplace, and alerts",
     icon: Car,
-    color: "text-red-400",
-    gradient: "from-red-500/20 to-orange-500/20",
-    items: [
-      { title: "Parts Search", description: "68+ retailers, 16 categories, vehicle-aware filtering", route: "/results", icon: Search, color: "text-cyan-400", glow: "rgba(0,229,255,0.2)" },
-      { title: "My Garage", description: "Fleet management, VIN decoding, service records, expenses", route: "/garage", icon: Car, color: "text-red-400", glow: "rgba(248,113,113,0.2)" },
-      { title: "DIY Guides", description: "AI-generated repair guides with YouTube integration", route: "/diy-guides", icon: BookOpen, color: "text-green-400", glow: "rgba(74,222,128,0.2)" },
-      { title: "Parts Marketplace", description: "Peer-to-peer listings with messaging", route: "/marketplace", icon: ShoppingCart, color: "text-orange-400", glow: "rgba(251,146,60,0.2)" },
-      { title: "Wishlists", description: "Save, organize, and share parts lists", route: "/wishlists", icon: Heart, color: "text-pink-400", glow: "rgba(244,114,182,0.2)" },
-      { title: "Build Projects", description: "Track custom builds with parts and progress", route: "/projects", icon: GitBranch, color: "text-purple-400", glow: "rgba(168,85,247,0.2)" },
-      { title: "Price Alerts", description: "Track price changes and get notifications", route: "/garage", icon: Bell, color: "text-yellow-400", glow: "rgba(250,204,21,0.2)" },
+    gradient: "from-red-500 to-orange-500",
+    description: "The core product experience. Search parts across 68+ retailers, manage vehicle fleets with VIN decoding, follow AI-generated DIY repair guides, browse the peer-to-peer marketplace, track wishlists, and monitor price alerts.",
+    cards: [
+      { label: "Parts Search", description: "68+ retailers, 16 categories, vehicle-aware", href: "/results", icon: Search, image: imgPartsSearch, glowColor: "shadow-cyan-500/30", featured: true },
+      { label: "My Garage", description: "Fleet management, VIN decoding & service records", href: "/garage", icon: Car, image: imgMyGarage, glowColor: "shadow-red-500/30" },
+      { label: "DIY Guides", description: "AI repair guides with YouTube integration", href: "/diy-guides", icon: BookOpen, image: imgDiyGuides, glowColor: "shadow-green-500/30" },
+      { label: "Parts Marketplace", description: "Peer-to-peer listings with messaging", href: "/marketplace", icon: ShoppingCart, image: imgPartsMarketplace, glowColor: "shadow-orange-500/30" },
+      { label: "Wishlists", description: "Save, organize & share parts lists", href: "/wishlists", icon: Heart, image: imgWishlists, glowColor: "shadow-pink-500/30" },
+      { label: "Build Projects", description: "Track custom builds with parts & progress", href: "/projects", icon: GitBranch, image: imgBuildProjects, glowColor: "shadow-purple-500/30" },
+      { label: "Price Alerts", description: "Track price changes & get notifications", href: "/garage", icon: Bell, image: imgPriceAlerts, glowColor: "shadow-yellow-500/30" },
     ]
   },
   {
     title: "Services & Directories",
-    description: "Insurance, rentals, CDL, vendors, and support",
     icon: Compass,
-    color: "text-teal-400",
-    gradient: "from-teal-500/20 to-cyan-500/20",
-    items: [
-      { title: "Insurance Comparison", description: "Multi-provider quote comparison tool", route: "/insurance", icon: Shield, color: "text-teal-400", glow: "rgba(45,212,191,0.2)" },
-      { title: "Rental Cars", description: "Carla, Expedia, Hotels.com comparison", route: "/rentals", icon: Car, color: "text-blue-400", glow: "rgba(96,165,250,0.2)" },
-      { title: "CDL Directory", description: "Trucking companies and CDL programs", route: "/cdl-directory", icon: Truck, color: "text-orange-400", glow: "rgba(251,146,60,0.2)" },
-      { title: "Vendor Management", description: "Retailer applications, featured vendors, partnerships", route: "/vendor-signup", icon: Building2, color: "text-indigo-400", glow: "rgba(129,140,248,0.2)" },
-      { title: "Weather Radar", description: "Leaflet map, RainViewer, NOAA alerts", route: "/break-room", icon: Map, color: "text-sky-400", glow: "rgba(56,189,248,0.2)" },
-      { title: "Support Center", description: "Help desk, contact, and user support", route: "/support", icon: Phone, color: "text-green-400", glow: "rgba(74,222,128,0.2)" },
+    gradient: "from-teal-500 to-cyan-500",
+    description: "Extended platform services beyond parts. Compare insurance quotes, browse rental cars, explore the CDL trucking directory, manage vendor partnerships, monitor weather radar, and handle customer support.",
+    cards: [
+      { label: "Insurance Comparison", description: "Multi-provider quote comparison tool", href: "/insurance", icon: Shield, image: imgInsurance, glowColor: "shadow-teal-500/30" },
+      { label: "Rental Cars", description: "Carla, Expedia & Hotels.com comparison", href: "/rentals", icon: Car, image: imgRentalCars, glowColor: "shadow-blue-500/30" },
+      { label: "CDL Directory", description: "Trucking companies & CDL programs", href: "/cdl-directory", icon: Truck, image: imgCdlDirectory, glowColor: "shadow-orange-500/30" },
+      { label: "Vendor Management", description: "Retailer applications & partnerships", href: "/vendor-signup", icon: Building2, image: imgVendorManagement, glowColor: "shadow-indigo-500/30" },
+      { label: "Weather Radar", description: "Leaflet map, RainViewer & NOAA alerts", href: "/break-room", icon: Map, image: imgWeatherRadar, glowColor: "shadow-sky-500/30" },
+      { label: "Support Center", description: "Help desk & user support", href: "/support", icon: Mail, image: imgSupportCenter, glowColor: "shadow-green-500/30" },
     ]
   },
   {
     title: "Platform & Development",
-    description: "Roadmap, releases, users, and system config",
     icon: Settings,
-    color: "text-slate-400",
-    gradient: "from-slate-500/20 to-zinc-500/20",
-    items: [
-      { title: "Dev Portal", description: "Full admin panel — roadmap, tasks, releases, seed data, configs", route: "/dev", icon: Terminal, color: "text-slate-400", glow: "rgba(148,163,184,0.2)" },
-      { title: "Release Manager", description: "Version tracking, changelogs, blockchain verification", route: "/dev", icon: Rocket, color: "text-cyan-400", glow: "rgba(0,229,255,0.2)" },
-      { title: "Blockchain Verifier", description: "Solana on-chain transaction submission and verification", route: "/dev", icon: Blocks, color: "text-purple-400", glow: "rgba(168,85,247,0.2)" },
-      { title: "User Management", description: "Accounts, roles, waitlist, sessions", route: "/dev", icon: Users, color: "text-blue-400", glow: "rgba(96,165,250,0.2)" },
-      { title: "Explore Page", description: "Feature discovery and platform showcase", route: "/explore", icon: Compass, color: "text-emerald-400", glow: "rgba(52,211,153,0.2)" },
-      { title: "Investor Portal", description: "Business metrics and investment deck", route: "/investors", icon: PieChart, color: "text-amber-400", glow: "rgba(251,191,36,0.2)" },
+    gradient: "from-slate-500 to-zinc-500",
+    description: "Under-the-hood tools for platform management. Access the full dev portal, manage release versions with blockchain verification, handle user accounts and roles, explore features, and review investor metrics.",
+    cards: [
+      { label: "Dev Portal", description: "Full admin panel — roadmap, tasks, configs", href: "/dev", icon: Terminal, image: imgDevPortal, glowColor: "shadow-slate-500/30", featured: true },
+      { label: "Release Manager", description: "Version tracking & changelogs", href: "/dev", icon: Rocket, image: imgReleaseManager, glowColor: "shadow-cyan-500/30" },
+      { label: "Blockchain Verifier", description: "Solana on-chain verification", href: "/dev", icon: Blocks, image: imgBlockchainVerifier, glowColor: "shadow-purple-500/30" },
+      { label: "User Management", description: "Accounts, roles, waitlist & sessions", href: "/dev", icon: Users, image: imgUserManagement, glowColor: "shadow-blue-500/30" },
+      { label: "Explore Page", description: "Feature discovery & platform showcase", href: "/explore", icon: Compass, image: imgExplorePage, glowColor: "shadow-emerald-500/30" },
+      { label: "Investor Portal", description: "Business metrics & investment deck", href: "/investors", icon: PieChart, image: imgInvestorPortal, glowColor: "shadow-amber-500/30" },
     ]
   },
 ];
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl border border-white/5 bg-black/20 p-5 animate-pulse">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-xl bg-white/5" />
-        <div className="flex-1">
-          <div className="h-4 w-24 bg-white/5 rounded mb-2" />
-          <div className="h-3 w-40 bg-white/5 rounded" />
-        </div>
+    <div className="flex-shrink-0 basis-[280px] h-[200px] rounded-2xl bg-white/[0.03] border border-white/5 animate-pulse">
+      <div className="p-5 h-full flex flex-col justify-end">
+        <div className="h-4 w-20 bg-white/5 rounded mb-2" />
+        <div className="h-3 w-36 bg-white/5 rounded" />
       </div>
     </div>
   );
 }
 
-function SkeletonCategory() {
+function SkeletonSection() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 animate-pulse">
-        <div className="w-12 h-12 rounded-2xl bg-white/5" />
+        <div className="w-10 h-10 rounded-xl bg-white/5" />
         <div>
           <div className="h-5 w-32 bg-white/5 rounded mb-2" />
-          <div className="h-3 w-48 bg-white/5 rounded" />
+          <div className="h-3 w-64 bg-white/5 rounded" />
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {[1,2,3,4,5,6].map(i => <SkeletonCard key={i} />)}
+      <div className="flex gap-4 overflow-hidden">
+        {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
       </div>
+    </div>
+  );
+}
+
+function CardComponent({ card, index, catIndex }: { card: LaunchCard; index: number; catIndex: number }) {
+  const [, navigate] = useLocation();
+  const [isHovered, setIsHovered] = useState(false);
+  const glowShadow = GLOW_MAP[card.glowColor] || "0 0 25px rgba(6,182,212,0.3)";
+
+  return (
+    <CarouselItem className={`pl-4 ${card.featured ? "basis-[320px]" : "basis-[280px]"}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: catIndex * 0.08 + index * 0.05 }}
+        whileHover={{ scale: 1.03 }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        onClick={() => navigate(card.href)}
+        className={`relative cursor-pointer rounded-2xl overflow-hidden group ${card.featured ? "h-[220px]" : "h-[200px]"} border transition-all duration-300 ${isHovered ? "border-white/15" : "border-white/5"}`}
+        style={{ boxShadow: isHovered ? glowShadow : "none" }}
+        data-testid={`card-${card.label.toLowerCase().replace(/\s+/g, '-')}`}
+      >
+        <img
+          src={card.image}
+          alt={card.label}
+          className="absolute inset-0 w-full h-full object-cover brightness-110 group-hover:scale-105 transition-transform duration-500"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30" />
+
+        {card.badge && (
+          <div className="absolute top-3 right-3 z-20">
+            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-full text-white ${
+              card.badge === "Live" ? "bg-gradient-to-r from-green-500 to-emerald-500" :
+              card.badge === "New" ? "bg-gradient-to-r from-cyan-500 to-blue-500" :
+              card.badge === "Earn" ? "bg-gradient-to-r from-orange-500 to-rose-500" :
+              "bg-gradient-to-r from-purple-500 to-pink-500"
+            }`}>
+              {card.badge}
+            </span>
+          </div>
+        )}
+
+        {card.featured && (
+          <div className="absolute top-3 left-3 z-20">
+            <span className="px-2 py-0.5 text-[9px] font-bold uppercase rounded border border-yellow-500/30 text-yellow-400 bg-yellow-500/10 backdrop-blur-sm">
+              Featured
+            </span>
+          </div>
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+              <card.icon className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors truncate">
+              {card.label}
+            </h3>
+            <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/60 group-hover:translate-x-1 transition-all ml-auto shrink-0" />
+          </div>
+          <p className="text-xs text-white/50 line-clamp-2">{card.description}</p>
+        </div>
+      </motion.div>
+    </CarouselItem>
+  );
+}
+
+function LoginGate({ onSuccess }: { onSuccess: () => void }) {
+  const [username, setUsername] = useState("");
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, mainPin: pin }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Login failed");
+      if (data.user.role !== "admin") {
+        setError("Command Center access requires administrator privileges.");
+        setLoading(false);
+        return;
+      }
+      onSuccess();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#070b16] via-[#0c1222] to-[#070b16] flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-sm"
+      >
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl p-8">
+          <div className="text-center mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-7 h-7 text-white" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-1">Command Center</h2>
+            <p className="text-sm text-white/40">Enter your credentials to access mission control</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="text-xs text-white/50 mb-1.5 block">Username</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-cyan-500/40 transition-colors text-sm"
+                placeholder="Enter username"
+                data-testid="input-cc-username"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-white/50 mb-1.5 block">PIN / Password</label>
+              <input
+                type="password"
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-cyan-500/40 transition-colors text-sm"
+                placeholder="Enter PIN"
+                data-testid="input-cc-pin"
+              />
+            </div>
+
+            {error && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"
+              >
+                {error}
+              </motion.p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || !username || !pin}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-sm hover:from-cyan-400 hover:to-blue-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              data-testid="button-cc-login"
+            >
+              {loading ? "Authenticating..." : "Access Command Center"}
+            </button>
+          </form>
+        </div>
+      </motion.div>
     </div>
   );
 }
 
 export default function CommandCenter() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logout } = useAuth();
+  const queryClient = useQueryClient();
   const [, navigate] = useLocation();
   const [loaded, setLoaded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoaded(true), 600);
+    const timer = setTimeout(() => setLoaded(true), 400);
     return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a1a]">
-        <Nav />
-        <div className="max-w-7xl mx-auto px-4 pt-24 pb-12 space-y-8">
-          {[1,2,3].map(i => <SkeletonCategory key={i} />)}
+      <div className="min-h-screen bg-gradient-to-b from-[#070b16] via-[#0c1222] to-[#070b16]">
+        <div className="max-w-[1400px] mx-auto px-6 pt-20 pb-12 space-y-10">
+          {[1,2,3].map(i => <SkeletonSection key={i} />)}
         </div>
       </div>
     );
   }
 
-  if (!user || user.role !== "admin") {
+  if (!user) {
+    return <LoginGate onSuccess={() => queryClient.invalidateQueries({ queryKey: ["auth-user"] })} />;
+  }
+
+  if (user.role !== "admin") {
     return (
-      <div className="min-h-screen bg-[#0a0a1a] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#070b16] via-[#0c1222] to-[#070b16] flex items-center justify-center">
         <Nav />
-        <Card className="bg-black/40 backdrop-blur-xl border border-red-500/30 p-8 text-center max-w-md">
+        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center max-w-md">
           <Lock className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Access Restricted</h2>
-          <p className="text-gray-400">Command Center is available to platform administrators only.</p>
-        </Card>
+          <p className="text-white/50">Command Center is available to platform administrators only.</p>
+        </div>
       </div>
     );
   }
 
-  const filteredCategories = searchQuery
-    ? COMMAND_CATEGORIES.map(cat => ({
-        ...cat,
-        items: cat.items.filter(item =>
-          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      })).filter(cat => cat.items.length > 0)
-    : activeCategory
-      ? COMMAND_CATEGORIES.filter(cat => cat.title === activeCategory)
-      : COMMAND_CATEGORIES;
-
-  const totalFeatures = COMMAND_CATEGORIES.reduce((sum, cat) => sum + cat.items.length, 0);
+  const totalFeatures = categories.reduce((sum, cat) => sum + cat.cards.length, 0);
 
   return (
-    <div className="min-h-screen bg-[#0a0a1a]" data-testid="page-command-center">
-      <Nav />
-
-      <div className="max-w-7xl mx-auto px-4 pt-24 pb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-10"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 mb-5">
-            <LayoutDashboard className="w-4 h-4 text-cyan-400" />
-            <span className="text-cyan-400 text-sm font-medium tracking-wider uppercase">Command Center</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Mission Control
-            </span>
-          </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            {totalFeatures} features across {COMMAND_CATEGORIES.length} categories — everything in one place
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="mb-8"
-        >
-          <div className="relative max-w-xl mx-auto mb-6">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search all features..."
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setActiveCategory(null); }}
-              className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-black/40 backdrop-blur-xl border border-cyan-500/20 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:shadow-[0_0_20px_rgba(0,229,255,0.15)] transition-all"
-              data-testid="input-search-features"
-            />
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-2">
+    <div className="min-h-screen bg-gradient-to-b from-[#070b16] via-[#0c1222] to-[#070b16]" data-testid="page-command-center">
+      <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#070b16]/80 border-b border-white/5">
+        <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <button
-              onClick={() => { setActiveCategory(null); setSearchQuery(""); }}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                !activeCategory && !searchQuery
-                  ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 shadow-[0_0_15px_rgba(0,229,255,0.15)]"
-                  : "bg-black/20 text-gray-400 border border-white/5 hover:border-white/15 hover:text-white"
-              }`}
-              data-testid="button-filter-all"
+              onClick={() => navigate("/")}
+              className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+              data-testid="button-back-home"
             >
-              All ({totalFeatures})
+              <ArrowLeft className="w-4 h-4 text-white/60" />
             </button>
-            {COMMAND_CATEGORIES.map((cat) => (
-              <button
-                key={cat.title}
-                onClick={() => { setActiveCategory(activeCategory === cat.title ? null : cat.title); setSearchQuery(""); }}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
-                  activeCategory === cat.title
-                    ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 shadow-[0_0_15px_rgba(0,229,255,0.15)]"
-                    : "bg-black/20 text-gray-400 border border-white/5 hover:border-white/15 hover:text-white"
-                }`}
-                data-testid={`button-filter-${cat.title.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                <cat.icon className="w-3.5 h-3.5" />
-                {cat.title.split(" ")[0]}
-                <span className="text-xs opacity-60">({cat.items.length})</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory || searchQuery || "all"}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-10"
-          >
-            {!loaded ? (
-              [1,2,3].map(i => <SkeletonCategory key={i} />)
-            ) : filteredCategories.length === 0 ? (
-              <div className="text-center py-16">
-                <Search className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400 text-lg">No features match "{searchQuery}"</p>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                <LayoutGrid className="w-4 h-4 text-white" />
               </div>
-            ) : (
-              filteredCategories.map((category, catIndex) => (
-                <motion.section
-                  key={category.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: catIndex * 0.08 }}
-                >
-                  <div className="flex items-center gap-4 mb-5">
-                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${category.gradient} border border-white/10 flex items-center justify-center`}>
-                      <category.icon className={`w-6 h-6 ${category.color}`} />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-white">{category.title}</h2>
-                      <p className="text-sm text-gray-500">{category.description}</p>
-                    </div>
-                    <Badge variant="outline" className="ml-auto border-white/10 text-gray-500 text-xs">
-                      {category.items.length} tools
-                    </Badge>
-                  </div>
+              <div>
+                <h1 className="text-sm font-bold text-white leading-tight">GarageBot Command Center</h1>
+                <p className="text-[11px] text-white/40">{totalFeatures} tools across {categories.length} categories</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-white/50 hidden sm:block">
+              Welcome, <span className="text-white/80 font-medium">{user.firstName || user.username}</span>
+            </span>
+            <button
+              onClick={() => { logout(); navigate("/"); }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 transition-all text-xs"
+              data-testid="button-logout"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {category.items.map((item, itemIndex) => {
-                      const itemKey = `${category.title}-${item.title}`;
-                      const isHovered = hoveredItem === itemKey;
+      <div className="max-w-[1400px] mx-auto px-6 pt-24 pb-16 space-y-12">
+        {!loaded ? (
+          [1,2,3,4].map(i => <SkeletonSection key={i} />)
+        ) : (
+          categories.map((category, catIndex) => (
+            <motion.section
+              key={category.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: catIndex * 0.1 }}
+              className="space-y-5"
+            >
+              <div className="flex items-start gap-4">
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center shrink-0`}>
+                  <category.icon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white mb-1">{category.title}</h2>
+                  <p className="text-sm text-white/40 max-w-2xl leading-relaxed">{category.description}</p>
+                </div>
+              </div>
 
-                      return (
-                        <motion.div
-                          key={item.title}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: catIndex * 0.05 + itemIndex * 0.03 }}
-                          whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                          onHoverStart={() => setHoveredItem(itemKey)}
-                          onHoverEnd={() => setHoveredItem(null)}
-                          onClick={() => navigate(item.route)}
-                          className="cursor-pointer group"
-                          data-testid={`card-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
-                        >
-                          <div
-                            className={`relative rounded-2xl p-5 h-full transition-all duration-300 overflow-hidden ${
-                              isHovered
-                                ? "bg-black/50 border border-cyan-500/30"
-                                : "bg-black/20 border border-white/5"
-                            }`}
-                            style={{
-                              backdropFilter: "blur(20px)",
-                              boxShadow: isHovered
-                                ? `0 8px 32px rgba(0,0,0,0.4), 0 0 20px ${item.glow}`
-                                : "0 4px 16px rgba(0,0,0,0.2)",
-                            }}
-                          >
-                            {isHovered && (
-                              <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="absolute inset-0 pointer-events-none"
-                                style={{
-                                  background: `radial-gradient(circle at 50% 0%, ${item.glow}, transparent 70%)`,
-                                }}
-                              />
-                            )}
-
-                            <div className="relative z-10 flex items-start gap-3">
-                              <div
-                                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${
-                                  isHovered ? "scale-110" : ""
-                                }`}
-                                style={{
-                                  background: `linear-gradient(135deg, ${item.glow}, transparent)`,
-                                  border: `1px solid ${item.glow.replace("0.2", "0.3")}`,
-                                }}
-                              >
-                                <item.icon className={`w-5 h-5 ${item.color}`} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="text-sm font-semibold text-white truncate group-hover:text-cyan-300 transition-colors">
-                                    {item.title}
-                                  </h3>
-                                  {item.badge && (
-                                    <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${item.badgeColor} text-white uppercase`}>
-                                      {item.badge}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-gray-500 line-clamp-2 group-hover:text-gray-400 transition-colors">
-                                  {item.description}
-                                </p>
-                              </div>
-                              <ChevronRight className={`w-4 h-4 shrink-0 mt-1 transition-all duration-300 ${
-                                isHovered ? "text-cyan-400 translate-x-1" : "text-gray-600"
-                              }`} />
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </motion.section>
-              ))
-            )}
-          </motion.div>
-        </AnimatePresence>
+              <Carousel
+                opts={{
+                  align: "start",
+                  dragFree: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-4">
+                  {category.cards.map((card, cardIndex) => (
+                    <CardComponent
+                      key={card.label}
+                      card={card}
+                      index={cardIndex}
+                      catIndex={catIndex}
+                    />
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex -left-3 bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white" />
+                <CarouselNext className="hidden md:flex -right-3 bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white" />
+              </Carousel>
+            </motion.section>
+          ))
+        )}
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: loaded ? 1 : 0 }}
-          transition={{ delay: 0.8 }}
-          className="mt-12 text-center"
+          transition={{ delay: 1 }}
+          className="text-center pt-4"
         >
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-black/30 backdrop-blur-xl border border-white/5">
-            <Cpu className="w-4 h-4 text-cyan-400" />
-            <span className="text-gray-500 text-sm">
-              GarageBot v4.0 — 86,000+ lines of code — 422 API endpoints — 120+ database tables
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.03] backdrop-blur-xl border border-white/5">
+            <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="text-white/30 text-xs">
+              GarageBot v4.0 — 86,000+ lines — 422 endpoints — 120+ tables
             </span>
-            <Zap className="w-4 h-4 text-cyan-400" />
+            <Zap className="w-3.5 h-3.5 text-cyan-400" />
           </div>
         </motion.div>
       </div>
