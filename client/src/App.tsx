@@ -37,6 +37,7 @@ import Pro from "@/pages/Pro";
 import GenesisHallmark from "@/pages/GenesisHallmark";
 import DIYGuides from "@/pages/DIYGuides";
 import TermsOfService from "@/pages/TermsOfService";
+import SMSConsent from "@/pages/SMSConsent";
 import InviteFriends from "@/pages/InviteFriends";
 import VendorSignup from "@/pages/VendorSignup";
 import Wishlists from "@/pages/Wishlists";
@@ -84,6 +85,7 @@ function Router() {
       <Route path="/auth/callback">{() => <AuthCallback />}</Route>
       <Route path="/privacy">{() => <PrivacyPolicy />}</Route>
       <Route path="/terms">{() => <TermsOfService />}</Route>
+      <Route path="/sms-consent">{() => <SMSConsent />}</Route>
       <Route path="/investors">{() => <Investors />}</Route>
       <Route path="/dashboard">{() => <Dashboard />}</Route>
       <Route path="/account">{() => <AccountSetup />}</Route>
