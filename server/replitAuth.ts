@@ -51,9 +51,12 @@ function updateUserSession(
 }
 
 async function upsertUser(claims: any) {
+  const email = claims["email"] || "";
+  const username = claims["preferred_username"] || claims["email"]?.split("@")[0] || `user_${claims["sub"]?.slice(0, 8)}`;
   await storage.upsertUser({
     id: claims["sub"],
-    email: claims["email"],
+    username,
+    email,
     firstName: claims["first_name"],
     lastName: claims["last_name"],
     profileImageUrl: claims["profile_image_url"],
@@ -128,10 +131,24 @@ export async function setupAuth(app: Express) {
   });
 }
 
+export function getUserId(req: any): string | null {
+  if (req.user?.claims?.sub) {
+    return req.user.claims.sub;
+  }
+  if ((req.session as any)?.userId) {
+    return (req.session as any).userId;
+  }
+  return null;
+}
+
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  if ((req.session as any)?.userId && (req.session as any)?.isCustomAuth) {
+    return next();
+  }
+
   const user = req.user as any;
 
-  if (!req.isAuthenticated() || !user.expires_at) {
+  if (!req.isAuthenticated() || !user?.expires_at) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 

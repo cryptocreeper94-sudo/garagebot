@@ -172,7 +172,7 @@ async function initStripe() {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
+    console.error(err);
   });
 
   if (process.env.NODE_ENV === "production") {

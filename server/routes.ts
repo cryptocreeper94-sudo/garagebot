@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, getUserId } from "./replitAuth";
 import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations, insertPartListingSchema, updatePartListingSchema, insertPartListingMessageSchema, partListings, newsletterSubscribers } from "@shared/schema";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
 import { comparePrice } from "./services/price-comparison";
@@ -105,7 +105,7 @@ ${pages.map(p => `  <url>
   // Auth routes (Replit OIDC)
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -407,9 +407,9 @@ ${pages.map(p => `  <url>
     });
   });
 
-  app.get('/api/auth/me', async (req, res) => {
+  app.get('/api/auth/me', async (req: any, res) => {
     try {
-      const userId = (req.session as any)?.userId;
+      const userId = getUserId(req);
       if (!userId) {
         return res.status(401).json({ error: "Not authenticated" });
       }
@@ -430,7 +430,10 @@ ${pages.map(p => `  <url>
           subscriptionTier: user.subscriptionTier,
           hasQuickPin: !!user.quickPin,
           hasGenesisBadge: user.hasGenesisBadge,
-          profileImageUrl: user.profileImageUrl
+          profileImageUrl: user.profileImageUrl,
+          role: user.role,
+          isFounder: user.isFounder,
+          adFreeSubscription: user.adFreeSubscription,
         }
       });
     } catch (error) {
@@ -677,8 +680,8 @@ ${pages.map(p => `  <url>
   }, CLEANUP_INTERVAL);
   
   const checkAIRateLimit = (req: any, res: any): boolean => {
-    const isAuthenticated = !!req.user?.claims?.sub;
-    const userId = req.user?.claims?.sub;
+    const isAuthenticated = !!getUserId(req);
+    const userId = getUserId(req);
     const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
     const identifier = userId || `ip:${ip}`;
     const limit = isAuthenticated ? AI_RATE_LIMIT_AUTHENTICATED : AI_RATE_LIMIT_ANONYMOUS;
@@ -798,8 +801,8 @@ ${pages.map(p => `  <url>
       
       // Build user context
       let userContext: any = {};
-      if (req.user?.claims?.sub) {
-        const userId = req.user.claims.sub;
+      if (getUserId(req)) {
+        const userId = getUserId(req)!;
         const user = await storage.getUser(userId);
         const vehicles = await storage.getVehiclesByUserId(userId);
         userContext = {
@@ -846,7 +849,7 @@ ${pages.map(p => `  <url>
       let vehicle = req.body.vehicle;
       
       // If vehicleId provided, fetch from DB
-      if (vehicleId && req.user?.claims?.sub) {
+      if (vehicleId && getUserId(req)) {
         const dbVehicle = await storage.getVehicle(vehicleId);
         if (dbVehicle) {
           vehicle = {
@@ -907,7 +910,7 @@ ${pages.map(p => `  <url>
   // Get proactive alerts for user's vehicles
   app.get('/api/ai/alerts', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const vehicles = await storage.getVehiclesByUserId(userId);
       
       const vehicleContexts = vehicles.map(v => ({
@@ -929,7 +932,7 @@ ${pages.map(p => `  <url>
   // Vehicles API (protected)
   app.get("/api/vehicles", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const vehicles = await storage.getVehiclesByUserId(userId);
       res.json(vehicles);
     } catch (error) {
@@ -939,7 +942,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/vehicles", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const result = insertVehicleSchema.safeParse({ ...req.body, userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
@@ -980,7 +983,7 @@ ${pages.map(p => `  <url>
   app.post("/api/vehicles/:id/set-primary", isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       await storage.setPrimaryVehicle(userId, id);
       res.json({ success: true });
     } catch (error) {
@@ -1074,7 +1077,7 @@ ${pages.map(p => `  <url>
   app.post("/api/vehicles/:vehicleId/service-records", isAuthenticated, async (req: any, res) => {
     try {
       const { vehicleId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const result = insertServiceRecordSchema.safeParse({ ...req.body, vehicleId, userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
@@ -1089,7 +1092,7 @@ ${pages.map(p => `  <url>
   // Service Reminders API
   app.get("/api/reminders", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const reminders = await storage.getServiceRemindersByUser(userId);
       res.json(reminders);
     } catch (error) {
@@ -1099,7 +1102,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/reminders", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const result = insertServiceReminderSchema.safeParse({ ...req.body, userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
@@ -1314,7 +1317,7 @@ ${pages.map(p => `  <url>
   // User preferences for weather (stored ZIP, etc.)
   app.get("/api/user/preferences", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const prefs = await storage.getUserPreferences(userId);
       res.json(prefs || {});
     } catch (error) {
@@ -1324,7 +1327,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/user/preferences", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const prefs = await storage.upsertUserPreferences({ userId, ...req.body });
       res.json(prefs);
     } catch (error) {
@@ -1358,7 +1361,7 @@ ${pages.map(p => `  <url>
   // Hallmarks API (protected)
   app.get("/api/hallmark", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const hallmark = await storage.getHallmarkByUserId(userId);
       res.json(hallmark || null);
     } catch (error) {
@@ -1368,7 +1371,7 @@ ${pages.map(p => `  <url>
 
   app.get("/api/hallmarks/me", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const hallmark = await storage.getHallmarkByUserId(userId);
       res.json(hallmark || null);
     } catch (error) {
@@ -1431,7 +1434,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/hallmark/mint", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const { vehicleId } = req.body;
       
       const existingHallmark = await storage.getHallmarkByUserId(userId);
@@ -1495,7 +1498,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/hallmarks", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const existingHallmark = await storage.getHallmarkByUserId(userId);
       if (existingHallmark) {
         return res.status(400).json({ error: "User already has a Genesis Hallmark" });
@@ -1533,7 +1536,7 @@ ${pages.map(p => `  <url>
   // Get referral summary for logged-in user
   app.get("/api/referrals/summary", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const summary = await storage.getReferralSummary(userId);
       res.json(summary);
     } catch (error) {
@@ -1545,7 +1548,7 @@ ${pages.map(p => `  <url>
   // Get point transaction history
   app.get("/api/referrals/transactions", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const transactions = await storage.getPointTransactions(userId);
       res.json(transactions);
     } catch (error) {
@@ -1557,7 +1560,7 @@ ${pages.map(p => `  <url>
   // Get referral invites
   app.get("/api/referrals/invites", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const invites = await storage.getReferralInvites(userId);
       res.json(invites);
     } catch (error) {
@@ -1569,7 +1572,7 @@ ${pages.map(p => `  <url>
   // Redeem points for rewards
   app.post("/api/referrals/redeem", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const { rewardType } = req.body;
 
       if (!['pro_month', 'pro_year', 'pro_lifetime'].includes(rewardType)) {
@@ -1594,7 +1597,7 @@ ${pages.map(p => `  <url>
   // Get redemption history
   app.get("/api/referrals/redemptions", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const redemptions = await storage.getRedemptions(userId);
       res.json(redemptions);
     } catch (error) {
@@ -1628,7 +1631,7 @@ ${pages.map(p => `  <url>
   // Get user's badges
   app.get("/api/rewards/badges", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const badges = await db.select().from(userBadges).where(eq(userBadges.userId, userId));
       res.json(badges);
     } catch (error) {
@@ -1640,7 +1643,7 @@ ${pages.map(p => `  <url>
   // Get user's achievement progress
   app.get("/api/rewards/achievements", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const achievements = await db.select().from(userAchievements).where(eq(userAchievements.userId, userId));
       res.json(achievements);
     } catch (error) {
@@ -1652,7 +1655,7 @@ ${pages.map(p => `  <url>
   // Get user's giveaway entries for current month
   app.get("/api/rewards/giveaway", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const currentMonth = new Date().toISOString().slice(0, 7); // '2026-02'
       
       const entries = await db.select().from(giveawayEntries)
@@ -1675,7 +1678,7 @@ ${pages.map(p => `  <url>
   // Get rewards summary (all stats in one call)
   app.get("/api/rewards/summary", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const currentMonth = new Date().toISOString().slice(0, 7);
       
       // Get referral count
@@ -1728,7 +1731,7 @@ ${pages.map(p => `  <url>
   // Add giveaway entry (called when user refers someone)
   app.post("/api/rewards/giveaway/enter", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const { source } = req.body;
       const currentMonth = new Date().toISOString().slice(0, 7);
       
@@ -1858,7 +1861,7 @@ ${pages.map(p => `  <url>
   // Stripe Connect - Create connected account for shop
   app.post("/api/stripe/connect/create-account", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const user = await storage.getUser(userId);
       
       if (!user) {
@@ -1940,7 +1943,7 @@ ${pages.map(p => `  <url>
   // Stripe Connect - Get account status
   app.get("/api/stripe/connect/status", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const shop = await storage.getShopByOwnerId(userId);
       
       if (!shop) {
@@ -1988,7 +1991,7 @@ ${pages.map(p => `  <url>
   // Stripe Connect - Create dashboard link
   app.get("/api/stripe/connect/dashboard", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const shop = await storage.getShopByOwnerId(userId);
       
       if (!shop?.stripeAccountId) {
@@ -2018,7 +2021,7 @@ ${pages.map(p => `  <url>
   // Cart API
   app.get("/api/cart", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req) || undefined;
       const sessionId = req.sessionID;
       const cart = await storage.getOrCreateCart(userId, sessionId);
       const items = await storage.getCartItems(cart.id);
@@ -2030,7 +2033,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/cart/items", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req) || undefined;
       const sessionId = req.sessionID;
       const { productId, priceId, productName, productImage, quantity, unitPrice } = req.body;
       
@@ -2062,7 +2065,7 @@ ${pages.map(p => `  <url>
       
       await storage.updateCartItem(itemId, quantity);
       
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req) || undefined;
       const sessionId = req.sessionID;
       const cart = await storage.getOrCreateCart(userId, sessionId);
       const items = await storage.getCartItems(cart.id);
@@ -2077,7 +2080,7 @@ ${pages.map(p => `  <url>
       const { itemId } = req.params;
       await storage.removeCartItem(itemId);
       
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req) || undefined;
       const sessionId = req.sessionID;
       const cart = await storage.getOrCreateCart(userId, sessionId);
       const items = await storage.getCartItems(cart.id);
@@ -2090,7 +2093,7 @@ ${pages.map(p => `  <url>
   // Checkout
   app.post("/api/checkout", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req) || undefined;
       const sessionId = req.sessionID;
       const cart = await storage.getOrCreateCart(userId, sessionId);
       const items = await storage.getCartItems(cart.id);
@@ -2115,7 +2118,9 @@ ${pages.map(p => `  <url>
       
       const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
       
-      const customerEmail = req.user?.claims?.email || '';
+      const uid = getUserId(req);
+      const currentUser = uid ? await storage.getUser(uid) : null;
+      const customerEmail = currentUser?.email || '';
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -2126,7 +2131,7 @@ ${pages.map(p => `  <url>
         customer_email: customerEmail || undefined,
         metadata: {
           cartId: cart.id,
-          userId: userId || 'guest',
+          userId: uid || 'guest',
         },
       });
 
@@ -2136,7 +2141,7 @@ ${pages.map(p => `  <url>
           const subtotal = items.reduce((sum: number, item: any) => sum + parseFloat(item.unitPrice) * item.quantity, 0);
           sendOrderConfirmationEmail({
             orderNumber: session.id.slice(-8).toUpperCase(),
-            customerName: req.user?.claims?.name || 'Customer',
+            customerName: currentUser?.firstName || currentUser?.username || 'Customer',
             customerEmail,
             items: items.map((item: any) => ({ name: item.productName, quantity: item.quantity, price: parseFloat(item.unitPrice) })),
             subtotal,
@@ -2156,7 +2161,7 @@ ${pages.map(p => `  <url>
   // Order history
   app.get("/api/orders", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const orders = await storage.getOrdersByUserId(userId);
       res.json(orders);
     } catch (error) {
@@ -2259,7 +2264,7 @@ ${pages.map(p => `  <url>
       
       // Log the search/click for analytics
       await storage.logSearch({
-        userId: req.user?.claims?.sub || null,
+        userId: getUserId(req) || null,
         sessionId: req.sessionID,
         query: (query as string) || (partNumber as string) || '',
         clickedVendor: vendor.name,
@@ -2438,7 +2443,7 @@ ${pages.map(p => `  <url>
       
       // Log the search
       await storage.logSearch({
-        userId: req.user?.claims?.sub || null,
+        userId: getUserId(req) || null,
         sessionId: req.sessionID,
         query: query || partNumber || '',
         vehicleYear: year,
@@ -2499,7 +2504,7 @@ ${pages.map(p => `  <url>
       const vehicle = (year || make || model) ? { year, make, model } : undefined;
 
       await storage.logSearch({
-        userId: req.user?.claims?.sub || null,
+        userId: getUserId(req) || null,
         sessionId: req.sessionID,
         query,
         vehicleYear: year ? parseInt(year) : null,
@@ -2557,7 +2562,7 @@ ${pages.map(p => `  <url>
   app.post("/api/shops/:shopId/reviews", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const review = await storage.createShopReview({ ...req.body, shopId, userId });
       res.json(review);
     } catch (error) {
@@ -2568,7 +2573,7 @@ ${pages.map(p => `  <url>
   // Shop owner routes
   app.get("/api/my-shops", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const shops = await storage.getShopsByOwner(userId);
       res.json(shops);
     } catch (error) {
@@ -2578,7 +2583,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/shops", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const slug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       const shop = await storage.createShop({ ...req.body, ownerId: userId, slug });
       
@@ -2602,7 +2607,7 @@ ${pages.map(p => `  <url>
   app.patch("/api/shops/:shopId", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2620,7 +2625,7 @@ ${pages.map(p => `  <url>
   app.get("/api/shops/:shopId/customers", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2637,7 +2642,7 @@ ${pages.map(p => `  <url>
   app.post("/api/shops/:shopId/customers", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2665,7 +2670,7 @@ ${pages.map(p => `  <url>
   app.post("/api/shops/:shopId/staff", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2702,7 +2707,7 @@ ${pages.map(p => `  <url>
   // Message log
   app.post("/api/messages/send", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const { shopId, recipient, content, messageType } = req.body;
       
       // Log the message (actual sending would be via Twilio)
@@ -2727,7 +2732,7 @@ ${pages.map(p => `  <url>
   app.get("/api/messages/history", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.query;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const messages = await storage.getMessageHistory({ 
         shopId: shopId as string, 
         userId: !shopId ? userId : undefined 
@@ -2745,7 +2750,7 @@ ${pages.map(p => `  <url>
   app.get("/api/shops/:shopId/repair-orders", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2762,7 +2767,7 @@ ${pages.map(p => `  <url>
   app.post("/api/shops/:shopId/repair-orders", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2791,7 +2796,7 @@ ${pages.map(p => `  <url>
   app.get("/api/shops/:shopId/repair-orders/:orderId", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId, orderId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       // Authorization check - verify user owns the shop
       const shop = await storage.getShop(shopId);
@@ -2812,7 +2817,7 @@ ${pages.map(p => `  <url>
   app.patch("/api/shops/:shopId/repair-orders/:orderId", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId, orderId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2846,7 +2851,7 @@ ${pages.map(p => `  <url>
   app.post("/api/shops/:shopId/repair-orders/:orderId/collect-payment", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId, orderId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2933,7 +2938,7 @@ ${pages.map(p => `  <url>
   app.get("/api/shops/:shopId/estimates", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2950,7 +2955,7 @@ ${pages.map(p => `  <url>
   app.post("/api/shops/:shopId/estimates", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2981,7 +2986,7 @@ ${pages.map(p => `  <url>
   app.get("/api/shops/:shopId/appointments", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -2998,7 +3003,7 @@ ${pages.map(p => `  <url>
   app.post("/api/shops/:shopId/appointments", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -3025,7 +3030,7 @@ ${pages.map(p => `  <url>
   app.patch("/api/shops/:shopId/appointments/:appointmentId", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId, appointmentId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -3046,7 +3051,7 @@ ${pages.map(p => `  <url>
   app.get("/api/shops/:shopId/inventory", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -3067,7 +3072,7 @@ ${pages.map(p => `  <url>
   app.get("/api/shops/:shopId/inspections", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       
       const shop = await storage.getShop(shopId);
       if (!shop || shop.ownerId !== userId) {
@@ -3735,7 +3740,7 @@ ${pages.map(p => `  <url>
 
   app.get('/api/trust-circle', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       // For now, return empty array - trust circle members would be stored in a separate table
       // This is a placeholder for the trust circle feature
       res.json([]);
@@ -3747,7 +3752,7 @@ ${pages.map(p => `  <url>
 
   app.get('/api/trust-circle/memberships', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       // Return circles the user is a member of
       res.json([]);
     } catch (error) {
@@ -3758,7 +3763,7 @@ ${pages.map(p => `  <url>
 
   app.post('/api/trust-circle/invite', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const { email, memberType } = req.body;
       
       // Generate invite code
@@ -3794,7 +3799,7 @@ ${pages.map(p => `  <url>
 
   app.get('/api/subscription/status', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const user = await storage.getUser(userId);
       
       const tier = user?.subscriptionTier || 'free';
@@ -3826,7 +3831,7 @@ ${pages.map(p => `  <url>
 
   app.post('/api/subscription/checkout', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const { billingPeriod, tier } = req.body;
       const user = await storage.getUser(userId);
       
@@ -3909,7 +3914,7 @@ ${pages.map(p => `  <url>
 
   app.get('/api/vehicles/shares', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const shares = await storage.getVehicleSharesByOwner(userId);
       res.json(shares);
     } catch (error) {
@@ -3920,7 +3925,7 @@ ${pages.map(p => `  <url>
 
   app.get('/api/vehicles/shared-with-me', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const shares = await storage.getVehicleSharesWithUser(userId);
       res.json(shares);
     } catch (error) {
@@ -3931,7 +3936,7 @@ ${pages.map(p => `  <url>
 
   app.post('/api/vehicles/shares', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const { vehicleId, email, shareType } = req.body;
       
       // Generate invite code
@@ -3956,7 +3961,7 @@ ${pages.map(p => `  <url>
 
   app.post('/api/vehicles/shares/accept', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const { inviteCode } = req.body;
       
       const share = await storage.acceptVehicleShare(inviteCode, userId);
@@ -3974,7 +3979,7 @@ ${pages.map(p => `  <url>
   app.delete('/api/vehicles/shares/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       
       await storage.deleteVehicleShare(id, userId);
       res.json({ success: true });
@@ -4259,7 +4264,7 @@ ${pages.map(p => `  <url>
 
   app.post('/api/orbit/test-sync', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const user = await storage.getUser(userId);
       
       if (!user) {
@@ -4510,7 +4515,7 @@ ${pages.map(p => `  <url>
   app.post('/api/shops/:shopId/orbit/connect', isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
       const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
       if (!shop.length || shop[0].ownerId !== userId) {
         return res.status(403).json({ error: "Only the shop owner can connect ORBIT" });
@@ -4546,7 +4551,7 @@ ${pages.map(p => `  <url>
   app.post('/api/shops/:shopId/orbit/disconnect', isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
       const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
       if (!shop.length || shop[0].ownerId !== userId) {
         return res.status(403).json({ error: "Only the shop owner can disconnect ORBIT" });
@@ -4726,7 +4731,7 @@ ${pages.map(p => `  <url>
       if (!payPeriodStart || !payPeriodEnd) {
         return res.status(400).json({ error: "payPeriodStart and payPeriodEnd are required" });
       }
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
       const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
       if (!shop.length || shop[0].ownerId !== userId) {
         return res.status(403).json({ error: "Only the shop owner can run payroll" });
@@ -4822,7 +4827,7 @@ ${pages.map(p => `  <url>
     try {
       const { shopId, service } = req.params;
       const { businessIntegrationService } = await import('./services/businessIntegrations');
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
 
       const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
       if (!shop.length || shop[0].ownerId !== userId) {
@@ -4923,7 +4928,7 @@ ${pages.map(p => `  <url>
   app.post('/api/shops/:shopId/integrations/:service/disconnect', isAuthenticated, async (req: any, res) => {
     try {
       const { shopId, service } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
 
       const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
       if (!shop.length || shop[0].ownerId !== userId) {
@@ -5709,7 +5714,7 @@ ${pages.map(p => `  <url>
   // Track guide progress
   app.post("/api/diy-guides/:guideId/progress", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const { currentStep, completedSteps, isCompleted, vehicleId, userNotes } = req.body;
       
       const progress = await storage.upsertGuideProgress({
@@ -5733,7 +5738,7 @@ ${pages.map(p => `  <url>
   // Get user's guide history
   app.get("/api/diy-guides/user/history", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = getUserId(req)!;
       const history = await storage.getUserGuideHistory(userId);
       res.json(history);
     } catch (error) {
@@ -6947,7 +6952,7 @@ ${pages.map(p => `  <url>
   // Get user's price alerts
   app.get('/api/price-alerts', isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       if (!userId) {
         return res.status(401).json({ error: "Not authenticated" });
       }
@@ -6966,7 +6971,7 @@ ${pages.map(p => `  <url>
       if (!alert) {
         return res.status(404).json({ error: "Alert not found" });
       }
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       if (alert.userId !== userId) {
         return res.status(403).json({ error: "Not authorized" });
       }
@@ -6980,7 +6985,7 @@ ${pages.map(p => `  <url>
   // Create price alert (Pro only)
   app.post('/api/price-alerts', isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       const user = await storage.getUser(userId);
       
       if (!user || user.subscriptionTier !== 'pro') {
@@ -7007,7 +7012,7 @@ ${pages.map(p => `  <url>
   // Update price alert
   app.patch('/api/price-alerts/:id', isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       const existingAlert = await storage.getPriceAlert(req.params.id);
       
       if (!existingAlert) {
@@ -7028,7 +7033,7 @@ ${pages.map(p => `  <url>
   // Delete price alert
   app.delete('/api/price-alerts/:id', isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       const existingAlert = await storage.getPriceAlert(req.params.id);
       
       if (!existingAlert) {
@@ -7055,7 +7060,7 @@ ${pages.map(p => `  <url>
   // Get user's blockchain verifications
   app.get('/api/blockchain/verifications', isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       const verifications = await storage.getBlockchainVerificationsByUser(userId);
       res.json(verifications);
     } catch (error) {
@@ -7067,7 +7072,7 @@ ${pages.map(p => `  <url>
   // Get verification status for an entity (with ownership check)
   app.get('/api/blockchain/status/:entityType/:entityId', isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       const { entityType, entityId } = req.params;
       
       // Verify ownership based on entity type
@@ -7115,7 +7120,7 @@ ${pages.map(p => `  <url>
   // Verify a hallmark on blockchain
   app.post('/api/blockchain/hallmark/:id', isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       const hallmarkId = req.params.id;
       
       const hallmark = await storage.getHallmark(hallmarkId);
@@ -7175,7 +7180,7 @@ ${pages.map(p => `  <url>
   // Verify a vehicle on blockchain
   app.post('/api/blockchain/vehicle/:id', isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id;
+      const userId = getUserId(req)!;
       const vehicleId = req.params.id;
       
       const vehicle = await storage.getVehicle(vehicleId);
@@ -7750,7 +7755,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/affiliate-program/enroll", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.id || req.session?.userId;
+      const userId = getUserId(req)!;
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
 
       const existing = await storage.getAffiliateAccountByUserId(userId);
@@ -7783,7 +7788,7 @@ ${pages.map(p => `  <url>
 
   app.get("/api/affiliate-program/me", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.id || req.session?.userId;
+      const userId = getUserId(req)!;
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
 
       const account = await storage.getAffiliateAccountByUserId(userId);
@@ -7820,7 +7825,7 @@ ${pages.map(p => `  <url>
 
   app.patch("/api/affiliate-program/me", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.id || req.session?.userId;
+      const userId = getUserId(req)!;
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
 
       const account = await storage.getAffiliateAccountByUserId(userId);
@@ -7849,7 +7854,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/affiliate-program/track-referral", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.id || req.session?.userId;
+      const userId = getUserId(req)!;
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
 
       const { affiliateCode } = req.body;
@@ -7884,7 +7889,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/affiliate-program/record-purchase", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.id || req.session?.userId;
+      const userId = getUserId(req)!;
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
 
       const user = await storage.getUser(userId);
@@ -7957,7 +7962,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/affiliate-program/record-pro-conversion", isAuthenticated, async (req: any, res) => {
     try {
-      const callerId = req.user?.id || req.session?.userId;
+      const callerId = getUserId(req)!;
       if (!callerId) return res.status(401).json({ error: "Not authenticated" });
 
       const caller = await storage.getUser(callerId);
@@ -8018,7 +8023,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/affiliate-program/payout-request", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.id || req.session?.userId;
+      const userId = getUserId(req)!;
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
 
       const account = await storage.getAffiliateAccountByUserId(userId);
@@ -8052,7 +8057,7 @@ ${pages.map(p => `  <url>
 
   app.get("/api/affiliate-program/admin/accounts", isAuthenticated, async (req: any, res) => {
     try {
-      const callerId = req.user?.id || req.session?.userId;
+      const callerId = getUserId(req)!;
       const caller = callerId ? await storage.getUser(callerId) : null;
       if (!caller || caller.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
@@ -8067,7 +8072,7 @@ ${pages.map(p => `  <url>
 
   app.get("/api/affiliate-program/admin/payouts", isAuthenticated, async (req: any, res) => {
     try {
-      const callerId = req.user?.id || req.session?.userId;
+      const callerId = getUserId(req)!;
       const caller = callerId ? await storage.getUser(callerId) : null;
       if (!caller || caller.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
@@ -8081,7 +8086,7 @@ ${pages.map(p => `  <url>
 
   app.patch("/api/affiliate-program/admin/payouts/:id", isAuthenticated, async (req: any, res) => {
     try {
-      const callerId = req.user?.id || req.session?.userId;
+      const callerId = getUserId(req)!;
       const caller = callerId ? await storage.getUser(callerId) : null;
       if (!caller || caller.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
@@ -8175,7 +8180,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/vendors/:vendorId/reviews", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.session?.userId;
+      const userId = getUserId(req)! || req.session?.userId;
       const review = await storage.createVendorReview({
         vendorId: req.params.vendorId,
         userId,
@@ -8196,7 +8201,7 @@ ${pages.map(p => `  <url>
   // Wishlists
   app.get("/api/wishlists", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.session?.userId;
+      const userId = getUserId(req)! || req.session?.userId;
       const wishlists = await storage.getUserWishlists(userId);
       res.json(wishlists);
     } catch (err) {
@@ -8206,7 +8211,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/wishlists", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.session?.userId;
+      const userId = getUserId(req)! || req.session?.userId;
       const shareCode = Math.random().toString(36).substring(2, 10).toUpperCase();
       const wishlist = await storage.createWishlist({
         userId,
@@ -8273,7 +8278,7 @@ ${pages.map(p => `  <url>
   // Projects
   app.get("/api/projects", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.session?.userId;
+      const userId = getUserId(req)! || req.session?.userId;
       const projects = await storage.getUserProjects(userId);
       res.json(projects);
     } catch (err) {
@@ -8283,7 +8288,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/projects", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.session?.userId;
+      const userId = getUserId(req)! || req.session?.userId;
       const shareCode = Math.random().toString(36).substring(2, 10).toUpperCase();
       const project = await storage.createProject({
         userId,
@@ -8364,7 +8369,7 @@ ${pages.map(p => `  <url>
 
   app.get("/api/sms/preferences", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.session?.userId;
+      const userId = getUserId(req)! || req.session?.userId;
       const prefs = await storage.getSmsPreferences(userId);
       res.json(prefs || { serviceReminders: false, priceAlerts: false, orderUpdates: false });
     } catch (err) {
@@ -8374,7 +8379,7 @@ ${pages.map(p => `  <url>
 
   app.post("/api/sms/preferences", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || req.session?.userId;
+      const userId = getUserId(req)! || req.session?.userId;
       const prefs = await storage.upsertSmsPreferences({
         userId,
         phoneNumber: req.body.phoneNumber,
@@ -8786,7 +8791,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.get("/api/shop/:shopId/marketing/subscription", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
       
       // Verify user has access to this shop
       const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
@@ -8845,7 +8850,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.get("/api/shop/:shopId/marketing/integrations", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
       
       // Verify user has access to this shop
       const access = await verifyShopAccess(shopId, userId);
@@ -8878,7 +8883,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.get("/api/shop/:shopId/marketing/content", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
       const { status, platform } = req.query;
       
       // Verify user has access to this shop
@@ -8908,7 +8913,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.post("/api/shop/:shopId/marketing/content", isAuthenticated, async (req: any, res) => {
     try {
       const { shopId } = req.params;
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
       const { type, platform, content, imageUrl, hashtags, scheduledFor } = req.body;
       
       // Verify user has access to this shop
@@ -8940,7 +8945,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     try {
       const { shopId } = req.params;
       const { tier } = req.body;
-      const userId = req.user?.claims?.sub;
+      const userId = getUserId(req)!;
       
       // Verify shop ownership
       const shop = await db.select().from(shops).where(eq(shops.id, shopId)).limit(1);
@@ -10050,7 +10055,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.get('/api/shops/:shopId/api-credentials', isAuthenticated, async (req: any, res) => {
     try {
       const shop = await storage.getShop(req.params.shopId);
-      if (!shop || shop.ownerId !== req.user.claims.sub) {
+      if (!shop || shop.ownerId !== getUserId(req)!) {
         return res.status(403).json({ error: 'Access denied' });
       }
       const credentials = await storage.getPartnerApiCredentials(req.params.shopId);
@@ -10079,7 +10084,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.post('/api/shops/:shopId/api-credentials', isAuthenticated, async (req: any, res) => {
     try {
       const shop = await storage.getShop(req.params.shopId);
-      if (!shop || shop.ownerId !== req.user.claims.sub) {
+      if (!shop || shop.ownerId !== getUserId(req)!) {
         return res.status(403).json({ error: 'Access denied' });
       }
       
@@ -10100,7 +10105,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
         environment: environment || 'production',
         scopes: scopes || ['orders:read'],
         rateLimitPerDay: rateLimitPerDay || 10000,
-        createdBy: req.user.claims.sub
+        createdBy: getUserId(req)!
       });
       
       // Return the raw secret ONLY at creation time - it cannot be retrieved again
@@ -10126,7 +10131,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.patch('/api/shops/:shopId/api-credentials/:credentialId', isAuthenticated, async (req: any, res) => {
     try {
       const shop = await storage.getShop(req.params.shopId);
-      if (!shop || shop.ownerId !== req.user.claims.sub) {
+      if (!shop || shop.ownerId !== getUserId(req)!) {
         return res.status(403).json({ error: 'Access denied' });
       }
       
@@ -10152,7 +10157,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.delete('/api/shops/:shopId/api-credentials/:credentialId', isAuthenticated, async (req: any, res) => {
     try {
       const shop = await storage.getShop(req.params.shopId);
-      if (!shop || shop.ownerId !== req.user.claims.sub) {
+      if (!shop || shop.ownerId !== getUserId(req)!) {
         return res.status(403).json({ error: 'Access denied' });
       }
       
@@ -10172,7 +10177,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.get('/api/shops/:shopId/api-logs', isAuthenticated, async (req: any, res) => {
     try {
       const shop = await storage.getShop(req.params.shopId);
-      if (!shop || shop.ownerId !== req.user.claims.sub) {
+      if (!shop || shop.ownerId !== getUserId(req)!) {
         return res.status(403).json({ error: 'Access denied' });
       }
       
@@ -10190,7 +10195,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.get('/api/shops/:shopId/locations', isAuthenticated, async (req: any, res) => {
     try {
       const shop = await storage.getShop(req.params.shopId);
-      if (!shop || shop.ownerId !== req.user.claims.sub) {
+      if (!shop || shop.ownerId !== getUserId(req)!) {
         return res.status(403).json({ error: 'Access denied' });
       }
       const locations = await storage.getShopLocations(req.params.shopId);
@@ -10203,7 +10208,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   app.post('/api/shops/:shopId/locations', isAuthenticated, async (req: any, res) => {
     try {
       const shop = await storage.getShop(req.params.shopId);
-      if (!shop || shop.ownerId !== req.user.claims.sub) {
+      if (!shop || shop.ownerId !== getUserId(req)!) {
         return res.status(403).json({ error: 'Access denied' });
       }
       
@@ -10255,7 +10260,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       const result = await scanDocument(image, documentType);
 
       if (result.success) {
-        const userId = req.user?.claims?.sub || (req.session as any).userId;
+        const userId = getUserId(req)!;
         await db.insert(scannedDocuments).values({
           userId,
           documentType,
@@ -10279,7 +10284,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   // Mileage Tracker
   app.get("/api/break-room/mileage", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const entries = await db.select().from(mileageEntries)
         .where(eq(mileageEntries.userId, userId))
         .orderBy(desc(mileageEntries.date))
@@ -10292,7 +10297,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/break-room/mileage", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const result = insertMileageEntrySchema.safeParse({ ...req.body, userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
@@ -10321,7 +10326,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/break-room/speed-traps", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const result = insertSpeedTrapSchema.safeParse({ ...req.body, userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
@@ -10353,7 +10358,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/break-room/specialty-shops", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const result = insertSpecialtyShopSchema.safeParse({ ...req.body, submittedBy: userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
@@ -10385,7 +10390,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/break-room/events", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const result = insertCarEventSchema.safeParse({ ...req.body, submittedBy: userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
@@ -10463,7 +10468,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/break-room/fuel", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const result = insertFuelReportSchema.safeParse({ ...req.body, userId });
       if (!result.success) {
         return res.status(400).json({ error: fromZodError(result.error).toString() });
@@ -10478,7 +10483,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   // Scanned Documents History
   app.get("/api/break-room/scans", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any).userId;
+      const userId = getUserId(req)!;
       const scans = await db.select().from(scannedDocuments)
         .where(eq(scannedDocuments.userId, userId))
         .orderBy(desc(scannedDocuments.createdAt))
@@ -10611,7 +10616,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   // Warranties
   app.get("/api/warranties", isAuthenticated, async (req: any, res) => {
     try {
-      const warranties = await storage.getWarrantiesByUser(req.user.id);
+      const warranties = await storage.getWarrantiesByUser(getUserId(req)!);
       res.json(warranties);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch warranties" });
@@ -10629,7 +10634,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/warranties", isAuthenticated, async (req: any, res) => {
     try {
-      const result = insertWarrantySchema.safeParse({ ...req.body, userId: req.user.id });
+      const result = insertWarrantySchema.safeParse({ ...req.body, userId: getUserId(req)! });
       if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
       const warranty = await storage.createWarranty(result.data);
       res.json(warranty);
@@ -10670,7 +10675,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/warranties/:warrantyId/claims", isAuthenticated, async (req: any, res) => {
     try {
-      const result = insertWarrantyClaimSchema.safeParse({ ...req.body, warrantyId: req.params.warrantyId, userId: req.user.id });
+      const result = insertWarrantyClaimSchema.safeParse({ ...req.body, warrantyId: req.params.warrantyId, userId: getUserId(req)! });
       if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
       const claim = await storage.createWarrantyClaim(result.data);
       res.json(claim);
@@ -10691,7 +10696,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.get("/api/fuel-logs", isAuthenticated, async (req: any, res) => {
     try {
-      const logs = await storage.getFuelLogsByUser(req.user.id);
+      const logs = await storage.getFuelLogsByUser(getUserId(req)!);
       res.json(logs);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch fuel logs" });
@@ -10700,7 +10705,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/vehicles/:vehicleId/fuel-logs", isAuthenticated, async (req: any, res) => {
     try {
-      const result = insertFuelLogSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: req.user.id });
+      const result = insertFuelLogSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: getUserId(req)! });
       if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
       const log = await storage.createFuelLog(result.data);
       res.json(log);
@@ -10731,7 +10736,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.get("/api/expenses", isAuthenticated, async (req: any, res) => {
     try {
-      const expenses = await storage.getExpensesByUser(req.user.id);
+      const expenses = await storage.getExpensesByUser(getUserId(req)!);
       res.json(expenses);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch expenses" });
@@ -10749,7 +10754,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/vehicles/:vehicleId/expenses", isAuthenticated, async (req: any, res) => {
     try {
-      const result = insertVehicleExpenseSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: req.user.id });
+      const result = insertVehicleExpenseSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: getUserId(req)! });
       if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
       const expense = await storage.createExpense(result.data);
       res.json(expense);
@@ -10780,7 +10785,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.get("/api/price-history", isAuthenticated, async (req: any, res) => {
     try {
-      const history = await storage.getPriceHistoryByUser(req.user.id);
+      const history = await storage.getPriceHistoryByUser(getUserId(req)!);
       res.json(history);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch price history" });
@@ -10790,7 +10795,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
   // Emergency Contacts
   app.get("/api/emergency-contacts", isAuthenticated, async (req: any, res) => {
     try {
-      const contacts = await storage.getEmergencyContactsByUser(req.user.id);
+      const contacts = await storage.getEmergencyContactsByUser(getUserId(req)!);
       res.json(contacts);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch emergency contacts" });
@@ -10799,7 +10804,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/emergency-contacts", isAuthenticated, async (req: any, res) => {
     try {
-      const result = insertEmergencyContactSchema.safeParse({ ...req.body, userId: req.user.id });
+      const result = insertEmergencyContactSchema.safeParse({ ...req.body, userId: getUserId(req)! });
       if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
       const contact = await storage.createEmergencyContact(result.data);
       res.json(contact);
@@ -10840,7 +10845,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.get("/api/maintenance/overdue", isAuthenticated, async (req: any, res) => {
     try {
-      const overdue = await storage.getOverdueMaintenanceByUser(req.user.id);
+      const overdue = await storage.getOverdueMaintenanceByUser(getUserId(req)!);
       res.json(overdue);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch overdue maintenance" });
@@ -10849,7 +10854,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/vehicles/:vehicleId/maintenance", isAuthenticated, async (req: any, res) => {
     try {
-      const result = insertMaintenanceScheduleSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: req.user.id });
+      const result = insertMaintenanceScheduleSchema.safeParse({ ...req.body, vehicleId: req.params.vehicleId, userId: getUserId(req)! });
       if (!result.success) return res.status(400).json({ error: fromZodError(result.error).toString() });
       const schedule = await storage.createMaintenanceSchedule(result.data);
       res.json(schedule);
@@ -10897,7 +10902,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
         comment: z.string().optional(),
       });
       const parsed = schema.parse(req.body);
-      const userId = req.user?.id || req.user?.claims?.sub || "anonymous";
+      const userId = req.user?.id || getUserId(req) || "anonymous";
       console.log(`[Rating] User ${userId} rated ${parsed.rating}/5${parsed.comment ? ` - "${parsed.comment}"` : ""}`);
       res.json({ success: true });
     } catch (error: any) {
@@ -10942,7 +10947,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.get("/api/marketplace/my-listings", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      const userId = getUserId(req);
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
       const listings = await storage.getPartListingsBySeller(userId);
       res.json(listings);
@@ -10953,7 +10958,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/marketplace/listings", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      const userId = getUserId(req);
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
 
       const user = await storage.getUser(userId);
@@ -10977,7 +10982,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.patch("/api/marketplace/listings/:id", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      const userId = getUserId(req);
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
       const listing = await storage.getPartListing(req.params.id);
       if (!listing) return res.status(404).json({ error: "Listing not found" });
@@ -10993,7 +10998,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.delete("/api/marketplace/listings/:id", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      const userId = getUserId(req);
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
       const listing = await storage.getPartListing(req.params.id);
       if (!listing) return res.status(404).json({ error: "Listing not found" });
@@ -11007,7 +11012,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.post("/api/marketplace/listings/:id/contact", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      const userId = getUserId(req);
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
       const listing = await storage.getPartListing(req.params.id);
       if (!listing) return res.status(404).json({ error: "Listing not found" });
@@ -11030,7 +11035,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
 
   app.get("/api/marketplace/messages", async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub || (req.session as any)?.userId;
+      const userId = getUserId(req);
       if (!userId) return res.status(401).json({ error: "Not authenticated" });
       const messages = await storage.getPartListingMessages(userId);
       res.json(messages);
