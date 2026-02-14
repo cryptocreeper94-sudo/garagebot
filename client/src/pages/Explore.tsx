@@ -10,7 +10,7 @@ import {
   Store, Tag, Heart, FolderOpen, Fuel, DollarSign, Calendar,
   TrendingDown, Phone, MessageCircle, Gamepad2, Coffee, Truck,
   Globe, Crown, ChevronRight, Sparkles, MapPin, Star,
-  BookOpen, Blocks, Compass, Award,
+  BookOpen, Blocks, Compass, Award, Home,
   HeadphonesIcon, Mail, Settings, Rocket, Eye, ArrowRight
 } from "lucide-react";
 
@@ -47,6 +47,7 @@ import imgMaintenanceScheduler from "@/assets/images/hub/maintenance-scheduler.p
 import imgPriceWatch from "@/assets/images/hub/price-watch.png";
 import imgInviteFriends from "@/assets/images/hub/invite-friends.png";
 import imgContactUs from "@/assets/images/hub/contact-us.png";
+import imgGaragebotHome from "@/assets/images/hub/garagebot-home.png";
 
 interface Feature {
   name: string;
@@ -101,7 +102,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     icon: ShoppingCart,
     gradient: "from-cyan-500 to-blue-600",
     features: [
-      { name: "Parts Search", description: "Search 15M+ parts across 68+ retailers with price comparison and vehicle-aware results.", href: "/", icon: Search, image: imgPartsSearch, glowColor: "cyan", featured: true, subFeatures: ["68+ Retailers", "Price Compare", "Local Pickup", "Vehicle-Aware"] },
+      { name: "Parts Search", description: "Search 15M+ parts across 68+ retailers with price comparison and vehicle-aware results.", href: "/home", icon: Search, image: imgPartsSearch, glowColor: "cyan", featured: true, subFeatures: ["68+ Retailers", "Price Compare", "Local Pickup", "Vehicle-Aware"] },
       { name: "Parts Marketplace", description: "Buy and sell used parts directly. List spare parts, search by fitment, and message sellers.", href: "/marketplace", icon: Tag, image: imgPartsMarketplace, glowColor: "green", badge: "NEW", badgeVariant: "new", subFeatures: ["List Parts", "Fitment Search", "Messaging", "Photos"] },
       { name: "Wishlists", description: "Save parts to organized lists. Share with friends or your mechanic and track price changes.", href: "/wishlists", icon: Heart, image: imgWishlists, glowColor: "pink", subFeatures: ["Multiple Lists", "Share Link", "Price Tracking", "Priority Sort"] },
       { name: "Build Projects", description: "Plan vehicle builds with parts lists, spending vs budget tracking, and purchase progress.", href: "/projects", icon: FolderOpen, image: imgBuildProjects, glowColor: "amber", subFeatures: ["Budget Tracking", "Parts Checklist", "Progress", "Cost Estimate"] },
@@ -197,6 +198,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     features: [
       { name: "Account Setup", description: "Manage your profile, preferences, notification settings, and connected services.", href: "/account", icon: Settings, image: imgAccountSettings, glowColor: "blue", subFeatures: ["Profile", "Preferences", "Notifications", "Services"] },
       { name: "About GarageBot", description: "Learn about our mission, the team behind it, and our vision for the future of parts search.", href: "/about", icon: Sparkles, image: imgAboutGaragebot, glowColor: "cyan", subFeatures: ["Our Mission", "The Team", "DarkWave Studios", "Vision"] },
+      { name: "GarageBot Home", description: "Experience the full immersive GarageBot homepage with AI search, featured deals, vehicle showcase, and more.", href: "/home", icon: Home, image: imgGaragebotHome, glowColor: "cyan", featured: true, badge: "MAIN", badgeVariant: "live", subFeatures: ["AI Search", "Featured Deals", "Vehicle Showcase", "Full Experience"] },
     ],
   },
 ];
@@ -347,7 +349,7 @@ export default function Explore() {
             </div>
           </div>
 
-          <Link href="/dashboard">
+          <Link href="/home">
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.98 }}
@@ -505,7 +507,7 @@ export default function Explore() {
                   This hub gives you quick access to every feature. For the full immersive GarageBot experience with your personalized dashboard, vehicle data, and AI assistant, dive into the main site.
                 </p>
               </div>
-              <Link href="/dashboard">
+              <Link href="/home">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}

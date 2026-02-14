@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, Shield, Fingerprint, Mail, Send, CheckCircle2, Users, Gift, MessageCircle, Wrench } from "lucide-react";
+import { Sparkles, Shield, Fingerprint, Mail, Send, CheckCircle2, Users, Gift, MessageCircle, Wrench, Lock } from "lucide-react";
 
 interface Release {
   id: string;
@@ -191,6 +191,11 @@ export default function Footer() {
             <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
             <Link href="/break-room" className="hover:text-primary transition-colors" data-testid="footer-link-breakroom">Break Room</Link>
             <Link href="/dev" className="hover:text-primary transition-colors" data-testid="footer-link-dev">Dev Portal</Link>
+            <span className="text-border">|</span>
+            <Link href="/command-center" className="hover:text-primary transition-colors inline-flex items-center gap-1" data-testid="footer-link-admin">
+              <Lock className="w-2.5 h-2.5" />
+              Admin
+            </Link>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[9px] text-muted-foreground/70">
