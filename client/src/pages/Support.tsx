@@ -47,7 +47,7 @@ const faqItems = [
   },
   {
     question: "What is Pro / Founders Circle?",
-    answer: "Pro is our premium subscription tier that unlocks advanced features like priority support, enhanced AI recommendations, price alerts, and the Mechanics Garage shop portal. Founders Circle members are early supporters who locked in lifetime benefits and receive exclusive perks.",
+    answer: "Pro is our premium subscription tier that unlocks advanced features like priority support, enhanced AI recommendations, price alerts, and the TORQUE shop management portal. Founders Circle members are early supporters who locked in lifetime benefits and receive exclusive perks.",
     icon: Sparkles,
   },
   {

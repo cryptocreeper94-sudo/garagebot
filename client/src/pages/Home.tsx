@@ -774,13 +774,13 @@ export default function Home() {
           
           {/* Mechanics Garage Competitive Comparison */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-            <Link href="/mechanics-garage" data-testid="link-mechanics-garage-comparison">
-              <Card className="bento-glass p-4 border-primary/20 hover:border-primary/40 transition-all cursor-pointer overflow-hidden relative" data-testid="card-mechanics-comparison">
+            <Link href="/torque" data-testid="link-torque-comparison">
+              <Card className="bento-glass p-4 border-primary/20 hover:border-primary/40 transition-all cursor-pointer overflow-hidden relative" data-testid="card-torque-comparison">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
                     <Wrench className="w-5 h-5 text-primary" />
-                    <h3 className="text-sm font-tech font-bold uppercase text-primary">Mechanics Garage</h3>
+                    <h3 className="text-sm font-tech font-bold uppercase text-primary">TORQUE</h3>
                     <span className="px-1.5 py-0.5 text-[9px] font-mono uppercase bg-primary/20 text-primary border border-primary/30 rounded">PRO</span>
                   </div>
                   <p className="text-xs text-muted-foreground mb-3">

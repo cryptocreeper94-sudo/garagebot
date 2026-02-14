@@ -380,7 +380,7 @@ export default function MechanicsGarageSales() {
             <div className="grid grid-cols-3 gap-4 p-4 bg-zinc-800/50 border-b border-zinc-700">
               <div className="font-bold text-zinc-400">Feature</div>
               <div className="text-center">
-                <div className="font-bold text-cyan-400">Mechanics Garage</div>
+                <div className="font-bold text-cyan-400">TORQUE</div>
                 <div className="text-xs text-green-400">$49/mo</div>
               </div>
               <div className="text-center">
@@ -475,7 +475,7 @@ export default function MechanicsGarageSales() {
               <div className="p-8 bg-gradient-to-br from-cyan-500/10 to-green-500/10">
                 <h2 className="text-2xl font-bold text-white mb-4">Ready to Transform Your Shop?</h2>
                 <p className="text-zinc-400 mb-8">
-                  Fill out the form and we'll reach out within 24 hours to discuss how Mechanics Garage can help your business.
+                  Fill out the form and we'll reach out within 24 hours to discuss how TORQUE can help your business.
                 </p>
 
                 <div className="space-y-6">
@@ -683,7 +683,7 @@ export default function MechanicsGarageSales() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Wrench className="w-5 h-5 text-cyan-400" />
-            <span className="text-white font-bold">Mechanics Garage</span>
+            <span className="text-white font-bold">TORQUE</span>
             <span className="text-zinc-600">by GarageBot</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-zinc-500">
