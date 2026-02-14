@@ -682,6 +682,32 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "AWIN",
     logoColor: "#0EA5E9"
   },
+  {
+    id: "autopartstoys",
+    name: "AutoPartsToys",
+    slug: "autopartstoys",
+    searchTemplate: "http://www.awin1.com/awclick.php?mid=90763&id=2752166&ued=https%3A%2F%2Fwww.autopartstoys.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv", "motorcycles", "atvs", "boats", "powersports"],
+    priority: 81,
+    supportsOEM: true,
+    supportsAftermarket: true,
+    affiliateNetwork: "AWIN",
+    logoColor: "#E63946"
+  },
+  {
+    id: "tcmt",
+    name: "TCMT",
+    slug: "tcmt",
+    searchTemplate: "https://tcmtco.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["motorcycles", "atvs", "powersports"],
+    priority: 83,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#FF6B00"
+  },
 ];
 
 // Helper function to generate search URL for a vendor
