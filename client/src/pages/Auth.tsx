@@ -108,7 +108,7 @@ export default function Auth() {
       }
       
       toast({ title: "Welcome back!", description: `Logged in as ${data.user.username}` });
-      setLocation("/dashboard");
+      setLocation(data.user.role === "admin" ? "/command-center" : "/dashboard");
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
