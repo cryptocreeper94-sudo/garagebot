@@ -3,9 +3,10 @@ import { marketingPosts, marketingImages, socialIntegrations, scheduledPosts, co
 import { eq, and, asc, sql, desc, isNotNull, inArray } from 'drizzle-orm';
 import { TwitterConnector, postToFacebook, postToInstagram } from './social-connectors';
 
-const POSTING_HOURS_CST = [0, 3, 6, 9, 12, 15, 18, 21];
+const GARAGEBOT_POSTING_HOURS_CST = [0, 3, 6, 9, 12, 15, 18, 21];
+const ALL_POSTING_HOURS_CST = [0, 3, 6, 8, 9, 12, 15, 16, 18, 21];
 const TWITTER_POSTING_HOURS_CST = [0, 6, 12, 18];
-const TRUST_LAYER_HOURS_CST = [9, 21];
+const TRUST_LAYER_HOURS_CST = [0, 8, 16];
 const CST_TIMEZONE = 'America/Chicago';
 
 function getCSTHour(): number {
@@ -271,7 +272,7 @@ async function postToAllPlatforms(
 async function executeScheduledPosts() {
   const hour = getCSTHour();
   
-  if (!POSTING_HOURS_CST.includes(hour) || hour === lastPostHour) {
+  if (!ALL_POSTING_HOURS_CST.includes(hour) || hour === lastPostHour) {
     return;
   }
   
@@ -281,11 +282,13 @@ async function executeScheduledPosts() {
   const integration = await getIntegration();
   const twitter = new TwitterConnector();
   
-  const post = await getNextPost('all');
-  if (!post) {
-    console.log('[Marketing] No active GarageBot posts available');
-  } else {
-    await postToAllPlatforms(post, integration, twitter, hour);
+  if (GARAGEBOT_POSTING_HOURS_CST.includes(hour)) {
+    const post = await getNextPost('all');
+    if (!post) {
+      console.log('[Marketing] No active GarageBot posts available');
+    } else {
+      await postToAllPlatforms(post, integration, twitter, hour);
+    }
   }
 
   if (TRUST_LAYER_HOURS_CST.includes(hour) && hour !== lastTrustLayerHour) {
@@ -410,7 +413,7 @@ export function startMarketingScheduler() {
   
   console.log('[Marketing] Starting scheduler...');
   console.log('[Marketing] GarageBot posts: FB/IG every 3 hours CST (12am,3am,6am,9am,12pm,3pm,6pm,9pm), X every 6 hours (12am,6am,12pm,6pm)');
-  console.log('[Marketing] Trust Layer posts: All platforms twice daily at 9am & 9pm CST');
+  console.log('[Marketing] Trust Layer posts: All platforms 3x daily every 8 hours at 12am, 8am & 4pm CST');
   
   isRunning = true;
 
@@ -460,7 +463,7 @@ export async function getMarketingStats() {
     activeImages: Number(imagesCount.count),
     totalPosted: Number(postedCount.count),
     totalFailed: Number(failedCount.count),
-    postingHours: POSTING_HOURS_CST,
+    postingHours: ALL_POSTING_HOURS_CST,
   };
 }
 
