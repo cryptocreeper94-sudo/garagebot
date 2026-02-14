@@ -5,6 +5,7 @@ import { TwitterConnector, postToFacebook, postToInstagram } from './social-conn
 
 const POSTING_HOURS_CST = [0, 3, 6, 9, 12, 15, 18, 21];
 const TWITTER_POSTING_HOURS_CST = [0, 6, 12, 18];
+const TRUST_LAYER_HOURS_CST = [9, 21];
 const CST_TIMEZONE = 'America/Chicago';
 
 function getCSTHour(): number {
@@ -44,6 +45,7 @@ function getBaseUrl(): string {
 
 let isRunning = false;
 let lastPostHour = -1;
+let lastTrustLayerHour = -1;
 
 async function fetchPageAccessToken(userToken: string, targetPageId: string): Promise<string | null> {
   try {
@@ -122,16 +124,20 @@ async function getIntegration(tenantId: string = 'garagebot') {
   return integration;
 }
 
-async function getNextPost(platform: string, tenantId: string = 'garagebot') {
+async function getNextPost(platform: string, tenantId: string = 'garagebot', category?: string) {
   const { or } = await import('drizzle-orm');
   const season = getCurrentSeason();
+  const conditions = [
+    eq(marketingPosts.tenantId, tenantId),
+    or(eq(marketingPosts.platform, platform), eq(marketingPosts.platform, 'all')),
+    or(eq(marketingPosts.season, season), eq(marketingPosts.season, 'all')),
+    eq(marketingPosts.isActive, true),
+  ];
+  if (category) {
+    conditions.push(eq(marketingPosts.category, category));
+  }
   const [post] = await db.select().from(marketingPosts)
-    .where(and(
-      eq(marketingPosts.tenantId, tenantId),
-      or(eq(marketingPosts.platform, platform), eq(marketingPosts.platform, 'all')),
-      or(eq(marketingPosts.season, season), eq(marketingPosts.season, 'all')),
-      eq(marketingPosts.isActive, true)
-    ))
+    .where(and(...conditions))
     .orderBy(asc(marketingPosts.usageCount), asc(marketingPosts.lastUsedAt))
     .limit(1);
   return post;
@@ -220,6 +226,48 @@ async function recordPost(
   });
 }
 
+async function postToAllPlatforms(
+  post: any,
+  integration: any,
+  twitter: TwitterConnector,
+  hour: number,
+  forceTwitter: boolean = false
+) {
+  const message = buildMessage(post.content, post.targetSite || 'garagebot', post.hashtags || []);
+  const image = await getNextImage(post.category || undefined);
+  const imageUrl = image ? `${getBaseUrl()}${image.filePath}` : undefined;
+
+  if (integration?.facebookConnected && integration.facebookPageId && integration.facebookPageAccessToken) {
+    const result = await postToFacebook(integration.facebookPageId, integration.facebookPageAccessToken, message, imageUrl);
+    await recordPost('facebook', message, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
+    console.log(`[Marketing FB] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
+  }
+
+  if (integration?.instagramConnected && integration.instagramAccountId && imageUrl) {
+    const igMessage = message.length > 2200 ? message.substring(0, 2197) + '...' : message;
+    const result = await postToInstagram(integration.instagramAccountId, integration.facebookPageAccessToken!, igMessage, imageUrl);
+    await recordPost('instagram', igMessage, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
+    console.log(`[Marketing IG] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
+  }
+
+  if (twitter.isConfigured() && (TWITTER_POSTING_HOURS_CST.includes(hour) || forceTwitter)) {
+    const twitterMessage = message.length > 4000 ? message.substring(0, 3997) + '...' : message;
+    const result = await twitter.post(twitterMessage);
+    await recordPost('x', twitterMessage, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
+    console.log(`[Marketing X] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
+  }
+
+  await db.update(marketingPosts)
+    .set({ usageCount: sql`${marketingPosts.usageCount} + 1`, lastUsedAt: new Date() })
+    .where(eq(marketingPosts.id, post.id));
+
+  if (image) {
+    await db.update(marketingImages)
+      .set({ usageCount: sql`${marketingImages.usageCount} + 1`, lastUsedAt: new Date() })
+      .where(eq(marketingImages.id, image.id));
+  }
+}
+
 async function executeScheduledPosts() {
   const hour = getCSTHour();
   
@@ -235,41 +283,20 @@ async function executeScheduledPosts() {
   
   const post = await getNextPost('all');
   if (!post) {
-    console.log('[Marketing] No active posts available');
-    return;
+    console.log('[Marketing] No active GarageBot posts available');
+  } else {
+    await postToAllPlatforms(post, integration, twitter, hour);
   }
-  
-  const message = buildMessage(post.content, post.targetSite || 'garagebot', post.hashtags || []);
-  const image = await getNextImage(post.category || undefined);
-  const imageUrl = image ? `${getBaseUrl()}${image.filePath}` : undefined;
-  
-  if (integration?.facebookConnected && integration.facebookPageId && integration.facebookPageAccessToken) {
-    const result = await postToFacebook(integration.facebookPageId, integration.facebookPageAccessToken, message, imageUrl);
-    await recordPost('facebook', message, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
-    console.log(`[Marketing FB] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
-  }
-  
-  if (integration?.instagramConnected && integration.instagramAccountId && imageUrl) {
-    const result = await postToInstagram(integration.instagramAccountId, integration.facebookPageAccessToken!, message, imageUrl);
-    await recordPost('instagram', message, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
-    console.log(`[Marketing IG] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
-  }
-  
-  if (twitter.isConfigured() && TWITTER_POSTING_HOURS_CST.includes(hour)) {
-    const twitterMessage = message.length > 280 ? message.substring(0, 277) + '...' : message;
-    const result = await twitter.post(twitterMessage);
-    await recordPost('x', twitterMessage, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
-    console.log(`[Marketing X] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
-  }
-  
-  await db.update(marketingPosts)
-    .set({ usageCount: sql`${marketingPosts.usageCount} + 1`, lastUsedAt: new Date() })
-    .where(eq(marketingPosts.id, post.id));
-  
-  if (image) {
-    await db.update(marketingImages)
-      .set({ usageCount: sql`${marketingImages.usageCount} + 1`, lastUsedAt: new Date() })
-      .where(eq(marketingImages.id, image.id));
+
+  if (TRUST_LAYER_HOURS_CST.includes(hour) && hour !== lastTrustLayerHour) {
+    lastTrustLayerHour = hour;
+    const tlPost = await getNextPost('all', 'garagebot', 'darkwave');
+    if (tlPost) {
+      console.log(`[Marketing] Posting dedicated Trust Layer content at CST hour ${hour}`);
+      await postToAllPlatforms(tlPost, integration, twitter, hour, true);
+    } else {
+      console.log('[Marketing] No active Trust Layer posts available for dedicated slot');
+    }
   }
 }
 
@@ -382,8 +409,8 @@ export function startMarketingScheduler() {
   }
   
   console.log('[Marketing] Starting scheduler...');
-  console.log('[Marketing] FB/IG scheduled every 3 hours CST: 12am, 3am, 6am, 9am, 12pm, 3pm, 6pm, 9pm');
-  console.log('[Marketing] X/Twitter scheduled every 6 hours CST: 12am, 6am, 12pm, 6pm');
+  console.log('[Marketing] GarageBot posts: FB/IG every 3 hours CST (12am,3am,6am,9am,12pm,3pm,6pm,9pm), X every 6 hours (12am,6am,12pm,6pm)');
+  console.log('[Marketing] Trust Layer posts: All platforms twice daily at 9am & 9pm CST');
   
   isRunning = true;
 
