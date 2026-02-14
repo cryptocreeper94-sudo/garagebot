@@ -84,8 +84,8 @@ const AFFILIATE_NETWORKS = [
     commission: "Varies by retailer (3-10%)",
     approval: "24-72 hours for network, varies by retailer",
     difficulty: "Easy",
-    status: "pending" as const,
-    retailers: ["Partzilla", "Jack's Small Engines", "Classic Industries", "RV Parts Country", "etrailer"],
+    status: "connected" as const,
+    retailers: ["Partzilla", "PartsGeek", "1A Auto", "Jack's Small Engines", "Classic Industries", "RV Parts Country", "etrailer", "Rocky Mountain ATV/MC", "BikeBandit", "Year One"],
     requirements: [
       "Active website",
       "U.S. address for payments (or Payoneer)",
@@ -153,6 +153,31 @@ const AFFILIATE_NETWORKS = [
       "Generate tracking links once approved"
     ],
     integration: "Impact provides Universal Tracking Tags and deep linking tools."
+  },
+  {
+    id: "awin",
+    name: "Awin",
+    logo: "🌐",
+    url: "https://www.awin.com/us",
+    commission: "Varies by retailer (3-10%)",
+    approval: "1-5 business days for network, then apply per retailer",
+    difficulty: "Medium",
+    status: "connected" as const,
+    retailers: ["OEDRO (truck accessories)", "Auto Parts Toys", "Dunford Inc", "Ottocast", "Guta Auto Parts"],
+    requirements: [
+      "Active website with content",
+      "Apply to Awin network first, then each advertiser",
+      "Some advertisers require minimum traffic"
+    ],
+    steps: [
+      "Sign up at awin.com/us as a Publisher",
+      "Complete your profile with website details",
+      "Once approved, search for automotive advertisers",
+      "Apply to each retailer individually",
+      "Wait for retailer approval",
+      "Generate tracking links in the Awin dashboard"
+    ],
+    integration: "Awin provides tracking links. Format: awin1.com/cread.php?awinmid=MERCHANT&awinaffid=YOUR_ID&p=DESTINATION_URL. Owns ShareASale."
   },
   {
     id: "ebay",
@@ -390,6 +415,37 @@ Your massive selection of RC, drone, and model aircraft parts makes you the go-t
 • Include in our "Specialty Retailers" section for hobby categories
 
 I'd love to join your affiliate program and start driving sales your way.
+
+Best regards,
+Jason
+Founder, GarageBot.io
+https://garagebot.io`
+  },
+  oem_partnership: {
+    subject: "GarageBot.io — OEM Parts Distribution Partnership Inquiry",
+    body: `Dear Partnership/Business Development Team,
+
+I'm Jason, founder of GarageBot.io, a comprehensive auto parts search aggregator that unifies inventory from 68+ retailers into a single searchable interface for ALL motorized vehicles.
+
+**About GarageBot:**
+• Search aggregator covering 68+ retailers — auto, powersports, marine, diesel, RV, small engine, and hobby
+• AI-powered Buddy assistant for part recommendations and DIY repair guides
+• VIN decoding and vehicle-specific part matching
+• "Mechanics Garage" portal for professional shops with repair orders, estimates, scheduling
+• Growing user base actively searching for parts with purchase intent
+
+**Why OEM Parts Matter:**
+Our users frequently search for genuine OEM parts, especially for newer vehicles and warranty-compliant repairs. Adding your OEM inventory to our platform ensures we can fulfill the "Right Part. First Time." promise.
+
+**Partnership Proposal:**
+1. **Affiliate/Referral Program** — Drive qualified buyers to your store and earn commission on sales
+2. **Search Integration** — Feature your OEM catalog in our vehicle-specific search results
+3. **Mechanics Garage B2B** — Connect professional shops to your ordering platform
+4. **Content Partnership** — Include your parts in our AI-generated DIY repair guides
+
+Our platform drives high-intent traffic — users are actively searching for specific parts for specific vehicles. This makes our referrals highly valuable.
+
+Would you be open to discussing partnership opportunities?
 
 Best regards,
 Jason
@@ -813,6 +869,160 @@ const AFFILIATE_OUTREACH_VENDORS = [
     action: "Apply via AvantLink once network account is approved",
     priority: "high" as const,
   },
+  {
+    name: "AutoNation Parts",
+    category: "OEM (Auto)",
+    website: "https://www.autonationparts.com",
+    hasProgram: true,
+    network: "CJ Affiliate",
+    contact: "https://www.autonationparts.com/join-the-autonation-parts-affiliate-program",
+    phone: "",
+    notes: "Nation's largest auto retailer. Genuine OEM from all brands + aftermarket (Bosch, Denso). Also via CJ: signup.cj.com/member/signup/publisher/?cid=7394161",
+    action: "Apply via CJ Affiliate or direct on their site",
+    priority: "high" as const,
+  },
+  {
+    name: "Parts Geek",
+    category: "OEM (Auto)",
+    website: "https://www.partsgeek.com",
+    hasProgram: true,
+    network: "FlexOffers",
+    contact: "https://www.partsgeek.com/affliates.html",
+    phone: "",
+    notes: "10M+ OEM & aftermarket parts, 600+ brands. $0.32/purchase or 5-10% commission, 7-day cookie. Also on Shopper.com (instant approval) and VigLink.",
+    action: "Apply via FlexOffers network",
+    priority: "high" as const,
+  },
+  {
+    name: "OEM Parts Online",
+    category: "OEM (Auto)",
+    website: "https://oempartsonline.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "Multi-brand OEM catalogs, up to 35% off MSRP. Free shipping US, 2-3 day delivery. No public affiliate program — contact directly.",
+    action: "Email to propose referral/affiliate partnership",
+    priority: "medium" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "Genuine OEM Auto Parts",
+    category: "OEM (Diesel/Truck)",
+    website: "https://genuineoemautoparts.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website contact form",
+    phone: "",
+    notes: "Mopar, Motorcraft, AcDelco, Caterpillar, Fleetguard. Diesel/truck focus. Global wholesale.",
+    action: "Contact via website for referral partnership inquiry",
+    priority: "medium" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "OEM Surplus Depot",
+    category: "OEM (Auto — Japanese)",
+    website: "https://oemsurplus.parts",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website",
+    phone: "",
+    notes: "Nissan, Toyota, Lexus, Infiniti, Kia, Hyundai, Mazda, Honda surplus. 40 years in business. Nationwide via UPS.",
+    action: "Contact for referral/affiliate partnership",
+    priority: "medium" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "Keystone Automotive",
+    category: "OEM (Wholesale Distributor)",
+    website: "https://www.keystoneautomotive.com",
+    hasProgram: false,
+    network: "None (wholesale only)",
+    contact: "customercare@ekeystone.com",
+    phone: "1-800-521-9999",
+    notes: "Major national distributor (LKQ Corp). 185K+ SKUs, 800+ suppliers, 8 warehouses. Next-day delivery 48 states. Exports to 70+ countries.",
+    action: "Apply at keystoneautomotive.com/newcustomers for dealer account, or call for partnership inquiry",
+    priority: "high" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "Factory Motor Parts (FMP)",
+    category: "OEM (Wholesale Distributor)",
+    website: "https://www.factorymotorparts.com",
+    hasProgram: false,
+    network: "None (wholesale only)",
+    contact: "https://www.factorymotorparts.com/contact-us",
+    phone: "800-278-6394",
+    notes: "Family-owned since 1945. 300+ locations. OEM + aftermarket, import parts, virtual inventory, GPS tracking. Select 'New Customer' on contact form.",
+    action: "Call 800-278-6394 or submit New Customer form on website",
+    priority: "high" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "Western Power Sports (WPS)",
+    category: "OEM (Powersports)",
+    website: "https://www.wps.com",
+    hasProgram: false,
+    network: "None (dealer only)",
+    contact: "Via website",
+    phone: "",
+    notes: "Honda, Kawasaki, Yamaha, Suzuki, KTM, Polaris, Can-Am, Arctic Cat, Sea-Doo. 120K+ parts. 5 regional warehouses. HardDrive Parts = V-Twin division.",
+    action: "Contact for dealer/partner program inquiry",
+    priority: "high" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "Parts Unlimited",
+    category: "OEM (Powersports)",
+    website: "https://www.partsunlimited.com",
+    hasProgram: false,
+    network: "None (dealer only)",
+    contact: "Via website",
+    phone: "",
+    notes: "World's largest powersports aftermarket distributor. 75K+ parts, all major brands.",
+    action: "Contact for dealer/partner program inquiry",
+    priority: "high" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "Dealer Cost Parts",
+    category: "OEM (Powersports)",
+    website: "https://www.dealercostparts.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website",
+    phone: "",
+    notes: "OEM parts at dealer cost: Arctic Cat, Can-Am, Honda, Indian, Kawasaki, KTM, Polaris, Sea-Doo, Ski-Doo, Suzuki, Yamaha.",
+    action: "Contact for partnership/affiliate inquiry",
+    priority: "medium" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "The OEM Parts Store",
+    category: "OEM (Small Engine)",
+    website: "https://www.theoempartsstore.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website",
+    phone: "",
+    notes: "Briggs & Stratton, Kohler, Tecumseh, Honda, Kawasaki. 1M+ parts. Wholesale/dealer pricing available for shops.",
+    action: "Contact for wholesale/affiliate partnership",
+    priority: "medium" as const,
+    letterType: "oem_partnership",
+  },
+  {
+    name: "Medart Engine",
+    category: "OEM (Small Engine/Industrial)",
+    website: "https://www.medartengine.com",
+    hasProgram: false,
+    network: "None found",
+    contact: "Via website",
+    phone: "",
+    notes: "80+ manufacturers, 50K+ part numbers. 5 distribution locations. Outdoor power, rental, industrial equipment.",
+    action: "Contact for dealer/wholesale program",
+    priority: "medium" as const,
+    letterType: "oem_partnership",
+  },
 ];
 
 const DEV_PIN = "0424";
@@ -838,6 +1048,7 @@ const CATEGORIES = [
   { id: "parts_ordering", name: "Parts & Tool Ordering", icon: Settings, color: "text-amber-400" },
   { id: "features", name: "Feature Development", icon: Zap, color: "text-yellow-400" },
   { id: "marketing", name: "Marketing & Monetization", icon: DollarSign, color: "text-pink-400" },
+  { id: "oem_distributors", name: "OEM Parts Distributors", icon: Car, color: "text-emerald-400" },
   { id: "partnerships", name: "Partnerships", icon: Users, color: "text-purple-400" },
   { id: "legal", name: "Legal & Compliance", icon: Shield, color: "text-red-400" },
   { id: "infrastructure", name: "Infrastructure", icon: Settings, color: "text-cyan-400" },
@@ -941,7 +1152,49 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   
   // FORTELLIS MARKETPLACE
   { category: "parts_ordering", title: "Fortellis Marketplace", description: "CDK Global automotive API marketplace", priority: "medium", status: "pending", dueDate: null, link: "https://fortellis.io", notes: "Automotive API ecosystem", sortOrder: 14 },
-  
+
+  // OEM PARTS DISTRIBUTORS - Automotive (Affiliate Programs)
+  { category: "oem_distributors", title: "AutoNation Parts — Affiliate (CJ)", description: "Genuine OEM from all major brands + aftermarket (Bosch, Denso). Apply via CJ Affiliate.", priority: "high", status: "pending", dueDate: null, link: "https://www.autonationparts.com/join-the-autonation-parts-affiliate-program", notes: "Also via CJ: signup.cj.com/member/signup/publisher/?cid=7394161. Nation's largest auto retailer.", sortOrder: 1 },
+  { category: "oem_distributors", title: "Parts Geek — Affiliate (FlexOffers)", description: "10M+ OEM & aftermarket parts, up to 80% off list. Apply via FlexOffers.", priority: "high", status: "pending", dueDate: null, link: "https://www.partsgeek.com/affliates.html", notes: "FlexOffers signup: publisherpro.flexoffers.com. $0.32/purchase or 5-10%. 7-day cookie. 600+ brands.", sortOrder: 2 },
+  { category: "oem_distributors", title: "OEM Parts Online — Direct Outreach", description: "Multi-brand OEM catalogs, up to 35% off MSRP. No public affiliate — contact directly.", priority: "medium", status: "pending", dueDate: null, link: "https://oempartsonline.com", notes: "Check footer for contact/partnership page. Free shipping US, 2-3 day delivery.", sortOrder: 3 },
+  { category: "oem_distributors", title: "Genuine OEM Auto Parts — Direct Outreach", description: "Mopar, Motorcraft, AcDelco, Caterpillar, Fleetguard. Diesel/truck focus. Global wholesale.", priority: "medium", status: "pending", dueDate: null, link: "https://genuineoemautoparts.com", notes: "Contact via website for affiliate/referral partnership inquiry.", sortOrder: 4 },
+  { category: "oem_distributors", title: "Detroit Axle — Amazon Associates", description: "OE remanufactured + new aftermarket — suspension, steering, brakes. 30+ years, 180K sq ft warehouse.", priority: "medium", status: "pending", dueDate: null, link: "https://www.detroitaxle.com", notes: "Sells via Amazon & eBay. Promote through Amazon Associates (already connected) or eBay Partner Network.", sortOrder: 5 },
+  { category: "oem_distributors", title: "OEM Surplus Depot — Direct Outreach", description: "Nissan, Toyota, Lexus, Infiniti, Kia, Hyundai, Mazda, Honda surplus. 40 years in business.", priority: "medium", status: "pending", dueDate: null, link: "https://oemsurplus.parts", notes: "Nationwide via UPS. Contact for referral/affiliate partnership.", sortOrder: 6 },
+
+  // OEM PARTS DISTRIBUTORS - Automotive (Wholesale/Partnership)
+  { category: "oem_distributors", title: "Keystone Automotive — Wholesale Dealer", description: "Major national distributor (LKQ Corp). 185K+ SKUs, 800+ suppliers, 8 warehouses.", priority: "high", status: "pending", dueDate: null, link: "https://www.keystoneautomotive.com/newcustomers", notes: "Apply online. Phone: 1-800-521-9999. Email: customercare@ekeystone.com. Next-day delivery 48 states.", sortOrder: 7 },
+  { category: "oem_distributors", title: "Factory Motor Parts (FMP) — Wholesale", description: "OEM + aftermarket, import parts, virtual inventory, GPS tracking. 300+ locations nationwide.", priority: "high", status: "pending", dueDate: null, link: "https://www.factorymotorparts.com/contact-us", notes: "Call 800-278-6394, select 'New Customer' on contact form. Since 1945, family-owned.", sortOrder: 8 },
+  { category: "oem_distributors", title: "APW (Auto Parts Warehouse) — Wholesale", description: "Largest independent distributor. 55+ years, Pronto Network member, vast inventory.", priority: "medium", status: "pending", dueDate: null, link: "https://apwks.com", notes: "Contact via website for dealer/wholesale inquiries.", sortOrder: 9 },
+  { category: "oem_distributors", title: "Advantage Parts Solutions (ADPS) — Partnership", description: "OEM wholesale platform connecting suppliers to 300,000+ repair shops. Loyalty rewards.", priority: "medium", status: "pending", dueDate: null, link: "https://adps.com", notes: "Contact partnership team for integration/referral opportunity.", sortOrder: 10 },
+  { category: "oem_distributors", title: "Bam Wholesale Parts — Wholesale", description: "OEM parts from Brunswick Auto Mart. Nationwide delivery.", priority: "low", status: "pending", dueDate: null, link: "https://bamwholesaleparts.com", notes: "Direct wholesale ordering available on site.", sortOrder: 11 },
+  { category: "oem_distributors", title: "Cochran Wholesale Parts — Regional Wholesale", description: "OEM at aftermarket prices. Fleet of 20 delivery vehicles. PA/OH region.", priority: "low", status: "pending", dueDate: null, link: "https://www.cochran.com/wholesale-parts-dev/", notes: "Will beat competitor pricing. Regional coverage PA/OH.", sortOrder: 12 },
+
+  // OEM PARTS DISTRIBUTORS - Data/Catalog API Providers
+  { category: "oem_distributors", title: "OEC (OE Connection) — Catalog API", description: "Leading OEM parts catalog software. Connects dealers, distributors, repair shops, insurers.", priority: "high", status: "pending", dueDate: null, link: "https://oeconnection.com", notes: "Industry leader for OEM catalog data. Contact for API/partnership.", sortOrder: 13 },
+  { category: "oem_distributors", title: "Epicor Parts Portal — Distributor API", description: "API access to 19,000+ aftermarket distributors. Lookup, ordering, purchasing.", priority: "high", status: "pending", dueDate: null, link: "https://www.epicor.com/en-us/products/supply-chain-management-scm/parts-portal/", notes: "Enterprise-level integration. Contact sales for API access.", sortOrder: 14 },
+  { category: "oem_distributors", title: "SEMA Data Co-op — ACES/PIES Data", description: "Industry standard for parts catalog data. OEM-to-aftermarket cross-referencing.", priority: "medium", status: "pending", dueDate: null, link: "https://www.semadatacoop.org", notes: "ACES (fitment) + PIES (product info) standards. Key for part number cross-referencing.", sortOrder: 15 },
+  { category: "oem_distributors", title: "TecDoc API — European Catalog", description: "European parts catalog standard. Multi-language, region-specific data.", priority: "low", status: "pending", dueDate: null, link: "https://www.tecalliance.net", notes: "Useful if expanding to European markets.", sortOrder: 16 },
+
+  // OEM PARTS DISTRIBUTORS - Powersports
+  { category: "oem_distributors", title: "Western Power Sports (WPS) — Powersports Wholesale", description: "Honda, Kawasaki, Yamaha, Suzuki, KTM, Polaris, Can-Am, Arctic Cat, Sea-Doo. 120K+ parts.", priority: "high", status: "pending", dueDate: null, link: "https://www.wps.com", notes: "5 regional warehouses. HardDrive Parts = their V-Twin division. Contact for dealer program.", sortOrder: 17 },
+  { category: "oem_distributors", title: "Parts Unlimited — Powersports Wholesale", description: "World's largest powersports aftermarket distributor. 75K+ parts, all major brands.", priority: "high", status: "pending", dueDate: null, link: "https://www.partsunlimited.com", notes: "Contact for dealer/partner program.", sortOrder: 18 },
+  { category: "oem_distributors", title: "Drag Specialties — Harley/V-Twin Wholesale", description: "Leading Harley-Davidson and V-Twin aftermarket. 40+ years in business.", priority: "medium", status: "pending", dueDate: null, link: "https://www.dragspecialties.com", notes: "Contact for dealer program.", sortOrder: 19 },
+  { category: "oem_distributors", title: "Automatic Distributors — Powersports", description: "350+ brands, 75K+ products, 7 catalogs. National wholesale distribution.", priority: "medium", status: "pending", dueDate: null, link: "https://www.autodist.com", notes: "Contact for dealer/wholesale program.", sortOrder: 20 },
+  { category: "oem_distributors", title: "Dealer Cost Parts — OEM Powersports", description: "OEM parts: Arctic Cat, Can-Am, Honda, Indian, Kawasaki, KTM, Polaris, Sea-Doo, Suzuki, Yamaha.", priority: "medium", status: "pending", dueDate: null, link: "https://www.dealercostparts.com", notes: "OEM parts & accessories at dealer cost. Contact for partnership.", sortOrder: 21 },
+
+  // OEM PARTS DISTRIBUTORS - Marine
+  { category: "oem_distributors", title: "Wholesale Marine — Marine Affiliate (AvantLink)", description: "OEM boat engine parts: Mercury, Yamaha, Honda Marine. Has affiliate program.", priority: "high", status: "pending", dueDate: null, link: "https://www.wholesalemarine.com/affiliate-program/", notes: "Via AvantLink. 2-5% commission, 14-day cookie, $200+ avg order. Sign up through AvantLink network.", sortOrder: 22 },
+
+  // OEM PARTS DISTRIBUTORS - Small Engine / Outdoor Power
+  { category: "oem_distributors", title: "Medart Engine — Small Engine Wholesale", description: "80+ manufacturers, 50K+ part numbers. Outdoor power equipment, rental, industrial.", priority: "medium", status: "pending", dueDate: null, link: "https://www.medartengine.com", notes: "5 distribution locations. Contact for dealer/wholesale program.", sortOrder: 23 },
+  { category: "oem_distributors", title: "The OEM Parts Store — Small Engine", description: "Briggs & Stratton, Kohler, Tecumseh, Honda, Kawasaki. 1M+ parts. Wholesale pricing available.", priority: "medium", status: "pending", dueDate: null, link: "https://www.theoempartsstore.com", notes: "Wholesale/dealer pricing available for shops. Contact for partner program.", sortOrder: 24 },
+  { category: "oem_distributors", title: "Small Engine Suppliers — Engines & Parts", description: "Complete engines + parts: Briggs, Honda, Kohler. Online source.", priority: "low", status: "pending", dueDate: null, link: "https://www.smallenginesuppliers.com", notes: "Contact for referral/affiliate partnership inquiry.", sortOrder: 25 },
+
+  // OEM PARTS DISTRIBUTORS - Affiliate Networks for OEM access
+  { category: "oem_distributors", title: "FlexOffers — Join Network for OEM Programs", description: "Access Parts Geek, NAPA, SimpleTire, and more OEM/aftermarket programs.", priority: "high", status: "pending", dueDate: null, link: "https://www.flexoffers.com/affiliate-programs/automotive/auto-parts-and-accessories/", notes: "Free to join. Multiple auto parts programs in one place.", sortOrder: 26 },
+  { category: "oem_distributors", title: "Rakuten Advertising — Join for Advance Auto", description: "Advance Auto Parts runs their affiliate through Rakuten. Apply to network first.", priority: "medium", status: "pending", dueDate: null, link: "https://rakutenadvertising.com", notes: "Apply to Rakuten network, then search for Advance Auto Parts program.", sortOrder: 27 },
+  { category: "oem_distributors", title: "Impact — Join for AutoZone & Others", description: "AutoZone, Camping World, Bass Pro run through Impact. Apply as partner.", priority: "medium", status: "pending", dueDate: null, link: "https://impact.com/partners/", notes: "Apply to Impact network, then search automotive brands. Some invite-only.", sortOrder: 28 },
+
   // MARKETING & MONETIZATION
   { category: "marketing", title: "Google AdSense Setup", description: "Sign up for Google AdSense to monetize informational pages (NOT search results). Get your publisher ID (ca-pub-XXXXX)", priority: "high", status: "pending", dueDate: null, link: "https://adsense.google.com/start/", notes: "Only on informational pages (DIY guides, about, blog). Avoid on search results to keep UX clean", sortOrder: 1 },
   { category: "marketing", title: "Buffer Account Setup", description: "Create Buffer account for social media scheduling. Connect Twitter/X, Facebook, Instagram, LinkedIn", priority: "medium", status: "pending", dueDate: null, link: "https://buffer.com", notes: "Free tier: 3 channels, 10 posts/channel. Pro $6/mo for more", sortOrder: 2 },
