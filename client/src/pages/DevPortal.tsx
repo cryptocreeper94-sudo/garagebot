@@ -950,6 +950,27 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "marketing", title: "TikTok/Reels Strategy", description: "Short-form video content: quick repair tips, tool reviews, before/after fixes", priority: "low", status: "pending", dueDate: null, link: null, notes: "Repurpose DIY guide content into 60-sec videos", sortOrder: 5 },
   { category: "marketing", title: "Email Marketing Setup", description: "Set up email list for price drop alerts, weekly deals digest, maintenance reminders", priority: "medium", status: "pending", dueDate: null, link: "https://www.mailerlite.com", notes: "Free up to 1000 subscribers", sortOrder: 6 },
   { category: "marketing", title: "Google Analytics 4", description: "Set up GA4 for traffic and conversion tracking", priority: "high", status: "pending", dueDate: null, link: "https://analytics.google.com", notes: "Track: searches, affiliate clicks, conversions, Buddy usage", sortOrder: 7 },
+
+  // X/TWITTER & SOCIAL MEDIA
+  { category: "marketing", title: "X/Twitter API Credentials", description: "Add Twitter API keys to secrets so auto-posting connector goes live. Social connector is coded — just needs credentials", priority: "high", status: "pending", dueDate: null, link: "https://developer.x.com/en/portal/dashboard", notes: "Need: API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET", sortOrder: 8 },
+  { category: "marketing", title: "Meta ads_management Permission", description: "Request ads_management permission in Meta App Review so Meta Ads campaigns can go live", priority: "high", status: "pending", dueDate: null, link: "https://developers.facebook.com/apps", notes: "Token has pages_manage_posts but needs ads_management added", sortOrder: 9 },
+  { category: "marketing", title: "Google AdSense Verification", description: "Verify domain in AdSense console and configure ad units for blog, DIY guides, Break Room pages", priority: "high", status: "pending", dueDate: null, link: "https://adsense.google.com", notes: "Meta tag is in place — just needs domain verification + ad unit setup", sortOrder: 10 },
+  { category: "marketing", title: "Newsletter Email System", description: "Build subscriber management, campaign creation, and sending via Resend or MailerLite", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Page exists in Command Center — needs full email campaign backend", sortOrder: 11 },
+  { category: "marketing", title: "Sponsored Products Feature", description: "Build featured placements system — vendors can pay to promote listings in search results", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Revenue stream: promoted listings with CPC/CPM model", sortOrder: 12 },
+
+  // REVENUE VERIFICATION
+  { category: "features", title: "Stripe Checkout End-to-End Test", description: "Test full checkout flow with live Stripe keys — Pro subscription, ad-free tier, cart purchases", priority: "high", status: "pending", dueDate: null, link: "https://dashboard.stripe.com", notes: "Switch from test to live keys, verify webhooks", sortOrder: 13 },
+  { category: "features", title: "Affiliate Click Tracking Verification", description: "Verify that clicks through to Amazon, CJ, eBay actually record in their dashboards for commission", priority: "high", status: "pending", dueDate: null, link: null, notes: "Test with real affiliate tags — check each network's reporting", sortOrder: 14 },
+  { category: "features", title: "Inbound Affiliate Payout Flow", description: "Test full GB-XXXXXX affiliate payout cycle: signup → referral → earning → PayPal payout request", priority: "medium", status: "pending", dueDate: null, link: "/affiliates", notes: "System built — needs real affiliates to validate end-to-end", sortOrder: 15 },
+  { category: "features", title: "Genesis Hallmark Live Minting", description: "Test NFT minting with real Solana transactions on mainnet", priority: "low", status: "pending", dueDate: null, link: null, notes: "Currently testnet — switch to mainnet when ready", sortOrder: 16 },
+  { category: "features", title: "Giveaways System", description: "Build prize drawings, winner selection, and management page at /giveaways", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Card exists in Command Center — needs full feature build", sortOrder: 17 },
+  { category: "features", title: "Blog SEO Content Pipeline", description: "Publish 20+ high-quality blog posts covering seasonal maintenance, DIY tips, and part buying guides", priority: "high", status: "pending", dueDate: null, link: "/blog", notes: "11 posts published — need more for organic traffic growth", sortOrder: 18 },
+  { category: "features", title: "Trivia Quiz Content Expansion", description: "Add 200+ questions across all vehicle categories — cars, trucks, marine, powersports, hobby", priority: "low", status: "pending", dueDate: null, link: "/trivia", notes: "Game works — just needs more question variety", sortOrder: 19 },
+
+  // INFRASTRUCTURE GAPS
+  { category: "infrastructure", title: "Production Error Monitoring", description: "Set up error tracking (Sentry or similar) for production crash reporting", priority: "medium", status: "pending", dueDate: null, link: "https://sentry.io", notes: "Catch runtime errors before users report them", sortOrder: 5 },
+  { category: "infrastructure", title: "Database Backup Strategy", description: "Configure automated daily database backups and test restoration process", priority: "high", status: "pending", dueDate: null, link: null, notes: "Neon has point-in-time recovery — verify it works", sortOrder: 6 },
+  { category: "infrastructure", title: "Rate Limiting Audit", description: "Review API rate limits across all endpoints — ensure partner API and public routes are protected", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Partner API has limits — check public search and blog endpoints too", sortOrder: 7 },
 ];
 
 export default function DevPortal() {
@@ -960,7 +981,26 @@ export default function DevPortal() {
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({ category: "features", title: "", description: "", priority: "medium", link: "" });
-  const [activeTab, setActiveTab] = useState("features");
+  const validTabs = ["features", "tasks", "releases", "blockchain", "analytics", "affiliates", "outreach", "logos", "buddy"];
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    return tab && validTabs.includes(tab) ? tab : "features";
+  });
+
+  useEffect(() => {
+    const syncTab = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      if (tab && validTabs.includes(tab)) {
+        setActiveTab(tab);
+      }
+    };
+    window.addEventListener("popstate", syncTab);
+    syncTab();
+    return () => window.removeEventListener("popstate", syncTab);
+  }, []);
+
   const [showNewRelease, setShowNewRelease] = useState(false);
   const [newRelease, setNewRelease] = useState({
     version: "",
