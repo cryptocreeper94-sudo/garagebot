@@ -112,6 +112,9 @@ const marketingImagesList = [
   { filename: 'hatch_garagebot_nashville.png', filePath: '/generated_images/hatch_garagebot_nashville.png', category: 'brand', subject: 'garagebot', style: 'lifestyle', altText: 'GarageBot Nashville' },
   { filename: 'hatch_garagebot_search.png', filePath: '/generated_images/hatch_garagebot_search.png', category: 'brand', subject: 'garagebot', style: 'product', altText: 'GarageBot search feature' },
   { filename: 'garagebot_facebook_cover_16x9.png', filePath: '/generated_images/../attached_assets/garagebot_facebook_cover_16x9.png', category: 'brand', subject: 'garagebot', style: 'product', altText: 'GarageBot.io Facebook cover banner' },
+  { filename: 'darkwave_disrupt_signal.jpeg', filePath: '/generated_images/darkwave_disrupt_signal.jpeg', category: 'brand', subject: 'darkwave', style: 'product', altText: 'DarkWave Studios - Disrupt the Noise, Can You Feel the Signal' },
+  { filename: 'trustlayer_robot_shield.jpeg', filePath: '/generated_images/trustlayer_robot_shield.jpeg', category: 'brand', subject: 'darkwave', style: 'product', altText: 'Trust Layer shield logo with robot mascot' },
+  { filename: 'darkwave_trustlayer_wave.jpeg', filePath: '/generated_images/darkwave_trustlayer_wave.jpeg', category: 'brand', subject: 'darkwave', style: 'product', altText: 'DarkWave Trust Layer wave shield logo with signal visualization' },
 ];
 
 export async function seedMarketingContent() {
