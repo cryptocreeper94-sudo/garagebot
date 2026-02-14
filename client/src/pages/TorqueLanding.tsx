@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTorqueTenant } from "@/hooks/useTorqueTenant";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Link } from "wouter";
 import {
@@ -251,17 +252,11 @@ export default function TorqueLanding() {
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
+  useTorqueTenant();
+
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2200);
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "manifest";
-    link.href = "/torque-manifest.json";
-    document.head.appendChild(link);
-    return () => { document.head.removeChild(link); };
   }, []);
 
   useEffect(() => {
