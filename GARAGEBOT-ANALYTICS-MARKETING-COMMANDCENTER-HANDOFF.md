@@ -28,13 +28,21 @@
 ## 1. COMMAND CENTER (Admin Landing Page)
 
 ### Overview
-The Command Center (`/command-center`) is an admin-only dashboard that serves as the central launchpad for managing all 46+ platform tools organized across 8 categories. It features an ultra-premium dark UI with glassmorphism cards, image-backed carousel navigation, and gated access requiring admin credentials.
+The Command Center (`/command-center`) is an admin-only dashboard that serves as the central launchpad for managing all 46+ platform tools organized across 8 categories. It uses a clean, spacious icon-driven glassmorphism design with horizontal carousel navigation per category. No background images — each card uses a gradient-accented Lucide icon, glassmorphism panel, and subtle hover glow for a lightweight, premium feel.
+
+### Design Philosophy (Feb 2026 Redesign)
+- **No images:** Removed all 46 heavy PNG card images (~55MB). Cards now use gradient icon badges + glassmorphism panels instead.
+- **Spacious carousels:** Cards are 300px/320px wide with 20px gaps (`pl-5`), giving proper breathing room.
+- **Taller section spacing:** `space-y-14` between categories (was `space-y-12`).
+- **Subtle gradient orb:** Each card has a large, faint gradient circle in the top-right corner that intensifies on hover.
+- **Hover lift:** Cards lift upward (`y: -4`) and scale (`1.03`) on hover with a soft white shadow.
+- **"Open" label:** Appears on hover in the bottom-right corner with a chevron arrow.
 
 ### Route
 `/command-center` — Registered in `client/src/App.tsx`
 
 ### File
-`client/src/pages/CommandCenter.tsx` (557 lines)
+`client/src/pages/CommandCenter.tsx`
 
 ### Access Control
 - **Login Gate:** Custom `LoginGate` component requiring username + PIN authentication
@@ -129,28 +137,32 @@ The Command Center (`/command-center`) is an admin-only dashboard that serves as
   - Explore Page → `/explore`
   - Investor Portal → `/investors`
 
-### Card Images
-All 46 card images are stored at `client/src/assets/images/cc/` as PNGs and imported at the top of `CommandCenter.tsx`. Each card has a unique AI-generated image showing a preview of that feature.
-
-Image naming convention: `{feature-name}.png` (e.g., `analytics-dashboard.png`, `marketing-hub.png`, `signal-chat.png`)
+### Card Design (Icon-Driven Glassmorphism)
+Each card is a 300px-wide (320px on larger screens) glassmorphism panel with:
+- **Background:** `bg-white/[0.03]` with `backdrop-blur-sm`
+- **Border:** `border-white/[0.06]`, transitions to `border-white/[0.15]` on hover
+- **Icon Badge:** 40x40px rounded-xl with per-card gradient background (e.g., `from-cyan-500 to-blue-600`)
+- **Gradient Orb:** A large (128px) faint gradient circle positioned at top-right, 8% opacity → 15% on hover with scale-up
+- **Height:** 150px fixed
+- **Hover:** Scale 1.03, lift -4px, soft white shadow
 
 ### UI Components Used
 - **Carousel:** shadcn/ui `Carousel` (`CarouselContent`, `CarouselItem`, `CarouselNext`, `CarouselPrevious`) with `dragFree: true` and `align: "start"`
-- **Animations:** Framer Motion — staggered `initial/animate` with `catIndex * 0.1` delay per category, `whileHover: { scale: 1.03 }` on cards
-- **Glow Effects:** Dynamic `GLOW_MAP` maps color class names to CSS `boxShadow` values (17 colors defined)
+- **Animations:** Framer Motion — staggered entry with `catIndex * 0.06 + index * 0.04` delay, `whileHover: { scale: 1.03, y: -4 }`, `whileTap: { scale: 0.98 }`
 - **Badges:** "Live", "New", "Earn" badges with gradient pill backgrounds positioned top-right
-- **Featured Flag:** Yellow bordered pill badge positioned top-left for featured cards
-- **Skeleton Loading:** `SkeletonCard` and `SkeletonSection` components shown during 400ms load delay and auth loading
+- **Featured Flag:** Yellow bordered pill badge positioned top-right for featured cards
+- **Skeleton Loading:** `SkeletonCard` and `SkeletonSection` components shown during 300ms load delay
 - **Top Bar:** Fixed backdrop-blur header with back button, gradient icon, title, user greeting, and logout button
 
+### Legacy Card Images (No Longer Used)
+The 46 PNG images in `client/src/assets/images/cc/` are no longer imported or displayed. They remain in the repo but can be safely deleted to save ~55MB. The redesign uses Lucide icons with per-card gradients instead.
+
 ### How to Add a New Card
-1. Generate or add an image to `client/src/assets/images/cc/` (recommended: 280x200px or 320x220px)
-2. Import the image at the top of `CommandCenter.tsx`: `import imgNewFeature from "@/assets/images/cc/new-feature.png";`
-3. Add a `LaunchCard` object to the appropriate category in the `categories` array:
+Add a `LaunchCard` object to the appropriate category in the `categories` array:
 ```typescript
-{ label: "New Feature", description: "Short description here", href: "/route", icon: IconName, image: imgNewFeature, glowColor: "shadow-cyan-500/30", badge: "New", featured: false }
+{ label: "New Feature", description: "Short description here", href: "/route", icon: LucideIconName, gradient: "from-cyan-500 to-blue-600", badge: "New", featured: false }
 ```
-4. Available `glowColor` values: Any key from the `GLOW_MAP` (e.g., `shadow-cyan-500/30`, `shadow-green-500/30`, etc.)
+No image imports needed — just pick a Lucide icon and a Tailwind gradient pair.
 
 ### How to Add a New Category
 Add a new `Category` object to the `categories` array:
@@ -456,7 +468,7 @@ const GLOW_MAP = {
 - **Loading States:** `SkeletonCard` and `SkeletonSection` with `animate-pulse`
 
 ### Carousel Implementations
-1. **Command Center:** shadcn/ui `Carousel` (Embla under the hood) with `dragFree: true`, left/right nav arrows hidden on mobile
+1. **Command Center:** shadcn/ui `Carousel` (Embla under the hood) with `dragFree: true`, spacious 300-320px icon-driven glassmorphism cards, left/right nav arrows hidden on mobile
 2. **FeaturedCarousel:** Embla Carousel React for deals with auto-scroll
 3. **VehicleShowcase:** Custom auto-scrolling with `requestAnimationFrame`, doubled vehicle array for infinite loop effect
 4. **CategoryGrid:** Native scroll with manual left/right buttons and pagination dots
@@ -465,7 +477,7 @@ const GLOW_MAP = {
 ### Mobile Responsiveness
 - **Breakpoints:** Mobile-first, `sm:`, `md:`, `lg:`, `xl:`, `2xl:` via Tailwind
 - **Home Page:** Separate desktop Bento layout (`hidden lg:block`) and mobile layout (`lg:hidden`)
-- **Command Center:** Carousel cards use `basis-[280px]` (standard) and `basis-[320px]` (featured) for flexible scrolling
+- **Command Center:** Carousel cards use `basis-[300px]` (mobile) and `basis-[320px]` (sm+) with `pl-5` spacing for spacious scrolling
 - **Navigation:** Collapsible mobile nav with hamburger menu
 
 ---
@@ -576,7 +588,7 @@ client/
 │   ├── pages/
 │   │   ├── CommandCenter.tsx               # Admin command center (557 lines)
 │   │   └── MarketingHub.tsx                # Marketing management (1,928 lines)
-│   └── assets/images/cc/                   # 46 Command Center card images (PNGs)
+│   └── assets/images/cc/                   # 46 legacy card images (PNGs, no longer used — safe to delete)
 │
 server/
 ├── routes.ts                               # All API routes (analytics, marketing, SEO, ads)
@@ -636,11 +648,11 @@ Posts will automatically fire at the next scheduled hour.
 3. Login with admin username and PIN
 4. Browse all 8 categories and 46 feature cards
 
-### Step 8: Command Center Card Images
-All 46 images live in `client/src/assets/images/cc/`. To add new cards:
-1. Create or generate a 280x200px PNG for the feature
-2. Save to `client/src/assets/images/cc/your-feature.png`
-3. Import in `CommandCenter.tsx` and add to the appropriate category's `cards` array
+### Step 8: Adding New Command Center Cards
+No images needed. To add new cards:
+1. Pick a Lucide icon and a Tailwind gradient pair (e.g., `from-cyan-500 to-blue-600`)
+2. Add a `LaunchCard` object to the appropriate category's `cards` array in `CommandCenter.tsx`
+3. The legacy 46 PNGs in `client/src/assets/images/cc/` are no longer used and can be safely deleted (~55MB)
 
 ---
 
