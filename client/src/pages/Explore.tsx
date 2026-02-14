@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
@@ -11,430 +10,273 @@ import {
   Store, Tag, Heart, FolderOpen, Fuel, DollarSign, Calendar,
   TrendingDown, Phone, MessageCircle, Gamepad2, Coffee, Truck,
   Globe, Crown, ChevronRight, Sparkles, MapPin, Star,
-  BookOpen, Blocks, Compass, Layout, Award,
-  HeadphonesIcon, Mail, Settings
+  BookOpen, Blocks, Compass, Award,
+  HeadphonesIcon, Mail, Settings, Rocket, Eye, ArrowRight
 } from "lucide-react";
+
+import imgPartsSearch from "@/assets/images/cc/parts-search.png";
+import imgPartsMarketplace from "@/assets/images/cc/parts-marketplace.png";
+import imgWishlists from "@/assets/images/cc/wishlists.png";
+import imgBuildProjects from "@/assets/images/cc/build-projects.png";
+import imgMyGarage from "@/assets/images/cc/my-garage.png";
+import imgDiyGuides from "@/assets/images/cc/diy-guides.png";
+import imgShadeTree from "@/assets/images/cc/shade-tree.png";
+import imgTriviaQuiz from "@/assets/images/cc/trivia-quiz.png";
+import imgBlogManager from "@/assets/images/cc/blog-manager.png";
+import imgSignalChat from "@/assets/images/cc/signal-chat.png";
+import imgBreakRoom from "@/assets/images/cc/break-room.png";
+import imgSupportCenter from "@/assets/images/cc/support-center.png";
+import imgMechanicsGarage from "@/assets/images/cc/mechanics-garage.png";
+import imgShopPortal from "@/assets/images/cc/shop-portal.png";
+import imgVendorManagement from "@/assets/images/cc/vendor-management.png";
+import imgCdlDirectory from "@/assets/images/cc/cdl-directory.png";
+import imgRentalCars from "@/assets/images/cc/rental-cars.png";
+import imgInsurance from "@/assets/images/cc/insurance.png";
+import imgGenesisHallmarks from "@/assets/images/cc/genesis-hallmarks.png";
+import imgProMembership from "@/assets/images/cc/pro-membership.png";
+import imgPriceAlerts from "@/assets/images/cc/price-alerts.png";
+import imgReferralProgram from "@/assets/images/cc/referral-program.png";
+
+import imgWarrantyTracker from "@/assets/images/hub/warranty-tracker.png";
+import imgFuelTracker from "@/assets/images/hub/fuel-tracker.png";
+import imgExpenseTracker from "@/assets/images/hub/expense-tracker.png";
+import imgEmergencyInfo from "@/assets/images/hub/emergency-info.png";
+import imgAccountSettings from "@/assets/images/hub/account-settings.png";
+import imgAboutGaragebot from "@/assets/images/hub/about-garagebot.png";
+import imgMaintenanceScheduler from "@/assets/images/hub/maintenance-scheduler.png";
+import imgPriceWatch from "@/assets/images/hub/price-watch.png";
+import imgInviteFriends from "@/assets/images/hub/invite-friends.png";
+import imgContactUs from "@/assets/images/hub/contact-us.png";
 
 interface Feature {
   name: string;
   description: string;
   href: string;
   icon: any;
-  color: string;
+  image: string;
   glowColor: string;
   badge?: string;
-  badgeColor?: string;
-  pro?: boolean;
+  badgeVariant?: "new" | "live" | "hot" | "pro" | "free" | "nft" | "founders";
   subFeatures?: string[];
+  featured?: boolean;
 }
 
 interface FeatureCategory {
   title: string;
   description: string;
   icon: any;
-  color: string;
   gradient: string;
   features: Feature[];
 }
 
+const GLOW_MAP: Record<string, string> = {
+  cyan: "0 0 30px rgba(6,182,212,0.35)",
+  green: "0 0 30px rgba(34,197,94,0.35)",
+  purple: "0 0 30px rgba(168,85,247,0.35)",
+  amber: "0 0 30px rgba(245,158,11,0.35)",
+  blue: "0 0 30px rgba(59,130,246,0.35)",
+  pink: "0 0 30px rgba(236,72,153,0.35)",
+  orange: "0 0 30px rgba(249,115,22,0.35)",
+  red: "0 0 30px rgba(239,68,68,0.35)",
+  emerald: "0 0 30px rgba(16,185,129,0.35)",
+  yellow: "0 0 30px rgba(234,179,8,0.35)",
+  teal: "0 0 30px rgba(20,184,166,0.35)",
+  indigo: "0 0 30px rgba(99,102,241,0.35)",
+};
+
+const BADGE_STYLES: Record<string, string> = {
+  new: "bg-gradient-to-r from-cyan-500 to-blue-500",
+  live: "bg-gradient-to-r from-green-500 to-emerald-500",
+  hot: "bg-gradient-to-r from-orange-500 to-rose-500",
+  pro: "bg-gradient-to-r from-yellow-500 to-amber-500",
+  free: "bg-gradient-to-r from-teal-500 to-cyan-500",
+  nft: "bg-gradient-to-r from-purple-500 to-pink-500",
+  founders: "bg-gradient-to-r from-yellow-500 to-amber-500",
+};
+
 const FEATURE_CATEGORIES: FeatureCategory[] = [
   {
     title: "Parts & Shopping",
-    description: "Search, compare, save, and buy parts across 68+ retailers",
+    description: "Search, compare, and save across 68+ retailers",
     icon: ShoppingCart,
-    color: "text-cyan-400",
     gradient: "from-cyan-500 to-blue-600",
     features: [
-      {
-        name: "Parts Search",
-        description: "Search 15M+ parts across 68+ retailers with AI-powered results, price comparison, and local pickup availability.",
-        href: "/",
-        icon: Search,
-        color: "text-cyan-400",
-        glowColor: "rgba(6,182,212,0.4)",
-        subFeatures: ["68+ Retailers", "Price Comparison", "Local Pickup", "Vehicle-Aware"],
-      },
-      {
-        name: "Parts Marketplace",
-        description: "Buy and sell used parts directly with other enthusiasts. List spare parts, search by vehicle fitment, and message sellers.",
-        href: "/marketplace",
-        icon: Tag,
-        color: "text-green-400",
-        glowColor: "rgba(74,222,128,0.4)",
-        badge: "NEW",
-        badgeColor: "bg-green-500/20 text-green-400 border-green-500/30",
-        subFeatures: ["List Parts", "Fitment Search", "In-App Messaging", "Photo Uploads"],
-      },
-      {
-        name: "Wishlists",
-        description: "Save parts you're watching to organized wishlists. Share them with friends or your mechanic, and track price changes.",
-        href: "/wishlists",
-        icon: Heart,
-        color: "text-pink-400",
-        glowColor: "rgba(244,114,182,0.4)",
-        subFeatures: ["Multiple Lists", "Share Link", "Price Tracking", "Priority Sort"],
-      },
-      {
-        name: "Build Projects",
-        description: "Plan and track your vehicle build projects. Create parts lists, track spending vs budget, and mark items as purchased.",
-        href: "/projects",
-        icon: FolderOpen,
-        color: "text-amber-400",
-        glowColor: "rgba(251,191,36,0.4)",
-        subFeatures: ["Budget Tracking", "Parts Checklist", "Progress", "Cost vs Estimate"],
-      },
+      { name: "Parts Search", description: "Search 15M+ parts across 68+ retailers with price comparison and vehicle-aware results.", href: "/", icon: Search, image: imgPartsSearch, glowColor: "cyan", featured: true, subFeatures: ["68+ Retailers", "Price Compare", "Local Pickup", "Vehicle-Aware"] },
+      { name: "Parts Marketplace", description: "Buy and sell used parts directly. List spare parts, search by fitment, and message sellers.", href: "/marketplace", icon: Tag, image: imgPartsMarketplace, glowColor: "green", badge: "NEW", badgeVariant: "new", subFeatures: ["List Parts", "Fitment Search", "Messaging", "Photos"] },
+      { name: "Wishlists", description: "Save parts to organized lists. Share with friends or your mechanic and track price changes.", href: "/wishlists", icon: Heart, image: imgWishlists, glowColor: "pink", subFeatures: ["Multiple Lists", "Share Link", "Price Tracking", "Priority Sort"] },
+      { name: "Build Projects", description: "Plan vehicle builds with parts lists, spending vs budget tracking, and purchase progress.", href: "/projects", icon: FolderOpen, image: imgBuildProjects, glowColor: "amber", subFeatures: ["Budget Tracking", "Parts Checklist", "Progress", "Cost Estimate"] },
+      { name: "Price Alerts", description: "Set alerts on parts you need. Get notified when prices drop at any of the 68+ retailers.", href: "/garage", icon: TrendingDown, image: imgPriceAlerts, glowColor: "yellow", subFeatures: ["Price Drops", "Multi-Retailer", "Target Price", "History"] },
     ],
   },
   {
     title: "My Garage",
-    description: "Complete vehicle fleet management with 7 smart tools built in",
+    description: "Complete vehicle fleet management with 7 smart tools",
     icon: Car,
-    color: "text-purple-400",
     gradient: "from-purple-500 to-pink-500",
     features: [
-      {
-        name: "Vehicle Fleet",
-        description: "Add all your vehicles with VIN decoding, manage details, and get vehicle-specific part recommendations.",
-        href: "/garage",
-        icon: Car,
-        color: "text-purple-400",
-        glowColor: "rgba(168,85,247,0.4)",
-        subFeatures: ["VIN Decoder", "Multiple Vehicles", "Smart Recs", "Vehicle Passport"],
-      },
-      {
-        name: "Warranty Tracker",
-        description: "Track all your warranties in one place. Get alerts before they expire so you never miss a claim.",
-        href: "/garage",
-        icon: Shield,
-        color: "text-blue-400",
-        glowColor: "rgba(96,165,250,0.4)",
-        subFeatures: ["Expiry Alerts", "Coverage Details", "Provider Info", "Mileage Limits"],
-      },
-      {
-        name: "Maintenance Scheduler",
-        description: "Set up service schedules based on mileage and time. Reminders for oil changes, tire rotations, and more.",
-        href: "/garage",
-        icon: Calendar,
-        color: "text-emerald-400",
-        glowColor: "rgba(52,211,153,0.4)",
-        subFeatures: ["Custom Schedules", "Mileage-Based", "Time-Based", "Service History"],
-      },
-      {
-        name: "Fuel Tracker",
-        description: "Log fill-ups, track MPG over time, and see cost trends. Know exactly what you're spending on fuel.",
-        href: "/garage",
-        icon: Fuel,
-        color: "text-orange-400",
-        glowColor: "rgba(251,146,60,0.4)",
-        subFeatures: ["MPG Tracking", "Cost Per Mile", "Fill-Up Log", "Trends"],
-      },
-      {
-        name: "Expense Tracker",
-        description: "Track every dollar on your vehicles. Categorize repairs, maintenance, upgrades, and see spending breakdowns.",
-        href: "/garage",
-        icon: DollarSign,
-        color: "text-green-400",
-        glowColor: "rgba(74,222,128,0.4)",
-        subFeatures: ["Categories", "Monthly Totals", "Per-Vehicle", "Receipts"],
-      },
-      {
-        name: "Price Watch",
-        description: "Set alerts on parts you need. Get notified when prices drop at any of the 68+ retailers we monitor.",
-        href: "/garage",
-        icon: TrendingDown,
-        color: "text-cyan-400",
-        glowColor: "rgba(6,182,212,0.4)",
-        subFeatures: ["Price Drop Alerts", "Multi-Retailer", "Target Price", "History"],
-      },
-      {
-        name: "Emergency Info",
-        description: "Store emergency contacts, roadside assistance numbers, and insurance info for quick access when you need it.",
-        href: "/garage",
-        icon: Phone,
-        color: "text-red-400",
-        glowColor: "rgba(248,113,113,0.4)",
-        subFeatures: ["Roadside Assist", "Emergency Contacts", "Insurance", "Quick Access"],
-      },
+      { name: "Vehicle Fleet", description: "Add all your vehicles with VIN decoding, manage details, and get vehicle-specific recommendations.", href: "/garage", icon: Car, image: imgMyGarage, glowColor: "purple", featured: true, subFeatures: ["VIN Decoder", "Multi-Vehicle", "Smart Recs", "Passport"] },
+      { name: "Warranty Tracker", description: "Track all warranties in one place. Get alerts before they expire so you never miss a claim.", href: "/garage", icon: Shield, image: imgWarrantyTracker, glowColor: "blue", subFeatures: ["Expiry Alerts", "Coverage", "Provider Info", "Mileage Limits"] },
+      { name: "Maintenance Scheduler", description: "Service schedules based on mileage and time. Reminders for oil changes, tire rotations, and more.", href: "/garage", icon: Calendar, image: imgMaintenanceScheduler, glowColor: "emerald", subFeatures: ["Custom Schedules", "Mileage-Based", "Time-Based", "History"] },
+      { name: "Fuel Tracker", description: "Log fill-ups, track MPG over time, and see cost trends. Know exactly what you're spending.", href: "/garage", icon: Fuel, image: imgFuelTracker, glowColor: "orange", subFeatures: ["MPG Tracking", "Cost Per Mile", "Fill-Up Log", "Trends"] },
+      { name: "Expense Tracker", description: "Track every dollar spent on your vehicles. Categorize repairs, maintenance, and upgrades.", href: "/garage", icon: DollarSign, image: imgExpenseTracker, glowColor: "green", subFeatures: ["Categories", "Monthly", "Per-Vehicle", "Receipts"] },
+      { name: "Price Watch", description: "Monitor parts prices across retailers. Get notified instantly when prices drop.", href: "/garage", icon: Eye, image: imgPriceWatch, glowColor: "cyan", subFeatures: ["Price Drop Alerts", "Multi-Retailer", "Target Price", "History"] },
+      { name: "Emergency Info", description: "Store emergency contacts, roadside assistance, and insurance info for quick access.", href: "/garage", icon: Phone, image: imgEmergencyInfo, glowColor: "red", subFeatures: ["Roadside Assist", "Emergency Contacts", "Insurance", "Quick Access"] },
     ],
   },
   {
     title: "DIY & Learning",
     description: "Repair guides, community tips, and automotive knowledge",
     icon: BookOpen,
-    color: "text-emerald-400",
     gradient: "from-emerald-500 to-teal-500",
     features: [
-      {
-        name: "DIY Repair Guides",
-        description: "Step-by-step repair guides for every skill level with video tutorials, tools needed, difficulty ratings, and time estimates.",
-        href: "/diy-guides",
-        icon: Wrench,
-        color: "text-emerald-400",
-        glowColor: "rgba(52,211,153,0.4)",
-        subFeatures: ["28+ Guides", "Video Tutorials", "Tool Lists", "Difficulty Ratings"],
-      },
-      {
-        name: "Shade Tree Mechanics",
-        description: "A community hub for DIY enthusiasts. Browse categorized tips, community tricks, and estimated savings vs shop prices.",
-        href: "/shade-tree",
-        icon: Star,
-        color: "text-yellow-400",
-        glowColor: "rgba(250,204,21,0.4)",
-        subFeatures: ["Community Tips", "Savings Calculator", "Skill Levels", "Photo Guides"],
-      },
-      {
-        name: "Auto Trivia",
-        description: "Test your automotive knowledge with fun trivia questions. Challenge friends and learn cool car facts.",
-        href: "/trivia",
-        icon: Gamepad2,
-        color: "text-pink-400",
-        glowColor: "rgba(244,114,182,0.4)",
-        subFeatures: ["Multiple Categories", "Score Tracking", "Fun Facts", "Challenge Mode"],
-      },
-      {
-        name: "Blog",
-        description: "In-depth articles on maintenance tips, industry news, product reviews, and how-to guides from experts.",
-        href: "/blog",
-        icon: FileText,
-        color: "text-blue-400",
-        glowColor: "rgba(96,165,250,0.4)",
-        subFeatures: ["Expert Articles", "Product Reviews", "Industry News", "How-To Guides"],
-      },
+      { name: "DIY Repair Guides", description: "Step-by-step guides for every skill level with videos, tools needed, and difficulty ratings.", href: "/diy-guides", icon: Wrench, image: imgDiyGuides, glowColor: "emerald", featured: true, subFeatures: ["28+ Guides", "Video Tutorials", "Tool Lists", "Difficulty"] },
+      { name: "Shade Tree Mechanics", description: "Community hub for DIY enthusiasts. Browse tips, tricks, and estimated savings vs shop prices.", href: "/shade-tree", icon: Star, image: imgShadeTree, glowColor: "yellow", subFeatures: ["Community Tips", "Savings Calc", "Skill Levels", "Photo Guides"] },
+      { name: "Auto Trivia", description: "Test your automotive knowledge with fun trivia. Challenge friends and learn cool car facts.", href: "/trivia", icon: Gamepad2, image: imgTriviaQuiz, glowColor: "pink", subFeatures: ["Categories", "Score Tracking", "Fun Facts", "Challenge Mode"] },
+      { name: "Blog", description: "Expert articles on maintenance, industry news, product reviews, and how-to guides.", href: "/blog", icon: FileText, image: imgBlogManager, glowColor: "blue", subFeatures: ["Expert Articles", "Reviews", "Industry News", "How-To"] },
     ],
   },
   {
     title: "Community & Social",
     description: "Connect with fellow enthusiasts, get help, and stay engaged",
     icon: Users,
-    color: "text-blue-400",
     gradient: "from-blue-500 to-indigo-500",
     features: [
-      {
-        name: "Signal Chat",
-        description: "Real-time community messaging with channels, DMs, threads, reactions, and polls. Buddy AI bot provides instant support.",
-        href: "/chat",
-        icon: MessageCircle,
-        color: "text-blue-400",
-        glowColor: "rgba(96,165,250,0.4)",
-        badge: "LIVE",
-        badgeColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-        subFeatures: ["Channels", "Direct Messages", "Buddy AI Bot", "Threads & Polls"],
-      },
-      {
-        name: "Break Room",
-        description: "Your central hub for automotive news, receipt scanner, mileage tracker, speed trap alerts, fuel prices, and more.",
-        href: "/break-room",
-        icon: Coffee,
-        color: "text-amber-400",
-        glowColor: "rgba(251,191,36,0.4)",
-        badge: "HUB",
-        badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-        subFeatures: ["News Feed", "Receipt Scanner", "Mileage Tracker", "Fuel Prices"],
-      },
-      {
-        name: "Invite Friends",
-        description: "Earn 100 points for every friend who signs up, plus bonus when they go Pro. Redeem for Pro membership time.",
-        href: "/invite",
-        icon: Users,
-        color: "text-green-400",
-        glowColor: "rgba(74,222,128,0.4)",
-        subFeatures: ["100pts Per Signup", "Pro Bonus", "Referral Link", "Points Rewards"],
-      },
-      {
-        name: "Support Center",
-        description: "Submit support tickets, get help from the team, and track your requests. We're here when you need us.",
-        href: "/support",
-        icon: HeadphonesIcon,
-        color: "text-cyan-400",
-        glowColor: "rgba(6,182,212,0.4)",
-        subFeatures: ["Submit Tickets", "Track Requests", "FAQ", "Live Chat"],
-      },
-      {
-        name: "Contact Us",
-        description: "Reach out directly with questions, feedback, partnership inquiries, or just to say hello.",
-        href: "/contact",
-        icon: Mail,
-        color: "text-purple-400",
-        glowColor: "rgba(168,85,247,0.4)",
-        subFeatures: ["General Inquiries", "Partnerships", "Feedback", "Press"],
-      },
+      { name: "Signal Chat", description: "Real-time community messaging with channels, DMs, threads, reactions, and Buddy AI bot support.", href: "/chat", icon: MessageCircle, image: imgSignalChat, glowColor: "blue", badge: "LIVE", badgeVariant: "live", featured: true, subFeatures: ["Channels", "DMs", "Buddy AI Bot", "Threads & Polls"] },
+      { name: "Break Room", description: "Central hub for automotive news, receipt scanner, mileage tracker, speed trap alerts, and fuel prices.", href: "/break-room", icon: Coffee, image: imgBreakRoom, glowColor: "amber", badge: "HUB", badgeVariant: "hot", subFeatures: ["News Feed", "Receipt Scanner", "Mileage Tracker", "Fuel Prices"] },
+      { name: "Invite Friends", description: "Earn 100 points per signup, bonus when they go Pro. Redeem for Pro membership time.", href: "/invite", icon: Users, image: imgInviteFriends, glowColor: "green", subFeatures: ["100pts Per Signup", "Pro Bonus", "Referral Link", "Rewards"] },
+      { name: "Support Center", description: "Submit support tickets, get help from the team, and track your requests.", href: "/support", icon: HeadphonesIcon, image: imgSupportCenter, glowColor: "cyan", subFeatures: ["Tickets", "Track Requests", "FAQ", "Live Chat"] },
+      { name: "Contact Us", description: "Reach out with questions, feedback, partnership inquiries, or just to say hello.", href: "/contact", icon: Mail, image: imgContactUs, glowColor: "purple", subFeatures: ["Inquiries", "Partnerships", "Feedback", "Press"] },
     ],
   },
   {
     title: "Business Tools",
     description: "Professional tools for mechanics and shop owners",
     icon: Store,
-    color: "text-amber-400",
     gradient: "from-amber-500 to-orange-500",
     features: [
-      {
-        name: "Mechanics Garage",
-        description: "Full business management suite for auto shops. Work orders, customer CRM, invoicing, inventory, scheduling, and more.",
-        href: "/mechanics-garage",
-        icon: Store,
-        color: "text-amber-400",
-        glowColor: "rgba(251,191,36,0.4)",
-        pro: true,
-        subFeatures: ["Work Orders", "Customer CRM", "Invoicing", "Inventory"],
-      },
-      {
-        name: "Shop Portal",
-        description: "Set up your shop profile, manage your team, handle customer reviews, and connect with the community.",
-        href: "/shop-portal",
-        icon: MapPin,
-        color: "text-orange-400",
-        glowColor: "rgba(251,146,60,0.4)",
-        subFeatures: ["Shop Profile", "Team Management", "Reviews", "Community"],
-      },
-      {
-        name: "Become a Vendor",
-        description: "Partner with GarageBot to reach thousands of parts seekers. Free signup for retailers, distributors, and manufacturers.",
-        href: "/vendor-signup",
-        icon: Globe,
-        color: "text-cyan-400",
-        glowColor: "rgba(6,182,212,0.4)",
-        badge: "FREE",
-        badgeColor: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-        subFeatures: ["Free Signup", "Reach Thousands", "Analytics", "Promoted Listings"],
-      },
-      {
-        name: "CDL Directory",
-        description: "Comprehensive directory of trucking companies and CDL training programs with search, filter, and interest forms.",
-        href: "/cdl-directory",
-        icon: Truck,
-        color: "text-blue-400",
-        glowColor: "rgba(96,165,250,0.4)",
-        subFeatures: ["Company Listings", "CDL Programs", "Search & Filter", "Interest Forms"],
-      },
+      { name: "Mechanics Garage", description: "Full shop management: work orders, customer CRM, invoicing, inventory, scheduling, and more.", href: "/mechanics-garage", icon: Store, image: imgMechanicsGarage, glowColor: "amber", badge: "PRO", badgeVariant: "pro", featured: true, subFeatures: ["Work Orders", "CRM", "Invoicing", "Inventory"] },
+      { name: "Shop Portal", description: "Set up your shop profile, manage your team, handle reviews, and connect with the community.", href: "/shop-portal", icon: MapPin, image: imgShopPortal, glowColor: "orange", subFeatures: ["Shop Profile", "Team", "Reviews", "Community"] },
+      { name: "Become a Vendor", description: "Partner with GarageBot to reach thousands of parts seekers. Free signup for retailers.", href: "/vendor-signup", icon: Globe, image: imgVendorManagement, glowColor: "cyan", badge: "FREE", badgeVariant: "free", subFeatures: ["Free Signup", "Reach Thousands", "Analytics", "Promoted"] },
+      { name: "CDL Directory", description: "Directory of trucking companies and CDL training programs with search and interest forms.", href: "/cdl-directory", icon: Truck, image: imgCdlDirectory, glowColor: "blue", subFeatures: ["Companies", "CDL Programs", "Search", "Interest Forms"] },
     ],
   },
   {
-    title: "Insurance, Travel & Financial",
+    title: "Insurance & Travel",
     description: "Compare rates, rent cars, and manage automotive finances",
     icon: Shield,
-    color: "text-green-400",
     gradient: "from-green-500 to-emerald-500",
     features: [
-      {
-        name: "Rental Cars",
-        description: "Compare prices across 1,000+ rental companies worldwide. Economy to luxury, airport to downtown — best deal every time.",
-        href: "/rentals",
-        icon: Car,
-        color: "text-cyan-400",
-        glowColor: "rgba(6,182,212,0.4)",
-        badge: "NEW",
-        badgeColor: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-        subFeatures: ["1,000+ Companies", "Price Comparison", "Free Cancellation", "150+ Countries"],
-      },
-      {
-        name: "Insurance Comparison",
-        description: "Compare quotes from top insurance providers. Find the best rates for auto, motorcycle, boat, RV, and more.",
-        href: "/insurance",
-        icon: Shield,
-        color: "text-green-400",
-        glowColor: "rgba(74,222,128,0.4)",
-        subFeatures: ["Multi-Vehicle", "Quote Comparison", "Top Providers", "Savings Estimates"],
-      },
+      { name: "Rental Cars", description: "Compare prices across 1,000+ rental companies worldwide. Economy to luxury, best deal every time.", href: "/rentals", icon: Car, image: imgRentalCars, glowColor: "cyan", badge: "NEW", badgeVariant: "new", subFeatures: ["1,000+ Companies", "Price Compare", "Free Cancel", "150+ Countries"] },
+      { name: "Insurance Comparison", description: "Compare quotes from top providers for auto, motorcycle, boat, RV, and more.", href: "/insurance", icon: Shield, image: imgInsurance, glowColor: "green", subFeatures: ["Multi-Vehicle", "Quote Compare", "Top Providers", "Savings"] },
     ],
   },
   {
     title: "Identity & Blockchain",
-    description: "Verified digital identity and blockchain certificates on Solana",
+    description: "Verified digital identity and blockchain certificates",
     icon: Blocks,
-    color: "text-purple-400",
     gradient: "from-purple-500 to-violet-500",
     features: [
-      {
-        name: "Genesis Hallmark",
-        description: "Your unique blockchain-verified digital certificate on Solana. Early adopters get exclusive Genesis NFTs with permanent on-chain proof.",
-        href: "/hallmark",
-        icon: Award,
-        color: "text-purple-400",
-        glowColor: "rgba(168,85,247,0.5)",
-        badge: "NFT",
-        badgeColor: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-        subFeatures: ["Solana Blockchain", "QR Verification", "Genesis Certificate", "On-Chain Proof"],
-      },
-      {
-        name: "Mission Control",
-        description: "Your personal dashboard with system health, traffic analytics, blockchain assets, and platform metrics.",
-        href: "/dashboard",
-        icon: Layout,
-        color: "text-cyan-400",
-        glowColor: "rgba(6,182,212,0.4)",
-        subFeatures: ["System Health", "Traffic Analytics", "Blockchain Assets", "Metrics"],
-      },
-    ],
-  },
-  {
-    title: "Account & Settings",
-    description: "Manage your profile, preferences, and account details",
-    icon: Settings,
-    color: "text-gray-400",
-    gradient: "from-gray-500 to-slate-500",
-    features: [
-      {
-        name: "Account Setup",
-        description: "Manage your profile information, preferences, notification settings, and connected services.",
-        href: "/account",
-        icon: Settings,
-        color: "text-gray-400",
-        glowColor: "rgba(156,163,175,0.3)",
-        subFeatures: ["Profile", "Preferences", "Notifications", "Connected Services"],
-      },
-      {
-        name: "About GarageBot",
-        description: "Learn about GarageBot's mission, the team behind it, and our vision to revolutionize parts search.",
-        href: "/about",
-        icon: Sparkles,
-        color: "text-cyan-400",
-        glowColor: "rgba(6,182,212,0.3)",
-        subFeatures: ["Our Mission", "The Team", "DarkWave Studios", "Vision"],
-      },
+      { name: "Genesis Hallmark", description: "Blockchain-verified digital certificate on Solana. Early adopters get exclusive Genesis NFTs.", href: "/hallmark", icon: Award, image: imgGenesisHallmarks, glowColor: "purple", badge: "NFT", badgeVariant: "nft", featured: true, subFeatures: ["Solana Blockchain", "QR Verification", "Genesis Cert", "On-Chain"] },
+      { name: "Referral Program", description: "Earn points for every friend who signs up. Redeem for Pro membership and exclusive perks.", href: "/invite", icon: Rocket, image: imgReferralProgram, glowColor: "pink", subFeatures: ["Points System", "Pro Rewards", "Invite Link", "Bonuses"] },
     ],
   },
   {
     title: "Membership & Pro",
     description: "Unlock the full GarageBot experience",
     icon: Crown,
-    color: "text-yellow-400",
     gradient: "from-yellow-500 to-amber-500",
     features: [
-      {
-        name: "Pro Membership",
-        description: "Join the Founders Circle starting at $5.99/mo. Unlock marketplace selling, ad-free experience, priority AI, and exclusive features.",
-        href: "/pro",
-        icon: Crown,
-        color: "text-yellow-400",
-        glowColor: "rgba(234,179,8,0.5)",
-        badge: "FOUNDERS",
-        badgeColor: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-        subFeatures: ["Sell on Marketplace", "Ad-Free", "Priority AI", "Founders Badge"],
-      },
+      { name: "Pro Membership", description: "Join the Founders Circle from $5.99/mo. Unlock marketplace selling, ad-free, priority AI, and more.", href: "/pro", icon: Crown, image: imgProMembership, glowColor: "yellow", badge: "FOUNDERS", badgeVariant: "founders", featured: true, subFeatures: ["Sell on Marketplace", "Ad-Free", "Priority AI", "Founders Badge"] },
+    ],
+  },
+  {
+    title: "Account & Settings",
+    description: "Manage your profile and learn about GarageBot",
+    icon: Settings,
+    gradient: "from-gray-500 to-slate-500",
+    features: [
+      { name: "Account Setup", description: "Manage your profile, preferences, notification settings, and connected services.", href: "/account", icon: Settings, image: imgAccountSettings, glowColor: "blue", subFeatures: ["Profile", "Preferences", "Notifications", "Services"] },
+      { name: "About GarageBot", description: "Learn about our mission, the team behind it, and our vision for the future of parts search.", href: "/about", icon: Sparkles, image: imgAboutGaragebot, glowColor: "cyan", subFeatures: ["Our Mission", "The Team", "DarkWave Studios", "Vision"] },
     ],
   },
 ];
 
 const totalFeatures = FEATURE_CATEGORIES.reduce((acc, cat) => acc + cat.features.length, 0);
 const totalSubFeatures = FEATURE_CATEGORIES.reduce(
-  (acc, cat) => acc + cat.features.reduce((a, f) => a + (f.subFeatures?.length || 0), 0),
-  0
+  (acc, cat) => acc + cat.features.reduce((a, f) => a + (f.subFeatures?.length || 0), 0), 0
 );
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 24, scale: 0.96 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { delay: i * 0.06, duration: 0.5, ease: [0.4, 0, 0.2, 1] },
-  }),
-};
+function FeatureCard({ feature, index, catIdx }: { feature: Feature; index: number; catIdx: number }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const glowShadow = GLOW_MAP[feature.glowColor] || GLOW_MAP.cyan;
 
-const categoryVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } },
-};
+  return (
+    <Link href={feature.href}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.45, delay: catIdx * 0.05 + index * 0.06 }}
+        whileHover={{ scale: 1.02, y: -4 }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        className={`relative cursor-pointer rounded-2xl overflow-hidden group ${feature.featured ? "h-[240px]" : "h-[220px]"} border transition-all duration-300 ${isHovered ? "border-white/20" : "border-white/[0.06]"}`}
+        style={{ boxShadow: isHovered ? glowShadow : "0 4px 30px rgba(0,0,0,0.3)" }}
+        data-testid={`card-feature-${feature.name.toLowerCase().replace(/\s+/g, "-")}`}
+      >
+        <img
+          src={feature.image}
+          alt={feature.name}
+          className="absolute inset-0 w-full h-full object-cover brightness-110 group-hover:scale-110 transition-transform duration-700 ease-out"
+          loading="lazy"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20 group-hover:from-black/90 transition-all duration-500" />
+
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `radial-gradient(circle at 50% 100%, ${GLOW_MAP[feature.glowColor]?.replace("0 0 30px ", "").replace("0.35", "0.08") || "rgba(6,182,212,0.08)"}, transparent 70%)` }} />
+
+        {feature.badge && (
+          <div className="absolute top-3 right-3 z-20">
+            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-full text-white shadow-lg ${BADGE_STYLES[feature.badgeVariant || "new"]}`}>
+              {feature.badge}
+            </span>
+          </div>
+        )}
+
+        {feature.featured && (
+          <div className="absolute top-3 left-3 z-20">
+            <span className="px-2 py-0.5 text-[9px] font-bold uppercase rounded border border-yellow-500/30 text-yellow-400 bg-yellow-500/10 backdrop-blur-sm flex items-center gap-1">
+              <Star className="w-2.5 h-2.5" />
+              Featured
+            </span>
+          </div>
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center group-hover:bg-white/15 group-hover:border-white/20 transition-all duration-300">
+              <feature.icon className="w-4.5 h-4.5 text-white" />
+            </div>
+            <h3 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors duration-300 truncate flex-1">
+              {feature.name}
+            </h3>
+            <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/60 group-hover:translate-x-1 transition-all duration-300 shrink-0" />
+          </div>
+          <p className="text-[11px] text-white/45 leading-relaxed mb-2.5 line-clamp-2 group-hover:text-white/60 transition-colors duration-300">{feature.description}</p>
+          {feature.subFeatures && (
+            <div className="flex flex-wrap gap-1 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+              {feature.subFeatures.slice(0, 4).map((sf) => (
+                <span key={sf} className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-white/[0.06] text-white/50 border border-white/[0.04] group-hover:bg-white/10 group-hover:text-white/70 group-hover:border-white/10 transition-all duration-300">
+                  {sf}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </Link>
+  );
+}
 
 export default function Explore() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -453,60 +295,70 @@ export default function Explore() {
   return (
     <div className="min-h-screen text-foreground font-sans selection:bg-primary selection:text-black overflow-x-hidden relative flex flex-col">
       <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02]">
-          <Compass className="w-[60vw] h-[60vw] text-primary" />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050810] via-[#0a0f1e] to-[#050810]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/[0.03] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/[0.03] rounded-full blur-[120px]" />
       </div>
 
       <Nav />
 
       <div className="flex-1 max-w-7xl mx-auto px-3 md:px-6 pt-20 pb-12 w-full">
         <motion.div
-          initial={{ opacity: 0, y: -30 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-10"
         >
-          <div className="sparkle-container relative inline-block">
-            <div className="sparkle" style={{ top: '0%', left: '10%' }} />
-            <div className="sparkle" style={{ top: '20%', right: '5%', animationDelay: '0.7s' }} />
-          </div>
-
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-mono tracking-wider mb-5 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_12px_var(--color-primary)]" />
-            FEATURE DISCOVERY HUB
-          </div>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/[0.08] text-cyan-400 text-[10px] font-mono tracking-[0.2em] uppercase mb-6 shadow-[0_0_30px_rgba(6,182,212,0.15)] backdrop-blur-sm"
+          >
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_12px_rgba(6,182,212,0.8)]" />
+            Navigation Hub
+          </motion.div>
 
           <h1
             className="text-4xl md:text-5xl lg:text-6xl font-tech font-black uppercase tracking-tight mb-4"
             data-testid="heading-explore"
           >
-            <span className="text-primary drop-shadow-[0_0_30px_rgba(6,182,212,0.9)] neon-text">E</span>
-            <span className="text-foreground">xplore</span>
-            <span className="text-primary drop-shadow-[0_0_30px_rgba(6,182,212,0.9)] neon-text"> E</span>
-            <span className="text-foreground">verything</span>
+            <span className="text-cyan-400 drop-shadow-[0_0_40px_rgba(6,182,212,0.9)]">Explore</span>{" "}
+            <span className="text-white/90">Everything</span>
           </h1>
-          <p className="text-muted-foreground/80 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-            GarageBot is packed with <span className="text-primary font-medium">{totalFeatures} powerful features</span> and{" "}
-            <span className="text-primary font-medium">{totalSubFeatures}+ capabilities</span>.
-            Here's everything at your fingertips.
+          <p className="text-white/40 max-w-2xl mx-auto text-sm md:text-base leading-relaxed mb-6">
+            <span className="text-cyan-400 font-medium">{totalFeatures} features</span> and{" "}
+            <span className="text-cyan-400 font-medium">{totalSubFeatures}+ capabilities</span> at your fingertips.
+            Find exactly what you need in seconds.
           </p>
 
-          <div className="flex items-center justify-center gap-3 mt-5 flex-wrap">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/40 border border-primary/20 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[11px] font-mono text-primary">{totalFeatures} Features</span>
+          <div className="flex items-center justify-center gap-3 flex-wrap mb-6">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="text-[11px] font-mono text-cyan-400">{totalFeatures} Features</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/40 border border-purple-500/20 shadow-[0_0_10px_rgba(168,85,247,0.1)]">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
               <Blocks className="w-3.5 h-3.5 text-purple-400" />
               <span className="text-[11px] font-mono text-purple-400">{FEATURE_CATEGORIES.length} Categories</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/40 border border-green-500/20 shadow-[0_0_10px_rgba(74,222,128,0.1)]">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
               <Award className="w-3.5 h-3.5 text-green-400" />
               <span className="text-[11px] font-mono text-green-400">{totalSubFeatures}+ Capabilities</span>
             </div>
           </div>
+
+          <Link href="/dashboard">
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-tech text-sm uppercase tracking-wider shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:shadow-[0_0_50px_rgba(6,182,212,0.5)] transition-shadow duration-300 border border-cyan-400/20"
+              data-testid="button-see-full-site"
+            >
+              <Compass className="w-4.5 h-4.5" />
+              See Full Site Experience
+              <ArrowRight className="w-4 h-4" />
+            </motion.button>
+          </Link>
         </motion.div>
 
         <motion.div
@@ -516,14 +368,14 @@ export default function Explore() {
           className="max-w-xl mx-auto mb-8"
         >
           <div className="relative group">
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/20 via-purple-500/20 to-primary/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/15 via-purple-500/15 to-cyan-500/15 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-cyan-400 transition-colors" />
               <Input
-                placeholder="Search features... (warranty, fuel tracker, marketplace...)"
+                placeholder="Search features... (warranty, fuel, marketplace, trivia...)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 h-12 bg-black/40 border-white/10 focus:border-primary/50 font-mono text-sm backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.3)] rounded-lg"
+                className="pl-11 h-12 bg-white/[0.03] border-white/[0.06] focus:border-cyan-500/40 font-mono text-sm backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.3)] rounded-xl text-white placeholder:text-white/25"
                 data-testid="input-search-features"
               />
             </div>
@@ -534,14 +386,14 @@ export default function Explore() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="flex flex-wrap justify-center gap-2 mb-10"
+          className="flex flex-wrap justify-center gap-2 mb-12"
         >
           <button
             onClick={() => setActiveCategory(null)}
-            className={`px-4 py-2 rounded-lg text-xs font-tech uppercase transition-all duration-300 ${
+            className={`px-4 py-2 rounded-xl text-xs font-tech uppercase transition-all duration-300 backdrop-blur-sm ${
               activeCategory === null
-                ? "bg-primary/20 text-primary border border-primary/40 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-                : "glass-card text-muted-foreground hover:text-primary"
+                ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                : "bg-white/[0.02] text-white/40 border border-white/[0.06] hover:text-cyan-400 hover:border-cyan-500/20"
             }`}
             data-testid="filter-all"
           >
@@ -551,10 +403,10 @@ export default function Explore() {
             <button
               key={cat.title}
               onClick={() => setActiveCategory(activeCategory === cat.title ? null : cat.title)}
-              className={`px-3 py-2 rounded-lg text-xs font-tech uppercase transition-all duration-300 flex items-center gap-1.5 ${
+              className={`px-3 py-2 rounded-xl text-xs font-tech uppercase transition-all duration-300 flex items-center gap-1.5 backdrop-blur-sm ${
                 activeCategory === cat.title
-                  ? "bg-primary/20 text-primary border border-primary/40 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-                  : "glass-card text-muted-foreground hover:text-primary"
+                  ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                  : "bg-white/[0.02] text-white/40 border border-white/[0.06] hover:text-cyan-400 hover:border-cyan-500/20"
               }`}
               data-testid={`filter-${cat.title.toLowerCase().replace(/\s+/g, "-")}`}
             >
@@ -564,116 +416,47 @@ export default function Explore() {
           ))}
         </motion.div>
 
-        <div className="space-y-14">
+        <div className="space-y-16">
           <AnimatePresence>
             {filteredCategories
               .filter((cat) => !activeCategory || cat.title === activeCategory)
-              .map((category) => (
+              .map((category, catIdx) => (
                 <motion.div
                   key={category.title}
-                  initial="hidden"
-                  whileInView="visible"
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
-                  variants={categoryVariants}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <div className="flex items-center gap-4 mb-6">
                     <div
-                      className={`p-3 rounded-xl bg-gradient-to-br ${category.gradient} shadow-lg shadow-black/30`}
-                      style={{ boxShadow: `0 8px 30px rgba(0,0,0,0.3)` }}
+                      className={`p-3 rounded-xl bg-gradient-to-br ${category.gradient} shadow-lg`}
+                      style={{ boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}
                     >
                       <category.icon className="w-6 h-6 text-white" />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <h2
-                        className="text-xl md:text-2xl font-tech font-bold uppercase tracking-wide"
+                        className="text-xl md:text-2xl font-tech font-bold uppercase tracking-wide text-white"
                         data-testid={`heading-category-${category.title.toLowerCase().replace(/\s+/g, "-")}`}
                       >
                         {category.title}
                       </h2>
-                      <p className="text-xs text-muted-foreground font-mono">{category.description}</p>
+                      <p className="text-xs text-white/35 font-mono">{category.description}</p>
                     </div>
-                    <Badge className="bg-white/5 text-muted-foreground border-white/10 font-mono text-[10px]">
+                    <Badge className="bg-white/[0.04] text-white/40 border-white/[0.06] font-mono text-[10px] backdrop-blur-sm">
                       {category.features.length}
                     </Badge>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {category.features.map((feature, idx) => (
-                      <motion.div
+                      <FeatureCard
                         key={feature.name}
-                        custom={idx}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={cardVariants}
-                      >
-                        <Link href={feature.href}>
-                          <div
-                            className="glass-card card-3d relative overflow-hidden p-5 rounded-xl cursor-pointer h-full group"
-                            data-testid={`card-feature-${feature.name.toLowerCase().replace(/\s+/g, "-")}`}
-                          >
-                            <div
-                              className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                              style={{
-                                background: `linear-gradient(90deg, transparent, ${feature.glowColor}, transparent)`,
-                              }}
-                            />
-
-                            <div className="absolute top-0 right-0 w-40 h-40 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-500">
-                              <feature.icon className="w-full h-full" />
-                            </div>
-
-                            <div className="relative z-10">
-                              <div className="flex items-start gap-3 mb-3">
-                                <div
-                                  className="p-2.5 rounded-xl bg-black/40 border border-white/10 group-hover:border-primary/30 transition-all duration-300 flex-shrink-0"
-                                  style={{
-                                    boxShadow: `0 0 0px ${feature.glowColor}`,
-                                    transition: 'box-shadow 0.5s ease, border-color 0.3s ease',
-                                  }}
-                                >
-                                  <feature.icon className={`w-5 h-5 ${feature.color} group-hover:drop-shadow-[0_0_8px_${feature.glowColor}] transition-all`} />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <h3 className="font-tech font-bold text-sm uppercase tracking-wide group-hover:text-primary transition-colors duration-300">
-                                      {feature.name}
-                                    </h3>
-                                    {feature.badge && (
-                                      <Badge className={`${feature.badgeColor} text-[9px] font-mono px-1.5 py-0`}>
-                                        {feature.badge}
-                                      </Badge>
-                                    )}
-                                    {feature.pro && (
-                                      <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px] font-mono px-1.5 py-0">
-                                        PRO
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 mt-1" />
-                              </div>
-
-                              <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                                {feature.description}
-                              </p>
-
-                              {feature.subFeatures && feature.subFeatures.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5">
-                                  {feature.subFeatures.map((sf) => (
-                                    <span
-                                      key={sf}
-                                      className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-black/40 text-muted-foreground/70 border border-white/5 group-hover:border-primary/20 group-hover:text-muted-foreground transition-all duration-300"
-                                    >
-                                      {sf}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </Link>
-                      </motion.div>
+                        feature={feature}
+                        index={idx}
+                        catIdx={catIdx}
+                      />
                     ))}
                   </div>
                 </motion.div>
@@ -687,12 +470,13 @@ export default function Explore() {
             animate={{ opacity: 1 }}
             className="text-center py-20"
           >
-            <div className="glass-ultra rounded-2xl p-12 max-w-md mx-auto">
-              <Search className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
-              <p className="text-muted-foreground font-mono text-sm">No features match "{searchQuery}"</p>
+            <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-12 max-w-md mx-auto">
+              <Search className="w-12 h-12 text-white/10 mx-auto mb-4" />
+              <p className="text-white/40 font-mono text-sm">No features match "{searchQuery}"</p>
               <button
                 onClick={() => setSearchQuery("")}
-                className="text-primary text-xs mt-3 hover:underline font-tech uppercase tracking-wider"
+                className="text-cyan-400 text-xs mt-3 hover:underline font-tech uppercase tracking-wider"
+                data-testid="button-clear-search"
               >
                 Clear Search
               </button>
@@ -707,30 +491,76 @@ export default function Explore() {
           transition={{ duration: 0.6 }}
           className="mt-16"
         >
-          <Card className="glass-card-accent card-3d p-8 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
+          <div className="relative overflow-hidden rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] p-8 md:p-10">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.04] via-transparent to-purple-500/[0.04]" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-8">
+              <div className="flex-shrink-0">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/20 flex items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.15)]">
+                  <Compass className="w-10 h-10 text-cyan-400" />
+                </div>
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="font-tech font-bold text-xl uppercase mb-2 text-white">Experience the Full Site</h3>
+                <p className="text-sm text-white/40 max-w-lg">
+                  This hub gives you quick access to every feature. For the full immersive GarageBot experience with your personalized dashboard, vehicle data, and AI assistant, dive into the main site.
+                </p>
+              </div>
+              <Link href="/dashboard">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-tech text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-shadow duration-300 whitespace-nowrap border border-cyan-400/20"
+                  data-testid="button-full-site-bottom"
+                >
+                  <Rocket className="w-4 h-4" />
+                  Launch Full Site
+                  <ArrowRight className="w-4 h-4" />
+                </motion.button>
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mt-8"
+        >
+          <div className="relative overflow-hidden rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] p-8">
             <div className="relative z-10 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-yellow-500/20 border border-primary/30 flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(6,182,212,0.15)]">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/20 border border-yellow-500/20 flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(234,179,8,0.15)]">
                 <Sparkles className="w-8 h-8 text-yellow-400" />
               </div>
-              <h3 className="font-tech font-bold text-xl uppercase mb-2">More Coming Soon</h3>
-              <p className="text-sm text-muted-foreground max-w-lg mx-auto mb-5">
+              <h3 className="font-tech font-bold text-xl uppercase mb-2 text-white">More Coming Soon</h3>
+              <p className="text-sm text-white/40 max-w-lg mx-auto mb-5">
                 We're constantly building new features. Have a suggestion? Let us know through Support or Signal Chat!
               </p>
               <div className="flex justify-center gap-3 flex-wrap">
                 <Link href="/support">
-                  <button className="px-5 py-2.5 rounded-lg bg-primary/20 text-primary text-sm font-tech uppercase hover:bg-primary/30 transition-all duration-300 border border-primary/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_25px_rgba(6,182,212,0.25)]" data-testid="button-suggest-feature">
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="px-5 py-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 text-sm font-tech uppercase border border-cyan-500/20 hover:bg-cyan-500/15 hover:shadow-[0_0_25px_rgba(6,182,212,0.2)] transition-all duration-300"
+                    data-testid="button-suggest-feature"
+                  >
                     Suggest a Feature
-                  </button>
+                  </motion.button>
                 </Link>
                 <Link href="/chat">
-                  <button className="px-5 py-2.5 rounded-lg glass-card text-muted-foreground text-sm font-tech uppercase hover:text-primary transition-all duration-300" data-testid="button-join-chat">
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="px-5 py-2.5 rounded-xl bg-white/[0.03] text-white/50 text-sm font-tech uppercase border border-white/[0.06] hover:text-cyan-400 hover:border-cyan-500/20 transition-all duration-300"
+                    data-testid="button-join-chat"
+                  >
                     Join the Conversation
-                  </button>
+                  </motion.button>
                 </Link>
               </div>
             </div>
-          </Card>
+          </div>
         </motion.div>
       </div>
 
