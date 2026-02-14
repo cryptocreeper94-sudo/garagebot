@@ -1,0 +1,116 @@
+Expedia Affiliate Program -  Use our travel expertise to make money online
+
+Dear Ronald Andrews,
+
+Welcome to the Expedia Canada Affiliate Program! We are thrilled to partner with you and look forward to your success.
+
+As a member of the Expedia Canada program, you can now earn up to 4% on air, hotel, package, car,vacation rental , and activities from the #1 online travel agency! Simply place Expedia links on your website, and you'll earn commissions when your customers book and complete travel through Expedia.ca.
+
+Program Overview
+
+Site Placements – Text/graphic links, product catalog links, API’s and/or widgets on partner sites drive customers to purchase travel through Expedia.ca pays a commission.
+Technical Integration – Customers move from partner site to Expedia site through a ‘deeplink’ that tracks customer movement and ties customer purchase to referring partner.
+Partner Benefits
+
+Leverage the Expedia brand, offers, and expertise in converting shoppers to earn additional revenue and increase tourism to your destination.
+Take advantage of your visitors’ interest in your destination by helping them book their trip before they decide to explore other destinations.
+Access superior inventory and exclusive rates (up to 50%) that Expedia has negotiated directly with suppliers as the #1 travel brand.
+Competitive commission rates from the first sale.
+24/7 access to the top Expedia banners, links, and booking engines.
+Complete support via the CJ Affiliate team from 6AM – 5PM PST to help ensure your success.
+Travel newsletters keep you informed of our top consumer promotions and insights to capitalize within your own marketing tactics.
+Expedia Group has partnered with Sertify to identify and support small and diverse-owned publishers to receive one or multiple badges for their businesses. Sign-up online for free to receive your badging sponsored by Expedia Group.
+Commission Structure
+
+Expedia pays commission when travel is consumed 48 hours after the checkout date based on a 7 day cookie window. • Flight: 0% • Hotel: 4% • Vacation rental: 2% • Package: 2% • Activities: 4% • Cruise: 0% • Car: 1.5%
+Commission Rates
+
+Percentages based on gross booking value of the transaction:
+
+
+Start Promoting Now!
+
+To access tools and insights to help you optimize your program, we created an Affiliate Marketing Hub. The Hub houses a suite of products including, deeplink builders, widgets, APIs and more-- we're constantly adding tools to help you grow your business. 
+
+Learn more about the Expedia Group Affiliate Hub with our recorded presentation and deck here: https://www.dropbox.com/sh/i19aj63f0kz4zqg/AACBdIGjfhXSmBpHJS8VSUUya?dl=0
+
+To sign up and learn more you can access the Expedia Group Affiliate Hub here.
+
+You will login to the hub by utilizing your CID (Company ID or Account Number) which is unique to your CJ account (see additional details below).
+
+What is a CID?
+When you signed up as an affiliate on CJ, your company was automatically assigned a company ID (also known as a CID).
+Where Can I find my CID?
+Log in to CJ using your CJ credentials.
+The CID can be found in the top right corner under your name
+source: imgur.com 
+
+ 
+Deals & Tools
+Weekly Newsletters - update of new deals and seasonal travel offers
+Widgets and Deeplinks - see Integration Options below
+Hotel Product Catalog - contains a wide range of hotel properties
+Get Started with Expedia Links Now!
+Click 'Get HTML' for personalize Expedia text and banner links!
+
+Expedia.com
+Get Html
+  Expedia.com
+Get Html
+Expedia.com
+Get Html
+
+Looking for more Expedia links? Check out the CJ Account Manager for a full list of available creative and links for Expedia CA.
+
+How to place Expedia links on your website:
+
+Click "Get HTML" and a pop-up window will appear containing HTML that includes your PID# (Website Identifying ID) and an Ad ID# (Link ID #).
+Copy and paste ALL of the HTML code for the link into the source code of your web page.
+Commissions will be credited to your account only after your customer completes their booking to result in a qualifying transaction per the Terms & Conditions of the Expedia Canada Affiliate Program.
+Integration Options
+The Expedia affiliate program has a variety of tools and resources for its partners:
+
+Light integration – Widgets & Deeplinks.
+Deeplinks – configurable, static hyperlinks that take users to a specific ‘landing page’ within the Expedia site to book travel, get more information, or view available products.
+Expedia-built Widgets – Customizable DIY widgets are available across multiple lines of business and provide direct links to an Expedia page to fulfill.
+Partner-built Widgets – build your own widgets to precisely fit your website that generate the same deeplinks and provide the same products as those built by Expedia.
+Heavier integration – Search & Booking APIs
+Search API integration provides real-time access to hotel, air, car and package pricing and availability in a data-only format that you can integrate into your site.
+Booking API integration allows affiliates to keep the customer their site throughout the search and book process (more developmental work needed, so only recommended if the resources are available).
+Access to the Search API depends on performance.
+Terms & Conditions
+We look forward to this being a long lasting, successful partnership. To ensure that your program is in compliance at all times, please familiarize yourself with the Expedia Terms and Conditions in addition to the key policies and guidelines listed below.
+
+Trademark Bidding:  Bidding on the Expedia trademarks and any variation or misspelling thereof is prohibited without written authorization from the Expedia Affiliate Team.
+Ad Copy:  Publishers cannot use the term Expedia in their ad copy without prior approval from the Expedia Affiliate Team.
+Display URL:  Using "www.expedia.ca" as the display URL in any paid or sponsored listing is strictly prohibited. Publishers may use "Expedia" in their display URL only after the root domain. Example: www.yourdomain.com/expedia.
+Direct Linking:  Publishers may not direct link to Expedia Canada in any paid or sponsored search listings. All traffic generated from paid or sponsored listings must first be directed to a landing page where the user then initiates a click through to Expedia Canada via an affiliate link.
+Other Restrictions:  Expedia does not pay commission on vacation packages or cruises sold through Expedia.ca. Affiliates are not allowed to promote Expedia.ca via Twitter, Facebook or Facebook Advertising unless approved in writing by Expedia. Toolbars, browser applications and/or extensions are not permitted unless approved in writing by Expedia.
+Other Programs
+If you haven't already, please apply to our other Expedia Inc. programs today!
+
+Expedia United States (CID: 1874913)
+Expedia Canada (CID: 5261370)
+Expedia Mexico (CID: 5263716)
+Expedia Brazil (CID: 5256787)
+Expedia Argentina (CID: 5261371)
+Expedia Finland (CID: 5289029)
+Expedia UK (CID: 5288967)
+Expedia Denmark (CID: 5289026)
+Expedia Germany, Austria, and Switzerland (CID: 5289015)
+Expedia Ireland (CID:5288969)
+Expedia France (CID: 5288974)
+Expedia Sweden (CID: 5289024)
+Expedia Norway (CID: 5289022)
+Expedia Belgium & Netherlands (CID: 5289014)
+Expedia Italy (CID: 5289017)
+Expedia Spain (CID: 5289019)
+Contact Us
+Do you still need a little more help? No problem! Visit the CJ Support Center (requires login) or contact the Expedia Canada Affiliate team. We're ready to answer your questions and provide assistance.
+
+Please note that Special T&C “Clause 20.1 shall be amended to remove the following references in the first row of the table: “Asia Pacific excluding Australia, New Zealand and China / BEX Travel Asia Pte Ltd, a corporation located at 38 Beach Road #09-12, South Beach Tower, 189767, Singapore” such that Expedia, Inc is the contracting entity for all points of sale.
+
+Best of Luck!
+
+The Expedia Canada Affiliate Team
+expedia@cj.com
