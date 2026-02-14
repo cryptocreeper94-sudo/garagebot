@@ -58,6 +58,7 @@ import PartsMarketplace from "@/pages/PartsMarketplace";
 import Explore from "@/pages/Explore";
 import Rentals from "@/pages/Rentals";
 import AffiliateProgram from "@/pages/AffiliateProgram";
+import CommandCenter from "@/pages/CommandCenter";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -109,6 +110,7 @@ function Router() {
       <Route path="/explore">{() => <Explore />}</Route>
       <Route path="/rentals">{() => <Rentals />}</Route>
       <Route path="/affiliates">{() => <AffiliateProgram />}</Route>
+      <Route path="/command-center">{() => <CommandCenter />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );

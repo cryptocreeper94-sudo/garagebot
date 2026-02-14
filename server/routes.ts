@@ -351,6 +351,7 @@ ${pages.map(p => `  <url>
           id: user.id, 
           username: user.username, 
           firstName: user.firstName,
+          role: user.role,
           subscriptionTier: user.subscriptionTier,
           hasQuickPin: !!user.quickPin
         }
@@ -387,6 +388,7 @@ ${pages.map(p => `  <url>
           id: user.id, 
           username: user.username, 
           firstName: user.firstName,
+          role: user.role,
           subscriptionTier: user.subscriptionTier
         }
       });
