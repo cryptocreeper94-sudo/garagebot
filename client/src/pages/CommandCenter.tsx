@@ -22,12 +22,59 @@ import {
   Crown, Sparkles, Bell, LogOut, ArrowLeft, LayoutGrid
 } from "lucide-react";
 
+import imgAnalyticsDashboard from "@/assets/images/cc/analytics-dashboard.png";
+import imgSystemHealth from "@/assets/images/cc/system-health.png";
+import imgAffiliateAnalytics from "@/assets/images/cc/affiliate-analytics.png";
+import imgSeoManager from "@/assets/images/cc/seo-manager.png";
+import imgMarketingHub from "@/assets/images/cc/marketing-hub.png";
+import imgBlogManager from "@/assets/images/cc/blog-manager.png";
+import imgNewsletter from "@/assets/images/cc/newsletter.png";
+import imgMetaAds from "@/assets/images/cc/meta-ads.png";
+import imgSponsoredProducts from "@/assets/images/cc/sponsored-products.png";
+import imgAffiliateNetworks from "@/assets/images/cc/affiliate-networks.png";
+import imgInboundAffiliate from "@/assets/images/cc/inbound-affiliate.png";
+import imgProMembership from "@/assets/images/cc/pro-membership.png";
+import imgStripePayments from "@/assets/images/cc/stripe-payments.png";
+import imgGenesisHallmarks from "@/assets/images/cc/genesis-hallmarks.png";
+import imgReferralProgram from "@/assets/images/cc/referral-program.png";
+import imgShopPortal from "@/assets/images/cc/shop-portal.png";
+import imgMechanicsGarage from "@/assets/images/cc/mechanics-garage.png";
+import imgShopInventory from "@/assets/images/cc/shop-inventory.png";
+import imgDigitalInspections from "@/assets/images/cc/digital-inspections.png";
+import imgOrbitStaffing from "@/assets/images/cc/orbit-staffing.png";
+import imgBusinessIntegrations from "@/assets/images/cc/business-integrations.png";
+import imgPartnerApi from "@/assets/images/cc/partner-api.png";
+import imgSignalChat from "@/assets/images/cc/signal-chat.png";
+import imgBreakRoom from "@/assets/images/cc/break-room.png";
+import imgShadeTree from "@/assets/images/cc/shade-tree.png";
+import imgTriviaQuiz from "@/assets/images/cc/trivia-quiz.png";
+import imgGiveaways from "@/assets/images/cc/giveaways.png";
+import imgPartsSearch from "@/assets/images/cc/parts-search.png";
+import imgMyGarage from "@/assets/images/cc/my-garage.png";
+import imgDiyGuides from "@/assets/images/cc/diy-guides.png";
+import imgPartsMarketplace from "@/assets/images/cc/parts-marketplace.png";
+import imgWishlists from "@/assets/images/cc/wishlists.png";
+import imgBuildProjects from "@/assets/images/cc/build-projects.png";
+import imgPriceAlerts from "@/assets/images/cc/price-alerts.png";
+import imgInsurance from "@/assets/images/cc/insurance.png";
+import imgRentalCars from "@/assets/images/cc/rental-cars.png";
+import imgCdlDirectory from "@/assets/images/cc/cdl-directory.png";
+import imgVendorManagement from "@/assets/images/cc/vendor-management.png";
+import imgWeatherRadar from "@/assets/images/cc/weather-radar.png";
+import imgSupportCenter from "@/assets/images/cc/support-center.png";
+import imgDevPortal from "@/assets/images/cc/dev-portal.png";
+import imgReleaseManager from "@/assets/images/cc/release-manager.png";
+import imgBlockchainVerifier from "@/assets/images/cc/blockchain-verifier.png";
+import imgUserManagement from "@/assets/images/cc/user-management.png";
+import imgExplorePage from "@/assets/images/cc/explore-page.png";
+import imgInvestorPortal from "@/assets/images/cc/investor-portal.png";
+
 interface LaunchCard {
   label: string;
   description: string;
   href: string;
   icon: any;
-  gradient: string;
+  image: string;
   badge?: string;
   featured?: boolean;
 }
@@ -47,10 +94,10 @@ const categories: Category[] = [
     gradient: "from-cyan-500 to-blue-500",
     description: "Monitor your platform's performance in real-time. Track traffic, page views, sessions, device breakdowns, geographic data, and affiliate click-through rates.",
     cards: [
-      { label: "Analytics Dashboard", description: "Real-time traffic, sessions, devices & geo data", href: "/dev", icon: BarChart3, gradient: "from-cyan-500 to-blue-600", badge: "Live", featured: true },
-      { label: "System Dashboard", description: "API health, server status & traffic charts", href: "/dashboard", icon: Activity, gradient: "from-green-500 to-emerald-600" },
-      { label: "Affiliate Analytics", description: "Click tracking & commission performance reports", href: "/dev", icon: TrendingUp, gradient: "from-purple-500 to-violet-600" },
-      { label: "SEO Manager", description: "Page meta tags, Open Graph & crawl optimization", href: "/dev", icon: Search, gradient: "from-amber-500 to-orange-600" },
+      { label: "Analytics Dashboard", description: "Real-time traffic, sessions, devices & geo data", href: "/dev", icon: BarChart3, image: imgAnalyticsDashboard, badge: "Live", featured: true },
+      { label: "System Dashboard", description: "API health, server status & traffic charts", href: "/dashboard", icon: Activity, image: imgSystemHealth },
+      { label: "Affiliate Analytics", description: "Click tracking & commission performance reports", href: "/dev", icon: TrendingUp, image: imgAffiliateAnalytics },
+      { label: "SEO Manager", description: "Page meta tags, Open Graph & crawl optimization", href: "/dev", icon: Search, image: imgSeoManager },
     ]
   },
   {
@@ -59,11 +106,11 @@ const categories: Category[] = [
     gradient: "from-purple-500 to-pink-500",
     description: "Grow your audience and drive engagement. Manage social media auto-posting, schedule content, run Meta ad campaigns, and publish blog content.",
     cards: [
-      { label: "Marketing Hub", description: "Meta auto-posting, 60+ posts, 3-hour rotation", href: "/marketing", icon: Megaphone, gradient: "from-purple-500 to-pink-600", featured: true },
-      { label: "Blog Manager", description: "AI-generated posts, publish & feature controls", href: "/blog", icon: FileText, gradient: "from-blue-500 to-indigo-600" },
-      { label: "Newsletter", description: "Subscriber management & email campaigns", href: "/dev", icon: Mail, gradient: "from-pink-500 to-rose-600" },
-      { label: "Meta Ads Campaigns", description: "Facebook/Instagram ad targeting & management", href: "/marketing", icon: Globe, gradient: "from-indigo-500 to-purple-600" },
-      { label: "Sponsored Products", description: "Featured placements & promoted listings", href: "/dev", icon: Star, gradient: "from-yellow-500 to-amber-600" },
+      { label: "Marketing Hub", description: "Meta auto-posting, 60+ posts, 3-hour rotation", href: "/marketing", icon: Megaphone, image: imgMarketingHub, featured: true },
+      { label: "Blog Manager", description: "AI-generated posts, publish & feature controls", href: "/blog", icon: FileText, image: imgBlogManager },
+      { label: "Newsletter", description: "Subscriber management & email campaigns", href: "/dev", icon: Mail, image: imgNewsletter },
+      { label: "Meta Ads Campaigns", description: "Facebook/Instagram ad targeting & management", href: "/marketing", icon: Globe, image: imgMetaAds },
+      { label: "Sponsored Products", description: "Featured placements & promoted listings", href: "/dev", icon: Star, image: imgSponsoredProducts },
     ]
   },
   {
@@ -72,12 +119,12 @@ const categories: Category[] = [
     gradient: "from-green-500 to-emerald-500",
     description: "Track and optimize every revenue stream. Manage affiliate networks, process payments, handle Pro subscriptions, and mint Genesis Hallmark NFTs.",
     cards: [
-      { label: "Affiliate Networks", description: "Amazon, CJ, eBay, ShareASale — 50+ retailers", href: "/dev", icon: Link2, gradient: "from-green-500 to-emerald-600", badge: "Earn", featured: true },
-      { label: "Inbound Affiliate Program", description: "GB-XXXXXX referral codes, commissions & payouts", href: "/affiliates", icon: Users, gradient: "from-cyan-500 to-teal-600", badge: "New" },
-      { label: "Pro Memberships", description: "Founders Circle subscriptions & ad-free tiers", href: "/pro", icon: Crown, gradient: "from-yellow-500 to-amber-600" },
-      { label: "Stripe Payments", description: "Payment processing, checkout & subscriptions", href: "/dev", icon: CreditCard, gradient: "from-blue-500 to-indigo-600" },
-      { label: "Genesis Hallmarks", description: "NFT minting & Solana blockchain verification", href: "/hallmark", icon: Award, gradient: "from-amber-500 to-orange-600" },
-      { label: "Referral Program", description: "Points system, invite rewards & Pro bonuses", href: "/invite", icon: Send, gradient: "from-pink-500 to-rose-600" },
+      { label: "Affiliate Networks", description: "Amazon, CJ, eBay, ShareASale — 50+ retailers", href: "/dev", icon: Link2, image: imgAffiliateNetworks, badge: "Earn", featured: true },
+      { label: "Inbound Affiliate Program", description: "GB-XXXXXX referral codes, commissions & payouts", href: "/affiliates", icon: Users, image: imgInboundAffiliate, badge: "New" },
+      { label: "Pro Memberships", description: "Founders Circle subscriptions & ad-free tiers", href: "/pro", icon: Crown, image: imgProMembership },
+      { label: "Stripe Payments", description: "Payment processing, checkout & subscriptions", href: "/dev", icon: CreditCard, image: imgStripePayments },
+      { label: "Genesis Hallmarks", description: "NFT minting & Solana blockchain verification", href: "/hallmark", icon: Award, image: imgGenesisHallmarks },
+      { label: "Referral Program", description: "Points system, invite rewards & Pro bonuses", href: "/invite", icon: Send, image: imgReferralProgram },
     ]
   },
   {
@@ -86,13 +133,13 @@ const categories: Category[] = [
     gradient: "from-orange-500 to-red-500",
     description: "The complete shop management platform. Register shops, manage repair orders, handle inventory, run inspections, and connect business tools.",
     cards: [
-      { label: "Shop Portal", description: "Shop registration, settings & management", href: "/shop-portal", icon: Building2, gradient: "from-orange-500 to-red-600", featured: true },
-      { label: "Mechanics Garage", description: "Repair orders, estimates, appointments & POS", href: "/mechanics-garage", icon: Wrench, gradient: "from-red-500 to-rose-600" },
-      { label: "Shop Inventory", description: "Parts inventory management & tracking", href: "/mechanics-garage", icon: Package, gradient: "from-amber-500 to-orange-600" },
-      { label: "Digital Inspections", description: "Vehicle inspection reports & customer sharing", href: "/mechanics-garage", icon: ClipboardList, gradient: "from-teal-500 to-cyan-600" },
-      { label: "ORBIT Staffing", description: "Payroll, timesheets, W2/1099 processing", href: "/mechanics-garage", icon: Briefcase, gradient: "from-violet-500 to-purple-600" },
-      { label: "Business Integrations", description: "QuickBooks, ADP, Gusto, PartsTech & more", href: "/mechanics-garage", icon: Layers, gradient: "from-sky-500 to-blue-600" },
-      { label: "Partner API", description: "B2B API keys, scopes & rate limiting", href: "/dev", icon: Terminal, gradient: "from-lime-500 to-green-600" },
+      { label: "Shop Portal", description: "Shop registration, settings & management", href: "/shop-portal", icon: Building2, image: imgShopPortal, featured: true },
+      { label: "Mechanics Garage", description: "Repair orders, estimates, appointments & POS", href: "/mechanics-garage", icon: Wrench, image: imgMechanicsGarage },
+      { label: "Shop Inventory", description: "Parts inventory management & tracking", href: "/mechanics-garage", icon: Package, image: imgShopInventory },
+      { label: "Digital Inspections", description: "Vehicle inspection reports & customer sharing", href: "/mechanics-garage", icon: ClipboardList, image: imgDigitalInspections },
+      { label: "ORBIT Staffing", description: "Payroll, timesheets, W2/1099 processing", href: "/mechanics-garage", icon: Briefcase, image: imgOrbitStaffing },
+      { label: "Business Integrations", description: "QuickBooks, ADP, Gusto, PartsTech & more", href: "/mechanics-garage", icon: Layers, image: imgBusinessIntegrations },
+      { label: "Partner API", description: "B2B API keys, scopes & rate limiting", href: "/dev", icon: Terminal, image: imgPartnerApi },
     ]
   },
   {
@@ -101,11 +148,11 @@ const categories: Category[] = [
     gradient: "from-blue-500 to-indigo-500",
     description: "Build and nurture your community. Manage Signal Chat, curate Break Room content, support the Shade Tree DIY community, and run trivia games.",
     cards: [
-      { label: "Signal Chat", description: "Community messaging, channels, DMs & threads", href: "/chat", icon: MessageCircle, gradient: "from-blue-500 to-indigo-600", featured: true },
-      { label: "Break Room", description: "News, tools, scanners, speed traps & fuel prices", href: "/break-room", icon: Coffee, gradient: "from-amber-500 to-orange-600" },
-      { label: "Shade Tree Mechanics", description: "DIY community hub & repair guides", href: "/shade-tree", icon: Wrench, gradient: "from-emerald-500 to-green-600" },
-      { label: "Trivia Quiz", description: "Automotive knowledge game", href: "/trivia", icon: Gamepad2, gradient: "from-pink-500 to-rose-600" },
-      { label: "Giveaways", description: "Prize drawings & winner management", href: "/dev", icon: Sparkles, gradient: "from-yellow-500 to-amber-600" },
+      { label: "Signal Chat", description: "Community messaging, channels, DMs & threads", href: "/chat", icon: MessageCircle, image: imgSignalChat, featured: true },
+      { label: "Break Room", description: "News, tools, scanners, speed traps & fuel prices", href: "/break-room", icon: Coffee, image: imgBreakRoom },
+      { label: "Shade Tree Mechanics", description: "DIY community hub & repair guides", href: "/shade-tree", icon: Wrench, image: imgShadeTree },
+      { label: "Trivia Quiz", description: "Automotive knowledge game", href: "/trivia", icon: Gamepad2, image: imgTriviaQuiz },
+      { label: "Giveaways", description: "Prize drawings & winner management", href: "/dev", icon: Sparkles, image: imgGiveaways },
     ]
   },
   {
@@ -114,13 +161,13 @@ const categories: Category[] = [
     gradient: "from-red-500 to-orange-500",
     description: "The core product experience. Search parts across 68+ retailers, manage vehicle fleets, follow DIY guides, browse the marketplace, and track wishlists.",
     cards: [
-      { label: "Parts Search", description: "68+ retailers, 16 categories, vehicle-aware", href: "/results", icon: Search, gradient: "from-cyan-500 to-blue-600", featured: true },
-      { label: "My Garage", description: "Fleet management, VIN decoding & service records", href: "/garage", icon: Car, gradient: "from-red-500 to-rose-600" },
-      { label: "DIY Guides", description: "AI repair guides with YouTube integration", href: "/diy-guides", icon: BookOpen, gradient: "from-green-500 to-emerald-600" },
-      { label: "Parts Marketplace", description: "Peer-to-peer listings with messaging", href: "/marketplace", icon: ShoppingCart, gradient: "from-orange-500 to-amber-600" },
-      { label: "Wishlists", description: "Save, organize & share parts lists", href: "/wishlists", icon: Heart, gradient: "from-pink-500 to-rose-600" },
-      { label: "Build Projects", description: "Track custom builds with parts & progress", href: "/projects", icon: GitBranch, gradient: "from-purple-500 to-violet-600" },
-      { label: "Price Alerts", description: "Track price changes & get notifications", href: "/garage", icon: Bell, gradient: "from-yellow-500 to-amber-600" },
+      { label: "Parts Search", description: "68+ retailers, 16 categories, vehicle-aware", href: "/results", icon: Search, image: imgPartsSearch, featured: true },
+      { label: "My Garage", description: "Fleet management, VIN decoding & service records", href: "/garage", icon: Car, image: imgMyGarage },
+      { label: "DIY Guides", description: "AI repair guides with YouTube integration", href: "/diy-guides", icon: BookOpen, image: imgDiyGuides },
+      { label: "Parts Marketplace", description: "Peer-to-peer listings with messaging", href: "/marketplace", icon: ShoppingCart, image: imgPartsMarketplace },
+      { label: "Wishlists", description: "Save, organize & share parts lists", href: "/wishlists", icon: Heart, image: imgWishlists },
+      { label: "Build Projects", description: "Track custom builds with parts & progress", href: "/projects", icon: GitBranch, image: imgBuildProjects },
+      { label: "Price Alerts", description: "Track price changes & get notifications", href: "/garage", icon: Bell, image: imgPriceAlerts },
     ]
   },
   {
@@ -129,12 +176,12 @@ const categories: Category[] = [
     gradient: "from-teal-500 to-cyan-500",
     description: "Extended platform services. Compare insurance quotes, browse rental cars, explore the CDL directory, manage vendors, and monitor weather radar.",
     cards: [
-      { label: "Insurance Comparison", description: "Multi-provider quote comparison tool", href: "/insurance", icon: Shield, gradient: "from-teal-500 to-cyan-600" },
-      { label: "Rental Cars", description: "Carla, Expedia & Hotels.com comparison", href: "/rentals", icon: Car, gradient: "from-blue-500 to-indigo-600" },
-      { label: "CDL Directory", description: "Trucking companies & CDL programs", href: "/cdl-directory", icon: Truck, gradient: "from-orange-500 to-red-600" },
-      { label: "Vendor Management", description: "Retailer applications & partnerships", href: "/vendor-signup", icon: Building2, gradient: "from-indigo-500 to-purple-600" },
-      { label: "Weather Radar", description: "Leaflet map, RainViewer & NOAA alerts", href: "/break-room", icon: Map, gradient: "from-sky-500 to-blue-600" },
-      { label: "Support Center", description: "Help desk & user support", href: "/support", icon: Mail, gradient: "from-green-500 to-emerald-600" },
+      { label: "Insurance Comparison", description: "Multi-provider quote comparison tool", href: "/insurance", icon: Shield, image: imgInsurance },
+      { label: "Rental Cars", description: "Carla, Expedia & Hotels.com comparison", href: "/rentals", icon: Car, image: imgRentalCars },
+      { label: "CDL Directory", description: "Trucking companies & CDL programs", href: "/cdl-directory", icon: Truck, image: imgCdlDirectory },
+      { label: "Vendor Management", description: "Retailer applications & partnerships", href: "/vendor-signup", icon: Building2, image: imgVendorManagement },
+      { label: "Weather Radar", description: "Leaflet map, RainViewer & NOAA alerts", href: "/break-room", icon: Map, image: imgWeatherRadar },
+      { label: "Support Center", description: "Help desk & user support", href: "/support", icon: Mail, image: imgSupportCenter },
     ]
   },
   {
@@ -143,19 +190,19 @@ const categories: Category[] = [
     gradient: "from-slate-500 to-zinc-500",
     description: "Under-the-hood tools for platform management. Access the dev portal, manage releases, handle user accounts, and review investor metrics.",
     cards: [
-      { label: "Dev Portal", description: "Full admin panel — roadmap, tasks, configs", href: "/dev", icon: Terminal, gradient: "from-slate-500 to-zinc-600", featured: true },
-      { label: "Release Manager", description: "Version tracking & changelogs", href: "/dev", icon: Rocket, gradient: "from-cyan-500 to-blue-600" },
-      { label: "Blockchain Verifier", description: "Solana on-chain verification", href: "/dev", icon: Blocks, gradient: "from-purple-500 to-violet-600" },
-      { label: "User Management", description: "Accounts, roles, waitlist & sessions", href: "/dev", icon: Users, gradient: "from-blue-500 to-indigo-600" },
-      { label: "Explore Page", description: "Feature discovery & platform showcase", href: "/explore", icon: Compass, gradient: "from-emerald-500 to-green-600" },
-      { label: "Investor Portal", description: "Business metrics & investment deck", href: "/investors", icon: PieChart, gradient: "from-amber-500 to-orange-600" },
+      { label: "Dev Portal", description: "Full admin panel — roadmap, tasks, configs", href: "/dev", icon: Terminal, image: imgDevPortal, featured: true },
+      { label: "Release Manager", description: "Version tracking & changelogs", href: "/dev", icon: Rocket, image: imgReleaseManager },
+      { label: "Blockchain Verifier", description: "Solana on-chain verification", href: "/dev", icon: Blocks, image: imgBlockchainVerifier },
+      { label: "User Management", description: "Accounts, roles, waitlist & sessions", href: "/dev", icon: Users, image: imgUserManagement },
+      { label: "Explore Page", description: "Feature discovery & platform showcase", href: "/explore", icon: Compass, image: imgExplorePage },
+      { label: "Investor Portal", description: "Business metrics & investment deck", href: "/investors", icon: PieChart, image: imgInvestorPortal },
     ]
   },
 ];
 
 function SkeletonCard() {
   return (
-    <div className="flex-shrink-0 w-[300px] h-[140px] rounded-2xl bg-white/[0.03] border border-white/5 animate-pulse">
+    <div className="flex-shrink-0 w-[320px] h-[220px] rounded-2xl bg-white/[0.03] border border-white/5 animate-pulse">
       <div className="p-6 h-full flex flex-col justify-end">
         <div className="h-4 w-20 bg-white/5 rounded mb-2" />
         <div className="h-3 w-36 bg-white/5 rounded" />
@@ -174,7 +221,7 @@ function SkeletonSection() {
           <div className="h-3 w-64 bg-white/5 rounded" />
         </div>
       </div>
-      <div className="flex gap-5 overflow-hidden">
+      <div className="flex gap-6 overflow-hidden">
         {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
       </div>
     </div>
@@ -185,7 +232,7 @@ function CardComponent({ card, index, catIndex }: { card: LaunchCard; index: num
   const [, navigate] = useLocation();
 
   return (
-    <CarouselItem className="pl-5 basis-[300px] sm:basis-[320px]">
+    <CarouselItem className="pl-6 basis-[320px] sm:basis-[340px]">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -193,14 +240,21 @@ function CardComponent({ card, index, catIndex }: { card: LaunchCard; index: num
         whileHover={{ scale: 1.03, y: -4 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => navigate(card.href)}
-        className="relative cursor-pointer rounded-2xl overflow-hidden group h-[150px] bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] hover:border-white/[0.15] transition-all duration-300 hover:shadow-lg hover:shadow-white/[0.03]"
+        className="relative cursor-pointer rounded-2xl overflow-hidden group h-[220px] border border-white/[0.08] hover:border-white/[0.2] transition-all duration-300 hover:shadow-xl hover:shadow-black/30"
         data-testid={`card-${card.label.toLowerCase().replace(/\s+/g, '-')}`}
       >
-        <div className={`absolute -top-12 -right-12 w-32 h-32 rounded-full bg-gradient-to-br ${card.gradient} opacity-[0.08] group-hover:opacity-[0.15] group-hover:scale-125 transition-all duration-500`} />
+        <img
+          src={card.image}
+          alt={card.label}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+          loading="lazy"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent" />
 
         {card.badge && (
           <div className="absolute top-4 right-4 z-20">
-            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full text-white ${
+            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full text-white shadow-lg ${
               card.badge === "Live" ? "bg-gradient-to-r from-green-500 to-emerald-500" :
               card.badge === "New" ? "bg-gradient-to-r from-cyan-500 to-blue-500" :
               card.badge === "Earn" ? "bg-gradient-to-r from-orange-500 to-rose-500" :
@@ -213,31 +267,25 @@ function CardComponent({ card, index, catIndex }: { card: LaunchCard; index: num
 
         {card.featured && !card.badge && (
           <div className="absolute top-4 right-4 z-20">
-            <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded border border-yellow-500/30 text-yellow-400 bg-yellow-500/10 backdrop-blur-sm">
+            <span className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded-full border border-yellow-500/40 text-yellow-400 bg-yellow-500/15 backdrop-blur-sm shadow-lg">
               Featured
             </span>
           </div>
         )}
 
-        <div className="relative h-full p-5 flex flex-col justify-between z-10">
-          <div className="flex items-start gap-3.5">
-            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shrink-0 shadow-lg`}>
-              <card.icon className="w-5 h-5 text-white" />
+        <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center">
+              <card.icon className="w-4.5 h-4.5 text-white" />
             </div>
-            <div className="min-w-0 flex-1 pt-0.5">
-              <h3 className="text-[13px] font-semibold text-white group-hover:text-cyan-300 transition-colors truncate leading-tight">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors truncate">
                 {card.label}
               </h3>
-              <p className="text-[11px] text-white/40 mt-1 line-clamp-2 leading-relaxed">{card.description}</p>
             </div>
+            <ChevronRight className="w-4 h-4 text-white/25 group-hover:text-cyan-400/70 group-hover:translate-x-1 transition-all shrink-0" />
           </div>
-
-          <div className="flex items-center justify-end">
-            <div className="flex items-center gap-1 text-white/20 group-hover:text-cyan-400/60 transition-colors">
-              <span className="text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity">Open</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-          </div>
+          <p className="text-[11px] text-white/50 line-clamp-2 leading-relaxed pl-12">{card.description}</p>
         </div>
       </motion.div>
     </CarouselItem>
@@ -439,7 +487,7 @@ export default function CommandCenter() {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-6 pt-24 pb-16 space-y-14">
+      <div className="max-w-[1400px] mx-auto px-6 pt-24 pb-16 space-y-16">
         {!loaded ? (
           [1,2,3,4].map(i => <SkeletonSection key={i} />)
         ) : (
@@ -449,7 +497,7 @@ export default function CommandCenter() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: catIndex * 0.08 }}
-              className="space-y-5"
+              className="space-y-6"
             >
               <div className="flex items-start gap-4">
                 <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center shrink-0 shadow-lg`}>
@@ -468,7 +516,7 @@ export default function CommandCenter() {
                 }}
                 className="w-full"
               >
-                <CarouselContent className="-ml-5">
+                <CarouselContent className="-ml-6">
                   {category.cards.map((card, cardIndex) => (
                     <CardComponent
                       key={card.label}
