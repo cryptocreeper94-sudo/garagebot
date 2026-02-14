@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearch, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, Award, Globe, ArrowRight, Star, TrendingDown, ShoppingCart, Loader2, BarChart3 } from "lucide-react";
+import { ExternalLink, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, Award, Globe, ArrowRight, Star, TrendingDown, ShoppingCart, Loader2, BarChart3, Mountain, Waves, CircleDot, Sparkles, Gamepad2, Radio } from "lucide-react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { AdSenseHorizontal } from "@/components/AdSense";
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
-import { VENDORS, VendorInfo, generateVendorSearchUrl, CATEGORIES, getVendorLogoUrl, getVendorFaviconUrl } from "@/lib/mockData";
+import { VENDORS, VendorInfo, VendorCategory, generateVendorSearchUrl, CATEGORIES, getVendorLogoUrl, getVendorFaviconUrl, VENDOR_CATEGORY_ORDER } from "@/lib/mockData";
 import { useAuthGate } from "@/hooks/useAuthGate";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -358,22 +358,22 @@ function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 10 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.02 }}
     >
       <div
-        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-200 group hover:scale-[1.01] ${
+        className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-300 group hover:scale-[1.01] ${
           isAffiliate
-            ? 'bg-primary/[0.04] border-primary/20 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)]'
-            : 'bg-white/[0.02] border-white/[0.06] hover:border-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.03)]'
+            ? 'bg-gradient-to-r from-primary/[0.06] to-primary/[0.02] border-primary/20 hover:border-primary/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.12)]'
+            : 'bg-gradient-to-r from-white/[0.04] to-white/[0.01] border-white/[0.08] hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.04)]'
         }`}
         onClick={() => requireAuth(handleClick, "compare prices across retailers")}
         data-testid={`vendor-link-${vendor.slug}`}
       >
-        <VendorLogo vendor={vendor} size="md" />
+        <VendorLogo vendor={vendor} size="lg" />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-0.5">
             <span className="font-tech font-bold text-sm text-white truncate">{vendor.name}</span>
             {isAffiliate && (
               <Badge variant="outline" className="text-[7px] h-3.5 px-1 border-primary/30 text-primary shrink-0">
@@ -381,28 +381,29 @@ function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: {
               </Badge>
             )}
           </div>
-          <div className="flex items-center gap-2 mt-0.5">
+          <p className="text-[11px] text-muted-foreground/80 leading-relaxed line-clamp-2 mb-1.5">{vendor.description}</p>
+          <div className="flex items-center gap-2 flex-wrap">
             {vendor.hasLocalPickup ? (
-              <span className="text-[9px] text-green-400 flex items-center gap-0.5 font-mono">
-                <MapPin className="w-2.5 h-2.5" /> LOCAL PICKUP
+              <span className="text-[9px] text-green-400 flex items-center gap-0.5 font-mono bg-green-400/10 px-1.5 py-0.5 rounded-full">
+                <MapPin className="w-2.5 h-2.5" /> PICKUP
               </span>
             ) : (
-              <span className="text-[9px] text-blue-400 flex items-center gap-0.5 font-mono">
+              <span className="text-[9px] text-blue-400 flex items-center gap-0.5 font-mono bg-blue-400/10 px-1.5 py-0.5 rounded-full">
                 <Truck className="w-2.5 h-2.5" /> SHIPS
               </span>
             )}
             {vendor.supportsOEM && (
-              <span className="text-[8px] text-blue-400/60">OEM</span>
+              <span className="text-[8px] text-blue-400/70 bg-blue-400/10 px-1.5 py-0.5 rounded-full">OEM</span>
             )}
             {vendor.supportsAftermarket && (
-              <span className="text-[8px] text-purple-400/60">Aftermarket</span>
+              <span className="text-[8px] text-purple-400/70 bg-purple-400/10 px-1.5 py-0.5 rounded-full">Aftermarket</span>
             )}
           </div>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-3 text-[10px] font-tech uppercase text-primary hover:bg-primary hover:text-black shrink-0 gap-1"
+          className="h-9 px-3 text-[10px] font-tech uppercase text-primary hover:bg-primary hover:text-black shrink-0 gap-1 mt-1"
           data-testid={`button-go-${vendor.slug}`}
         >
           Search <ExternalLink className="w-3 h-3" />
@@ -856,7 +857,6 @@ export default function Results() {
   const [zipCode, setZipCode] = useState(urlZip);
   const [showOEMOnly, setShowOEMOnly] = useState(false);
   const [showAftermarketOnly, setShowAftermarketOnly] = useState(false);
-  const [showAllVendors, setShowAllVendors] = useState(false);
 
   useEffect(() => {
     if (!zipCode && user?.zipCode) {
@@ -988,8 +988,6 @@ export default function Results() {
   }, [vehicleType, displayQuery, year, make, model, zipCode, showLocalOnly, showOEMOnly, showAftermarketOnly]);
 
   const affiliateVendors = vendorsWithUrls.filter(v => v.isAffiliate);
-  const otherVendors = vendorsWithUrls.filter(v => !v.isAffiliate);
-  const displayedOtherVendors = showAllVendors ? otherVendors : otherVendors.slice(0, 6);
 
   const handleBrowseSearch = (searchQuery: string) => {
     const newParams = new URLSearchParams();
@@ -1204,9 +1202,9 @@ export default function Results() {
                     requireAuth={requireAuth}
                   />
 
-                  {affiliateVendors.length > 0 && (
+                  {vendorsWithUrls.length > 0 && (
                     <section>
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-2 mb-2">
                         <Tag className="w-5 h-5 text-primary" />
                         <h2 className="font-tech text-lg font-bold uppercase text-white" data-testid="text-partner-retailers">
                           All {vendorsWithUrls.length} Retailers
@@ -1215,42 +1213,70 @@ export default function Results() {
                           <DollarSign className="w-3 h-3 mr-0.5" /> {affiliateVendors.length} partners
                         </Badge>
                       </div>
-                      <p className="text-[11px] text-muted-foreground mb-3 -mt-2">
-                        Direct links to "{displayQuery}" {vehicleLabel ? `for ${vehicleLabel}` : ''} across all retailers
+                      <p className="text-[11px] text-muted-foreground mb-4">
+                        Direct links to "{displayQuery}" {vehicleLabel ? `for ${vehicleLabel}` : ''} across all retailers — grouped by category
                       </p>
-                      <div className="space-y-2">
-                        {affiliateVendors.map((v, i) => (
-                          <VendorDirectLink key={v.vendor.id} vendorWithUrl={v} displayQuery={displayQuery} requireAuth={requireAuth} index={i} />
-                        ))}
-                      </div>
-                    </section>
-                  )}
 
-                  {otherVendors.length > 0 && (
-                    <section>
-                      <div className="flex items-center gap-2 mb-4">
-                        <Store className="w-5 h-5 text-muted-foreground" />
-                        <h2 className="font-tech text-base font-bold uppercase text-muted-foreground" data-testid="text-more-retailers">More Retailers</h2>
-                        <Badge variant="outline" className="text-[9px] border-white/20 text-muted-foreground ml-auto">
-                          {otherVendors.length} stores
-                        </Badge>
-                      </div>
-                      <div className="space-y-2">
-                        {displayedOtherVendors.map((v, i) => (
-                          <VendorDirectLink key={v.vendor.id} vendorWithUrl={v} displayQuery={displayQuery} requireAuth={requireAuth} index={i} />
-                        ))}
-                      </div>
-                      {otherVendors.length > 6 && (
-                        <Button
-                          variant="ghost"
-                          className="w-full mt-3 text-xs text-muted-foreground hover:text-primary font-mono"
-                          onClick={() => setShowAllVendors(!showAllVendors)}
-                          data-testid="button-show-all-vendors"
-                        >
-                          {showAllVendors ? 'Show Less' : `Show All ${otherVendors.length} Retailers`}
-                          {showAllVendors ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
-                        </Button>
-                      )}
+                      {(() => {
+                        const grouped = new Map<VendorCategory, VendorWithUrl[]>();
+                        vendorsWithUrls.forEach(v => {
+                          const cat = v.vendor.vendorCategory;
+                          if (!grouped.has(cat)) grouped.set(cat, []);
+                          grouped.get(cat)!.push(v);
+                        });
+
+                        const categoryIcons: Record<string, typeof Store> = {
+                          "Major Auto Parts Chains": Store,
+                          "Online Auto Parts": Globe,
+                          "Performance & Racing": Zap,
+                          "Powersports & Motorcycle": Car,
+                          "Off-Road & 4x4": Mountain,
+                          "Marine & Watercraft": Waves,
+                          "Diesel & Commercial": Truck,
+                          "RV & Trailer": Truck,
+                          "Classic & Restoration": Star,
+                          "Tires & Wheels": CircleDot,
+                          "Small Engine & Outdoor": Wrench,
+                          "Vehicle Electronics": Zap,
+                          "Coatings & Detailing": Sparkles,
+                          "Tools & Equipment": Wrench,
+                          "RC & Hobby": Gamepad2,
+                          "Drones & FPV": Radio,
+                          "Travel & Rental": Globe,
+                        };
+
+                        return VENDOR_CATEGORY_ORDER
+                          .filter(cat => grouped.has(cat))
+                          .map((cat, catIdx) => {
+                            const vendors = grouped.get(cat)!;
+                            const IconComp = categoryIcons[cat] || Store;
+                            return (
+                              <div key={cat} className="mb-6" data-testid={`category-${cat.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                                    <IconComp className="w-3.5 h-3.5 text-primary" />
+                                  </div>
+                                  <h3 className="font-tech text-sm font-bold uppercase text-white/90 tracking-wider">{cat}</h3>
+                                  <div className="flex-1 h-px bg-gradient-to-r from-white/10 to-transparent ml-2" />
+                                  <Badge variant="outline" className="text-[8px] h-4 px-1.5 border-white/10 text-muted-foreground">
+                                    {vendors.length}
+                                  </Badge>
+                                </div>
+                                <div className="space-y-2 pl-0">
+                                  {vendors.map((v, i) => (
+                                    <VendorDirectLink
+                                      key={v.vendor.id}
+                                      vendorWithUrl={v}
+                                      displayQuery={displayQuery}
+                                      requireAuth={requireAuth}
+                                      index={catIdx * 10 + i}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          });
+                      })()}
                     </section>
                   )}
 
