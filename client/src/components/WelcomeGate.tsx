@@ -221,11 +221,6 @@ export default function WelcomeGate() {
       setIsOpen(false);
       return;
     }
-    const hasDismissed = sessionStorage.getItem("garagebot_welcome_dismissed");
-    if (!hasDismissed) {
-      const timer = setTimeout(() => setIsOpen(true), 800);
-      return () => clearTimeout(timer);
-    }
   }, [user, authLoading]);
 
   useEffect(() => {
@@ -233,8 +228,16 @@ export default function WelcomeGate() {
       setView("signup");
       setIsOpen(true);
     };
+    const viewHandler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail === "login") setView("login");
+    };
     window.addEventListener("garagebot:open-welcome", openHandler);
-    return () => window.removeEventListener("garagebot:open-welcome", openHandler);
+    window.addEventListener("garagebot:welcome-view", viewHandler);
+    return () => {
+      window.removeEventListener("garagebot:open-welcome", openHandler);
+      window.removeEventListener("garagebot:welcome-view", viewHandler);
+    };
   }, []);
 
   const handleDismiss = () => {

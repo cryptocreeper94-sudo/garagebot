@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/hooks/useAuth";
+import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
@@ -11,7 +13,7 @@ import {
   TrendingDown, Phone, MessageCircle, Gamepad2, Coffee, Truck,
   Globe, Crown, ChevronRight, Sparkles, MapPin, Star,
   BookOpen, Blocks, Compass, Award, Home,
-  HeadphonesIcon, Mail, Settings, Rocket, Eye, ArrowRight
+  HeadphonesIcon, Mail, Settings, Rocket, Eye, ArrowRight, KeyRound
 } from "lucide-react";
 
 import imgPartsSearch from "@/assets/images/cc/parts-search.png";
@@ -281,8 +283,13 @@ function FeatureCard({ feature, index, catIdx }: { feature: Feature; index: numb
 }
 
 export default function Explore() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const openSignup = useCallback(() => {
+    window.dispatchEvent(new Event("garagebot:open-welcome"));
+  }, []);
 
   const filteredCategories = FEATURE_CATEGORIES.map((cat) => ({
     ...cat,
@@ -362,6 +369,54 @@ export default function Explore() {
             </motion.button>
           </Link>
         </motion.div>
+
+        {!user && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="max-w-2xl mx-auto mb-10"
+          >
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-500/[0.08] via-purple-500/[0.06] to-cyan-500/[0.08] backdrop-blur-xl border border-cyan-500/20 p-5 sm:p-6">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.05] via-transparent to-purple-500/[0.05]" />
+              <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4">
+                <img src={gbEmblem} alt="" className="w-12 h-12 drop-shadow-[0_0_12px_rgba(6,182,212,0.6)]" />
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className="font-tech font-bold text-lg uppercase text-white mb-1">
+                    Build Your Free <span className="text-cyan-400">Garage</span>
+                  </h3>
+                  <p className="text-xs text-white/50">
+                    Search 68+ retailers, save vehicles, get AI recommendations — all free
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={openSignup}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-tech text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-shadow duration-300 border border-cyan-400/20 whitespace-nowrap"
+                    data-testid="button-signup-cta"
+                  >
+                    <KeyRound className="w-4 h-4" />
+                    Sign Up Free
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => {
+                      window.dispatchEvent(new Event("garagebot:open-welcome"));
+                      setTimeout(() => window.dispatchEvent(new CustomEvent("garagebot:welcome-view", { detail: "login" })), 100);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] text-white/70 font-tech text-xs uppercase tracking-wider border border-white/10 hover:text-cyan-400 hover:border-cyan-500/30 transition-all duration-300 whitespace-nowrap"
+                    data-testid="button-login-cta"
+                  >
+                    Log In
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}

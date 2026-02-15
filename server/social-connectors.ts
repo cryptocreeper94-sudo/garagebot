@@ -56,19 +56,96 @@ export class TwitterConnector {
     return `OAuth ${headerParts.join(', ')}`;
   }
 
-  async post(text: string): Promise<DeployResult> {
+  private getOAuthHeaderWithParams(method: string, url: string, extraParams: Record<string, string> = {}): string {
+    const oauthParams: Record<string, string> = {
+      oauth_consumer_key: this.apiKey,
+      oauth_nonce: crypto.randomBytes(16).toString('hex'),
+      oauth_signature_method: 'HMAC-SHA1',
+      oauth_timestamp: Math.floor(Date.now() / 1000).toString(),
+      oauth_token: this.accessToken,
+      oauth_version: '1.0',
+    };
+    const allParams = { ...oauthParams, ...extraParams };
+    const signature = generateOAuthSignature(method, url, allParams, this.apiSecret, this.accessTokenSecret);
+    oauthParams.oauth_signature = signature;
+    const headerParts = Object.keys(oauthParams)
+      .filter(k => k.startsWith('oauth_'))
+      .sort()
+      .map(k => `${encodeURIComponent(k)}="${encodeURIComponent(oauthParams[k])}"`);
+    return `OAuth ${headerParts.join(', ')}`;
+  }
+
+  private async uploadMedia(imageUrl: string): Promise<string | null> {
+    try {
+      const imgRes = await fetch(imageUrl, { signal: AbortSignal.timeout(15000) });
+      if (!imgRes.ok) {
+        console.log(`[X Media] Failed to download image: ${imgRes.status}`);
+        return null;
+      }
+      const contentType = imgRes.headers.get('content-type') || 'image/png';
+      const buffer = Buffer.from(await imgRes.arrayBuffer());
+      const base64 = buffer.toString('base64');
+
+      const uploadUrl = 'https://upload.twitter.com/1.1/media/upload.json';
+      const formParams: Record<string, string> = {
+        media_data: base64,
+      };
+
+      const boundary = `----FormBoundary${crypto.randomBytes(8).toString('hex')}`;
+      let body = '';
+      for (const [key, value] of Object.entries(formParams)) {
+        body += `--${boundary}\r\n`;
+        body += `Content-Disposition: form-data; name="${key}"\r\n\r\n`;
+        body += `${value}\r\n`;
+      }
+      body += `--${boundary}--\r\n`;
+
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': this.getOAuthHeader('POST', uploadUrl),
+          'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        },
+        body,
+      });
+      const data = await response.json();
+      if (data.media_id_string) {
+        console.log(`[X Media] Uploaded media: ${data.media_id_string}`);
+        return data.media_id_string;
+      }
+      console.log(`[X Media] Upload failed: ${JSON.stringify(data)}`);
+      return null;
+    } catch (error) {
+      console.log(`[X Media] Upload error: ${error}`);
+      return null;
+    }
+  }
+
+  async post(text: string, imageUrl?: string): Promise<DeployResult> {
     if (!this.isConfigured()) {
       return { success: false, error: 'Twitter/X not configured - add API credentials in Secrets' };
     }
     try {
+      let mediaId: string | null = null;
+      if (imageUrl) {
+        mediaId = await this.uploadMedia(imageUrl);
+        if (!mediaId) {
+          console.log('[X] Image upload failed, posting text-only');
+        }
+      }
+
       const url = 'https://api.twitter.com/2/tweets';
+      const tweetBody: any = { text };
+      if (mediaId) {
+        tweetBody.media = { media_ids: [mediaId] };
+      }
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': this.getOAuthHeader('POST', url),
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify(tweetBody),
       });
       const data = await response.json();
       if (response.ok && data.data?.id) {

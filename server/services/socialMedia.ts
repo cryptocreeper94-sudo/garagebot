@@ -71,6 +71,41 @@ export class TwitterService {
     return `OAuth ${headerParts}`;
   }
 
+  private async uploadMedia(imageUrl: string): Promise<string | null> {
+    try {
+      const imgRes = await fetch(imageUrl, { signal: AbortSignal.timeout(15000) });
+      if (!imgRes.ok) {
+        console.log(`[X Media] Failed to download image: ${imgRes.status}`);
+        return null;
+      }
+      const buffer = Buffer.from(await imgRes.arrayBuffer());
+      const base64 = buffer.toString('base64');
+
+      const uploadUrl = 'https://upload.twitter.com/1.1/media/upload.json';
+      const boundary = `----FormBoundary${crypto.randomBytes(8).toString('hex')}`;
+      let body = `--${boundary}\r\nContent-Disposition: form-data; name="media_data"\r\n\r\n${base64}\r\n--${boundary}--\r\n`;
+
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': this.generateOAuthHeader('POST', uploadUrl),
+          'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        },
+        body,
+      });
+      const data = await response.json();
+      if (data.media_id_string) {
+        console.log(`[X Media] Uploaded: ${data.media_id_string}`);
+        return data.media_id_string;
+      }
+      console.log(`[X Media] Upload failed: ${JSON.stringify(data)}`);
+      return null;
+    } catch (error) {
+      console.log(`[X Media] Upload error: ${error}`);
+      return null;
+    }
+  }
+
   async post(content: PostContent): Promise<PostResult> {
     if (!this.configured) {
       return {
@@ -81,12 +116,24 @@ export class TwitterService {
     }
 
     try {
+      let mediaId: string | null = null;
+      if (content.imageUrl) {
+        mediaId = await this.uploadMedia(content.imageUrl);
+        if (!mediaId) {
+          console.log('[X] Image upload failed, posting text-only');
+        }
+      }
+
       const tweetText = content.hashtags?.length
         ? `${content.text}\n\n${content.hashtags.map(h => `#${h}`).join(' ')}`
         : content.text;
 
       const url = 'https://api.twitter.com/2/tweets';
       const authHeader = this.generateOAuthHeader('POST', url);
+      const tweetBody: any = { text: tweetText.slice(0, 280) };
+      if (mediaId) {
+        tweetBody.media = { media_ids: [mediaId] };
+      }
 
       const response = await fetch(url, {
         method: 'POST',
@@ -94,7 +141,7 @@ export class TwitterService {
           'Authorization': authHeader,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: tweetText.slice(0, 280) }),
+        body: JSON.stringify(tweetBody),
       });
 
       if (!response.ok) {
