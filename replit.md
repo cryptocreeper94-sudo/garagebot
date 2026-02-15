@@ -111,6 +111,14 @@ Preferred communication style: Simple, everyday language.
 - **Meta Ads Campaigns**: Manages paid ad campaigns via Meta Marketing API with configurable targeting.
 - **Analytics**: Tracks top-performing content and provides performance insights from Meta Graph API.
 
+## OEM Parts
+- **Route**: `/oem-parts` — Full OEM genuine parts directory page with 12+ manufacturer brands.
+- **Layout**: Premium bento grid header, 3-column partner cards with photorealistic images, parts category carousel, OEM vs aftermarket comparison table, warranty section, FAQ accordion, bottom CTA bento.
+- **Brands**: Toyota, Ford/Motorcraft, GM/ACDelco, Mopar, Honda, BMW, Nissan, Mercedes-Benz, Hyundai, Subaru, Volkswagen/Audi, Kia.
+- **Images**: Unique photorealistic images per brand in `client/src/assets/images/oem/`.
+- **Explore/CC**: Card added to "Parts & Shopping" in Explore page and "Vehicle & Parts" in Command Center.
+- **Affiliate**: URLs placeholder-ready for affiliate link integration.
+
 ## Rental Cars
 - **Route**: `/rentals` — Full rental car comparison page with partners like Carla Car Rental, Expedia, and Hotels.com.
 

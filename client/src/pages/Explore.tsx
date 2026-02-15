@@ -14,10 +14,11 @@ import {
   Globe, Crown, ChevronRight, Sparkles, MapPin, Star,
   BookOpen, Blocks, Compass, Award, Home,
   HeadphonesIcon, Mail, Settings, Rocket, Eye, ArrowRight, KeyRound,
-  Download, Smartphone, Share, Plus, X, Monitor
+  Download, Smartphone, Share, Plus, X, Monitor, Factory
 } from "lucide-react";
 
 import imgPartsSearch from "@/assets/images/cc/parts-search.png";
+import imgOemParts from "@/assets/images/cc/oem-parts.png";
 import imgPartsMarketplace from "@/assets/images/cc/parts-marketplace.png";
 import imgWishlists from "@/assets/images/cc/wishlists.png";
 import imgBuildProjects from "@/assets/images/cc/build-projects.png";
@@ -106,6 +107,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     gradient: "from-cyan-500 to-blue-600",
     features: [
       { name: "Parts Search", description: "Search 15M+ parts across 68+ retailers with price comparison and vehicle-aware results.", href: "/home", icon: Search, image: imgPartsSearch, glowColor: "cyan", featured: true, subFeatures: ["68+ Retailers", "Price Compare", "Local Pickup", "Vehicle-Aware"] },
+      { name: "OEM Parts", description: "Genuine manufacturer parts from 12+ brands. Factory-spec fit, full warranty, zero compromises.", href: "/oem-parts", icon: Factory, image: imgOemParts, glowColor: "green", badge: "NEW", badgeVariant: "new", featured: true, subFeatures: ["12+ OEM Brands", "Factory Warranty", "Perfect Fit", "Dealer Direct"] },
       { name: "Parts Marketplace", description: "Buy and sell used parts directly. List spare parts, search by fitment, and message sellers.", href: "/marketplace", icon: Tag, image: imgPartsMarketplace, glowColor: "green", badge: "NEW", badgeVariant: "new", subFeatures: ["List Parts", "Fitment Search", "Messaging", "Photos"] },
       { name: "Wishlists", description: "Save parts to organized lists. Share with friends or your mechanic and track price changes.", href: "/wishlists", icon: Heart, image: imgWishlists, glowColor: "pink", subFeatures: ["Multiple Lists", "Share Link", "Price Tracking", "Priority Sort"] },
       { name: "Build Projects", description: "Plan vehicle builds with parts lists, spending vs budget tracking, and purchase progress.", href: "/projects", icon: FolderOpen, image: imgBuildProjects, glowColor: "amber", subFeatures: ["Budget Tracking", "Parts Checklist", "Progress", "Cost Estimate"] },

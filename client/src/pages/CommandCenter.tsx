@@ -50,6 +50,7 @@ import imgShadeTree from "@/assets/images/cc/shade-tree.png";
 import imgTriviaQuiz from "@/assets/images/cc/trivia-quiz.png";
 import imgGiveaways from "@/assets/images/cc/giveaways.png";
 import imgPartsSearch from "@/assets/images/cc/parts-search.png";
+import imgOemParts from "@/assets/images/cc/oem-parts.png";
 import imgMyGarage from "@/assets/images/cc/my-garage.png";
 import imgDiyGuides from "@/assets/images/cc/diy-guides.png";
 import imgPartsMarketplace from "@/assets/images/cc/parts-marketplace.png";
@@ -162,6 +163,7 @@ const categories: Category[] = [
     description: "The core product experience. Search parts across 68+ retailers, manage vehicle fleets, follow DIY guides, browse the marketplace, and track wishlists.",
     cards: [
       { label: "Parts Search", description: "68+ retailers, 16 categories, vehicle-aware", href: "/results", icon: Search, image: imgPartsSearch, featured: true },
+      { label: "OEM Parts", description: "12+ OEM brands, factory warranty, dealer-direct", href: "/oem-parts", icon: Package, image: imgOemParts, badge: "New" },
       { label: "My Garage", description: "Fleet management, VIN decoding & service records", href: "/garage", icon: Car, image: imgMyGarage },
       { label: "DIY Guides", description: "AI repair guides with YouTube integration", href: "/diy-guides", icon: BookOpen, image: imgDiyGuides },
       { label: "Parts Marketplace", description: "Peer-to-peer listings with messaging", href: "/marketplace", icon: ShoppingCart, image: imgPartsMarketplace },
