@@ -1,9 +1,9 @@
 import { Link, useLocation } from "wouter";
-import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check, Coffee, MessageCircle, Truck, Gamepad2, HeadphonesIcon, Tag, Compass, Heart, FolderOpen } from "lucide-react";
+import { Search, User, ShoppingCart, Wrench, ChevronLeft, X, Menu, LogIn, LogOut, Shield, FileText, Star, Store, Crown, Sparkles, Home, LayoutDashboard, Car, Settings, BadgeCheck, ExternalLink, Copy, Check, Coffee, MessageCircle, Truck, Gamepad2, HeadphonesIcon, Tag, Compass, Heart, FolderOpen, Download, Smartphone, Share, Plus, Zap, ClipboardList, Users, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { CartButton, MobileCartButton } from "@/components/CartDrawer";
@@ -42,6 +42,94 @@ interface UserHallmark {
     make: string;
     model: string;
   };
+}
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+function TorquePWAInstallButton() {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [showIOSSteps, setShowIOSSteps] = useState(false);
+
+  useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    if (isStandalone) {
+      setIsInstalled(true);
+      return;
+    }
+
+    const isIOSDevice = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(isIOSDevice);
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', () => setIsInstalled(true));
+
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (isIOS) {
+      setShowIOSSteps(!showIOSSteps);
+      return;
+    }
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') setIsInstalled(true);
+      setDeferredPrompt(null);
+    } else {
+      window.open('/torque', '_blank');
+    }
+  };
+
+  if (isInstalled) return null;
+
+  return (
+    <div className="space-y-1">
+      <button
+        onClick={handleInstall}
+        className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-foreground hover:bg-orange-500/10 w-full text-left"
+        data-testid="menu-torque-pwa-install"
+      >
+        <Download className="w-5 h-5 text-orange-400" />
+        <span className="font-medium">Install TORQUE App</span>
+        <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[8px] font-mono ml-auto">PWA</Badge>
+      </button>
+      {isIOS && showIOSSteps && (
+        <div className="mx-3 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20 space-y-2">
+          <p className="text-[10px] text-orange-300 font-tech uppercase font-bold">Install on iPhone / iPad:</p>
+          <div className="flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-[10px] font-bold text-orange-400">1</span>
+            <p className="text-[11px] text-muted-foreground">First, open <span className="text-orange-400 font-medium">garagebot.io/torque</span> in Safari</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-[10px] font-bold text-orange-400">2</span>
+            <div className="flex items-center gap-1">
+              <p className="text-[11px] text-muted-foreground">Tap the</p>
+              <Share className="w-3.5 h-3.5 text-orange-400" />
+              <p className="text-[11px] text-muted-foreground">Share button</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-[10px] font-bold text-orange-400">3</span>
+            <div className="flex items-center gap-1">
+              <p className="text-[11px] text-muted-foreground">Tap</p>
+              <Plus className="w-3.5 h-3.5 text-orange-400" />
+              <p className="text-[11px] text-muted-foreground font-medium">"Add to Home Screen"</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function Nav() {
@@ -406,12 +494,6 @@ export default function Nav() {
                       </div>
                     </Link>
                     
-                    <Link href="/torque" onClick={() => setIsOpen(false)}>
-                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/torque' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-white/5'}`} data-testid="menu-torque">
-                        <Store className="w-5 h-5" />
-                        <span className="font-medium">TORQUE</span>
-                      </div>
-                    </Link>
                   </div>
                   
                   {/* Column 2: Features & Services */}
@@ -499,6 +581,41 @@ export default function Nav() {
                         <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] font-mono ml-auto">SOON</Badge>
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                {/* === TORQUE — Separate Product Section === */}
+                <div className="pt-3 mt-3 border-t border-orange-500/20">
+                  <div className="flex items-center gap-3 px-3 mb-2">
+                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 shadow-[0_0_12px_rgba(249,115,22,0.3)]">
+                      <Zap className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-tech font-bold uppercase tracking-wider text-orange-400">TORQUE</span>
+                      <p className="text-[9px] text-muted-foreground font-mono">Shop Management OS</p>
+                    </div>
+                    <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-[8px] font-mono ml-auto">STANDALONE</Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <Link href="/torque" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/torque' ? 'bg-orange-500/10 text-orange-400' : 'text-foreground hover:bg-orange-500/5'}`} data-testid="menu-torque-landing">
+                        <Store className="w-5 h-5 text-orange-400" />
+                        <span className="font-medium">TORQUE Home</span>
+                      </div>
+                    </Link>
+                    <Link href="/torque/app" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/torque/app' ? 'bg-orange-500/10 text-orange-400' : 'text-foreground hover:bg-orange-500/5'}`} data-testid="menu-torque-dashboard">
+                        <ClipboardList className="w-5 h-5 text-orange-400" />
+                        <span className="font-medium">Shop Dashboard</span>
+                      </div>
+                    </Link>
+                    <Link href="/torque/onboard" onClick={() => setIsOpen(false)}>
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/torque/onboard' ? 'bg-orange-500/10 text-orange-400' : 'text-foreground hover:bg-orange-500/5'}`} data-testid="menu-torque-onboard">
+                        <Users className="w-5 h-5 text-orange-400" />
+                        <span className="font-medium">Shop Setup</span>
+                      </div>
+                    </Link>
+                    <TorquePWAInstallButton />
                   </div>
                 </div>
                 
