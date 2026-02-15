@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,7 +13,8 @@ import {
   TrendingDown, Phone, MessageCircle, Gamepad2, Coffee, Truck,
   Globe, Crown, ChevronRight, Sparkles, MapPin, Star,
   BookOpen, Blocks, Compass, Award, Home,
-  HeadphonesIcon, Mail, Settings, Rocket, Eye, ArrowRight, KeyRound
+  HeadphonesIcon, Mail, Settings, Rocket, Eye, ArrowRight, KeyRound,
+  Download, Smartphone, Share, Plus, X, Monitor
 } from "lucide-react";
 
 import imgPartsSearch from "@/assets/images/cc/parts-search.png";
@@ -282,10 +283,53 @@ function FeatureCard({ feature, index, catIdx }: { feature: Feature; index: numb
   );
 }
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export default function Explore() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showPwaBanner, setShowPwaBanner] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [pwaInstalled, setPwaInstalled] = useState(false);
+
+  useEffect(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setPwaInstalled(true);
+      return;
+    }
+    const dismissed = localStorage.getItem('pwa-banner-dismissed');
+    if (dismissed && Date.now() - parseInt(dismissed) < 7 * 24 * 60 * 60 * 1000) return;
+
+    setIsIOS(/iPhone|iPad|iPod/i.test(navigator.userAgent) && !(window as any).MSStream);
+    setShowPwaBanner(true);
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', () => { setPwaInstalled(true); setShowPwaBanner(false); });
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handlePwaInstall = async () => {
+    if (!deferredPrompt) return;
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') setPwaInstalled(true);
+    setDeferredPrompt(null);
+    setShowPwaBanner(false);
+  };
+
+  const dismissPwaBanner = () => {
+    localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
+    setShowPwaBanner(false);
+  };
 
   const openSignup = useCallback(() => {
     window.dispatchEvent(new Event("garagebot:open-welcome"));
@@ -438,6 +482,69 @@ export default function Explore() {
             </div>
           </div>
         </motion.div>
+
+        <AnimatePresence>
+          {showPwaBanner && !pwaInstalled && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+              transition={{ delay: 0.35 }}
+              className="max-w-2xl mx-auto mb-8"
+              data-testid="pwa-install-banner"
+            >
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-green-500/[0.08] via-cyan-500/[0.06] to-green-500/[0.08] backdrop-blur-xl border border-green-500/20 p-4 sm:p-5">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/[0.04] via-transparent to-cyan-500/[0.04]" />
+                <button
+                  onClick={dismissPwaBanner}
+                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center text-white/40 hover:text-white/80 hover:bg-white/10 transition-all z-10"
+                  data-testid="pwa-banner-dismiss"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+                <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-cyan-500/20 border border-green-500/20 flex items-center justify-center shrink-0">
+                    <Download className="w-6 h-6 text-green-400" />
+                  </div>
+                  <div className="flex-1 text-center sm:text-left pr-6">
+                    <h3 className="font-tech font-bold text-sm sm:text-base uppercase text-white mb-1 flex items-center justify-center sm:justify-start gap-2">
+                      <Smartphone className="w-4 h-4 text-green-400 hidden sm:block" />
+                      Install GarageBot App
+                      <Monitor className="w-4 h-4 text-cyan-400 hidden sm:block" />
+                    </h3>
+                    <p className="text-[11px] sm:text-xs text-white/50 leading-relaxed">
+                      This is a web app you can install on your phone or desktop for quick, easy access — no app store needed!
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    {deferredPrompt ? (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={handlePwaInstall}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-cyan-600 text-white font-tech text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(34,197,94,0.3)] hover:shadow-[0_0_40px_rgba(34,197,94,0.5)] transition-shadow duration-300 border border-green-400/20 whitespace-nowrap"
+                        data-testid="pwa-banner-install"
+                      >
+                        <Download className="w-4 h-4" />
+                        Install Now
+                      </motion.button>
+                    ) : isIOS ? (
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-[11px] text-white/60">
+                        <Share className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span>Tap <span className="text-white/90 font-medium">Share</span> then <span className="text-white/90 font-medium">Add to Home Screen</span></span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-[11px] text-white/60">
+                        <Monitor className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span>Use browser menu → <span className="text-white/90 font-medium">Install app</span></span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <motion.div
           initial={{ opacity: 0 }}
