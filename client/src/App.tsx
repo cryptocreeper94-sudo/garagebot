@@ -60,6 +60,7 @@ import Contact from "@/pages/Contact";
 import PartsMarketplace from "@/pages/PartsMarketplace";
 import Explore from "@/pages/Explore";
 import Rentals from "@/pages/Rentals";
+import OEMParts from "@/pages/OEMParts";
 import AffiliateProgram from "@/pages/AffiliateProgram";
 import CommandCenter from "@/pages/CommandCenter";
 
@@ -118,6 +119,7 @@ function Router() {
       <Route path="/explore">{() => <Explore />}</Route>
       <Route path="/hub">{() => <Explore />}</Route>
       <Route path="/rentals">{() => <Rentals />}</Route>
+      <Route path="/oem-parts">{() => <OEMParts />}</Route>
       <Route path="/affiliates">{() => <AffiliateProgram />}</Route>
       <Route path="/command-center">{() => <CommandCenter />}</Route>
       <Route>{() => <NotFound />}</Route>
