@@ -190,11 +190,14 @@ export default function Footer() {
             <Link href="/investors" className="hover:text-primary transition-colors" data-testid="footer-link-investors">Investors</Link>
             <Link href="/vendor-signup" className="hover:text-primary transition-colors" data-testid="footer-link-vendor">Vendor Signup</Link>
             <Link href="/break-room" className="hover:text-primary transition-colors" data-testid="footer-link-breakroom">Break Room</Link>
-            <Link href="/dev" className="hover:text-primary transition-colors" data-testid="footer-link-dev">Dev Portal</Link>
             <span className="text-border">|</span>
             <Link href="/command-center" className="hover:text-primary transition-colors inline-flex items-center gap-1" data-testid="footer-link-admin">
               <Lock className="w-2.5 h-2.5" />
               Admin
+            </Link>
+            <Link href="/dev" className="hover:text-primary transition-colors inline-flex items-center gap-1" data-testid="footer-link-developers">
+              <Wrench className="w-2.5 h-2.5" />
+              Developers
             </Link>
           </div>
 

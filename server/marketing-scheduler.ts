@@ -253,7 +253,7 @@ async function postToAllPlatforms(
 
   if (twitter.isConfigured() && (TWITTER_POSTING_HOURS_CST.includes(hour) || forceTwitter)) {
     const twitterMessage = message.length > 4000 ? message.substring(0, 3997) + '...' : message;
-    const result = await twitter.post(twitterMessage);
+    const result = await twitter.post(twitterMessage, imageUrl);
     await recordPost('x', twitterMessage, result.success ? 'posted' : 'failed', result.externalId, result.error, post.id);
     console.log(`[Marketing X] ${result.success ? 'Posted' : 'Failed'}: ${result.externalId || result.error}`);
   }
