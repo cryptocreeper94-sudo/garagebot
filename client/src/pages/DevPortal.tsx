@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
@@ -8,7 +9,8 @@ import {
   BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard,
   Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch, Blocks, Car,
   MessageCircle, Send, Bot, Loader2, Megaphone, Search, Filter,
-  LayoutDashboard, Activity
+  LayoutDashboard, Activity, BarChart3, TrendingUp, PieChart,
+  Newspaper, Palette, FileText, Command
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { Button } from "@/components/ui/button";
@@ -20,6 +22,122 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
+
+import imgAnalyticsDash from "@/assets/images/cc/analytics-dashboard.png";
+import imgAffiliateAnalytics from "@/assets/images/cc/affiliate-analytics.png";
+import imgAffiliateNetworks from "@/assets/images/cc/affiliate-networks.png";
+import imgInboundAffiliate from "@/assets/images/cc/inbound-affiliate.png";
+import imgReleaseManager from "@/assets/images/cc/release-manager.png";
+import imgBlockchainVerifier from "@/assets/images/cc/blockchain-verifier.png";
+import imgBlogManager from "@/assets/images/cc/blog-manager.png";
+import imgMarketingHub from "@/assets/images/cc/marketing-hub.png";
+import imgSeoManager from "@/assets/images/cc/seo-manager.png";
+import imgNewsletter from "@/assets/images/cc/newsletter.png";
+import imgMetaAds from "@/assets/images/cc/meta-ads.png";
+import imgStripePayments from "@/assets/images/cc/stripe-payments.png";
+import imgGenesisHallmarks from "@/assets/images/cc/genesis-hallmarks.png";
+import imgProMembership from "@/assets/images/cc/pro-membership.png";
+import imgReferralProgram from "@/assets/images/cc/referral-program.png";
+import imgShopPortal from "@/assets/images/cc/shop-portal.png";
+import imgPartnerApi from "@/assets/images/cc/partner-api.png";
+import imgUserManagement from "@/assets/images/cc/user-management.png";
+import imgSystemHealth from "@/assets/images/cc/system-health.png";
+import imgVendorManagement from "@/assets/images/cc/vendor-management.png";
+import imgSupportCenter from "@/assets/images/cc/support-center.png";
+import imgInvestorPortal from "@/assets/images/cc/investor-portal.png";
+
+interface DevCommandCard {
+  label: string;
+  description: string;
+  tab?: string;
+  href?: string;
+  icon: any;
+  image: string;
+  badge?: string;
+  featured?: boolean;
+}
+
+interface DevCommandCategory {
+  title: string;
+  icon: any;
+  gradient: string;
+  description: string;
+  cards: DevCommandCard[];
+}
+
+const DEV_COMMAND_CATEGORIES: DevCommandCategory[] = [
+  {
+    title: "Analytics & Performance",
+    icon: BarChart3,
+    gradient: "from-cyan-500 to-blue-500",
+    description: "Monitor platform traffic, sessions, device breakdowns, affiliate performance, and system health in real-time.",
+    cards: [
+      { label: "Analytics Dashboard", description: "Real-time traffic, sessions, devices & geo data", href: "/dashboard", icon: BarChart3, image: imgAnalyticsDash, badge: "Live", featured: true },
+      { label: "System Health", description: "API health, server status & uptime monitoring", href: "/dashboard", icon: Activity, image: imgSystemHealth },
+      { label: "Affiliate Analytics", description: "Click tracking & commission performance reports", tab: "affiliates", icon: TrendingUp, image: imgAffiliateAnalytics },
+    ]
+  },
+  {
+    title: "Affiliate & Revenue",
+    icon: DollarSign,
+    gradient: "from-green-500 to-emerald-500",
+    description: "Manage affiliate networks, outreach vendors, inbound affiliate program, and revenue tracking across all partner channels.",
+    cards: [
+      { label: "Affiliate Networks", description: "Amazon, CJ, ShareASale, eBay & more", tab: "affiliates", icon: Link2, image: imgAffiliateNetworks, featured: true },
+      { label: "Vendor Outreach", description: "Contact list for 45+ retailers needing connections", tab: "affiliates", icon: Megaphone, image: imgVendorManagement },
+      { label: "Inbound Affiliates", description: "GB-XXXXXX referral program management", href: "/affiliates", icon: Users, image: imgInboundAffiliate },
+      { label: "Stripe Payments", description: "Payment processing, subscriptions & invoices", href: "/dashboard", icon: CreditCard, image: imgStripePayments },
+    ]
+  },
+  {
+    title: "Releases & Blockchain",
+    icon: Rocket,
+    gradient: "from-purple-500 to-violet-500",
+    description: "Publish new versions, verify releases on Solana blockchain, and manage the Genesis Hallmark NFT system.",
+    cards: [
+      { label: "Release Manager", description: "Publish new versions & changelogs", tab: "releases", icon: Tag, image: imgReleaseManager, featured: true },
+      { label: "Blockchain Verifier", description: "Solana signature verification for releases", tab: "releases", icon: Blocks, image: imgBlockchainVerifier },
+      { label: "Genesis Hallmarks", description: "NFT minting & early adopter certificates", href: "/hallmarks", icon: Shield, image: imgGenesisHallmarks },
+    ]
+  },
+  {
+    title: "Content & Marketing",
+    icon: Newspaper,
+    gradient: "from-orange-500 to-amber-500",
+    description: "Manage blog posts, marketing campaigns, SEO, newsletters, and Meta advertising across all social channels.",
+    cards: [
+      { label: "Marketing Hub", description: "Auto-posting to Facebook, Instagram & X", href: "/marketing-hub", icon: Megaphone, image: imgMarketingHub, featured: true },
+      { label: "Blog Manager", description: "Create & publish blog content", href: "/blog", icon: FileText, image: imgBlogManager },
+      { label: "SEO Manager", description: "Meta tags, sitemaps & search optimization", href: "/dashboard", icon: Search, image: imgSeoManager },
+      { label: "Newsletter", description: "Email campaigns & subscriber management", href: "/dashboard", icon: Mail, image: imgNewsletter },
+      { label: "Meta Ads", description: "Facebook & Instagram ad campaign management", href: "/marketing-hub", icon: Globe, image: imgMetaAds },
+    ]
+  },
+  {
+    title: "Users & Membership",
+    icon: Users,
+    gradient: "from-pink-500 to-rose-500",
+    description: "Manage users, Pro membership tiers, referral programs, and customer engagement across the platform.",
+    cards: [
+      { label: "User Management", description: "View & manage registered users", href: "/dashboard", icon: Users, image: imgUserManagement, featured: true },
+      { label: "Pro Membership", description: "$29/mo subscription management", href: "/pro", icon: Zap, image: imgProMembership },
+      { label: "Referral Program", description: "Points-based rewards for signups & conversions", href: "/dashboard", icon: Users, image: imgReferralProgram },
+    ]
+  },
+  {
+    title: "Platform & Development",
+    icon: Settings,
+    gradient: "from-slate-400 to-zinc-500",
+    description: "Roadmap planning, Buddy AI configuration, TORQUE shop portal, Partner API, and infrastructure management.",
+    cards: [
+      { label: "Roadmap", description: "Task planning, priorities & milestone tracking", tab: "roadmap", icon: CheckCheck, image: imgReleaseManager, featured: true },
+      { label: "Buddy AI", description: "Configure AI assistant behavior & personalities", tab: "buddy", icon: Bot, image: imgSupportCenter },
+      { label: "TORQUE Portal", description: "Shop Management OS administration", href: "/torque", icon: Rocket, image: imgShopPortal },
+      { label: "Partner API", description: "B2B API keys, scopes & rate limiting", href: "/dashboard", icon: Settings, image: imgPartnerApi },
+      { label: "Investor Portal", description: "Pitch deck, metrics & fundraising materials", href: "/investors", icon: PieChart, image: imgInvestorPortal },
+    ]
+  }
+];
 
 const AFFILIATE_NETWORKS = [
   {
@@ -1194,6 +1312,7 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
 ];
 
 export default function DevPortal() {
+  const [, navigate] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState(false);
@@ -1201,18 +1320,21 @@ export default function DevPortal() {
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({ category: "features", title: "", description: "", priority: "medium", link: "" });
-  const validTabs = ["dashboard", "roadmap", "releases", "affiliates", "buddy"];
+  const validTabs = ["command", "roadmap", "releases", "affiliates", "buddy"];
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
-    return tab && validTabs.includes(tab) ? tab : "dashboard";
+    if (tab === "dashboard") return "command";
+    return tab && validTabs.includes(tab) ? tab : "command";
   });
 
   useEffect(() => {
     const syncTab = () => {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get("tab");
-      if (tab && validTabs.includes(tab)) {
+      if (tab === "dashboard") {
+        setActiveTab("command");
+      } else if (tab && validTabs.includes(tab)) {
         setActiveTab(tab);
       }
     };
@@ -1647,8 +1769,8 @@ export default function DevPortal() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="flex w-full overflow-x-auto no-scrollbar mb-4">
-            <TabsTrigger value="dashboard" className="font-tech uppercase text-xs flex-shrink-0">
-              <LayoutDashboard className="w-3 h-3 mr-1" /> Dashboard
+            <TabsTrigger value="command" className="font-tech uppercase text-xs flex-shrink-0">
+              <Command className="w-3 h-3 mr-1" /> Command
             </TabsTrigger>
             <TabsTrigger value="roadmap" className="font-tech uppercase text-xs flex-shrink-0">
               <CheckCheck className="w-3 h-3 mr-1" /> Roadmap
@@ -1664,119 +1786,109 @@ export default function DevPortal() {
             </TabsTrigger>
           </TabsList>
 
-          {/* ═══════════════════════ DASHBOARD TAB ═══════════════════════ */}
-          <TabsContent value="dashboard" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="glass-card border-primary/20 p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                    <CheckCheck className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Total Tasks</p>
-                    <p className="font-tech text-2xl text-primary" data-testid="text-total-tasks">{stats.total}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="text-green-400">{stats.completed} done</span>
-                  <span>·</span>
-                  <span className="text-yellow-400">{pendingTasks} pending</span>
-                </div>
+          {/* ═══════════════════════ COMMAND CENTER TAB ═══════════════════════ */}
+          <TabsContent value="command" className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Card className="glass-card border-primary/20 p-3 text-center">
+                <p className="text-xs text-muted-foreground">Tasks</p>
+                <p className="font-tech text-xl text-primary" data-testid="text-total-tasks">{stats.completed}/{stats.total}</p>
+                <p className="text-[10px] text-muted-foreground">{stats.percentage}% complete</p>
               </Card>
-
-              <Card className="glass-card border-green-500/20 p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Connected Affiliates</p>
-                    <p className="font-tech text-2xl text-green-400" data-testid="text-connected-affiliates">{connectedAffiliates}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="text-yellow-400">{AFFILIATE_NETWORKS.filter(n => n.status === 'pending').length} pending</span>
-                  <span>·</span>
-                  <span>{AFFILIATE_NETWORKS.length} total networks</span>
-                </div>
+              <Card className="glass-card border-green-500/20 p-3 text-center">
+                <p className="text-xs text-muted-foreground">Affiliates</p>
+                <p className="font-tech text-xl text-green-400" data-testid="text-connected-affiliates">{connectedAffiliates}</p>
+                <p className="text-[10px] text-muted-foreground">{AFFILIATE_NETWORKS.length} total networks</p>
               </Card>
-
-              <Card className="glass-card border-cyan-500/20 p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                    <GitBranch className="w-5 h-5 text-cyan-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Latest Release</p>
-                    <p className="font-tech text-2xl text-cyan-400" data-testid="text-latest-version">
-                      {latestRelease?.version || "—"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  {blockchainHealth?.connected ? (
-                    <span className="text-green-400 flex items-center gap-1">
-                      <Blocks className="w-3 h-3" /> Solana Connected
-                    </span>
-                  ) : (
-                    <span className="text-red-400">Blockchain Disconnected</span>
-                  )}
-                </div>
+              <Card className="glass-card border-cyan-500/20 p-3 text-center">
+                <p className="text-xs text-muted-foreground">Release</p>
+                <p className="font-tech text-xl text-cyan-400" data-testid="text-latest-version">{latestRelease?.version || "—"}</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {blockchainHealth?.connected ? "Solana Connected" : "Offline"}
+                </p>
+              </Card>
+              <Card className="glass-card border-yellow-500/20 p-3 text-center">
+                <p className="text-xs text-muted-foreground">Pending</p>
+                <p className="font-tech text-xl text-yellow-400">{pendingTasks}</p>
+                <p className="text-[10px] text-muted-foreground">tasks remaining</p>
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="glass-card border-primary/20 p-4">
-                <h3 className="font-tech text-sm text-primary mb-3 flex items-center gap-2 uppercase">
-                  <Activity className="w-4 h-4" /> Quick Navigation
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { label: "Roadmap", tab: "roadmap", icon: CheckCheck, color: "text-yellow-400" },
-                    { label: "Releases", tab: "releases", icon: Tag, color: "text-cyan-400" },
-                    { label: "Affiliates", tab: "affiliates", icon: DollarSign, color: "text-green-400" },
-                    { label: "Buddy AI", tab: "buddy", icon: Bot, color: "text-purple-400" },
-                  ].map(item => (
-                    <button
-                      key={item.tab}
-                      onClick={() => setActiveTab(item.tab)}
-                      className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-primary/30 transition-all text-left"
-                      data-testid={`button-nav-${item.tab}`}
-                    >
-                      <item.icon className={`w-4 h-4 ${item.color}`} />
-                      <span className="text-sm font-tech uppercase">{item.label}</span>
-                      <ArrowRight className="w-3 h-3 ml-auto text-muted-foreground" />
-                    </button>
-                  ))}
-                </div>
-              </Card>
-
-              <Card className="glass-card border-primary/20 p-4">
-                <h3 className="font-tech text-sm text-primary mb-3 flex items-center gap-2 uppercase">
-                  <CheckCircle2 className="w-4 h-4" /> Recent Completions
-                </h3>
-                {recentCompletions.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">No completed tasks yet</p>
-                ) : (
-                  <div className="space-y-2">
-                    {recentCompletions.map(task => (
-                      <div key={task.id} className="flex items-center gap-2 p-2 rounded-lg bg-green-500/5 border border-green-500/10">
-                        <CheckCircle2 className="w-3 h-3 text-green-400 shrink-0" />
-                        <span className="text-xs text-muted-foreground truncate">{task.title}</span>
-                        {task.completedAt && (
-                          <span className="text-[10px] text-muted-foreground ml-auto shrink-0">
-                            {new Date(task.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </span>
-                        )}
+            {DEV_COMMAND_CATEGORIES.map((category, catIdx) => {
+              const CategoryIcon = category.icon;
+              return (
+                <motion.div
+                  key={category.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: catIdx * 0.08 }}
+                >
+                  <div className="mb-3">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${category.gradient} flex items-center justify-center`}>
+                        <CategoryIcon className="w-4 h-4 text-white" />
                       </div>
-                    ))}
+                      <div>
+                        <h3 className="font-tech text-sm uppercase tracking-wider">{category.title}</h3>
+                        <p className="text-xs text-muted-foreground">{category.description}</p>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </Card>
-            </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {category.cards.map((card) => {
+                      const CardIcon = card.icon;
+                      return (
+                        <button
+                          key={card.label}
+                          onClick={() => {
+                            if (card.tab) {
+                              setActiveTab(card.tab);
+                            } else if (card.href) {
+                              navigate(card.href);
+                            }
+                          }}
+                          className={`group relative overflow-hidden rounded-xl border transition-all duration-300 text-left ${
+                            card.featured 
+                              ? 'border-primary/30 hover:border-primary/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]' 
+                              : 'border-white/10 hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]'
+                          }`}
+                          data-testid={`button-dev-cmd-${card.label.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                          <div className="relative h-28 overflow-hidden">
+                            <img 
+                              src={card.image} 
+                              alt={card.label}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                            {card.badge && (
+                              <Badge className="absolute top-2 right-2 bg-primary/90 text-[10px] px-1.5 py-0.5">
+                                {card.badge}
+                              </Badge>
+                            )}
+                            <div className="absolute bottom-2 left-3 right-3">
+                              <div className="flex items-center gap-2">
+                                <CardIcon className="w-4 h-4 text-primary shrink-0" />
+                                <span className="font-tech text-sm text-white truncate">{card.label}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="p-3 bg-card/50 backdrop-blur-sm">
+                            <p className="text-xs text-muted-foreground line-clamp-2">{card.description}</p>
+                            <div className="flex items-center gap-1 mt-2 text-[10px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                              {card.tab ? "Open Tab" : "Go to Page"} <ArrowRight className="w-3 h-3" />
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              );
+            })}
 
             <Card className="glass-card border-primary/20 p-4">
-              <h3 className="font-tech text-sm text-primary mb-3 uppercase">Category Progress</h3>
+              <h3 className="font-tech text-sm text-primary mb-3 uppercase">Roadmap Progress</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {CATEGORIES.map(category => {
                   const catTasks = getTasksByCategory(category.id);
