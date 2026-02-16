@@ -1729,16 +1729,24 @@ export default function DevPortal() {
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
-      <div className="pt-24 min-h-[calc(100vh-5rem)] max-w-6xl mx-auto px-4 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
+      <div className="pt-20 sm:pt-24 min-h-[calc(100vh-5rem)] max-w-6xl mx-auto px-3 sm:px-4 pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 mb-6">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className="md:col-span-8"
           >
-            <Card className="bg-gradient-to-br from-primary/10 to-cyan-500/5 border-primary/20 p-4 h-full">
-              <h1 className="font-tech text-2xl uppercase text-primary mb-1">Dev Portal</h1>
-              <p className="text-sm text-muted-foreground">TORQUE development command center</p>
+            <Card className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-cyan-500/5 to-transparent border-primary/20 p-5 sm:p-6 h-full">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(6,182,212,0.08),transparent_60%)]" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                  <span className="text-[10px] sm:text-xs text-primary/60 font-tech uppercase tracking-[0.2em]">GarageBot Platform</span>
+                </div>
+                <h1 className="font-tech text-xl sm:text-2xl lg:text-3xl uppercase text-primary tracking-wider">Dev Portal</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Full-stack development command center</p>
+              </div>
             </Card>
           </motion.div>
           
@@ -1748,98 +1756,115 @@ export default function DevPortal() {
             transition={{ delay: 0.1 }}
             className="md:col-span-4"
           >
-            <Card className="glass-card border-primary/20 p-4 h-full flex items-center justify-center gap-4">
-              <div className="w-16 h-16 relative">
-                <svg className="w-full h-full -rotate-90">
-                  <circle cx="32" cy="32" r="26" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
+            <Card className="relative overflow-hidden glass-card border-primary/20 p-4 sm:p-5 h-full flex items-center justify-center gap-4">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.06),transparent_70%)]" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 relative z-10">
+                <svg viewBox="0 0 64 64" className="w-full h-full -rotate-90">
+                  <defs>
+                    <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="hsl(var(--primary))" />
+                      <stop offset="100%" stopColor="#22d3ee" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="none" stroke="hsl(var(--muted))" strokeWidth="5" opacity="0.2" />
                   <circle 
-                    cx="32" cy="32" r="26" fill="none" stroke="hsl(var(--primary))" strokeWidth="6"
+                    cx="32" cy="32" r="26" fill="none" stroke="url(#progressGrad)" strokeWidth="5"
                     strokeDasharray={`${stats.percentage * 1.63} 163`}
                     strokeLinecap="round"
+                    className="drop-shadow-[0_0_6px_rgba(6,182,212,0.4)]"
                   />
                 </svg>
               </div>
-              <div className="text-center">
-                <p className="text-xl font-bold text-primary">{stats.percentage}%</p>
-                <p className="text-xs text-muted-foreground">{stats.completed}/{stats.total}</p>
+              <div className="text-center relative z-10">
+                <p className="text-2xl sm:text-3xl font-bold text-primary font-tech">{stats.percentage}%</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">{stats.completed}/{stats.total} tasks</p>
               </div>
             </Card>
           </motion.div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="flex w-full overflow-x-auto no-scrollbar mb-4">
-            <TabsTrigger value="command" className="font-tech uppercase text-xs flex-shrink-0">
+          <TabsList className="flex w-full overflow-x-auto no-scrollbar mb-5 sm:mb-6 gap-1 bg-card/50 backdrop-blur-sm border border-white/5 p-1 rounded-xl">
+            <TabsTrigger value="command" className="font-tech uppercase text-[10px] sm:text-xs flex-shrink-0 rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-[0_0_12px_rgba(6,182,212,0.15)] transition-all px-3 sm:px-4 py-2">
               <Command className="w-3 h-3 mr-1" /> Command
             </TabsTrigger>
-            <TabsTrigger value="roadmap" className="font-tech uppercase text-xs flex-shrink-0">
+            <TabsTrigger value="roadmap" className="font-tech uppercase text-[10px] sm:text-xs flex-shrink-0 rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-[0_0_12px_rgba(6,182,212,0.15)] transition-all px-3 sm:px-4 py-2">
               <CheckCheck className="w-3 h-3 mr-1" /> Roadmap
             </TabsTrigger>
-            <TabsTrigger value="releases" className="font-tech uppercase text-xs flex-shrink-0">
+            <TabsTrigger value="releases" className="font-tech uppercase text-[10px] sm:text-xs flex-shrink-0 rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-[0_0_12px_rgba(6,182,212,0.15)] transition-all px-3 sm:px-4 py-2">
               <Tag className="w-3 h-3 mr-1" /> Releases
             </TabsTrigger>
-            <TabsTrigger value="affiliates" className="font-tech uppercase text-xs flex-shrink-0">
+            <TabsTrigger value="affiliates" className="font-tech uppercase text-[10px] sm:text-xs flex-shrink-0 rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-[0_0_12px_rgba(6,182,212,0.15)] transition-all px-3 sm:px-4 py-2">
               <DollarSign className="w-3 h-3 mr-1" /> Affiliates
             </TabsTrigger>
-            <TabsTrigger value="buddy" className="font-tech uppercase text-xs flex-shrink-0">
+            <TabsTrigger value="buddy" className="font-tech uppercase text-[10px] sm:text-xs flex-shrink-0 rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-[0_0_12px_rgba(6,182,212,0.15)] transition-all px-3 sm:px-4 py-2">
               <Bot className="w-3 h-3 mr-1" /> Buddy
             </TabsTrigger>
           </TabsList>
 
           {/* ═══════════════════════ COMMAND CENTER TAB ═══════════════════════ */}
-          <TabsContent value="command" className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <Card className="glass-card border-primary/20 p-3 text-center">
-                <p className="text-xs text-muted-foreground">Tasks</p>
-                <p className="font-tech text-xl text-primary" data-testid="text-total-tasks">{stats.completed}/{stats.total}</p>
-                <p className="text-[10px] text-muted-foreground">{stats.percentage}% complete</p>
-              </Card>
-              <Card className="glass-card border-green-500/20 p-3 text-center">
-                <p className="text-xs text-muted-foreground">Affiliates</p>
-                <p className="font-tech text-xl text-green-400" data-testid="text-connected-affiliates">{connectedAffiliates}</p>
-                <p className="text-[10px] text-muted-foreground">{AFFILIATE_NETWORKS.length} total networks</p>
-              </Card>
-              <Card className="glass-card border-cyan-500/20 p-3 text-center">
-                <p className="text-xs text-muted-foreground">Release</p>
-                <p className="font-tech text-xl text-cyan-400" data-testid="text-latest-version">{latestRelease?.version || "—"}</p>
-                <p className="text-[10px] text-muted-foreground">
-                  {blockchainHealth?.connected ? "Solana Connected" : "Offline"}
-                </p>
-              </Card>
-              <Card className="glass-card border-yellow-500/20 p-3 text-center">
-                <p className="text-xs text-muted-foreground">Pending</p>
-                <p className="font-tech text-xl text-yellow-400">{pendingTasks}</p>
-                <p className="text-[10px] text-muted-foreground">tasks remaining</p>
-              </Card>
-            </div>
+          <TabsContent value="command" className="space-y-8">
+            {/* ─── PREMIUM BENTO STATS HEADER ─── */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+            >
+              {[
+                { label: "Tasks", value: `${stats.completed}/${stats.total}`, sub: `${stats.percentage}% complete`, color: "from-cyan-500/20 to-blue-600/10", border: "border-cyan-500/30", glow: "shadow-[0_0_20px_rgba(6,182,212,0.1)]", accent: "text-cyan-400", testId: "text-total-tasks" },
+                { label: "Affiliates", value: String(connectedAffiliates), sub: `${AFFILIATE_NETWORKS.length} total networks`, color: "from-green-500/20 to-emerald-600/10", border: "border-green-500/30", glow: "shadow-[0_0_20px_rgba(34,197,94,0.1)]", accent: "text-green-400", testId: "text-connected-affiliates" },
+                { label: "Release", value: latestRelease?.version || "—", sub: blockchainHealth?.connected ? "Solana Live" : "Offline", color: "from-violet-500/20 to-purple-600/10", border: "border-violet-500/30", glow: "shadow-[0_0_20px_rgba(139,92,246,0.1)]", accent: "text-violet-400", testId: "text-latest-version" },
+                { label: "Pending", value: String(pendingTasks), sub: "tasks remaining", color: "from-amber-500/20 to-orange-600/10", border: "border-amber-500/30", glow: "shadow-[0_0_20px_rgba(245,158,11,0.1)]", accent: "text-amber-400", testId: "text-pending-tasks" },
+              ].map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.06 }}
+                >
+                  <Card className={`relative overflow-hidden bg-gradient-to-br ${stat.color} ${stat.border} ${stat.glow} backdrop-blur-xl p-4 sm:p-5 text-center hover:scale-[1.02] transition-transform duration-300`}>
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_70%)]" />
+                    <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-widest font-tech relative z-10">{stat.label}</p>
+                    <p className={`font-tech text-2xl sm:text-3xl ${stat.accent} relative z-10 mt-1`} data-testid={stat.testId}>{stat.value}</p>
+                    <p className="text-[10px] sm:text-[11px] text-muted-foreground relative z-10 mt-0.5">{stat.sub}</p>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
 
+            {/* ─── COMMAND CATEGORY SECTIONS ─── */}
             {DEV_COMMAND_CATEGORIES.map((category, catIdx) => {
               const CategoryIcon = category.icon;
               return (
-                <motion.div
+                <motion.section
                   key={category.title}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: catIdx * 0.08 }}
+                  transition={{ delay: 0.15 + catIdx * 0.08, type: "spring", stiffness: 100 }}
+                  className="space-y-4"
                 >
-                  <div className="mb-3">
-                    <div className="flex items-center gap-3 mb-1">
-                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${category.gradient} flex items-center justify-center`}>
-                        <CategoryIcon className="w-4 h-4 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-tech text-sm uppercase tracking-wider">{category.title}</h3>
-                        <p className="text-xs text-muted-foreground">{category.description}</p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center shadow-lg`}>
+                      <CategoryIcon className="w-5 h-5 text-white" />
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-tech text-sm sm:text-base uppercase tracking-wider text-white">{category.title}</h3>
+                      <p className="text-xs text-muted-foreground truncate">{category.description}</p>
+                    </div>
+                    <Badge variant="outline" className="hidden sm:flex text-[10px] border-white/10 text-muted-foreground">
+                      {category.cards.length} tools
+                    </Badge>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {category.cards.map((card) => {
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                    {category.cards.map((card, cardIdx) => {
                       const CardIcon = card.icon;
                       return (
-                        <button
+                        <motion.button
                           key={card.label}
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 + catIdx * 0.08 + cardIdx * 0.04 }}
                           onClick={() => {
                             if (card.tab) {
                               setActiveTab(card.tab);
@@ -1847,73 +1872,103 @@ export default function DevPortal() {
                               navigate(card.href);
                             }
                           }}
-                          className={`group relative overflow-hidden rounded-xl border transition-all duration-300 text-left ${
+                          className={`group relative overflow-hidden rounded-2xl border transition-all duration-500 text-left backdrop-blur-sm ${
                             card.featured 
-                              ? 'border-primary/30 hover:border-primary/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]' 
-                              : 'border-white/10 hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]'
-                          }`}
+                              ? 'border-primary/40 hover:border-primary/70 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] bg-gradient-to-br from-primary/5 to-transparent' 
+                              : 'border-white/10 hover:border-white/25 hover:shadow-[0_0_20px_rgba(255,255,255,0.06)]'
+                          } hover:scale-[1.02] active:scale-[0.98]`}
                           data-testid={`button-dev-cmd-${card.label.toLowerCase().replace(/\s+/g, '-')}`}
                         >
-                          <div className="relative h-28 overflow-hidden">
+                          <div className="relative h-32 sm:h-36 overflow-hidden">
                             <img 
                               src={card.image} 
                               alt={card.label}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                              loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             {card.badge && (
-                              <Badge className="absolute top-2 right-2 bg-primary/90 text-[10px] px-1.5 py-0.5">
+                              <Badge className="absolute top-2.5 right-2.5 bg-primary text-white text-[10px] px-2 py-0.5 shadow-lg shadow-primary/30">
                                 {card.badge}
                               </Badge>
                             )}
-                            <div className="absolute bottom-2 left-3 right-3">
+                            {card.featured && (
+                              <div className="absolute top-2.5 left-2.5 w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                            )}
+                            <div className="absolute bottom-3 left-3 right-3">
                               <div className="flex items-center gap-2">
-                                <CardIcon className="w-4 h-4 text-primary shrink-0" />
-                                <span className="font-tech text-sm text-white truncate">{card.label}</span>
+                                <div className="w-7 h-7 rounded-lg bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/10">
+                                  <CardIcon className="w-3.5 h-3.5 text-primary" />
+                                </div>
+                                <span className="font-tech text-sm sm:text-base text-white drop-shadow-lg">{card.label}</span>
                               </div>
                             </div>
                           </div>
-                          <div className="p-3 bg-card/50 backdrop-blur-sm">
-                            <p className="text-xs text-muted-foreground line-clamp-2">{card.description}</p>
-                            <div className="flex items-center gap-1 mt-2 text-[10px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                              {card.tab ? "Open Tab" : "Go to Page"} <ArrowRight className="w-3 h-3" />
+                          <div className="p-3 sm:p-4 bg-card/60 backdrop-blur-md border-t border-white/5">
+                            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">{card.description}</p>
+                            <div className="flex items-center justify-between mt-2.5">
+                              <span className="text-[10px] text-white/30 font-tech uppercase">
+                                {card.tab ? "Internal" : "Navigate"}
+                              </span>
+                              <div className="flex items-center gap-1 text-[11px] text-primary font-tech opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0">
+                                {card.tab ? "Open" : "Go"} <ArrowRight className="w-3 h-3" />
+                              </div>
                             </div>
                           </div>
-                        </button>
+                        </motion.button>
                       );
                     })}
                   </div>
-                </motion.div>
+                </motion.section>
               );
             })}
 
-            <Card className="glass-card border-primary/20 p-4">
-              <h3 className="font-tech text-sm text-primary mb-3 uppercase">Roadmap Progress</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {CATEGORIES.map(category => {
-                  const catTasks = getTasksByCategory(category.id);
-                  const catCompleted = catTasks.filter(t => t.status === 'completed').length;
-                  const catPct = catTasks.length > 0 ? Math.round((catCompleted / catTasks.length) * 100) : 0;
-                  const IconComponent = category.icon;
-                  return (
-                    <div key={category.id} className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
-                      <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center ${category.color}`}>
-                        <IconComponent className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium truncate">{category.name}</p>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-primary transition-all duration-300" style={{ width: `${catPct}%` }} />
+            {/* ─── ROADMAP PROGRESS BENTO ─── */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-transparent to-cyan-500/5 border-primary/20 backdrop-blur-xl p-5 sm:p-6">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(6,182,212,0.08),transparent_60%)]" />
+                <div className="flex items-center gap-3 mb-4 relative z-10">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/30 to-cyan-500/20 flex items-center justify-center">
+                    <BarChart3 className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="font-tech text-sm sm:text-base text-primary uppercase tracking-wider">Roadmap Progress</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 relative z-10">
+                  {CATEGORIES.map(category => {
+                    const catTasks = getTasksByCategory(category.id);
+                    const catCompleted = catTasks.filter(t => t.status === 'completed').length;
+                    const catPct = catTasks.length > 0 ? Math.round((catCompleted / catTasks.length) * 100) : 0;
+                    const IconComponent = category.icon;
+                    return (
+                      <div key={category.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-colors">
+                        <div className={`w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center ${category.color} shrink-0`}>
+                          <IconComponent className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{category.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                              <motion.div 
+                                className="h-full bg-gradient-to-r from-primary to-cyan-400 rounded-full" 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${catPct}%` }}
+                                transition={{ duration: 1, delay: 0.5 }}
+                              />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground font-tech">{catCompleted}/{catTasks.length}</span>
                           </div>
-                          <span className="text-[10px] text-muted-foreground">{catCompleted}/{catTasks.length}</span>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
+                    );
+                  })}
+                </div>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           {/* ═══════════════════════ ROADMAP TAB ═══════════════════════ */}
