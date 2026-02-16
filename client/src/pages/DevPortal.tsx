@@ -5,13 +5,12 @@ import {
   Lock, CheckCircle2, Circle, Plus, ExternalLink, Trash2, 
   DollarSign, Link2, Settings, Zap, Users, Shield, Clock,
   ChevronDown, ChevronRight, Edit2, Save, X, AlertTriangle,
-  BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard, ClipboardList,
+  BookOpen, ArrowRight, CheckCheck, Timer, Globe, CreditCard,
   Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch, Blocks, Car,
-  MessageCircle, Send, Bot, Loader2, BarChart3, Megaphone, Search, Filter
+  MessageCircle, Send, Bot, Loader2, Megaphone, Search, Filter,
+  LayoutDashboard, Activity
 } from "lucide-react";
 import Nav from "@/components/Nav";
-import { FeatureInventory } from "@/components/FeatureInventory";
-import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -311,13 +310,13 @@ GarageBot.io is a comprehensive auto parts search aggregator that unifies invent
 **Key Features:**
 • VIN-based vehicle identification and part matching
 • AI-powered repair guides and part recommendations
-• "Mechanics Garage" portal for professional shops
+• "TORQUE" portal for professional shops
 • Coverage across cars, trucks, boats, ATVs, motorcycles, RVs, and more
 
 **Partnership Interests:**
 1. **Affiliate/Referral Program** - Drive qualified buyers to O'Reilly locations and online store
 2. **Local Pickup Integration** - Highlight O'Reilly stores for same-day pickup options
-3. **Commercial Account** - Access to B2B pricing for our Mechanics Garage portal users
+3. **Commercial Account** - Access to B2B pricing for our TORQUE portal users
 4. **Sponsorship** - Featured placement in our trusted retailers section
 
 Our users are actively searching for parts with purchase intent - making them highly valuable traffic for O'Reilly.
@@ -373,7 +372,7 @@ Your marketplace represents the gold standard for recycled/used auto parts - a c
 • Unified search across 68+ auto parts retailers (new parts focus currently)
 • VIN decoding and vehicle-specific part matching
 • AI-powered recommendations and DIY repair guides
-• "Mechanics Garage" portal for professional shops
+• "TORQUE" portal for professional shops
 • Covers all vehicle types: cars, trucks, classics, exotics, and more
 
 **Partnership Interests:**
@@ -431,7 +430,7 @@ I'm Jason, founder of GarageBot.io, a comprehensive auto parts search aggregator
 • Search aggregator covering 68+ retailers — auto, powersports, marine, diesel, RV, small engine, and hobby
 • AI-powered Buddy assistant for part recommendations and DIY repair guides
 • VIN decoding and vehicle-specific part matching
-• "Mechanics Garage" portal for professional shops with repair orders, estimates, scheduling
+• "TORQUE" portal for professional shops with repair orders, estimates, scheduling
 • Growing user base actively searching for parts with purchase intent
 
 **Why OEM Parts Matter:**
@@ -440,7 +439,7 @@ Our users frequently search for genuine OEM parts, especially for newer vehicles
 **Partnership Proposal:**
 1. **Affiliate/Referral Program** — Drive qualified buyers to your store and earn commission on sales
 2. **Search Integration** — Feature your OEM catalog in our vehicle-specific search results
-3. **Mechanics Garage B2B** — Connect professional shops to your ordering platform
+3. **TORQUE B2B** — Connect professional shops to your ordering platform
 4. **Content Partnership** — Include your parts in our AI-generated DIY repair guides
 
 Our platform drives high-intent traffic — users are actively searching for specific parts for specific vehicles. This makes our referrals highly valuable.
@@ -1025,6 +1024,7 @@ const AFFILIATE_OUTREACH_VENDORS = [
   },
 ];
 
+
 const DEV_PIN = "0424";
 
 interface DevTask {
@@ -1050,7 +1050,6 @@ const CATEGORIES = [
   { id: "marketing", name: "Marketing & Monetization", icon: DollarSign, color: "text-pink-400" },
   { id: "oem_distributors", name: "OEM Parts Distributors", icon: Car, color: "text-emerald-400" },
   { id: "partnerships", name: "Partnerships", icon: Users, color: "text-purple-400" },
-  { id: "legal", name: "Legal & Compliance", icon: Shield, color: "text-red-400" },
   { id: "infrastructure", name: "Infrastructure", icon: Settings, color: "text-cyan-400" },
 ];
 
@@ -1058,23 +1057,18 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "affiliates", title: "AutoZone Affiliate Program", description: "Sign up for AutoZone affiliate program through CJ Affiliate", priority: "high", status: "pending", dueDate: null, link: "https://www.cj.com", notes: null, sortOrder: 1 },
   { category: "affiliates", title: "O'Reilly Auto Parts Affiliate", description: "Apply for O'Reilly affiliate partnership", priority: "high", status: "pending", dueDate: null, link: "https://www.oreillyauto.com", notes: null, sortOrder: 2 },
   { category: "affiliates", title: "RockAuto Affiliate Program", description: "Join RockAuto affiliate network", priority: "high", status: "pending", dueDate: null, link: "https://www.rockauto.com", notes: null, sortOrder: 3 },
-  { category: "affiliates", title: "Amazon Associates - Automotive", description: "Set up Amazon Associates for automotive category", priority: "high", status: "pending", dueDate: null, link: "https://affiliate-program.amazon.com", notes: null, sortOrder: 4 },
   { category: "affiliates", title: "Advance Auto Parts Affiliate", description: "Apply for Advance Auto affiliate program", priority: "medium", status: "pending", dueDate: null, link: "https://www.advanceautoparts.com", notes: null, sortOrder: 5 },
   { category: "affiliates", title: "NAPA Online Affiliate", description: "Join NAPA affiliate network", priority: "medium", status: "pending", dueDate: null, link: "https://www.napaonline.com", notes: null, sortOrder: 6 },
   { category: "affiliates", title: "Summit Racing Affiliate", description: "Apply for Summit Racing affiliate partnership", priority: "medium", status: "pending", dueDate: null, link: "https://www.summitracing.com", notes: null, sortOrder: 7 },
   { category: "affiliates", title: "Dennis Kirk Affiliate", description: "Powersports affiliate program", priority: "medium", status: "pending", dueDate: null, link: "https://www.denniskirk.com", notes: null, sortOrder: 8 },
   { category: "affiliates", title: "West Marine Affiliate", description: "Marine parts affiliate partnership", priority: "medium", status: "pending", dueDate: null, link: "https://www.westmarine.com", notes: null, sortOrder: 9 },
-  { category: "affiliates", title: "eBay Partner Network", description: "Set up eBay Motors affiliate links", priority: "medium", status: "pending", dueDate: null, link: "https://partnernetwork.ebay.com", notes: null, sortOrder: 10 },
   { category: "affiliates", title: "CJ: Add Horizon Hobby Merchant", description: "Log into CJ dashboard → Search Advertisers → 'Horizon Hobby' → Apply to their program", priority: "high", status: "pending", dueDate: null, link: "https://members.cj.com", notes: "CJ account already connected - just need to add this merchant", sortOrder: 11 },
   { category: "affiliates", title: "ShareASale: Sign Up & Add Hobby Merchants", description: "Sign up for ShareASale network, then apply to Tower Hobbies, GetFPV, and Redcat Racing", priority: "high", status: "pending", dueDate: null, link: "https://www.shareasale.com/info/affiliates/", notes: "3 hobby merchants to add once network is approved", sortOrder: 12 },
   { category: "affiliates", title: "AvantLink: Sign Up & Add Hobby Merchants", description: "Sign up for AvantLink network, then apply to AMain Hobbies and RC Planet", priority: "high", status: "pending", dueDate: null, link: "https://www.avantlink.com/affiliates/", notes: "2 hobby merchants to add once network is approved", sortOrder: 13 },
   { category: "affiliates", title: "HobbyKing Direct Affiliate", description: "Apply for HobbyKing's direct affiliate program - email or use website form", priority: "medium", status: "pending", dueDate: null, link: "https://www.hobbyking.com/en_us/affiliate-program", notes: "Direct program - 5-8% commission, 30-day cookie", sortOrder: 14 },
   { category: "affiliates", title: "BETAFPV Direct Affiliate", description: "Apply for BETAFPV's affiliate/ambassador program - email marketing team", priority: "medium", status: "pending", dueDate: null, link: "https://betafpv.com/pages/affiliate-program", notes: "Direct program - 5-10% commission on FPV products", sortOrder: 15 },
-  { category: "apis", title: "NHTSA VIN Decoder API", description: "Integrate NHTSA VIN decoding for vehicle identification", priority: "high", status: "pending", dueDate: null, link: "https://vpic.nhtsa.dot.gov/api/", notes: null, sortOrder: 1 },
-  { category: "apis", title: "NHTSA Recalls API", description: "Set up recall alerts using NHTSA recall database", priority: "high", status: "pending", dueDate: null, link: "https://www.nhtsa.gov/recalls", notes: null, sortOrder: 2 },
   { category: "apis", title: "OpenAI Vision API", description: "Enable photo-based part identification", priority: "high", status: "pending", dueDate: null, link: "https://platform.openai.com", notes: null, sortOrder: 3 },
   { category: "apis", title: "Web Speech API", description: "Implement voice search with Hey Buddy", priority: "medium", status: "pending", dueDate: null, link: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API", notes: null, sortOrder: 4 },
-  { category: "apis", title: "Stripe Subscriptions", description: "Set up Pro tier subscription billing", priority: "high", status: "pending", dueDate: null, link: "https://stripe.com/docs/billing/subscriptions", notes: null, sortOrder: 5 },
   { category: "apis", title: "Twilio SMS API", description: "Enable SMS notifications and reminders", priority: "medium", status: "pending", dueDate: null, link: "https://www.twilio.com", notes: null, sortOrder: 6 },
   { category: "features", title: "VIN Scanner Camera", description: "Build camera-based VIN scanning feature", priority: "high", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 1 },
   { category: "features", title: "Photo Part Search", description: "Snap photo → AI identifies part", priority: "high", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 2 },
@@ -1084,34 +1078,24 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "features", title: "Collaborative Carts", description: "Family can add to shared carts", priority: "low", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 6 },
   { category: "features", title: "PWA Offline Mode", description: "Works without internet in garage", priority: "medium", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 7 },
   { category: "features", title: "Order Tracking", description: "Track parts shipments", priority: "low", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 8 },
-  { category: "features", title: "Member Referral Program", description: "Unique referral codes/links for each user, track sign-ups", priority: "high", status: "pending", dueDate: null, link: null, notes: "Phase 2 feature", sortOrder: 9 },
-  { category: "features", title: "Referral Points System", description: "100 pts for sign-up, 500 pts when friend goes Pro", priority: "high", status: "pending", dueDate: null, link: null, notes: "Points balance in user profile", sortOrder: 10 },
-  { category: "features", title: "Points Redemption Flow", description: "500 pts = 1 month Pro, 1000 pts = 1 year, 2500 pts = Lifetime", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Auto-extend Pro subscription time", sortOrder: 11 },
-  { category: "features", title: "Invite Friends UI", description: "Show referral link, stats, and points balance in profile", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Copy-to-clipboard + share buttons", sortOrder: 12 },
   { category: "partnerships", title: "Insurance Company Partnerships", description: "Set up referral agreements with auto insurers", priority: "medium", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 1 },
   { category: "partnerships", title: "Mechanic Shop Network", description: "Recruit shops to Shop Portal", priority: "medium", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 2 },
   { category: "partnerships", title: "Extended Warranty Partners", description: "Referral deals with warranty providers", priority: "low", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 3 },
-  { category: "legal", title: "Terms of Service", description: "Draft and publish ToS", priority: "high", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 1 },
-  { category: "legal", title: "Affiliate Disclosure", description: "FTC-compliant affiliate disclosures", priority: "high", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 2 },
-  { category: "legal", title: "DMCA Policy", description: "Copyright protection policy", priority: "medium", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 3 },
   { category: "infrastructure", title: "Domain: garagebot.io", description: "Register and configure primary domain", priority: "high", status: "pending", dueDate: null, link: "https://domains.google.com", notes: null, sortOrder: 1 },
   { category: "infrastructure", title: "Domain: garagebot.net", description: "Set up redirect domain", priority: "medium", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 2 },
   { category: "infrastructure", title: "SSL Certificates", description: "Ensure SSL on all domains", priority: "high", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 3 },
   { category: "infrastructure", title: "CDN Setup", description: "Configure CDN for assets", priority: "low", status: "pending", dueDate: null, link: null, notes: null, sortOrder: 4 },
   
-  // SHOP SOFTWARE OAUTH INTEGRATIONS - Accounting
   { category: "shop_integrations", title: "QuickBooks Online OAuth", description: "OAuth 2.0 - Sync invoices, payments, financial reports. Apply at developer.intuit.com", priority: "high", status: "pending", dueDate: null, link: "https://developer.intuit.com", notes: "OAuth 2.0, access token expires 1hr, refresh 100 days", sortOrder: 1 },
   { category: "shop_integrations", title: "FreshBooks OAuth", description: "OAuth 2.0 - Time tracking, invoicing, expense management", priority: "medium", status: "pending", dueDate: null, link: "https://www.freshbooks.com/api", notes: "OAuth 2.0 Authorization Code flow", sortOrder: 2 },
   { category: "shop_integrations", title: "Xero OAuth", description: "OAuth 2.0 - Cloud accounting with powerful reporting", priority: "medium", status: "pending", dueDate: null, link: "https://developer.xero.com", notes: "OAuth 2.0, PKCE flow recommended", sortOrder: 3 },
   { category: "shop_integrations", title: "Wave Accounting API", description: "Free accounting software API integration", priority: "low", status: "pending", dueDate: null, link: "https://developer.waveapps.com", notes: "GraphQL API", sortOrder: 4 },
   
-  // SHOP SOFTWARE OAUTH - Workforce & Payroll
   { category: "shop_integrations", title: "UKG Pro OAuth", description: "OAuth 2.0 - HR, payroll, talent management. Apply at developer.ukg.com", priority: "high", status: "pending", dueDate: null, link: "https://developer.ukg.com", notes: "OAuth 2.0 client credentials, token ~30min", sortOrder: 5 },
   { category: "shop_integrations", title: "ADP OAuth", description: "OAuth 2.0 - Payroll, HR, workforce management", priority: "high", status: "pending", dueDate: null, link: "https://developers.adp.com", notes: "OAuth 2.0, requires partner approval", sortOrder: 6 },
   { category: "shop_integrations", title: "Gusto OAuth", description: "OAuth 2.0 - Modern payroll and benefits for small business", priority: "medium", status: "pending", dueDate: null, link: "https://dev.gusto.com", notes: "OAuth 2.0, REST API", sortOrder: 7 },
   { category: "shop_integrations", title: "Paychex API", description: "Payroll and HR services integration", priority: "medium", status: "pending", dueDate: null, link: "https://developer.paychex.com", notes: "REST API with OAuth", sortOrder: 8 },
   
-  // SHOP SOFTWARE - Scheduling & Communication
   { category: "shop_integrations", title: "Google Calendar OAuth", description: "OAuth 2.0 - Sync appointments with Google accounts", priority: "high", status: "pending", dueDate: null, link: "https://console.cloud.google.com", notes: "OAuth 2.0, calendar.events scope", sortOrder: 9 },
   { category: "shop_integrations", title: "Google Workspace OAuth", description: "OAuth 2.0 - Gmail, Drive, Sheets integration", priority: "medium", status: "pending", dueDate: null, link: "https://console.cloud.google.com", notes: "OAuth 2.0, multiple scopes available", sortOrder: 10 },
   { category: "shop_integrations", title: "Microsoft 365 OAuth", description: "OAuth 2.0 - Outlook calendar and email sync", priority: "medium", status: "pending", dueDate: null, link: "https://portal.azure.com", notes: "Azure AD OAuth 2.0", sortOrder: 11 },
@@ -1119,21 +1103,17 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "shop_integrations", title: "SendGrid API", description: "API Key - Email notifications and invoices", priority: "medium", status: "pending", dueDate: null, link: "https://app.sendgrid.com", notes: "API Key auth, 69 char keys", sortOrder: 13 },
   { category: "shop_integrations", title: "Mailchimp OAuth", description: "OAuth 2.0 - Email marketing and customer outreach", priority: "low", status: "pending", dueDate: null, link: "https://mailchimp.com/developer", notes: "OAuth 2.0, tokens never expire", sortOrder: 14 },
   
-  // SHOP SOFTWARE - Vehicle Data
   { category: "shop_integrations", title: "CARFAX API", description: "Vehicle history report integration", priority: "high", status: "pending", dueDate: null, link: "https://www.carfaxforlife.com", notes: "Contact for partnership", sortOrder: 15 },
   { category: "shop_integrations", title: "AutoCheck API", description: "Vehicle history from Experian", priority: "medium", status: "pending", dueDate: null, link: "https://www.autocheck.com", notes: "Contact for API access", sortOrder: 16 },
   { category: "shop_integrations", title: "Smartcar OAuth", description: "OAuth 2.0 - Connected vehicle data from 30+ brands", priority: "medium", status: "pending", dueDate: null, link: "https://smartcar.com/developers", notes: "OAuth 2.0, real-time vehicle data", sortOrder: 17 },
   
-  // SHOP SOFTWARE - Payment
   { category: "shop_integrations", title: "Square OAuth", description: "OAuth 2.0 - Payment processing and POS", priority: "medium", status: "pending", dueDate: null, link: "https://developer.squareup.com", notes: "OAuth 2.0 for Connect API", sortOrder: 18 },
   { category: "shop_integrations", title: "PayPal OAuth", description: "OAuth 2.0 - Alternative payment option", priority: "low", status: "pending", dueDate: null, link: "https://developer.paypal.com", notes: "OAuth 2.0 REST API", sortOrder: 19 },
   
-  // SHOP SOFTWARE - Competitor Data Import
   { category: "shop_integrations", title: "Shopmonkey API", description: "API/OAuth - Import customer data from Shopmonkey shops", priority: "medium", status: "pending", dueDate: null, link: "https://shopmonkey.dev", notes: "REST API, Bearer token auth", sortOrder: 20 },
   { category: "shop_integrations", title: "Tekmetric API", description: "REST API - Import from Tekmetric shops", priority: "medium", status: "pending", dueDate: null, link: "https://api.tekmetric.com", notes: "REST API with OAuth", sortOrder: 21 },
   { category: "shop_integrations", title: "Mitchell 1 API", description: "Shop management data import", priority: "low", status: "pending", dueDate: null, link: "https://mitchell1.com", notes: "Contact for API access", sortOrder: 22 },
   
-  // PARTS ORDERING INTEGRATIONS
   { category: "parts_ordering", title: "PartsTech API (FREE)", description: "FREE API - Search 20,000+ suppliers, 7M+ parts, VIN lookup", priority: "high", status: "pending", dueDate: null, link: "https://partstech.com", notes: "FREE - Username + API key auth", sortOrder: 1 },
   { category: "parts_ordering", title: "Nexpart/WHI Solutions API", description: "43,000+ seller locations, multi-seller stock check", priority: "high", status: "pending", dueDate: null, link: "https://whisolutions.com/products/nexpart-ecommerce-solution", notes: "SDK + REST API, contact WHI", sortOrder: 2 },
   { category: "parts_ordering", title: "WorldPac SpeedDIAL API", description: "OEM and import parts distributor", priority: "medium", status: "pending", dueDate: null, link: "https://worldpac.com", notes: "Contact for API access", sortOrder: 3 },
@@ -1143,17 +1123,14 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "parts_ordering", title: "Advance Pro Commercial", description: "Commercial parts ordering for shops", priority: "medium", status: "pending", dueDate: null, link: "https://shop.advanceautoparts.com", notes: "Contact for pro account API", sortOrder: 7 },
   { category: "parts_ordering", title: "NAPA TRACS Integration", description: "NAPA commercial shop ordering", priority: "medium", status: "pending", dueDate: null, link: "https://napatracs.com", notes: "NAPA commercial accounts", sortOrder: 8 },
   
-  // TOOL ORDERING (B2B/EDI)
   { category: "parts_ordering", title: "Grainger API", description: "Industrial tool and supply ordering", priority: "medium", status: "pending", dueDate: null, link: "https://www.grainger.com", notes: "B2B API available", sortOrder: 9 },
   { category: "parts_ordering", title: "MSC Industrial API", description: "Industrial tools and metalworking", priority: "medium", status: "pending", dueDate: null, link: "https://www.mscdirect.com", notes: "EDI/API for B2B", sortOrder: 10 },
   { category: "parts_ordering", title: "Fastenal B2B Integration", description: "Industrial and construction supplies", priority: "low", status: "pending", dueDate: null, link: "https://www.fastenal.com", notes: "B2B integration options", sortOrder: 11 },
   { category: "parts_ordering", title: "Snap-on B2B Portal", description: "Tool ordering for shops (EDI required)", priority: "low", status: "pending", dueDate: null, link: "https://b2b.snapon.com", notes: "Contact order@snapon.com for B2B", sortOrder: 12 },
   { category: "parts_ordering", title: "Matco Tools EDI", description: "EDI integration via B2BGateway", priority: "low", status: "pending", dueDate: null, link: "https://www.matcotools.com", notes: "EDI via B2BGateway.net", sortOrder: 13 },
   
-  // FORTELLIS MARKETPLACE
   { category: "parts_ordering", title: "Fortellis Marketplace", description: "CDK Global automotive API marketplace", priority: "medium", status: "pending", dueDate: null, link: "https://fortellis.io", notes: "Automotive API ecosystem", sortOrder: 14 },
 
-  // OEM PARTS DISTRIBUTORS - Automotive (Affiliate Programs)
   { category: "oem_distributors", title: "AutoNation Parts — Affiliate (CJ)", description: "Genuine OEM from all major brands + aftermarket (Bosch, Denso). Apply via CJ Affiliate.", priority: "high", status: "pending", dueDate: null, link: "https://www.autonationparts.com/join-the-autonation-parts-affiliate-program", notes: "Also via CJ: signup.cj.com/member/signup/publisher/?cid=7394161. Nation's largest auto retailer.", sortOrder: 1 },
   { category: "oem_distributors", title: "Parts Geek — Affiliate (FlexOffers)", description: "10M+ OEM & aftermarket parts, up to 80% off list. Apply via FlexOffers.", priority: "high", status: "pending", dueDate: null, link: "https://www.partsgeek.com/affliates.html", notes: "FlexOffers signup: publisherpro.flexoffers.com. $0.32/purchase or 5-10%. 7-day cookie. 600+ brands.", sortOrder: 2 },
   { category: "oem_distributors", title: "OEM Parts Online — Direct Outreach", description: "Multi-brand OEM catalogs, up to 35% off MSRP. No public affiliate — contact directly.", priority: "medium", status: "pending", dueDate: null, link: "https://oempartsonline.com", notes: "Check footer for contact/partnership page. Free shipping US, 2-3 day delivery.", sortOrder: 3 },
@@ -1161,7 +1138,6 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "oem_distributors", title: "Detroit Axle — Amazon Associates", description: "OE remanufactured + new aftermarket — suspension, steering, brakes. 30+ years, 180K sq ft warehouse.", priority: "medium", status: "pending", dueDate: null, link: "https://www.detroitaxle.com", notes: "Sells via Amazon & eBay. Promote through Amazon Associates (already connected) or eBay Partner Network.", sortOrder: 5 },
   { category: "oem_distributors", title: "OEM Surplus Depot — Direct Outreach", description: "Nissan, Toyota, Lexus, Infiniti, Kia, Hyundai, Mazda, Honda surplus. 40 years in business.", priority: "medium", status: "pending", dueDate: null, link: "https://oemsurplus.parts", notes: "Nationwide via UPS. Contact for referral/affiliate partnership.", sortOrder: 6 },
 
-  // OEM PARTS DISTRIBUTORS - Automotive (Wholesale/Partnership)
   { category: "oem_distributors", title: "Keystone Automotive — Wholesale Dealer", description: "Major national distributor (LKQ Corp). 185K+ SKUs, 800+ suppliers, 8 warehouses.", priority: "high", status: "pending", dueDate: null, link: "https://www.keystoneautomotive.com/newcustomers", notes: "Apply online. Phone: 1-800-521-9999. Email: customercare@ekeystone.com. Next-day delivery 48 states.", sortOrder: 7 },
   { category: "oem_distributors", title: "Factory Motor Parts (FMP) — Wholesale", description: "OEM + aftermarket, import parts, virtual inventory, GPS tracking. 300+ locations nationwide.", priority: "high", status: "pending", dueDate: null, link: "https://www.factorymotorparts.com/contact-us", notes: "Call 800-278-6394, select 'New Customer' on contact form. Since 1945, family-owned.", sortOrder: 8 },
   { category: "oem_distributors", title: "APW (Auto Parts Warehouse) — Wholesale", description: "Largest independent distributor. 55+ years, Pronto Network member, vast inventory.", priority: "medium", status: "pending", dueDate: null, link: "https://apwks.com", notes: "Contact via website for dealer/wholesale inquiries.", sortOrder: 9 },
@@ -1169,33 +1145,27 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "oem_distributors", title: "Bam Wholesale Parts — Wholesale", description: "OEM parts from Brunswick Auto Mart. Nationwide delivery.", priority: "low", status: "pending", dueDate: null, link: "https://bamwholesaleparts.com", notes: "Direct wholesale ordering available on site.", sortOrder: 11 },
   { category: "oem_distributors", title: "Cochran Wholesale Parts — Regional Wholesale", description: "OEM at aftermarket prices. Fleet of 20 delivery vehicles. PA/OH region.", priority: "low", status: "pending", dueDate: null, link: "https://www.cochran.com/wholesale-parts-dev/", notes: "Will beat competitor pricing. Regional coverage PA/OH.", sortOrder: 12 },
 
-  // OEM PARTS DISTRIBUTORS - Data/Catalog API Providers
   { category: "oem_distributors", title: "OEC (OE Connection) — Catalog API", description: "Leading OEM parts catalog software. Connects dealers, distributors, repair shops, insurers.", priority: "high", status: "pending", dueDate: null, link: "https://oeconnection.com", notes: "Industry leader for OEM catalog data. Contact for API/partnership.", sortOrder: 13 },
   { category: "oem_distributors", title: "Epicor Parts Portal — Distributor API", description: "API access to 19,000+ aftermarket distributors. Lookup, ordering, purchasing.", priority: "high", status: "pending", dueDate: null, link: "https://www.epicor.com/en-us/products/supply-chain-management-scm/parts-portal/", notes: "Enterprise-level integration. Contact sales for API access.", sortOrder: 14 },
   { category: "oem_distributors", title: "SEMA Data Co-op — ACES/PIES Data", description: "Industry standard for parts catalog data. OEM-to-aftermarket cross-referencing.", priority: "medium", status: "pending", dueDate: null, link: "https://www.semadatacoop.org", notes: "ACES (fitment) + PIES (product info) standards. Key for part number cross-referencing.", sortOrder: 15 },
   { category: "oem_distributors", title: "TecDoc API — European Catalog", description: "European parts catalog standard. Multi-language, region-specific data.", priority: "low", status: "pending", dueDate: null, link: "https://www.tecalliance.net", notes: "Useful if expanding to European markets.", sortOrder: 16 },
 
-  // OEM PARTS DISTRIBUTORS - Powersports
   { category: "oem_distributors", title: "Western Power Sports (WPS) — Powersports Wholesale", description: "Honda, Kawasaki, Yamaha, Suzuki, KTM, Polaris, Can-Am, Arctic Cat, Sea-Doo. 120K+ parts.", priority: "high", status: "pending", dueDate: null, link: "https://www.wps.com", notes: "5 regional warehouses. HardDrive Parts = their V-Twin division. Contact for dealer program.", sortOrder: 17 },
   { category: "oem_distributors", title: "Parts Unlimited — Powersports Wholesale", description: "World's largest powersports aftermarket distributor. 75K+ parts, all major brands.", priority: "high", status: "pending", dueDate: null, link: "https://www.partsunlimited.com", notes: "Contact for dealer/partner program.", sortOrder: 18 },
   { category: "oem_distributors", title: "Drag Specialties — Harley/V-Twin Wholesale", description: "Leading Harley-Davidson and V-Twin aftermarket. 40+ years in business.", priority: "medium", status: "pending", dueDate: null, link: "https://www.dragspecialties.com", notes: "Contact for dealer program.", sortOrder: 19 },
   { category: "oem_distributors", title: "Automatic Distributors — Powersports", description: "350+ brands, 75K+ products, 7 catalogs. National wholesale distribution.", priority: "medium", status: "pending", dueDate: null, link: "https://www.autodist.com", notes: "Contact for dealer/wholesale program.", sortOrder: 20 },
   { category: "oem_distributors", title: "Dealer Cost Parts — OEM Powersports", description: "OEM parts: Arctic Cat, Can-Am, Honda, Indian, Kawasaki, KTM, Polaris, Sea-Doo, Suzuki, Yamaha.", priority: "medium", status: "pending", dueDate: null, link: "https://www.dealercostparts.com", notes: "OEM parts & accessories at dealer cost. Contact for partnership.", sortOrder: 21 },
 
-  // OEM PARTS DISTRIBUTORS - Marine
   { category: "oem_distributors", title: "Wholesale Marine — Marine Affiliate (AvantLink)", description: "OEM boat engine parts: Mercury, Yamaha, Honda Marine. Has affiliate program.", priority: "high", status: "pending", dueDate: null, link: "https://www.wholesalemarine.com/affiliate-program/", notes: "Via AvantLink. 2-5% commission, 14-day cookie, $200+ avg order. Sign up through AvantLink network.", sortOrder: 22 },
 
-  // OEM PARTS DISTRIBUTORS - Small Engine / Outdoor Power
   { category: "oem_distributors", title: "Medart Engine — Small Engine Wholesale", description: "80+ manufacturers, 50K+ part numbers. Outdoor power equipment, rental, industrial.", priority: "medium", status: "pending", dueDate: null, link: "https://www.medartengine.com", notes: "5 distribution locations. Contact for dealer/wholesale program.", sortOrder: 23 },
   { category: "oem_distributors", title: "The OEM Parts Store — Small Engine", description: "Briggs & Stratton, Kohler, Tecumseh, Honda, Kawasaki. 1M+ parts. Wholesale pricing available.", priority: "medium", status: "pending", dueDate: null, link: "https://www.theoempartsstore.com", notes: "Wholesale/dealer pricing available for shops. Contact for partner program.", sortOrder: 24 },
   { category: "oem_distributors", title: "Small Engine Suppliers — Engines & Parts", description: "Complete engines + parts: Briggs, Honda, Kohler. Online source.", priority: "low", status: "pending", dueDate: null, link: "https://www.smallenginesuppliers.com", notes: "Contact for referral/affiliate partnership inquiry.", sortOrder: 25 },
 
-  // OEM PARTS DISTRIBUTORS - Affiliate Networks for OEM access
   { category: "oem_distributors", title: "FlexOffers — Join Network for OEM Programs", description: "Access Parts Geek, NAPA, SimpleTire, and more OEM/aftermarket programs.", priority: "high", status: "pending", dueDate: null, link: "https://www.flexoffers.com/affiliate-programs/automotive/auto-parts-and-accessories/", notes: "Free to join. Multiple auto parts programs in one place.", sortOrder: 26 },
   { category: "oem_distributors", title: "Rakuten Advertising — Join for Advance Auto", description: "Advance Auto Parts runs their affiliate through Rakuten. Apply to network first.", priority: "medium", status: "pending", dueDate: null, link: "https://rakutenadvertising.com", notes: "Apply to Rakuten network, then search for Advance Auto Parts program.", sortOrder: 27 },
   { category: "oem_distributors", title: "Impact — Join for AutoZone & Others", description: "AutoZone, Camping World, Bass Pro run through Impact. Apply as partner.", priority: "medium", status: "pending", dueDate: null, link: "https://impact.com/partners/", notes: "Apply to Impact network, then search automotive brands. Some invite-only.", sortOrder: 28 },
 
-  // MARKETING & MONETIZATION
   { category: "marketing", title: "Google AdSense Setup", description: "Sign up for Google AdSense to monetize informational pages (NOT search results). Get your publisher ID (ca-pub-XXXXX)", priority: "high", status: "pending", dueDate: null, link: "https://adsense.google.com/start/", notes: "Only on informational pages (DIY guides, about, blog). Avoid on search results to keep UX clean", sortOrder: 1 },
   { category: "marketing", title: "Buffer Account Setup", description: "Create Buffer account for social media scheduling. Connect Twitter/X, Facebook, Instagram, LinkedIn", priority: "medium", status: "pending", dueDate: null, link: "https://buffer.com", notes: "Free tier: 3 channels, 10 posts/channel. Pro $6/mo for more", sortOrder: 2 },
   { category: "marketing", title: "Hypefury Account Setup", description: "Twitter/X automation and thread scheduling. Great for automotive tips content", priority: "medium", status: "pending", dueDate: null, link: "https://hypefury.com", notes: "Auto-retweet best content, engagement features", sortOrder: 3 },
@@ -1204,14 +1174,12 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "marketing", title: "Email Marketing Setup", description: "Set up email list for price drop alerts, weekly deals digest, maintenance reminders", priority: "medium", status: "pending", dueDate: null, link: "https://www.mailerlite.com", notes: "Free up to 1000 subscribers", sortOrder: 6 },
   { category: "marketing", title: "Google Analytics 4", description: "Set up GA4 for traffic and conversion tracking", priority: "high", status: "pending", dueDate: null, link: "https://analytics.google.com", notes: "Track: searches, affiliate clicks, conversions, Buddy usage", sortOrder: 7 },
 
-  // X/TWITTER & SOCIAL MEDIA
   { category: "marketing", title: "X/Twitter API Credentials", description: "Add Twitter API keys to secrets so auto-posting connector goes live. Social connector is coded — just needs credentials", priority: "high", status: "pending", dueDate: null, link: "https://developer.x.com/en/portal/dashboard", notes: "Need: API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET", sortOrder: 8 },
   { category: "marketing", title: "Meta ads_management Permission", description: "Request ads_management permission in Meta App Review so Meta Ads campaigns can go live", priority: "high", status: "pending", dueDate: null, link: "https://developers.facebook.com/apps", notes: "Token has pages_manage_posts but needs ads_management added", sortOrder: 9 },
   { category: "marketing", title: "Google AdSense Verification", description: "Verify domain in AdSense console and configure ad units for blog, DIY guides, Break Room pages", priority: "high", status: "pending", dueDate: null, link: "https://adsense.google.com", notes: "Meta tag is in place — just needs domain verification + ad unit setup", sortOrder: 10 },
   { category: "marketing", title: "Newsletter Email System", description: "Build subscriber management, campaign creation, and sending via Resend or MailerLite", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Page exists in Command Center — needs full email campaign backend", sortOrder: 11 },
   { category: "marketing", title: "Sponsored Products Feature", description: "Build featured placements system — vendors can pay to promote listings in search results", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Revenue stream: promoted listings with CPC/CPM model", sortOrder: 12 },
 
-  // REVENUE VERIFICATION
   { category: "features", title: "Stripe Checkout End-to-End Test", description: "Test full checkout flow with live Stripe keys — Pro subscription, ad-free tier, cart purchases", priority: "high", status: "pending", dueDate: null, link: "https://dashboard.stripe.com", notes: "Switch from test to live keys, verify webhooks", sortOrder: 13 },
   { category: "features", title: "Affiliate Click Tracking Verification", description: "Verify that clicks through to Amazon, CJ, eBay actually record in their dashboards for commission", priority: "high", status: "pending", dueDate: null, link: null, notes: "Test with real affiliate tags — check each network's reporting", sortOrder: 14 },
   { category: "features", title: "Inbound Affiliate Payout Flow", description: "Test full GB-XXXXXX affiliate payout cycle: signup → referral → earning → PayPal payout request", priority: "medium", status: "pending", dueDate: null, link: "/affiliates", notes: "System built — needs real affiliates to validate end-to-end", sortOrder: 15 },
@@ -1220,7 +1188,6 @@ const DEFAULT_TASKS: Omit<DevTask, 'id' | 'completedAt'>[] = [
   { category: "features", title: "Blog SEO Content Pipeline", description: "Publish 20+ high-quality blog posts covering seasonal maintenance, DIY tips, and part buying guides", priority: "high", status: "pending", dueDate: null, link: "/blog", notes: "11 posts published — need more for organic traffic growth", sortOrder: 18 },
   { category: "features", title: "Trivia Quiz Content Expansion", description: "Add 200+ questions across all vehicle categories — cars, trucks, marine, powersports, hobby", priority: "low", status: "pending", dueDate: null, link: "/trivia", notes: "Game works — just needs more question variety", sortOrder: 19 },
 
-  // INFRASTRUCTURE GAPS
   { category: "infrastructure", title: "Production Error Monitoring", description: "Set up error tracking (Sentry or similar) for production crash reporting", priority: "medium", status: "pending", dueDate: null, link: "https://sentry.io", notes: "Catch runtime errors before users report them", sortOrder: 5 },
   { category: "infrastructure", title: "Database Backup Strategy", description: "Configure automated daily database backups and test restoration process", priority: "high", status: "pending", dueDate: null, link: null, notes: "Neon has point-in-time recovery — verify it works", sortOrder: 6 },
   { category: "infrastructure", title: "Rate Limiting Audit", description: "Review API rate limits across all endpoints — ensure partner API and public routes are protected", priority: "medium", status: "pending", dueDate: null, link: null, notes: "Partner API has limits — check public search and blog endpoints too", sortOrder: 7 },
@@ -1234,11 +1201,11 @@ export default function DevPortal() {
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({ category: "features", title: "", description: "", priority: "medium", link: "" });
-  const validTabs = ["features", "tasks", "releases", "blockchain", "analytics", "affiliates", "outreach", "logos", "buddy"];
+  const validTabs = ["dashboard", "roadmap", "releases", "affiliates", "buddy"];
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
-    return tab && validTabs.includes(tab) ? tab : "features";
+    return tab && validTabs.includes(tab) ? tab : "dashboard";
   });
 
   useEffect(() => {
@@ -1264,7 +1231,6 @@ export default function DevPortal() {
     notes: "",
   });
   
-  // Buddy AI Chat state
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatSessionId] = useState(() => `dev-portal-${Date.now()}`);
@@ -1343,7 +1309,6 @@ export default function DevPortal() {
     },
   });
 
-  // Release Version Control
   interface Release {
     id: string;
     version: string;
@@ -1380,7 +1345,6 @@ export default function DevPortal() {
     enabled: isAuthenticated,
   });
 
-  // Blockchain Assets
   interface BlockchainAsset {
     id: string;
     entityType: 'hallmark' | 'vehicle' | 'release';
@@ -1483,7 +1447,6 @@ export default function DevPortal() {
     },
   });
 
-  // Buddy AI Chat mutation
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
       const res = await fetch('/api/ai/buddy/chat', {
@@ -1633,27 +1596,30 @@ export default function DevPortal() {
   }
 
   const stats = getCompletionStats();
+  const connectedAffiliates = AFFILIATE_NETWORKS.filter(n => n.status === 'connected').length;
+  const pendingTasks = tasks.filter(t => t.status === 'pending').length;
+  const recentCompletions = tasks
+    .filter(t => t.status === 'completed' && t.completedAt)
+    .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())
+    .slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <Nav />
       
       <div className="pt-24 min-h-[calc(100vh-5rem)] max-w-6xl mx-auto px-4 pb-20">
-        {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
-          {/* Header Card - spans 8 cols */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className="md:col-span-8"
           >
-            <Card className="glass-card border-primary/20 p-4 h-full">
+            <Card className="bg-gradient-to-br from-primary/10 to-cyan-500/5 border-primary/20 p-4 h-full">
               <h1 className="font-tech text-2xl uppercase text-primary mb-1">Dev Portal</h1>
-              <p className="text-sm text-muted-foreground">Your daily checklist for building GarageBot</p>
+              <p className="text-sm text-muted-foreground">TORQUE development command center</p>
             </Card>
           </motion.div>
           
-          {/* Progress Ring Card - spans 4 cols */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -1680,44 +1646,346 @@ export default function DevPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-9 mb-4 max-w-5xl">
-            <TabsTrigger value="features" className="font-tech uppercase text-xs">
-              <ClipboardList className="w-3 h-3 mr-1" /> Features
+          <TabsList className="flex w-full overflow-x-auto no-scrollbar mb-4">
+            <TabsTrigger value="dashboard" className="font-tech uppercase text-xs flex-shrink-0">
+              <LayoutDashboard className="w-3 h-3 mr-1" /> Dashboard
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="font-tech uppercase text-xs">
-              <CheckCheck className="w-3 h-3 mr-1" /> Tasks
+            <TabsTrigger value="roadmap" className="font-tech uppercase text-xs flex-shrink-0">
+              <CheckCheck className="w-3 h-3 mr-1" /> Roadmap
             </TabsTrigger>
-            <TabsTrigger value="releases" className="font-tech uppercase text-xs">
+            <TabsTrigger value="releases" className="font-tech uppercase text-xs flex-shrink-0">
               <Tag className="w-3 h-3 mr-1" /> Releases
             </TabsTrigger>
-            <TabsTrigger value="blockchain" className="font-tech uppercase text-xs">
-              <Blocks className="w-3 h-3 mr-1" /> Blockchain
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="font-tech uppercase text-xs">
-              <BarChart3 className="w-3 h-3 mr-1" /> Analytics
-            </TabsTrigger>
-            <TabsTrigger value="affiliates" className="font-tech uppercase text-xs">
+            <TabsTrigger value="affiliates" className="font-tech uppercase text-xs flex-shrink-0">
               <DollarSign className="w-3 h-3 mr-1" /> Affiliates
             </TabsTrigger>
-            <TabsTrigger value="outreach" className="font-tech uppercase text-xs">
-              <Megaphone className="w-3 h-3 mr-1" /> Outreach
-            </TabsTrigger>
-            <TabsTrigger value="logos" className="font-tech uppercase text-xs">
-              <Globe className="w-3 h-3 mr-1" /> Logos
-            </TabsTrigger>
-            <TabsTrigger value="buddy" className="font-tech uppercase text-xs">
+            <TabsTrigger value="buddy" className="font-tech uppercase text-xs flex-shrink-0">
               <Bot className="w-3 h-3 mr-1" /> Buddy
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="features" className="space-y-6">
-            <FeatureInventory />
+          {/* ═══════════════════════ DASHBOARD TAB ═══════════════════════ */}
+          <TabsContent value="dashboard" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="glass-card border-primary/20 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <CheckCheck className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Total Tasks</p>
+                    <p className="font-tech text-2xl text-primary" data-testid="text-total-tasks">{stats.total}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="text-green-400">{stats.completed} done</span>
+                  <span>·</span>
+                  <span className="text-yellow-400">{pendingTasks} pending</span>
+                </div>
+              </Card>
+
+              <Card className="glass-card border-green-500/20 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Connected Affiliates</p>
+                    <p className="font-tech text-2xl text-green-400" data-testid="text-connected-affiliates">{connectedAffiliates}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="text-yellow-400">{AFFILIATE_NETWORKS.filter(n => n.status === 'pending').length} pending</span>
+                  <span>·</span>
+                  <span>{AFFILIATE_NETWORKS.length} total networks</span>
+                </div>
+              </Card>
+
+              <Card className="glass-card border-cyan-500/20 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                    <GitBranch className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Latest Release</p>
+                    <p className="font-tech text-2xl text-cyan-400" data-testid="text-latest-version">
+                      {latestRelease?.version || "—"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {blockchainHealth?.connected ? (
+                    <span className="text-green-400 flex items-center gap-1">
+                      <Blocks className="w-3 h-3" /> Solana Connected
+                    </span>
+                  ) : (
+                    <span className="text-red-400">Blockchain Disconnected</span>
+                  )}
+                </div>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card className="glass-card border-primary/20 p-4">
+                <h3 className="font-tech text-sm text-primary mb-3 flex items-center gap-2 uppercase">
+                  <Activity className="w-4 h-4" /> Quick Navigation
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Roadmap", tab: "roadmap", icon: CheckCheck, color: "text-yellow-400" },
+                    { label: "Releases", tab: "releases", icon: Tag, color: "text-cyan-400" },
+                    { label: "Affiliates", tab: "affiliates", icon: DollarSign, color: "text-green-400" },
+                    { label: "Buddy AI", tab: "buddy", icon: Bot, color: "text-purple-400" },
+                  ].map(item => (
+                    <button
+                      key={item.tab}
+                      onClick={() => setActiveTab(item.tab)}
+                      className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-primary/30 transition-all text-left"
+                      data-testid={`button-nav-${item.tab}`}
+                    >
+                      <item.icon className={`w-4 h-4 ${item.color}`} />
+                      <span className="text-sm font-tech uppercase">{item.label}</span>
+                      <ArrowRight className="w-3 h-3 ml-auto text-muted-foreground" />
+                    </button>
+                  ))}
+                </div>
+              </Card>
+
+              <Card className="glass-card border-primary/20 p-4">
+                <h3 className="font-tech text-sm text-primary mb-3 flex items-center gap-2 uppercase">
+                  <CheckCircle2 className="w-4 h-4" /> Recent Completions
+                </h3>
+                {recentCompletions.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">No completed tasks yet</p>
+                ) : (
+                  <div className="space-y-2">
+                    {recentCompletions.map(task => (
+                      <div key={task.id} className="flex items-center gap-2 p-2 rounded-lg bg-green-500/5 border border-green-500/10">
+                        <CheckCircle2 className="w-3 h-3 text-green-400 shrink-0" />
+                        <span className="text-xs text-muted-foreground truncate">{task.title}</span>
+                        {task.completedAt && (
+                          <span className="text-[10px] text-muted-foreground ml-auto shrink-0">
+                            {new Date(task.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            </div>
+
+            <Card className="glass-card border-primary/20 p-4">
+              <h3 className="font-tech text-sm text-primary mb-3 uppercase">Category Progress</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {CATEGORIES.map(category => {
+                  const catTasks = getTasksByCategory(category.id);
+                  const catCompleted = catTasks.filter(t => t.status === 'completed').length;
+                  const catPct = catTasks.length > 0 ? Math.round((catCompleted / catTasks.length) * 100) : 0;
+                  const IconComponent = category.icon;
+                  return (
+                    <div key={category.id} className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
+                      <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center ${category.color}`}>
+                        <IconComponent className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate">{category.name}</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary transition-all duration-300" style={{ width: `${catPct}%` }} />
+                          </div>
+                          <span className="text-[10px] text-muted-foreground">{catCompleted}/{catTasks.length}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
           </TabsContent>
 
+          {/* ═══════════════════════ ROADMAP TAB ═══════════════════════ */}
+          <TabsContent value="roadmap">
+            {tasks.length === 0 && !isLoading && (
+              <Card className="glass-ultra border-primary/30 p-8 text-center mb-8">
+                <AlertTriangle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+                <h3 className="font-tech text-xl mb-2">No Tasks Found</h3>
+                <p className="text-muted-foreground mb-4">Initialize your checklist with default tasks to get started</p>
+                <Button onClick={() => initTasksMutation.mutate()} className="font-tech uppercase">
+                  <Plus className="w-4 h-4 mr-2" /> Initialize Checklist
+                </Button>
+              </Card>
+            )}
+
+            <div className="flex justify-end mb-4">
+              <Button 
+                onClick={() => setShowAddTask(!showAddTask)} 
+                variant="outline" 
+                className="font-tech uppercase border-primary/30 hover:bg-primary/10"
+                size="sm"
+              >
+                <Plus className="w-3 h-3 mr-1" /> Add Task
+              </Button>
+            </div>
+
+            <AnimatePresence>
+              {showAddTask && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-4"
+                >
+                  <Card className="glass-card border-primary/30 p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                      <Select value={newTask.category} onValueChange={(v) => setNewTask(prev => ({ ...prev, category: v }))}>
+                        <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
+                        <SelectContent>
+                          {CATEGORIES.map(c => (
+                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={newTask.priority} onValueChange={(v) => setNewTask(prev => ({ ...prev, priority: v }))}>
+                        <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Input 
+                      placeholder="Task title" 
+                      value={newTask.title} 
+                      onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                      className="mb-3"
+                    />
+                    <div className="flex gap-2">
+                      <Button onClick={() => addTaskMutation.mutate(newTask)} disabled={!newTask.title} className="font-tech" size="sm">
+                        <Save className="w-3 h-3 mr-1" /> Save
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => setShowAddTask(false)}>
+                        <X className="w-3 h-3 mr-1" /> Cancel
+                      </Button>
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-3">
+              {CATEGORIES.map((category) => {
+                const categoryTasks = getTasksByCategory(category.id);
+                const completedCount = categoryTasks.filter(t => t.status === 'completed').length;
+                const isExpanded = expandedCategories.includes(category.id);
+                const IconComponent = category.icon;
+
+                return (
+                  <Card key={category.id} className="glass-card border-border overflow-hidden h-fit">
+                    <button
+                      onClick={() => toggleCategory(category.id)}
+                      className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center ${category.color}`}>
+                          <IconComponent className="w-4 h-4" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="font-tech text-sm uppercase">{category.name}</h3>
+                          <p className="text-[10px] text-muted-foreground">
+                            {completedCount}/{categoryTasks.length} done
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary transition-all duration-300"
+                            style={{ width: `${categoryTasks.length > 0 ? (completedCount / categoryTasks.length) * 100 : 0}%` }}
+                          />
+                        </div>
+                        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      </div>
+                    </button>
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: 'auto' }}
+                          exit={{ height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-3 pb-3 space-y-2">
+                            {categoryTasks.map((task) => (
+                              <div
+                                key={task.id}
+                                className={`flex items-start gap-2 p-2 rounded-lg border transition-all text-sm ${
+                                  task.status === 'completed' 
+                                    ? 'bg-green-500/5 border-green-500/20' 
+                                    : 'bg-white/5 border-white/10 hover:border-primary/30'
+                                }`}
+                              >
+                                <button
+                                  onClick={() => toggleTaskMutation.mutate({ 
+                                    id: task.id, 
+                                    status: task.status === 'completed' ? 'pending' : 'completed' 
+                                  })}
+                                  className="mt-0.5 shrink-0"
+                                >
+                                  {task.status === 'completed' ? (
+                                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                  ) : (
+                                    <Circle className="w-4 h-4 text-muted-foreground hover:text-primary" />
+                                  )}
+                                </button>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <p className={`${task.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
+                                      {task.title}
+                                    </p>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                      {task.priority === 'high' && (
+                                        <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px] px-1 py-0">!</Badge>
+                                      )}
+                                      {task.link && (
+                                        <a 
+                                          href={task.link} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="text-primary hover:text-primary/80"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                      )}
+                                      <button
+                                        onClick={() => deleteTaskMutation.mutate(task.id)}
+                                        className="text-muted-foreground hover:text-red-400 transition-colors"
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                            {categoryTasks.length === 0 && (
+                              <p className="text-center text-muted-foreground py-2 text-xs">No tasks</p>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </Card>
+                );
+              })}
+            </div>
+          </TabsContent>
+
+          {/* ═══════════════════════ RELEASES TAB (merged with Blockchain) ═══════════════════════ */}
           <TabsContent value="releases" className="space-y-4">
-            {/* Bento Grid: Current Version + Actions */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-              {/* Current Version - 8 cols */}
               <Card className="md:col-span-8 bg-gradient-to-br from-primary/10 to-cyan-500/5 border-primary/30 p-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
@@ -1739,7 +2007,6 @@ export default function DevPortal() {
                 </div>
               </Card>
               
-              {/* Actions - 4 cols */}
               <Card className="md:col-span-4 glass-card border-primary/20 p-4 flex flex-col justify-center gap-2">
                 <Button 
                   onClick={() => setShowNewRelease(true)} 
@@ -1756,7 +2023,6 @@ export default function DevPortal() {
               </Card>
             </div>
 
-            {/* New Release Form */}
             <AnimatePresence>
               {showNewRelease && (
                 <motion.div
@@ -1882,7 +2148,6 @@ export default function DevPortal() {
               )}
             </AnimatePresence>
 
-            {/* Release History - 2 column grid */}
             <div>
               <h3 className="font-tech text-sm text-primary mb-3">Release History</h3>
               
@@ -1903,7 +2168,7 @@ export default function DevPortal() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="font-tech text-xl text-primary">{release.version}</span>
                         {release.title && <span className="text-muted-foreground">— {release.title}</span>}
                         <Badge 
@@ -1942,7 +2207,6 @@ export default function DevPortal() {
                         }
                       </p>
 
-                      {/* Changelog */}
                       {release.changelog && Array.isArray(release.changelog) && release.changelog.length > 0 && (
                         <div className="space-y-2">
                           {release.changelog.map((cat: { category: string; changes: string[] }, i: number) => (
@@ -1985,158 +2249,155 @@ export default function DevPortal() {
               ))}
               </div>
             </div>
-          </TabsContent>
 
-          <TabsContent value="blockchain" className="space-y-4">
-            {/* Blockchain Status Header */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-              {/* Network Status - 8 cols */}
-              <Card className={`md:col-span-8 border-primary/30 p-4 ${blockchainHealth?.connected ? 'bg-gradient-to-br from-green-500/10 to-cyan-500/5' : 'bg-gradient-to-br from-red-500/10 to-orange-500/5'}`}>
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${blockchainHealth?.connected ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
-                    <Blocks className={`w-6 h-6 ${blockchainHealth?.connected ? 'text-green-400' : 'text-red-400'}`} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-muted-foreground">Solana Network</p>
-                    <p className="font-tech text-xl text-primary">
-                      {blockchainHealth?.connected ? blockchainHealth.network?.replace('-beta', '') : 'Disconnected'}
-                    </p>
-                    {blockchainHealth?.walletAddress && (
-                      <p className="text-xs text-muted-foreground font-mono truncate max-w-xs">
-                        Wallet: {blockchainHealth.walletAddress.slice(0, 8)}...{blockchainHealth.walletAddress.slice(-6)}
-                      </p>
-                    )}
-                  </div>
-                  {blockchainHealth?.balance !== undefined && (
-                    <Badge className="bg-primary/20 text-primary border-primary/30">
-                      {blockchainHealth.balance.toFixed(4)} SOL
-                    </Badge>
-                  )}
-                </div>
-              </Card>
-              
-              {/* Stats - 4 cols */}
-              <Card className="md:col-span-4 glass-card border-primary/20 p-4 flex flex-col justify-center gap-2">
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div>
-                    <p className="text-lg font-bold text-primary">{blockchainAssets.filter(a => a.entityType === 'hallmark').length}</p>
-                    <p className="text-xs text-muted-foreground">Hallmarks</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-cyan-400">{blockchainAssets.filter(a => a.entityType === 'vehicle').length}</p>
-                    <p className="text-xs text-muted-foreground">Vehicles</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-purple-400">{blockchainAssets.filter(a => a.entityType === 'release').length}</p>
-                    <p className="text-xs text-muted-foreground">Releases</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Assets List */}
-            <Card className="glass-card border-primary/20 p-4">
-              <h3 className="font-tech text-sm text-primary mb-4 flex items-center gap-2">
-                <Blocks className="w-4 h-4" />
-                All Blockchain-Verified Assets ({blockchainAssets.length})
+            {/* Blockchain Section */}
+            <div className="border-t border-primary/20 pt-6">
+              <h3 className="font-tech text-sm text-primary mb-4 flex items-center gap-2 uppercase">
+                <Blocks className="w-4 h-4" /> Blockchain Verification
               </h3>
               
-              {loadingAssets ? (
-                <div className="text-center py-8 text-muted-foreground">Loading assets...</div>
-              ) : blockchainAssets.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No blockchain-verified assets yet
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                  {blockchainAssets.map((asset) => (
-                    <div key={asset.id} className="bg-background/50 border border-primary/10 rounded-lg p-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                            asset.entityType === 'hallmark' ? 'bg-primary/20' :
-                            asset.entityType === 'vehicle' ? 'bg-cyan-500/20' :
-                            'bg-purple-500/20'
-                          }`}>
-                            {asset.entityType === 'hallmark' ? (
-                              <Shield className={`w-5 h-5 text-primary`} />
-                            ) : asset.entityType === 'vehicle' ? (
-                              <Car className={`w-5 h-5 text-cyan-400`} />
-                            ) : (
-                              <Tag className={`w-5 h-5 text-purple-400`} />
-                            )}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-tech text-sm uppercase text-primary">
-                                {asset.entityType}
-                              </span>
-                              <Badge className={`text-xs ${
-                                asset.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                                asset.status === 'submitted' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                                'bg-gray-500/20 text-gray-400 border-gray-500/30'
-                              }`}>
-                                {asset.status}
-                              </Badge>
-                              <Badge className="text-xs bg-primary/10 text-primary border-primary/20">
-                                {asset.network.replace('-beta', '')}
-                              </Badge>
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+                <Card className={`md:col-span-8 border-primary/30 p-4 ${blockchainHealth?.connected ? 'bg-gradient-to-br from-green-500/10 to-cyan-500/5' : 'bg-gradient-to-br from-red-500/10 to-orange-500/5'}`}>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${blockchainHealth?.connected ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
+                      <Blocks className={`w-6 h-6 ${blockchainHealth?.connected ? 'text-green-400' : 'text-red-400'}`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground">Solana Network</p>
+                      <p className="font-tech text-xl text-primary">
+                        {blockchainHealth?.connected ? blockchainHealth.network?.replace('-beta', '') : 'Disconnected'}
+                      </p>
+                      {blockchainHealth?.walletAddress && (
+                        <p className="text-xs text-muted-foreground font-mono truncate max-w-xs">
+                          Wallet: {blockchainHealth.walletAddress.slice(0, 8)}...{blockchainHealth.walletAddress.slice(-6)}
+                        </p>
+                      )}
+                    </div>
+                    {blockchainHealth?.balance !== undefined && (
+                      <Badge className="bg-primary/20 text-primary border-primary/30">
+                        {blockchainHealth.balance.toFixed(4)} SOL
+                      </Badge>
+                    )}
+                  </div>
+                </Card>
+                
+                <Card className="md:col-span-4 glass-card border-primary/20 p-4 flex flex-col justify-center gap-2">
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-lg font-bold text-primary">{blockchainAssets.filter(a => a.entityType === 'hallmark').length}</p>
+                      <p className="text-xs text-muted-foreground">Hallmarks</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-cyan-400">{blockchainAssets.filter(a => a.entityType === 'vehicle').length}</p>
+                      <p className="text-xs text-muted-foreground">Vehicles</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-purple-400">{blockchainAssets.filter(a => a.entityType === 'release').length}</p>
+                      <p className="text-xs text-muted-foreground">Releases</p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              <Card className="glass-card border-primary/20 p-4">
+                <h3 className="font-tech text-sm text-primary mb-4 flex items-center gap-2">
+                  <Blocks className="w-4 h-4" />
+                  All Blockchain-Verified Assets ({blockchainAssets.length})
+                </h3>
+                
+                {loadingAssets ? (
+                  <div className="text-center py-8 text-muted-foreground">Loading assets...</div>
+                ) : blockchainAssets.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No blockchain-verified assets yet
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                    {blockchainAssets.map((asset) => (
+                      <div key={asset.id} className="bg-background/50 border border-primary/10 rounded-lg p-3">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                              asset.entityType === 'hallmark' ? 'bg-primary/20' :
+                              asset.entityType === 'vehicle' ? 'bg-cyan-500/20' :
+                              'bg-purple-500/20'
+                            }`}>
+                              {asset.entityType === 'hallmark' ? (
+                                <Shield className={`w-5 h-5 text-primary`} />
+                              ) : asset.entityType === 'vehicle' ? (
+                                <Car className={`w-5 h-5 text-cyan-400`} />
+                              ) : (
+                                <Tag className={`w-5 h-5 text-purple-400`} />
+                              )}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {asset.entityDetails ? (
-                                asset.entityType === 'hallmark' ? (
-                                  <>Genesis #{asset.entityDetails.assetNumber}: {asset.entityDetails.displayName || 'Unnamed'}</>
-                                ) : asset.entityType === 'vehicle' ? (
-                                  <>{asset.entityDetails.year} {asset.entityDetails.make} {asset.entityDetails.model}</>
-                                ) : (
-                                  <>v{asset.entityDetails.version} ({asset.entityDetails.versionType})</>
-                                )
-                              ) : 'Entity details not available'}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-tech text-sm uppercase text-primary">
+                                  {asset.entityType}
+                                </span>
+                                <Badge className={`text-xs ${
+                                  asset.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                                  asset.status === 'submitted' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+                                  'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                                }`}>
+                                  {asset.status}
+                                </Badge>
+                                <Badge className="text-xs bg-primary/10 text-primary border-primary/20">
+                                  {asset.network.replace('-beta', '')}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {asset.entityDetails ? (
+                                  asset.entityType === 'hallmark' ? (
+                                    <>Genesis #{asset.entityDetails.assetNumber}: {asset.entityDetails.displayName || 'Unnamed'}</>
+                                  ) : asset.entityType === 'vehicle' ? (
+                                    <>{asset.entityDetails.year} {asset.entityDetails.make} {asset.entityDetails.model}</>
+                                  ) : (
+                                    <>v{asset.entityDetails.version} ({asset.entityDetails.versionType})</>
+                                  )
+                                ) : 'Entity details not available'}
+                              </p>
+                              {asset.ownerInfo && (
+                                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                                  <User className="w-3 h-3" />
+                                  {asset.ownerInfo.username || asset.ownerInfo.email}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right text-xs">
+                            <p className="text-muted-foreground">
+                              {new Date(asset.createdAt).toLocaleDateString('en-US', {
+                                month: 'short', day: 'numeric', year: '2-digit'
+                              })}
                             </p>
-                            {asset.ownerInfo && (
-                              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                                <User className="w-3 h-3" />
-                                {asset.ownerInfo.username || asset.ownerInfo.email}
+                            {asset.solscanUrl && (
+                              <a 
+                                href={asset.solscanUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline flex items-center gap-1 justify-end mt-1"
+                              >
+                                Solscan <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                            {asset.txSignature && !asset.solscanUrl && (
+                              <p className="font-mono text-muted-foreground truncate max-w-[100px]">
+                                {asset.txSignature.slice(0, 12)}...
                               </p>
                             )}
                           </div>
                         </div>
-                        <div className="text-right text-xs">
-                          <p className="text-muted-foreground">
-                            {new Date(asset.createdAt).toLocaleDateString('en-US', {
-                              month: 'short', day: 'numeric', year: '2-digit'
-                            })}
-                          </p>
-                          {asset.solscanUrl && (
-                            <a 
-                              href={asset.solscanUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline flex items-center gap-1 justify-end mt-1"
-                            >
-                              Solscan <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
-                          {asset.txSignature && !asset.solscanUrl && (
-                            <p className="font-mono text-muted-foreground truncate max-w-[100px]">
-                              {asset.txSignature.slice(0, 12)}...
-                            </p>
-                          )}
-                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            </div>
           </TabsContent>
 
-          <TabsContent value="analytics" className="space-y-4">
-            <AnalyticsDashboard />
-          </TabsContent>
-
+          {/* ═══════════════════════ AFFILIATES TAB (merged with Outreach) ═══════════════════════ */}
           <TabsContent value="affiliates" className="space-y-4">
-            {/* Bento Grid: Intro + Stats */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               <Card className="md:col-span-8 bg-gradient-to-br from-green-500/10 to-primary/5 border-green-500/30 p-4">
                 <h2 className="font-tech text-lg text-green-400 mb-2">Affiliate Network Status</h2>
@@ -2176,7 +2437,6 @@ export default function DevPortal() {
               </Card>
             </div>
 
-            {/* Hobby Affiliate Action Items */}
             <Card className="bg-gradient-to-br from-pink-500/10 to-indigo-500/5 border-pink-500/30 p-4">
               <h3 className="font-tech text-sm text-pink-400 mb-3 flex items-center gap-2">
                 <Zap className="w-4 h-4" /> Hobby & RC Affiliate Setup Checklist
@@ -2228,9 +2488,7 @@ export default function DevPortal() {
               </div>
             </Card>
 
-            {/* 6/6 Grid: Networks + Retailers */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Left: Affiliate Networks */}
               <div>
                 <h3 className="font-tech text-sm text-primary mb-2">Affiliate Networks</h3>
                 <Accordion type="multiple" className="space-y-2" defaultValue={["amazon"]}>
@@ -2338,7 +2596,6 @@ export default function DevPortal() {
               </Accordion>
               </div>
 
-              {/* Right: Direct Retailers */}
               <div>
                 <h3 className="font-tech text-sm text-primary mb-2">Direct Outreach</h3>
                 <Accordion type="multiple" className="space-y-2">
@@ -2378,7 +2635,6 @@ export default function DevPortal() {
                     </AccordionTrigger>
                     <AccordionContent className="px-4 pb-4 pt-2">
                       <div className="space-y-4">
-                        {/* Contact Info Section */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-primary/5 rounded-lg">
                           <div className="flex items-center gap-2">
                             <Mail className="w-4 h-4 text-primary" />
@@ -2452,7 +2708,6 @@ export default function DevPortal() {
 
                         <p className="text-sm">{retailer.notes || "Contact for partnership details"}</p>
 
-                        {/* Outreach Letter Section - only render if letter exists */}
                         {(() => {
                           const letter = retailer.letterType 
                             ? OUTREACH_LETTERS[retailer.letterType as keyof typeof OUTREACH_LETTERS] 
@@ -2508,7 +2763,6 @@ export default function DevPortal() {
                           );
                         })()}
 
-                        {/* NAPA special message */}
                         {retailer.name === "NAPA Auto Parts" && (
                           <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                             <p className="text-sm text-green-400 font-medium">✓ No outreach letter needed!</p>
@@ -2530,7 +2784,6 @@ export default function DevPortal() {
               </div>
             </div>
 
-            {/* Bottom: Recommended Order as 2x2 grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Card className="glass-card border-green-500/30 p-3 text-center">
                 <span className="w-8 h-8 rounded-full bg-green-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">1</span>
@@ -2553,212 +2806,214 @@ export default function DevPortal() {
                 <p className="text-[10px] text-muted-foreground">Custom deals</p>
               </Card>
             </div>
-          </TabsContent>
 
-          <TabsContent value="outreach" className="space-y-4">
-            {(() => {
-              const withProgram = AFFILIATE_OUTREACH_VENDORS.filter(v => v.hasProgram);
-              const withoutProgram = AFFILIATE_OUTREACH_VENDORS.filter(v => !v.hasProgram);
-              const highPriority = AFFILIATE_OUTREACH_VENDORS.filter(v => v.priority === 'high');
-              const categories = Array.from(new Set(AFFILIATE_OUTREACH_VENDORS.map(v => v.category)));
-              
-              return (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <Card className="md:col-span-8 bg-gradient-to-br from-orange-500/10 to-primary/5 border-orange-500/30 p-4">
-                      <h2 className="font-tech text-lg text-orange-400 mb-2 flex items-center gap-2">
-                        <Megaphone className="w-5 h-5" /> Affiliate Outreach Command Center
-                      </h2>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Complete contact list for all {AFFILIATE_OUTREACH_VENDORS.length} vendors needing affiliate connections. 
-                        Research completed Feb 2026 with signup links, networks, contact info, and recommended actions.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {categories.map(cat => (
-                          <Badge key={cat} variant="outline" className="text-xs border-orange-500/30 text-orange-300">
-                            {cat}
-                          </Badge>
+            {/* Outreach Vendors Section */}
+            <div className="border-t border-primary/20 pt-6">
+              {(() => {
+                const withProgram = AFFILIATE_OUTREACH_VENDORS.filter(v => v.hasProgram);
+                const withoutProgram = AFFILIATE_OUTREACH_VENDORS.filter(v => !v.hasProgram);
+                const highPriority = AFFILIATE_OUTREACH_VENDORS.filter(v => v.priority === 'high');
+                const categories = Array.from(new Set(AFFILIATE_OUTREACH_VENDORS.map(v => v.category)));
+                
+                return (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+                      <Card className="md:col-span-8 bg-gradient-to-br from-orange-500/10 to-primary/5 border-orange-500/30 p-4">
+                        <h2 className="font-tech text-lg text-orange-400 mb-2 flex items-center gap-2">
+                          <Megaphone className="w-5 h-5" /> Affiliate Outreach Command Center
+                        </h2>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Complete contact list for all {AFFILIATE_OUTREACH_VENDORS.length} vendors needing affiliate connections. 
+                          Research completed Feb 2026 with signup links, networks, contact info, and recommended actions.
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {categories.map(cat => (
+                            <Badge key={cat} variant="outline" className="text-xs border-orange-500/30 text-orange-300">
+                              {cat}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                      <Card className="md:col-span-4 glass-card border-primary/20 p-4">
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div>
+                            <p className="font-tech text-xl text-green-400">{withProgram.length}</p>
+                            <p className="text-[10px] text-muted-foreground">Has Program</p>
+                          </div>
+                          <div>
+                            <p className="font-tech text-xl text-yellow-400">{withoutProgram.length}</p>
+                            <p className="text-[10px] text-muted-foreground">Need Outreach</p>
+                          </div>
+                          <div>
+                            <p className="font-tech text-xl text-red-400">{highPriority.length}</p>
+                            <p className="text-[10px] text-muted-foreground">High Priority</p>
+                          </div>
+                        </div>
+                      </Card>
+                    </div>
+
+                    <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/5 border-green-500/30 p-4 mb-4">
+                      <h3 className="font-tech text-sm text-green-400 mb-3 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" /> Ready to Sign Up (Active Programs Found)
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {withProgram.map(vendor => (
+                          <div key={vendor.name} className="bg-background/50 rounded-lg p-3 border border-green-500/20">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-tech text-sm font-bold">{vendor.name}</span>
+                              <Badge className="text-[10px] bg-green-500/20 text-green-400 border-green-500/30">
+                                {vendor.priority.toUpperCase()}
+                              </Badge>
+                            </div>
+                            <p className="text-[10px] text-orange-300 mb-1">{vendor.category}</p>
+                            <p className="text-xs text-muted-foreground mb-2">{vendor.notes}</p>
+                            <div className="flex items-center gap-1 text-xs text-cyan-300 mb-2">
+                              <Link2 className="w-3 h-3" /> {vendor.network}
+                            </div>
+                            <div className="flex gap-2">
+                              {vendor.contact.startsWith('http') ? (
+                                <Button asChild size="sm" className="text-xs flex-1 bg-green-600 hover:bg-green-700">
+                                  <a href={vendor.contact} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="w-3 h-3 mr-1" /> Sign Up
+                                  </a>
+                                </Button>
+                              ) : (
+                                <Button asChild size="sm" variant="outline" className="text-xs flex-1">
+                                  <a href={`mailto:${vendor.contact}`}>
+                                    <Mail className="w-3 h-3 mr-1" /> Contact
+                                  </a>
+                                </Button>
+                              )}
+                              <Button asChild size="sm" variant="outline" className="text-xs">
+                                <a href={vendor.website} target="_blank" rel="noopener noreferrer">
+                                  <Globe className="w-3 h-3" />
+                                </a>
+                              </Button>
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </Card>
-                    <Card className="md:col-span-4 glass-card border-primary/20 p-4">
-                      <div className="grid grid-cols-3 gap-2 text-center">
-                        <div>
-                          <p className="font-tech text-xl text-green-400">{withProgram.length}</p>
-                          <p className="text-[10px] text-muted-foreground">Has Program</p>
+
+                    <Card className="bg-gradient-to-br from-yellow-500/10 to-amber-500/5 border-yellow-500/30 p-4 mb-4">
+                      <h3 className="font-tech text-sm text-yellow-400 mb-3 flex items-center gap-2">
+                        <Mail className="w-4 h-4" /> Need Direct Outreach (No Public Program)
+                      </h3>
+                      <div className="space-y-2">
+                        {withoutProgram.map(vendor => (
+                          <div key={vendor.name} className="bg-background/50 rounded-lg p-3 border border-yellow-500/10 flex flex-col md:flex-row md:items-center gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="font-tech text-sm font-bold">{vendor.name}</span>
+                                <Badge variant="outline" className={`text-[10px] ${
+                                  vendor.priority === 'high' ? 'border-red-500/50 text-red-400' :
+                                  vendor.priority === 'medium' ? 'border-yellow-500/50 text-yellow-400' :
+                                  'border-gray-500/50 text-gray-400'
+                                }`}>
+                                  {vendor.priority.toUpperCase()}
+                                </Badge>
+                                <Badge variant="outline" className="text-[10px] border-orange-500/30 text-orange-300">
+                                  {vendor.category}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-1">{vendor.notes}</p>
+                              <p className="text-[10px] text-cyan-300">{vendor.network}</p>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              {vendor.phone && (
+                                <Button asChild size="sm" variant="outline" className="text-xs">
+                                  <a href={`tel:${vendor.phone.replace(/[^0-9]/g, '')}`}>
+                                    <Phone className="w-3 h-3 mr-1" /> {vendor.phone}
+                                  </a>
+                                </Button>
+                              )}
+                              {vendor.contact.startsWith('http') ? (
+                                <Button asChild size="sm" variant="outline" className="text-xs">
+                                  <a href={vendor.contact} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="w-3 h-3 mr-1" /> Contact
+                                  </a>
+                                </Button>
+                              ) : vendor.contact.includes('@') ? (
+                                <Button asChild size="sm" variant="outline" className="text-xs">
+                                  <a href={`mailto:${vendor.contact}`}>
+                                    <Mail className="w-3 h-3 mr-1" /> Email
+                                  </a>
+                                </Button>
+                              ) : (
+                                <Badge variant="outline" className="text-xs">{vendor.contact}</Badge>
+                              )}
+                              <Button asChild size="sm" variant="outline" className="text-xs">
+                                <a href={vendor.website} target="_blank" rel="noopener noreferrer">
+                                  <Globe className="w-3 h-3" />
+                                </a>
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+
+                    <Card className="glass-card border-primary/20 p-4 mb-4">
+                      <h3 className="font-tech text-sm text-primary mb-3 flex items-center gap-2">
+                        <Rocket className="w-4 h-4" /> Recommended Signup Order
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                          <p className="font-tech text-xs text-green-400 mb-2">PHASE 1: Quick Wins</p>
+                          <ul className="space-y-1 text-xs text-muted-foreground">
+                            <li>1. Power Mower Sales (direct, 5%)</li>
+                            <li>2. Aurora Off Road (direct, 5%)</li>
+                            <li>3. FinditParts (FlexOffers/CJ)</li>
+                            <li>4. Sixity Powersports (FlexOffers)</li>
+                          </ul>
                         </div>
-                        <div>
-                          <p className="font-tech text-xl text-yellow-400">{withoutProgram.length}</p>
-                          <p className="text-[10px] text-muted-foreground">Need Outreach</p>
+                        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+                          <p className="font-tech text-xs text-yellow-400 mb-2">PHASE 2: AvantLink Batch</p>
+                          <ul className="space-y-1 text-xs text-muted-foreground">
+                            <li>5. Wholesale Marine (AvantLink)</li>
+                            <li>6. Marine Products Pro Shop (AvantLink)</li>
+                            <li>7. BuyAutoParts.com (AvantLink/CJ)</li>
+                            <li>8. Dennis Kirk (AvantLink)</li>
+                          </ul>
                         </div>
-                        <div>
-                          <p className="font-tech text-xl text-red-400">{highPriority.length}</p>
-                          <p className="text-[10px] text-muted-foreground">High Priority</p>
+                        <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+                          <p className="font-tech text-xs text-orange-400 mb-2">PHASE 3: Direct Outreach</p>
+                          <ul className="space-y-1 text-xs text-muted-foreground">
+                            <li>9. Aircraft Spruce (dealer pgm)</li>
+                            <li>10. RockAuto (forum partnership)</li>
+                            <li>11. O'Reilly (sponsorship)</li>
+                            <li>12. Car-Part.com (API partner)</li>
+                          </ul>
+                        </div>
+                        <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                          <p className="font-tech text-xs text-purple-400 mb-2">PHASE 4: Niche Coverage</p>
+                          <ul className="space-y-1 text-xs text-muted-foreground">
+                            <li>13. Sky Supply USA (direct)</li>
+                            <li>14. Diesel Laptops (15%!)</li>
+                            <li>15. Lawnmower Pros (direct)</li>
+                            <li>16. VMC Chinese Parts (propose)</li>
+                          </ul>
                         </div>
                       </div>
                     </Card>
-                  </div>
 
-                  <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/5 border-green-500/30 p-4">
-                    <h3 className="font-tech text-sm text-green-400 mb-3 flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4" /> Ready to Sign Up (Active Programs Found)
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {withProgram.map(vendor => (
-                        <div key={vendor.name} className="bg-background/50 rounded-lg p-3 border border-green-500/20">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-tech text-sm font-bold">{vendor.name}</span>
-                            <Badge className="text-[10px] bg-green-500/20 text-green-400 border-green-500/30">
-                              {vendor.priority.toUpperCase()}
-                            </Badge>
-                          </div>
-                          <p className="text-[10px] text-orange-300 mb-1">{vendor.category}</p>
-                          <p className="text-xs text-muted-foreground mb-2">{vendor.notes}</p>
-                          <div className="flex items-center gap-1 text-xs text-cyan-300 mb-2">
-                            <Link2 className="w-3 h-3" /> {vendor.network}
-                          </div>
-                          <div className="flex gap-2">
-                            {vendor.contact.startsWith('http') ? (
-                              <Button asChild size="sm" className="text-xs flex-1 bg-green-600 hover:bg-green-700">
-                                <a href={vendor.contact} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="w-3 h-3 mr-1" /> Sign Up
-                                </a>
-                              </Button>
-                            ) : (
-                              <Button asChild size="sm" variant="outline" className="text-xs flex-1">
-                                <a href={`mailto:${vendor.contact}`}>
-                                  <Mail className="w-3 h-3 mr-1" /> Contact
-                                </a>
-                              </Button>
-                            )}
-                            <Button asChild size="sm" variant="outline" className="text-xs">
-                              <a href={vendor.website} target="_blank" rel="noopener noreferrer">
-                                <Globe className="w-3 h-3" />
-                              </a>
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-
-                  <Card className="bg-gradient-to-br from-yellow-500/10 to-amber-500/5 border-yellow-500/30 p-4">
-                    <h3 className="font-tech text-sm text-yellow-400 mb-3 flex items-center gap-2">
-                      <Mail className="w-4 h-4" /> Need Direct Outreach (No Public Program)
-                    </h3>
-                    <div className="space-y-2">
-                      {withoutProgram.map(vendor => (
-                        <div key={vendor.name} className="bg-background/50 rounded-lg p-3 border border-yellow-500/10 flex flex-col md:flex-row md:items-center gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="font-tech text-sm font-bold">{vendor.name}</span>
-                              <Badge variant="outline" className={`text-[10px] ${
-                                vendor.priority === 'high' ? 'border-red-500/50 text-red-400' :
-                                vendor.priority === 'medium' ? 'border-yellow-500/50 text-yellow-400' :
-                                'border-gray-500/50 text-gray-400'
-                              }`}>
-                                {vendor.priority.toUpperCase()}
-                              </Badge>
-                              <Badge variant="outline" className="text-[10px] border-orange-500/30 text-orange-300">
-                                {vendor.category}
-                              </Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground mb-1">{vendor.notes}</p>
-                            <p className="text-[10px] text-cyan-300">{vendor.network}</p>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {vendor.phone && (
-                              <Button asChild size="sm" variant="outline" className="text-xs">
-                                <a href={`tel:${vendor.phone.replace(/[^0-9]/g, '')}`}>
-                                  <Phone className="w-3 h-3 mr-1" /> {vendor.phone}
-                                </a>
-                              </Button>
-                            )}
-                            {vendor.contact.startsWith('http') ? (
-                              <Button asChild size="sm" variant="outline" className="text-xs">
-                                <a href={vendor.contact} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="w-3 h-3 mr-1" /> Contact
-                                </a>
-                              </Button>
-                            ) : vendor.contact.includes('@') ? (
-                              <Button asChild size="sm" variant="outline" className="text-xs">
-                                <a href={`mailto:${vendor.contact}`}>
-                                  <Mail className="w-3 h-3 mr-1" /> Email
-                                </a>
-                              </Button>
-                            ) : (
-                              <Badge variant="outline" className="text-xs">{vendor.contact}</Badge>
-                            )}
-                            <Button asChild size="sm" variant="outline" className="text-xs">
-                              <a href={vendor.website} target="_blank" rel="noopener noreferrer">
-                                <Globe className="w-3 h-3" />
-                              </a>
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-
-                  <Card className="glass-card border-primary/20 p-4">
-                    <h3 className="font-tech text-sm text-primary mb-3 flex items-center gap-2">
-                      <Rocket className="w-4 h-4" /> Recommended Signup Order
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                      <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                        <p className="font-tech text-xs text-green-400 mb-2">PHASE 1: Quick Wins</p>
-                        <ul className="space-y-1 text-xs text-muted-foreground">
-                          <li>1. Power Mower Sales (direct, 5%)</li>
-                          <li>2. Aurora Off Road (direct, 5%)</li>
-                          <li>3. FinditParts (FlexOffers/CJ)</li>
-                          <li>4. Sixity Powersports (FlexOffers)</li>
-                        </ul>
-                      </div>
-                      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
-                        <p className="font-tech text-xs text-yellow-400 mb-2">PHASE 2: AvantLink Batch</p>
-                        <ul className="space-y-1 text-xs text-muted-foreground">
-                          <li>5. Wholesale Marine (AvantLink)</li>
-                          <li>6. Marine Products Pro Shop (AvantLink)</li>
-                          <li>7. BuyAutoParts.com (AvantLink/CJ)</li>
-                          <li>8. Dennis Kirk (AvantLink)</li>
-                        </ul>
-                      </div>
-                      <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
-                        <p className="font-tech text-xs text-orange-400 mb-2">PHASE 3: Direct Outreach</p>
-                        <ul className="space-y-1 text-xs text-muted-foreground">
-                          <li>9. Aircraft Spruce (dealer pgm)</li>
-                          <li>10. RockAuto (forum partnership)</li>
-                          <li>11. O'Reilly (sponsorship)</li>
-                          <li>12. Car-Part.com (API partner)</li>
-                        </ul>
-                      </div>
-                      <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-                        <p className="font-tech text-xs text-purple-400 mb-2">PHASE 4: Niche Coverage</p>
-                        <ul className="space-y-1 text-xs text-muted-foreground">
-                          <li>13. Sky Supply USA (direct)</li>
-                          <li>14. Diesel Laptops (15%!)</li>
-                          <li>15. Lawnmower Pros (direct)</li>
-                          <li>16. VMC Chinese Parts (propose)</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </Card>
-
-                  <Card className="bg-amber-500/10 border border-amber-500/30 p-4">
-                    <h3 className="font-tech text-sm text-amber-400 mb-2 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" /> Impact Network Note
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      AutoZone's affiliate program is on the Impact network which has a <strong className="text-amber-400">$30/month minimum subscription</strong>. 
-                      This was ruled out for now. Revisit once GarageBot has enough traffic to justify the cost. 
-                      Bass Pro Shops and Camping World are also on Impact but may be available via CJ or other networks too.
-                    </p>
-                  </Card>
-                </>
-              );
-            })()}
+                    <Card className="bg-amber-500/10 border border-amber-500/30 p-4">
+                      <h3 className="font-tech text-sm text-amber-400 mb-2 flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4" /> Impact Network Note
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        AutoZone's affiliate program is on the Impact network which has a <strong className="text-amber-400">$30/month minimum subscription</strong>. 
+                        This was ruled out for now. Revisit once GarageBot has enough traffic to justify the cost. 
+                        Bass Pro Shops and Camping World are also on Impact but may be available via CJ or other networks too.
+                      </p>
+                    </Card>
+                  </>
+                );
+              })()}
+            </div>
           </TabsContent>
 
+          {/* ═══════════════════════ BUDDY AI TAB ═══════════════════════ */}
           <TabsContent value="buddy" className="space-y-4">
             <Card className="bg-gradient-to-br from-cyan-500/10 to-primary/5 border-cyan-500/30">
               <div className="p-4 border-b border-cyan-500/20 flex items-center gap-3">
@@ -2841,198 +3096,6 @@ export default function DevPortal() {
                   </Button>
                 ))}
               </div>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="tasks">
-            {tasks.length === 0 && !isLoading && (
-              <Card className="glass-ultra border-primary/30 p-8 text-center mb-8">
-                <AlertTriangle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-                <h3 className="font-tech text-xl mb-2">No Tasks Found</h3>
-                <p className="text-muted-foreground mb-4">Initialize your checklist with default tasks to get started</p>
-                <Button onClick={() => initTasksMutation.mutate()} className="font-tech uppercase">
-                  <Plus className="w-4 h-4 mr-2" /> Initialize Checklist
-                </Button>
-              </Card>
-            )}
-
-            <div className="flex justify-end mb-4">
-              <Button 
-                onClick={() => setShowAddTask(!showAddTask)} 
-                variant="outline" 
-                className="font-tech uppercase border-primary/30 hover:bg-primary/10"
-                size="sm"
-              >
-                <Plus className="w-3 h-3 mr-1" /> Add Task
-              </Button>
-            </div>
-
-            <AnimatePresence>
-              {showAddTask && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mb-4"
-                >
-                  <Card className="glass-card border-primary/30 p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                      <Select value={newTask.category} onValueChange={(v) => setNewTask(prev => ({ ...prev, category: v }))}>
-                        <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
-                        <SelectContent>
-                          {CATEGORIES.map(c => (
-                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select value={newTask.priority} onValueChange={(v) => setNewTask(prev => ({ ...prev, priority: v }))}>
-                        <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="high">High</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="low">Low</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Input 
-                      placeholder="Task title" 
-                      value={newTask.title} 
-                      onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
-                      className="mb-3"
-                    />
-                    <div className="flex gap-2">
-                      <Button onClick={() => addTaskMutation.mutate(newTask)} disabled={!newTask.title} className="font-tech" size="sm">
-                        <Save className="w-3 h-3 mr-1" /> Save
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setShowAddTask(false)}>
-                        <X className="w-3 h-3 mr-1" /> Cancel
-                      </Button>
-                    </div>
-                  </Card>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Tasks in 2-column bento grid */}
-            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-3">
-              {CATEGORIES.map((category) => {
-                const categoryTasks = getTasksByCategory(category.id);
-                const completedCount = categoryTasks.filter(t => t.status === 'completed').length;
-                const isExpanded = expandedCategories.includes(category.id);
-                const IconComponent = category.icon;
-
-                return (
-                  <Card key={category.id} className="glass-card border-border overflow-hidden h-fit">
-                    <button
-                      onClick={() => toggleCategory(category.id)}
-                      className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center ${category.color}`}>
-                          <IconComponent className="w-4 h-4" />
-                        </div>
-                        <div className="text-left">
-                          <h3 className="font-tech text-sm uppercase">{category.name}</h3>
-                          <p className="text-[10px] text-muted-foreground">
-                            {completedCount}/{categoryTasks.length} done
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all duration-300"
-                            style={{ width: `${categoryTasks.length > 0 ? (completedCount / categoryTasks.length) * 100 : 0}%` }}
-                          />
-                        </div>
-                        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                      </div>
-                    </button>
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: 'auto' }}
-                          exit={{ height: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-3 pb-3 space-y-2">
-                            {categoryTasks.map((task) => (
-                              <div
-                                key={task.id}
-                                className={`flex items-start gap-2 p-2 rounded-lg border transition-all text-sm ${
-                                  task.status === 'completed' 
-                                    ? 'bg-green-500/5 border-green-500/20' 
-                                    : 'bg-white/5 border-white/10 hover:border-primary/30'
-                                }`}
-                              >
-                                <button
-                                  onClick={() => toggleTaskMutation.mutate({ 
-                                    id: task.id, 
-                                    status: task.status === 'completed' ? 'pending' : 'completed' 
-                                  })}
-                                  className="mt-0.5 shrink-0"
-                                >
-                                  {task.status === 'completed' ? (
-                                    <CheckCircle2 className="w-4 h-4 text-green-400" />
-                                  ) : (
-                                    <Circle className="w-4 h-4 text-muted-foreground hover:text-primary" />
-                                  )}
-                                </button>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-start justify-between gap-2">
-                                    <p className={`${task.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>
-                                      {task.title}
-                                    </p>
-                                    <div className="flex items-center gap-1 shrink-0">
-                                      {task.priority === 'high' && (
-                                        <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px] px-1 py-0">!</Badge>
-                                      )}
-                                      {task.link && (
-                                        <a 
-                                          href={task.link} 
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className="text-primary hover:text-primary/80"
-                                          onClick={(e) => e.stopPropagation()}
-                                        >
-                                          <ExternalLink className="w-3 h-3" />
-                                        </a>
-                                      )}
-                                      <button
-                                        onClick={() => deleteTaskMutation.mutate(task.id)}
-                                        className="text-muted-foreground hover:text-red-400 transition-colors"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                            {categoryTasks.length === 0 && (
-                              <p className="text-center text-muted-foreground py-2 text-xs">No tasks</p>
-                            )}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </Card>
-                );
-              })}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="logos" className="space-y-4">
-            <Card className="bg-gradient-to-br from-primary/10 to-cyan-500/5 border-primary/30 p-4">
-              <div className="flex items-center gap-3 mb-4">
-                <Globe className="w-5 h-5 text-cyan-400" />
-                <div>
-                  <h3 className="font-tech text-lg text-white">Vendor Logo Checklist</h3>
-                  <p className="text-xs text-muted-foreground">Upload logos for each vendor. Recommended: PNG, 200x200px minimum, transparent background preferred.</p>
-                </div>
-              </div>
-              <VendorLogoChecklist />
             </Card>
           </TabsContent>
         </Tabs>
