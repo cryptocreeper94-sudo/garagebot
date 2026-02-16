@@ -510,32 +510,31 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
   const ComicSpeechBubble = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
     <div className={`relative ${className}`}>
       <div 
-        className="absolute inset-0 rounded-[50%] overflow-hidden"
+        className="absolute inset-0 rounded-2xl overflow-hidden"
         style={{
           background: '#0d1117',
-          border: '3px solid #06b6d4',
-          boxShadow: '0 4px 20px rgba(6, 182, 212, 0.3), inset 0 0 20px rgba(6, 182, 212, 0.1)',
-          borderRadius: '50% 50% 50% 50% / 45% 45% 55% 55%',
+          border: '2px solid #06b6d4',
+          boxShadow: '0 4px 24px rgba(6, 182, 212, 0.3), inset 0 0 20px rgba(6, 182, 212, 0.05)',
         }}
       />
       <div 
         className="absolute -bottom-2 right-12 w-0 h-0"
         style={{
-          borderLeft: '15px solid transparent',
-          borderRight: '15px solid transparent',
-          borderTop: '20px solid #06b6d4',
+          borderLeft: '12px solid transparent',
+          borderRight: '12px solid transparent',
+          borderTop: '14px solid #06b6d4',
         }}
       />
       <div 
         className="absolute -bottom-1 right-12 w-0 h-0"
         style={{
-          borderLeft: '12px solid transparent',
-          borderRight: '12px solid transparent',
-          borderTop: '17px solid #0d1117',
-          marginLeft: '3px',
+          borderLeft: '10px solid transparent',
+          borderRight: '10px solid transparent',
+          borderTop: '12px solid #0d1117',
+          marginLeft: '2px',
         }}
       />
-      <div className="relative z-10 p-4 sm:p-6 overflow-hidden">
+      <div className="relative z-10 p-4 sm:p-5 overflow-hidden">
         {children}
       </div>
     </div>
@@ -588,7 +587,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
               onClick={(e) => e.stopPropagation()}
               data-testid="ai-mascot-chat"
             >
-              <div className="relative w-full sm:w-80 md:w-[420px] h-[280px] sm:h-[320px] mb-[-30px]">
+              <div className="relative w-full sm:w-[400px] md:w-[480px] mb-[-30px]">
                 <ComicSpeechBubble>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
