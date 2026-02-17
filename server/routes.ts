@@ -10917,6 +10917,163 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
+  // Marketplace Fee Configuration
+  const MARKETPLACE_FEES = {
+    free: { rate: 0.10, label: '10%' },
+    basic: { rate: 0.10, label: '10%' },
+    pro: { rate: 0.06, label: '6%' },
+  };
+
+  app.get("/api/marketplace/fee-info", async (req: any, res) => {
+    try {
+      const userId = getUserId(req);
+      let tier = 'free';
+      if (userId) {
+        const user = await storage.getUser(userId);
+        const userTier = user?.subscriptionTier || 'free';
+        const isActive = (userTier === 'basic' || userTier === 'pro') &&
+          (!user?.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
+        tier = isActive ? userTier : 'free';
+      }
+      const feeConfig = MARKETPLACE_FEES[tier as keyof typeof MARKETPLACE_FEES] || MARKETPLACE_FEES.free;
+      res.json({
+        sellerTier: tier,
+        feeRate: feeConfig.rate,
+        feeLabel: feeConfig.label,
+        proFeeRate: MARKETPLACE_FEES.pro.rate,
+        proFeeLabel: MARKETPLACE_FEES.pro.label,
+        stripeFeeEstimate: '2.9% + $0.30',
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get fee info" });
+    }
+  });
+
+  app.post("/api/marketplace/calculate-fees", async (req, res) => {
+    try {
+      const { listingId } = req.body;
+      const listing = await storage.getPartListing(listingId);
+      if (!listing) return res.status(404).json({ error: "Listing not found" });
+
+      const seller = await storage.getUser(listing.sellerId);
+      const sellerTier = seller?.subscriptionTier || 'free';
+      const isActive = (sellerTier === 'basic' || sellerTier === 'pro') &&
+        (!seller?.subscriptionExpiresAt || new Date(seller.subscriptionExpiresAt) > new Date());
+      const tier = isActive ? sellerTier : 'free';
+      const feeConfig = MARKETPLACE_FEES[tier as keyof typeof MARKETPLACE_FEES] || MARKETPLACE_FEES.free;
+
+      const price = parseFloat(listing.price as string);
+      const shippingPrice = listing.shippingAvailable && listing.shippingPrice ? parseFloat(listing.shippingPrice as string) : 0;
+      const platformFee = Math.round(price * feeConfig.rate * 100) / 100;
+      const buyerTotal = Math.round((price + shippingPrice + platformFee) * 100) / 100;
+
+      res.json({
+        price,
+        shippingPrice,
+        platformFee,
+        platformFeeRate: feeConfig.label,
+        buyerTotal,
+        sellerPayout: price,
+        sellerTier: tier,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to calculate fees" });
+    }
+  });
+
+  app.post("/api/marketplace/checkout", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getUserId(req)!;
+      const { listingId } = req.body;
+      const listing = await storage.getPartListing(listingId);
+      if (!listing) return res.status(404).json({ error: "Listing not found" });
+      if (listing.status !== 'active') return res.status(400).json({ error: "This listing is no longer active" });
+      if (listing.sellerId === userId) return res.status(400).json({ error: "You cannot buy your own listing" });
+
+      const seller = await storage.getUser(listing.sellerId);
+      const sellerTier = seller?.subscriptionTier || 'free';
+      const isActive = (sellerTier === 'basic' || sellerTier === 'pro') &&
+        (!seller?.subscriptionExpiresAt || new Date(seller.subscriptionExpiresAt) > new Date());
+      const tier = isActive ? sellerTier : 'free';
+      const feeConfig = MARKETPLACE_FEES[tier as keyof typeof MARKETPLACE_FEES] || MARKETPLACE_FEES.free;
+
+      const price = parseFloat(listing.price as string);
+      const shippingPrice = listing.shippingAvailable && listing.shippingPrice ? parseFloat(listing.shippingPrice as string) : 0;
+      const platformFee = Math.round(price * feeConfig.rate * 100) / 100;
+
+      const stripe = await getUncachableStripeClient();
+      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const buyer = await storage.getUser(userId);
+
+      const lineItems: any[] = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: listing.title,
+            description: [
+              listing.condition ? `Condition: ${listing.condition}` : '',
+              listing.fitmentMake ? `Fits: ${[listing.fitmentYear, listing.fitmentMake, listing.fitmentModel].filter(Boolean).join(' ')}` : '',
+              listing.partNumber ? `Part #: ${listing.partNumber}` : '',
+            ].filter(Boolean).join(' | '),
+            images: listing.photos?.[0] ? [listing.photos[0]] : [],
+          },
+          unit_amount: Math.round(price * 100),
+        },
+        quantity: 1,
+      }];
+
+      if (shippingPrice > 0) {
+        lineItems.push({
+          price_data: {
+            currency: 'usd',
+            product_data: { name: 'Shipping' },
+            unit_amount: Math.round(shippingPrice * 100),
+          },
+          quantity: 1,
+        });
+      }
+
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `GarageBot Marketplace Fee (${feeConfig.label})`,
+            description: 'Platform facilitation fee for secure marketplace transactions',
+          },
+          unit_amount: Math.round(platformFee * 100),
+        },
+        quantity: 1,
+      });
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'payment',
+        success_url: `${baseUrl}/parts-marketplace?purchase=success&listing=${listing.id}`,
+        cancel_url: `${baseUrl}/parts-marketplace?purchase=cancelled&listing=${listing.id}`,
+        customer_email: buyer?.email || undefined,
+        metadata: {
+          type: 'marketplace_purchase',
+          listingId: listing.id,
+          sellerId: listing.sellerId,
+          buyerId: userId,
+          platformFee: platformFee.toString(),
+          platformFeeRate: feeConfig.label,
+          sellerPayout: price.toFixed(2),
+          partPrice: price.toFixed(2),
+          shippingPrice: shippingPrice.toFixed(2),
+        },
+      });
+
+      await storage.updatePartListing(listing.id, { status: 'pending_sale' });
+
+      res.json({ url: session.url, sessionId: session.id });
+    } catch (error: any) {
+      console.error("Marketplace checkout error:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
   // Parts Marketplace Routes
   app.get("/api/marketplace/listings", async (req, res) => {
     try {

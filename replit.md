@@ -66,6 +66,16 @@ Preferred communication style: Simple, everyday language.
 ## Break Room Hub
 - **Functionality**: A central hub (`/break-room`) with tabs for motorsports/automotive news, tools (Receipt/Document Scanner, Mileage Tracker, NHTSA Recall Checker, Maintenance Scheduler), community features (Speed Trap Alerts, Fuel Price Finder, Directories), and opportunities (CDL Schools & Trucking Programs).
 
+## Parts Marketplace (Sell Your Parts)
+- **Route**: `/parts-marketplace` — Peer-to-peer marketplace for buying/selling auto parts.
+- **Fee Structure**: GarageBot charges a marketplace facilitation fee added to the buyer's total. Sellers receive 100% of their listed price.
+  - **Free/Basic sellers**: 10% marketplace fee charged to buyers.
+  - **Pro sellers**: 6% marketplace fee charged to buyers (incentivizes Pro upgrades).
+  - **Stripe processing**: 2.9% + $0.30 per transaction (standard Stripe fees).
+- **Checkout**: Stripe Checkout Sessions with line items for part price, shipping, and marketplace fee. Metadata tracks seller payout, platform fee, and listing details.
+- **Seller Requirements**: Basic or Pro subscription required to list parts.
+- **API Routes**: `/api/marketplace/fee-info`, `/api/marketplace/calculate-fees`, `/api/marketplace/checkout`, plus existing listing CRUD routes.
+
 ## Affiliate Strategy
 - **Current**: Vehicle-aware search links to over 50 retailers, with active integrations for Amazon Associates, eBay Partner Network, and CJ Affiliate.
 

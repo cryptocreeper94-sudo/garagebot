@@ -8,7 +8,8 @@ import {
   Search, Plus, Package, Wrench, Zap, CircleDot, Car, Truck,
   Bike, Ship, ChevronRight, Eye, MessageCircle, MapPin, X,
   Tag, ShieldCheck, Clock, TrendingUp, Filter, SlidersHorizontal,
-  Star, Heart, Share2, ArrowLeft, Send, CheckCircle, AlertCircle
+  Star, Heart, Share2, ArrowLeft, Send, CheckCircle, AlertCircle,
+  CreditCard, DollarSign, Info, ShoppingCart, Percent, BadgeCheck
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -400,6 +401,43 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
             )}
           </div>
 
+          <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 border border-emerald-500/15">
+            <h3 className="text-sm font-semibold text-emerald-400 mb-2 flex items-center gap-2">
+              <Percent className="w-4 h-4" /> How Marketplace Fees Work
+            </h3>
+            <div className="space-y-1.5 text-xs text-slate-400">
+              <div className="flex justify-between">
+                <span>You receive</span>
+                <span className="text-emerald-400 font-medium">100% of your listed price</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Buyer pays a marketplace fee</span>
+                <span className="text-white font-medium">10% (or 6% from Pro sellers)</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Payment processing (Stripe)</span>
+                <span className="text-slate-300">2.9% + $0.30</span>
+              </div>
+              <div className="mt-2 pt-2 border-t border-white/5 text-slate-500 flex items-start gap-1.5">
+                <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <span>The marketplace fee is added to the buyer's total. You get your full asking price. Pro sellers offer buyers a lower fee, making your listings more attractive.</span>
+              </div>
+            </div>
+          </div>
+
+          {form.price && parseFloat(form.price) > 0 && (
+            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
+              <div className="flex justify-between text-xs text-slate-400">
+                <span>Your payout for ${parseFloat(form.price).toFixed(2)} sale</span>
+                <span className="text-emerald-400 font-medium">${parseFloat(form.price).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-xs text-slate-500 mt-1">
+                <span>Buyer pays</span>
+                <span>${(parseFloat(form.price) * 1.10).toFixed(2)} (incl. 10% fee)</span>
+              </div>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={createMutation.isPending}
@@ -422,9 +460,42 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
 }
 
 function ListingDetail({ listing, onClose, onContact }: { listing: any; onClose: () => void; onContact: (msg: string) => void }) {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [message, setMessage] = useState('');
   const [sent, setSent] = useState(false);
+  const [buyLoading, setBuyLoading] = useState(false);
   const conditionInfo = CONDITIONS.find(c => c.id === listing.condition) || CONDITIONS[2];
+
+  const { data: feeData } = useQuery({
+    queryKey: ['/api/marketplace/calculate-fees', listing.id],
+    queryFn: async () => {
+      const res = await apiRequest('POST', '/api/marketplace/calculate-fees', { listingId: listing.id });
+      return res.json();
+    },
+    enabled: !!listing.id,
+  });
+
+  const handleBuyNow = async () => {
+    if (!user) {
+      toast({ title: "Sign in required", description: "Please sign in to purchase parts.", variant: "destructive" });
+      return;
+    }
+    setBuyLoading(true);
+    try {
+      const res = await apiRequest('POST', '/api/marketplace/checkout', { listingId: listing.id });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast({ title: "Error", description: data.error || "Failed to start checkout", variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to start checkout", variant: "destructive" });
+    } finally {
+      setBuyLoading(false);
+    }
+  };
 
   return (
     <motion.div
@@ -472,7 +543,7 @@ function ListingDetail({ listing, onClose, onContact }: { listing: any; onClose:
           <div className="grid grid-cols-3 gap-4 mb-6">
             <GlassCard className="p-4 text-center">
               <div className="text-3xl font-bold text-cyan-400 font-rajdhani">${listing.price}</div>
-              <div className="text-xs text-slate-500 mt-1">Asking Price</div>
+              <div className="text-xs text-slate-500 mt-1">Part Price</div>
             </GlassCard>
             <GlassCard className="p-4 text-center">
               <div className="text-lg font-bold text-white font-rajdhani">
@@ -490,6 +561,57 @@ function ListingDetail({ listing, onClose, onContact }: { listing: any; onClose:
               <div className="text-xs text-slate-500 mt-1">Location</div>
             </GlassCard>
           </div>
+
+          {feeData && listing.sellerId !== user?.id && (
+            <GlassCard className="p-5 mb-6 border-cyan-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <ShoppingCart className="w-5 h-5 text-cyan-400" />
+                <h3 className="text-sm font-bold text-white font-rajdhani uppercase tracking-wider">Purchase Summary</h3>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-slate-300">
+                  <span>Part price</span>
+                  <span className="font-medium">${feeData.price.toFixed(2)}</span>
+                </div>
+                {feeData.shippingPrice > 0 && (
+                  <div className="flex justify-between text-slate-300">
+                    <span>Shipping</span>
+                    <span className="font-medium">${feeData.shippingPrice.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-slate-400 text-xs">
+                  <span className="flex items-center gap-1">
+                    <BadgeCheck className="w-3.5 h-3.5 text-cyan-500" />
+                    GarageBot marketplace fee ({feeData.platformFeeRate})
+                  </span>
+                  <span>${feeData.platformFee.toFixed(2)}</span>
+                </div>
+                <div className="pt-2 mt-2 border-t border-white/10 flex justify-between text-white font-bold">
+                  <span>Total</span>
+                  <span className="text-cyan-400 text-lg font-rajdhani">${feeData.buyerTotal.toFixed(2)}</span>
+                </div>
+              </div>
+              <button
+                onClick={handleBuyNow}
+                disabled={buyLoading}
+                className="w-full mt-4 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-semibold text-sm hover:from-emerald-400 hover:to-cyan-500 transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                data-testid="button-buy-now"
+              >
+                {buyLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <CreditCard className="w-4 h-4" />
+                    Buy Now — Secure Checkout
+                  </>
+                )}
+              </button>
+              <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-slate-600">
+                <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Secure Payment</span>
+                <span className="flex items-center gap-1"><CreditCard className="w-3 h-3" /> Powered by Stripe</span>
+              </div>
+            </GlassCard>
+          )}
 
           {listing.description && (
             <div className="mb-6">
