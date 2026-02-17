@@ -4,10 +4,10 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { Link } from "wouter";
 import {
   FileText, Calendar, Users, BarChart3, DollarSign, Shield,
-  CheckCircle, ArrowRight, Play, Zap, Star, Download,
+  CheckCircle, ArrowRight, Play, Zap, Download,
   Car, Truck, Bike, Ship, Cog, Anchor, Tractor, Mountain,
-  Lock, Database, Coins, Menu, X, Package, ChevronDown,
-  ChevronLeft, ChevronRight, Wrench, Clock, MessageSquare,
+  Lock, Database, Menu, X, Package, ChevronDown,
+  Wrench, Clock, MessageSquare,
   Globe, Sparkles, TrendingUp, Award, Settings, Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,13 +63,6 @@ const VEHICLE_TYPES = [
   { id: "exotic", name: "Exotics", icon: Car },
 ];
 
-const TESTIMONIALS = [
-  { name: "Mike's Auto Care", location: "Dallas, TX", quote: "Finally, software that doesn't cost more than my rent. The parts search alone saves me hours every week.", rating: 5, vehicles: "Auto, Truck" },
-  { name: "Coastal Marine Repair", location: "Tampa, FL", quote: "Works great for our boat repair shop. Other software only handles cars - this handles everything.", rating: 5, vehicles: "Marine, PWC" },
-  { name: "Summit Truck Service", location: "Denver, CO", quote: "Switched from AutoLeap. Same features, a third of the price. No brainer.", rating: 5, vehicles: "Diesel, Heavy Duty" },
-  { name: "Valley Powersports", location: "Phoenix, AZ", quote: "Managing ATV and motorcycle repairs was a nightmare before TORQUE. Now everything's in one place.", rating: 5, vehicles: "ATV, Motorcycle" },
-  { name: "Precision Classics", location: "Nashville, TN", quote: "The blockchain verification gives our customers confidence in our restoration work. Total game-changer.", rating: 5, vehicles: "Classic, Exotic" },
-];
 
 const FAQ_ITEMS = [
   { q: "How is TORQUE different from AutoLeap or Tekmetric?", a: "TORQUE offers the same core features — repair orders, scheduling, payments, analytics — at $49/month instead of $179+. Plus we include 68+ parts vendor search, AI assistant, blockchain verification, and support for ALL vehicle types (not just cars)." },
@@ -123,91 +116,6 @@ function AccordionItem({ item, isOpen, onToggle, index }: { item: typeof FAQ_ITE
   );
 }
 
-function TestimonialCarousel() {
-  const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const startTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setDirection(1);
-      setCurrent(prev => (prev + 1) % TESTIMONIALS.length);
-    }, 5000);
-  }, []);
-
-  useEffect(() => {
-    startTimer();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [startTimer]);
-
-  const go = (dir: number) => {
-    setDirection(dir);
-    setCurrent(prev => (prev + dir + TESTIMONIALS.length) % TESTIMONIALS.length);
-    startTimer();
-  };
-
-  const variants = {
-    enter: (d: number) => ({ x: d > 0 ? 300 : -300, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (d: number) => ({ x: d > 0 ? -300 : 300, opacity: 0 }),
-  };
-
-  return (
-    <div className="relative" data-testid="testimonial-carousel">
-      <div className="overflow-hidden rounded-2xl">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={current}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.4, ease: "easeInOut" }}
-          >
-            <Card className="p-8 md:p-12 bg-gradient-to-br from-[#0f172a] to-[#131c33] border-white/10">
-              <div className="flex gap-1 mb-6">
-                {[...Array(TESTIMONIALS[current].rating)].map((_, j) => (
-                  <Star key={j} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                ))}
-              </div>
-              <p className="text-xl md:text-2xl text-white font-light leading-relaxed mb-8 italic">
-                "{TESTIMONIALS[current].quote}"
-              </p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-white font-bold text-lg">{TESTIMONIALS[current].name}</p>
-                  <p className="text-zinc-500">{TESTIMONIALS[current].location}</p>
-                </div>
-                <Badge className="bg-[#00D9FF]/10 border-[#00D9FF]/30 text-[#00D9FF]">{TESTIMONIALS[current].vehicles}</Badge>
-              </div>
-            </Card>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      <div className="flex items-center justify-center gap-4 mt-6">
-        <button onClick={() => go(-1)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors" data-testid="carousel-prev">
-          <ChevronLeft className="w-5 h-5 text-zinc-400" />
-        </button>
-        <div className="flex gap-2">
-          {TESTIMONIALS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); startTimer(); }}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === current ? "bg-[#00D9FF] w-8" : "bg-white/20 hover:bg-white/40"}`}
-              data-testid={`carousel-dot-${i}`}
-            />
-          ))}
-        </div>
-        <button onClick={() => go(1)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors" data-testid="carousel-next">
-          <ChevronRight className="w-5 h-5 text-zinc-400" />
-        </button>
-      </div>
-    </div>
-  );
-}
 
 function CountUpNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -624,7 +532,7 @@ export default function TorqueLanding() {
             {[
               { icon: Shield, title: "Verified Shop Identity", description: "Your shop's identity is verified and recorded on the Trust Layer blockchain. Customers can verify your legitimacy instantly.", color: "#00D9FF" },
               { icon: Lock, title: "Tamper-Proof Records", description: "Every repair order, estimate, and transaction is cryptographically signed. Records cannot be altered or fabricated.", color: "#8B5CF6" },
-              { icon: Coins, title: "Signal Token", description: "Earn and spend Signal (SIG) tokens within the Trust Layer ecosystem. Reward loyal customers and incentivize referrals.", color: "#F59E0B" },
+              { icon: Award, title: "Signal Rewards", description: "Earn and use Signal points within the Trust Layer ecosystem. Reward loyal customers and incentivize referrals with your shop's own loyalty program.", color: "#F59E0B" },
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}>
                 <Card className="group p-8 bg-[#0f172a]/60 border-white/[0.08] hover:border-white/20 h-full transition-all duration-500 relative overflow-hidden" data-testid={`card-trustlayer-${i}`}>
@@ -641,18 +549,6 @@ export default function TorqueLanding() {
         </div>
       </section>
 
-      {/* TESTIMONIAL CAROUSEL */}
-      <section className="py-24 px-4">
-        <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeInUp} className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-tech font-bold text-white mb-4">What Shop Owners Say</h2>
-            <p className="text-zinc-500">Real shops, real results</p>
-          </motion.div>
-          <motion.div {...fadeInUp}>
-            <TestimonialCarousel />
-          </motion.div>
-        </div>
-      </section>
 
       {/* PRICING */}
       <section id="pricing" className="py-24 px-4 relative">

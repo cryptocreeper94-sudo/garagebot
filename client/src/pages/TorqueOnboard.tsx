@@ -5,7 +5,7 @@ import { Link, useLocation } from "wouter";
 import {
   ArrowRight, ArrowLeft, CheckCircle, User, Building2, CreditCard,
   Users, Shield, Wrench, Mail, Phone, MapPin, Clock, Lock,
-  Eye, EyeOff, Loader2, Sparkles, ChevronRight, Globe
+  Eye, EyeOff, Loader2, Sparkles, ChevronRight, Globe, Plug, AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -35,8 +35,22 @@ const STEPS = [
   { id: 1, title: "Your Info", subtitle: "Create your account", icon: User },
   { id: 2, title: "Your Shop", subtitle: "Business details", icon: Building2 },
   { id: 3, title: "Services", subtitle: "What you repair", icon: Wrench },
-  { id: 4, title: "Team", subtitle: "Invite your crew", icon: Users },
-  { id: 5, title: "Verify", subtitle: "Trust Layer", icon: Shield },
+  { id: 4, title: "Software", subtitle: "Current tools", icon: Plug },
+  { id: 5, title: "Team", subtitle: "Invite your crew", icon: Users },
+  { id: 6, title: "Verify", subtitle: "Trust Layer", icon: Shield },
+];
+
+const SHOP_SOFTWARE = [
+  { id: "none", name: "No software (pen & paper)", desc: "Starting fresh" },
+  { id: "autoleap", name: "AutoLeap", desc: "Cloud-based shop management" },
+  { id: "tekmetric", name: "Tekmetric", desc: "Auto repair shop software" },
+  { id: "shopmonkey", name: "Shop-Ware / Shopmonkey", desc: "Modern shop platforms" },
+  { id: "mitchell", name: "Mitchell 1", desc: "ProDemand / Manager SE" },
+  { id: "alldata", name: "ALLDATA Manage", desc: "Shop management suite" },
+  { id: "shopboss", name: "ShopBoss", desc: "Auto repair software" },
+  { id: "protractor", name: "Protractor", desc: "Shop management system" },
+  { id: "quickbooks", name: "QuickBooks only", desc: "Accounting, no shop software" },
+  { id: "other", name: "Other", desc: "Something else" },
 ];
 
 const BUSINESS_HOURS = [
@@ -64,6 +78,9 @@ export default function TorqueOnboard() {
   const [shop, setShop] = useState({ name: "", description: "", address: "", city: "", state: "", zipCode: "", phone: "", email: "", website: "" });
   const [selectedVehicleTypes, setSelectedVehicleTypes] = useState<string[]>([]);
   const [hours, setHours] = useState(BUSINESS_HOURS);
+  const [currentSoftware, setCurrentSoftware] = useState("");
+  const [otherSoftware, setOtherSoftware] = useState("");
+  const [wantsMigration, setWantsMigration] = useState(false);
   const [teamMembers, setTeamMembers] = useState([{ name: "", email: "", role: "technician" }]);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
@@ -76,8 +93,10 @@ export default function TorqueOnboard() {
       case 3:
         return selectedVehicleTypes.length > 0;
       case 4:
-        return true;
+        return currentSoftware !== "";
       case 5:
+        return true;
+      case 6:
         return acceptTerms;
       default:
         return false;
@@ -216,14 +235,14 @@ export default function TorqueOnboard() {
               <span className="font-tech text-lg font-bold text-[#00D9FF]">TORQUE</span>
             </span>
           </Link>
-          <div className="text-sm text-zinc-500">Step {step} of 5</div>
+          <div className="text-sm text-zinc-500">Step {step} of 6</div>
         </div>
       </div>
 
       {/* Progress bar */}
       <div className="fixed top-16 left-0 right-0 z-40 h-1 bg-white/[0.05]">
         <motion.div
-          animate={{ width: `${(step / 5) * 100}%` }}
+          animate={{ width: `${(step / 6) * 100}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="h-full bg-gradient-to-r from-[#00D9FF] to-[#8B5CF6]"
         />
@@ -481,7 +500,88 @@ export default function TorqueOnboard() {
                 <Card className="p-8 bg-[#0f172a]/60 border-white/[0.08] rounded-2xl" data-testid="step-4">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-[#F59E0B]/10 flex items-center justify-center mx-auto mb-4">
-                      <Users className="w-8 h-8 text-[#F59E0B]" />
+                      <Plug className="w-8 h-8 text-[#F59E0B]" />
+                    </div>
+                    <h2 className="text-2xl font-tech font-bold text-white mb-2">Current Software</h2>
+                    <p className="text-zinc-500 text-sm">What shop management tools do you use today?</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                    {SHOP_SOFTWARE.map(sw => {
+                      const selected = currentSoftware === sw.id;
+                      return (
+                        <motion.button
+                          key={sw.id}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => { setCurrentSoftware(sw.id); if (sw.id === "none") setWantsMigration(false); }}
+                          className={`p-4 rounded-xl border text-left transition-all duration-200 ${
+                            selected
+                              ? "bg-[#F59E0B]/10 border-[#F59E0B]/40 shadow-lg shadow-[#F59E0B]/5"
+                              : "bg-white/[0.03] border-white/[0.08] hover:border-white/20"
+                          }`}
+                          data-testid={`software-${sw.id}`}
+                        >
+                          <p className={`font-medium text-sm ${selected ? "text-white" : "text-zinc-400"}`}>{sw.name}</p>
+                          <p className="text-zinc-600 text-xs mt-0.5">{sw.desc}</p>
+                          {selected && <CheckCircle className="w-3.5 h-3.5 text-[#F59E0B] mt-1" />}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  {currentSoftware === "other" && (
+                    <div className="mb-6">
+                      <Label className="text-zinc-400 text-sm mb-1.5 block">What software do you use?</Label>
+                      <Input
+                        value={otherSoftware}
+                        onChange={e => setOtherSoftware(e.target.value)}
+                        placeholder="e.g., R.O. Writer, MaxxTraxx, etc."
+                        className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#F59E0B]/50"
+                        data-testid="input-other-software"
+                      />
+                    </div>
+                  )}
+
+                  {currentSoftware && currentSoftware !== "none" && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                      <div className="p-5 rounded-xl bg-[#F59E0B]/[0.05] border border-[#F59E0B]/20 mb-4">
+                        <div className="flex items-start gap-3">
+                          <Plug className="w-5 h-5 text-[#F59E0B] mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-white font-medium text-sm mb-2">Data Migration Available</p>
+                            <p className="text-zinc-500 text-xs leading-relaxed mb-3">
+                              We can help migrate your existing customer records, vehicle history, and repair orders into TORQUE. 
+                              Migration is a one-time add-on service — our team will assess compatibility and provide a quote based on your data volume.
+                            </p>
+                            <div className="flex items-start gap-3">
+                              <Checkbox
+                                checked={wantsMigration}
+                                onCheckedChange={(checked) => setWantsMigration(checked as boolean)}
+                                className="mt-0.5 border-white/20 data-[state=checked]:bg-[#F59E0B] data-[state=checked]:border-[#F59E0B]"
+                                data-testid="checkbox-migration"
+                              />
+                              <label className="text-zinc-400 text-sm cursor-pointer" onClick={() => setWantsMigration(!wantsMigration)}>
+                                Yes, I'm interested in data migration (our team will contact you with details and pricing after setup)
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2 text-xs text-zinc-600">
+                        <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                        <span>Migration is a separate service with its own pricing. Your 30-day free trial of TORQUE is not affected.</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </Card>
+              )}
+
+              {step === 5 && (
+                <Card className="p-8 bg-[#0f172a]/60 border-white/[0.08] rounded-2xl" data-testid="step-5">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 rounded-2xl bg-[#8B5CF6]/10 flex items-center justify-center mx-auto mb-4">
+                      <Users className="w-8 h-8 text-[#8B5CF6]" />
                     </div>
                     <h2 className="text-2xl font-tech font-bold text-white mb-2">Invite Your Team</h2>
                     <p className="text-zinc-500 text-sm">Add technicians and staff (you can do this later too)</p>
@@ -525,8 +625,8 @@ export default function TorqueOnboard() {
                 </Card>
               )}
 
-              {step === 5 && (
-                <Card className="p-8 bg-[#0f172a]/60 border-white/[0.08] rounded-2xl" data-testid="step-5">
+              {step === 6 && (
+                <Card className="p-8 bg-[#0f172a]/60 border-white/[0.08] rounded-2xl" data-testid="step-6">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 rounded-2xl bg-[#00D9FF]/10 flex items-center justify-center mx-auto mb-4">
                       <Shield className="w-8 h-8 text-[#00D9FF]" />
@@ -567,6 +667,21 @@ export default function TorqueOnboard() {
                           ) : null;
                         })}
                       </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                      <div className="flex items-center gap-2 text-sm text-zinc-500 mb-2">
+                        <Plug className="w-4 h-4" /> Current Software
+                      </div>
+                      <p className="text-white text-sm">
+                        {currentSoftware ? (SHOP_SOFTWARE.find(s => s.id === currentSoftware)?.name || "—") : "—"}
+                        {currentSoftware === "other" && otherSoftware && ` (${otherSoftware})`}
+                      </p>
+                      {wantsMigration && (
+                        <Badge className="bg-[#F59E0B]/10 border-[#F59E0B]/20 text-[#F59E0B] text-xs mt-2">
+                          Data migration requested
+                        </Badge>
+                      )}
                     </div>
 
                     <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
@@ -625,7 +740,7 @@ export default function TorqueOnboard() {
               {step === 1 ? "Back" : "Previous"}
             </Button>
 
-            {step < 5 ? (
+            {step < 6 ? (
               <Button
                 className="bg-[#00D9FF] hover:bg-[#00D9FF]/80 text-black font-bold gap-2 h-12 px-8"
                 onClick={() => setStep(step + 1)}

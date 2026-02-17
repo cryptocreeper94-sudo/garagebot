@@ -10,7 +10,7 @@ import {
   Copy, Mail, Phone, User, Tag, Rocket, Archive, GitBranch, Blocks, Car,
   MessageCircle, Send, Bot, Loader2, Megaphone, Search, Filter,
   LayoutDashboard, Activity, BarChart3, TrendingUp, PieChart,
-  Newspaper, Palette, FileText, Command
+  Newspaper, Palette, FileText, Command, Package
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,7 @@ import imgSystemHealth from "@/assets/images/cc/system-health.png";
 import imgVendorManagement from "@/assets/images/cc/vendor-management.png";
 import imgSupportCenter from "@/assets/images/cc/support-center.png";
 import imgInvestorPortal from "@/assets/images/cc/investor-portal.png";
+import imgSellParts from "@/assets/images/cc/sell-parts.png";
 
 interface DevCommandCard {
   label: string;
@@ -86,6 +87,7 @@ const DEV_COMMAND_CATEGORIES: DevCommandCategory[] = [
       { label: "Affiliate Networks", description: "Amazon, CJ, ShareASale, eBay & more", tab: "affiliates", icon: Link2, image: imgAffiliateNetworks, featured: true },
       { label: "Vendor Outreach", description: "Contact list for 45+ retailers needing connections", tab: "affiliates", icon: Megaphone, image: imgVendorManagement },
       { label: "Inbound Affiliates", description: "GB-XXXXXX referral program management", href: "/affiliates", icon: Users, image: imgInboundAffiliate },
+      { label: "Sell Your Parts", description: "User parts marketplace & listing management", href: "/parts-marketplace", icon: Package, image: imgSellParts },
       { label: "Stripe Payments", description: "Payment processing, subscriptions & invoices", href: "/dashboard", icon: CreditCard, image: imgStripePayments },
     ]
   },
