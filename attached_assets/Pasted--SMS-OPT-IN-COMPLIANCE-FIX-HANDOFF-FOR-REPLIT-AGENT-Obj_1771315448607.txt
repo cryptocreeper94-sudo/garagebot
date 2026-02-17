@@ -1,0 +1,43 @@
+📦 SMS OPT‑IN COMPLIANCE FIX — HANDOFF FOR REPLIT AGENT
+Objective: Resolve Toll‑Free Verification rejection (Reason Code 30475) by creating a public, carrier‑compliant SMS opt‑in demo page inside the GarageBot Replit app.
+
+SUMMARY:
+Carriers require a PUBLIC URL that shows the ACTUAL SMS opt‑in flow, including the checkbox and consent language. A policy page alone is not enough. We need a simple, publicly accessible demo page that visually displays the opt‑in mechanism.
+
+REQUIRED DELIVERABLE:
+Create a new public page at:
+https://garagebot.io/sms-opt-in-demo
+
+This page must show:
+- A simple mock signup form
+- The SMS opt‑in checkbox
+- The required consent language (see below)
+- Checkbox must be UNCHECKED by default
+- Checkbox must be OPTIONAL
+- SMS consent must be SEPARATE from Terms of Service and Privacy Policy
+- Page must load publicly with no login required
+- No backend logic or database writes needed
+
+REQUIRED CHECKBOX LANGUAGE (USE EXACTLY THIS):
+☐ I agree to receive SMS messages from GarageBot about account updates, appointments, and promotions. Message frequency varies. Msg & data rates may apply. Reply STOP to unsubscribe, HELP for help. Consent is not required to use GarageBot.
+
+PAGE STRUCTURE REQUIREMENTS:
+- Include basic fields (Name, Email, Phone) to simulate a signup form
+- Include the SMS checkbox with the exact language above
+- Do NOT bundle SMS consent with Terms or Privacy
+- Do NOT pre-check the box
+- Do NOT require the box to submit the form
+- This page is ONLY for carrier verification and does not need to function
+
+COMPLETION CRITERIA:
+1. Page is live at https://garagebot.io/sms-opt-in-demo
+2. Checkbox and consent text are visible on the page
+3. Checkbox is optional and unchecked
+4. Page loads publicly without authentication
+5. I can submit this link to the carrier for Toll‑Free verification
+
+NOTES:
+- Do NOT modify the existing /sms-consent policy page.
+- This demo page must remain publicly accessible until verification is approved.
+
+END OF HANDOFF

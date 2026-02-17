@@ -63,6 +63,7 @@ import Rentals from "@/pages/Rentals";
 import OEMParts from "@/pages/OEMParts";
 import AffiliateProgram from "@/pages/AffiliateProgram";
 import CommandCenter from "@/pages/CommandCenter";
+import SMSOptInDemo from "@/pages/SMSOptInDemo";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -122,6 +123,7 @@ function Router() {
       <Route path="/oem-parts">{() => <OEMParts />}</Route>
       <Route path="/affiliates">{() => <AffiliateProgram />}</Route>
       <Route path="/command-center">{() => <CommandCenter />}</Route>
+      <Route path="/sms-opt-in-demo">{() => <SMSOptInDemo />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );
