@@ -72,6 +72,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByPhone(phone: string): Promise<User | undefined>;
+  getUserByTrustLayerId(trustLayerId: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
 
@@ -92,6 +93,7 @@ export interface IStorage {
 
   // Service Reminders
   getServiceRemindersByUser(userId: string): Promise<ServiceReminder[]>;
+  getServiceRemindersByVehicle(vehicleId: string): Promise<ServiceReminder[]>;
   getPendingReminders(): Promise<ServiceReminder[]>;
   createServiceReminder(reminder: InsertServiceReminder): Promise<ServiceReminder>;
   markReminderSent(id: string): Promise<void>;
@@ -507,6 +509,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByTrustLayerId(trustLayerId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.trustLayerId, trustLayerId));
+    return user;
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
@@ -584,6 +591,10 @@ export class DatabaseStorage implements IStorage {
   // Service Reminders
   async getServiceRemindersByUser(userId: string): Promise<ServiceReminder[]> {
     return await db.select().from(serviceReminders).where(eq(serviceReminders.userId, userId)).orderBy(asc(serviceReminders.dueDate));
+  }
+
+  async getServiceRemindersByVehicle(vehicleId: string): Promise<ServiceReminder[]> {
+    return await db.select().from(serviceReminders).where(eq(serviceReminders.vehicleId, vehicleId)).orderBy(asc(serviceReminders.dueDate));
   }
 
   async getPendingReminders(): Promise<ServiceReminder[]> {

@@ -10194,6 +10194,296 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
+  // ==================== ECOSYSTEM API v1 ====================
+  // Trust Layer JWT-authenticated API for ecosystem apps (Verdara, etc.)
+
+  const ecosystemApiAuth = async (req: any, res: any, next: any) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'UNAUTHORIZED',
+        message: 'Missing or invalid Authorization header. Use: Bearer <trust-layer-jwt>'
+      });
+    }
+
+    const token = authHeader.substring(7);
+    try {
+      const { verifyToken } = await import('./trustlayer-sso');
+      const decoded = verifyToken(token);
+      if (!decoded) {
+        return res.status(401).json({
+          error: 'INVALID_TOKEN',
+          message: 'Invalid or expired Trust Layer JWT.'
+        });
+      }
+
+      const user = await storage.getUserByTrustLayerId(decoded.trustLayerId);
+      if (!user) {
+        return res.status(404).json({
+          error: 'USER_NOT_FOUND',
+          message: 'No GarageBot user linked to this Trust Layer ID.'
+        });
+      }
+
+      req.ecosystemUser = user;
+      req.trustLayerId = decoded.trustLayerId;
+      next();
+    } catch (error) {
+      console.error('Ecosystem API auth error:', error);
+      return res.status(500).json({
+        error: 'AUTH_ERROR',
+        message: 'Authentication error occurred.'
+      });
+    }
+  };
+
+  app.get('/api/ecosystem/v1/equipment', ecosystemApiAuth, async (req: any, res) => {
+    try {
+      const user = req.ecosystemUser;
+      const vehicleList = await storage.getVehiclesByUserId(user.id);
+
+      const equipment = vehicleList.map(v => ({
+        id: v.id,
+        vin: v.vin,
+        year: v.year,
+        make: v.make,
+        model: v.model,
+        trim: v.trim,
+        vehicleType: v.vehicleType,
+        engineType: v.engineType,
+        engineSize: v.engineSize,
+        fuelType: v.fuelType,
+        transmission: v.transmission,
+        drivetrain: v.drivetrain,
+        bodyStyle: v.bodyStyle,
+        currentMileage: v.currentMileage,
+        isPrimary: v.isPrimary,
+        imageUrl: v.imageUrl,
+        createdAt: v.createdAt,
+        updatedAt: v.updatedAt
+      }));
+
+      res.json({
+        success: true,
+        trustLayerId: req.trustLayerId,
+        count: equipment.length,
+        equipment
+      });
+    } catch (err) {
+      console.error('Ecosystem equipment list error:', err);
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Failed to fetch equipment.' });
+    }
+  });
+
+  app.get('/api/ecosystem/v1/equipment/:id', ecosystemApiAuth, async (req: any, res) => {
+    try {
+      const user = req.ecosystemUser;
+      const vehicle = await storage.getVehicle(req.params.id);
+
+      if (!vehicle || vehicle.userId !== user.id) {
+        return res.status(404).json({ error: 'NOT_FOUND', message: 'Equipment not found.' });
+      }
+
+      const serviceHistory = await storage.getServiceRecordsByVehicle(vehicle.id);
+      const maintenanceItems = await storage.getMaintenanceSchedulesByVehicle(vehicle.id);
+      const reminders = await storage.getServiceRemindersByVehicle(vehicle.id);
+
+      res.json({
+        success: true,
+        equipment: {
+          id: vehicle.id,
+          vin: vehicle.vin,
+          year: vehicle.year,
+          make: vehicle.make,
+          model: vehicle.model,
+          trim: vehicle.trim,
+          vehicleType: vehicle.vehicleType,
+          engineType: vehicle.engineType,
+          engineSize: vehicle.engineSize,
+          fuelType: vehicle.fuelType,
+          transmission: vehicle.transmission,
+          drivetrain: vehicle.drivetrain,
+          bodyStyle: vehicle.bodyStyle,
+          exteriorColor: vehicle.exteriorColor,
+          interiorColor: vehicle.interiorColor,
+          currentMileage: vehicle.currentMileage,
+          oilType: vehicle.oilType,
+          oilCapacity: vehicle.oilCapacity,
+          tireSize: vehicle.tireSize,
+          isPrimary: vehicle.isPrimary,
+          imageUrl: vehicle.imageUrl,
+          notes: vehicle.notes,
+          createdAt: vehicle.createdAt,
+          updatedAt: vehicle.updatedAt
+        },
+        serviceHistory: serviceHistory.map(s => ({
+          id: s.id,
+          serviceType: s.serviceType,
+          serviceDate: s.serviceDate,
+          mileage: s.mileage,
+          description: s.description,
+          totalCost: s.totalCost,
+          nextServiceDue: s.nextServiceDue,
+          nextServiceMileage: s.nextServiceMileage
+        })),
+        maintenanceSchedule: maintenanceItems.map(m => ({
+          id: m.id,
+          taskName: m.taskName,
+          intervalMiles: m.intervalMiles,
+          intervalMonths: m.intervalMonths,
+          lastCompletedDate: m.lastCompletedDate,
+          lastCompletedMileage: m.lastCompletedMileage,
+          nextDueDate: m.nextDueDate,
+          nextDueMileage: m.nextDueMileage,
+          estimatedCost: m.estimatedCost,
+          priority: m.priority,
+          status: m.status
+        })),
+        reminders: reminders.map(r => ({
+          id: r.id,
+          serviceType: r.serviceType,
+          reminderType: r.reminderType,
+          dueMileage: r.dueMileage,
+          dueDate: r.dueDate,
+          isCompleted: r.isCompleted
+        }))
+      });
+    } catch (err) {
+      console.error('Ecosystem equipment detail error:', err);
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Failed to fetch equipment details.' });
+    }
+  });
+
+  app.get('/api/ecosystem/v1/maintenance-alerts', ecosystemApiAuth, async (req: any, res) => {
+    try {
+      const user = req.ecosystemUser;
+      const overdue = await storage.getOverdueMaintenanceByUser(user.id);
+      const upcoming = await storage.getMaintenanceSchedulesByUser(user.id);
+
+      const upcomingSoon = upcoming.filter(m => {
+        if (m.status !== 'upcoming' || !m.nextDueDate) return false;
+        const daysUntilDue = (new Date(m.nextDueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+        return daysUntilDue > 0 && daysUntilDue <= 30;
+      });
+
+      res.json({
+        success: true,
+        trustLayerId: req.trustLayerId,
+        alerts: {
+          overdueCount: overdue.length,
+          upcomingCount: upcomingSoon.length,
+          overdue: overdue.map(m => ({
+            id: m.id,
+            vehicleId: m.vehicleId,
+            taskName: m.taskName,
+            nextDueDate: m.nextDueDate,
+            nextDueMileage: m.nextDueMileage,
+            priority: m.priority
+          })),
+          upcoming: upcomingSoon.map(m => ({
+            id: m.id,
+            vehicleId: m.vehicleId,
+            taskName: m.taskName,
+            nextDueDate: m.nextDueDate,
+            nextDueMileage: m.nextDueMileage,
+            priority: m.priority
+          }))
+        }
+      });
+    } catch (err) {
+      console.error('Ecosystem maintenance alerts error:', err);
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Failed to fetch maintenance alerts.' });
+    }
+  });
+
+  app.post('/api/ecosystem/v1/equipment', ecosystemApiAuth, async (req: any, res) => {
+    try {
+      const user = req.ecosystemUser;
+      const { year, make, model, trim, vehicleType, engineType, engineSize, fuelType, vin, currentMileage, notes } = req.body;
+
+      if (!year || !make || !model) {
+        return res.status(400).json({
+          error: 'VALIDATION_ERROR',
+          message: 'year, make, and model are required fields.'
+        });
+      }
+
+      const vehicle = await storage.createVehicle({
+        userId: user.id,
+        year: parseInt(year),
+        make,
+        model,
+        trim: trim || null,
+        vehicleType: vehicleType || 'equipment',
+        engineType: engineType || null,
+        engineSize: engineSize || null,
+        fuelType: fuelType || null,
+        vin: vin || null,
+        currentMileage: currentMileage ? parseInt(currentMileage) : null,
+        notes: notes || null
+      });
+
+      res.status(201).json({
+        success: true,
+        equipment: {
+          id: vehicle.id,
+          year: vehicle.year,
+          make: vehicle.make,
+          model: vehicle.model,
+          trim: vehicle.trim,
+          vehicleType: vehicle.vehicleType,
+          createdAt: vehicle.createdAt
+        }
+      });
+    } catch (err) {
+      console.error('Ecosystem equipment create error:', err);
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Failed to create equipment entry.' });
+    }
+  });
+
+  app.patch('/api/ecosystem/v1/equipment/:id', ecosystemApiAuth, async (req: any, res) => {
+    try {
+      const user = req.ecosystemUser;
+      const vehicle = await storage.getVehicle(req.params.id);
+
+      if (!vehicle || vehicle.userId !== user.id) {
+        return res.status(404).json({ error: 'NOT_FOUND', message: 'Equipment not found.' });
+      }
+
+      const allowedFields = ['currentMileage', 'notes', 'engineType', 'engineSize', 'fuelType', 'vehicleType', 'trim'];
+      const updates: Record<string, any> = {};
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updates[field] = req.body[field];
+        }
+      }
+
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({
+          error: 'VALIDATION_ERROR',
+          message: `No valid fields to update. Allowed: ${allowedFields.join(', ')}`
+        });
+      }
+
+      const updated = await storage.updateVehicle(vehicle.id, updates);
+      res.json({
+        success: true,
+        equipment: {
+          id: updated!.id,
+          year: updated!.year,
+          make: updated!.make,
+          model: updated!.model,
+          vehicleType: updated!.vehicleType,
+          currentMileage: updated!.currentMileage,
+          updatedAt: updated!.updatedAt
+        }
+      });
+    } catch (err) {
+      console.error('Ecosystem equipment update error:', err);
+      res.status(500).json({ error: 'SERVER_ERROR', message: 'Failed to update equipment.' });
+    }
+  });
+
   // Shop Locations Management
   app.get('/api/shops/:shopId/locations', isAuthenticated, async (req: any, res) => {
     try {

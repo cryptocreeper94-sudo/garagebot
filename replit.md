@@ -98,6 +98,19 @@ Preferred communication style: Simple, everyday language.
 ## Partner API System
 - **Purpose**: Provides B2B API access for TORQUE shops with API Key + Secret authentication, granular scopes, and rate limiting.
 
+## Ecosystem API v1
+- **Route prefix**: `/api/ecosystem/v1/`
+- **Purpose**: Trust Layer JWT-authenticated API for cross-ecosystem app integration (Verdara, etc.)
+- **Auth**: Bearer token using shared Trust Layer SSO JWT (HS256, shared JWT_SECRET)
+- **Endpoints**:
+  - `GET /equipment` — List user's vehicles/equipment by Trust Layer ID
+  - `GET /equipment/:id` — Equipment details with service history, maintenance schedule, and reminders
+  - `GET /maintenance-alerts` — Overdue and upcoming (30-day) maintenance alerts
+  - `POST /equipment` — Create new equipment entry (write access)
+  - `PATCH /equipment/:id` — Update equipment fields (limited: mileage, notes, engine, fuel, type, trim)
+- **Rate Limits**: 120/min per Trust Layer ID, 10,000/day
+- **Handoff Doc**: `GARAGEBOT-ECOSYSTEM-API-HANDOFF.md`
+
 ## Weather Radar System
 - **Integration**: Utilizes Leaflet map and RainViewer radar tiles with NOAA Weather Alerts API for severe weather warnings.
 
