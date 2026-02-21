@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
@@ -52,6 +52,19 @@ import imgPriceWatch from "@/assets/images/hub/price-watch.png";
 import imgInviteFriends from "@/assets/images/hub/invite-friends.png";
 import imgContactUs from "@/assets/images/hub/contact-us.png";
 import imgGaragebotHome from "@/assets/images/hub/garagebot-home.png";
+import heroAutomotive from "@/assets/videos/hero-automotive.mp4";
+import heroPowersports from "@/assets/videos/hero-powersports.mp4";
+import heroMarine from "@/assets/videos/hero-marine.mp4";
+import heroOffroad from "@/assets/videos/hero-offroad.mp4";
+import heroPerformance from "@/assets/videos/hero-performance.mp4";
+
+const HERO_VIDEOS = [
+  { src: heroAutomotive, label: "Automotive" },
+  { src: heroPowersports, label: "Powersports" },
+  { src: heroMarine, label: "Marine" },
+  { src: heroOffroad, label: "Off-Road" },
+  { src: heroPerformance, label: "Performance" },
+];
 
 interface Feature {
   name: string;
@@ -299,6 +312,39 @@ export default function Explore() {
   const [isIOS, setIsIOS] = useState(false);
   const [pwaInstalled, setPwaInstalled] = useState(false);
 
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [nextVideoIndex, setNextVideoIndex] = useState(1);
+  const [isVideoTransitioning, setIsVideoTransitioning] = useState(false);
+  const currentVideoRef = useRef<HTMLVideoElement>(null);
+  const nextVideoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const handleVideoEnd = () => {
+      setIsVideoTransitioning(true);
+      setTimeout(() => {
+        setCurrentVideoIndex(nextVideoIndex);
+        setNextVideoIndex((nextVideoIndex + 1) % HERO_VIDEOS.length);
+        setIsVideoTransitioning(false);
+      }, 400);
+    };
+    const video = currentVideoRef.current;
+    if (video) {
+      video.addEventListener('ended', handleVideoEnd);
+      return () => video.removeEventListener('ended', handleVideoEnd);
+    }
+  }, [nextVideoIndex]);
+
+  useEffect(() => {
+    if (nextVideoRef.current) nextVideoRef.current.load();
+  }, [nextVideoIndex]);
+
+  useEffect(() => {
+    if (currentVideoRef.current && !isVideoTransitioning) {
+      currentVideoRef.current.volume = 0;
+      currentVideoRef.current.play().catch(() => {});
+    }
+  }, [currentVideoIndex, isVideoTransitioning]);
+
   useEffect(() => {
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setPwaInstalled(true);
@@ -357,36 +403,73 @@ export default function Explore() {
 
       <Nav />
 
-      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 pt-16 sm:pt-20 pb-10 sm:pb-12 w-full">
+      {/* Cinematic Video Hero */}
+      <div className="relative h-[45vh] sm:h-[50vh] overflow-hidden">
+        <div className="absolute inset-0 bg-black">
+          <video
+            ref={currentVideoRef}
+            key={`current-${currentVideoIndex}`}
+            autoPlay
+            muted
+            playsInline
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isVideoTransitioning ? 'opacity-0' : 'opacity-100'}`}
+          >
+            <source src={HERO_VIDEOS[currentVideoIndex].src} type="video/mp4" />
+          </video>
+          <video
+            ref={nextVideoRef}
+            key={`next-${nextVideoIndex}`}
+            muted
+            playsInline
+            preload="auto"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isVideoTransitioning ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <source src={HERO_VIDEOS[nextVideoIndex].src} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#050810]/80 via-black/40 to-[#050810]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+        </div>
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-12">
+          <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-[10px] font-mono text-cyan-400 tracking-wider uppercase mb-4">
+            {HERO_VIDEOS[currentVideoIndex].label} Category
+          </span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-tech font-black uppercase tracking-tight text-white mb-3">
+            <span className="text-cyan-400 drop-shadow-[0_0_40px_rgba(6,182,212,0.9)]">Explore</span>{" "}
+            Everything
+          </h2>
+          <p className="text-sm text-white/50 max-w-lg">
+            Right Part. First Time. <span className="text-cyan-400 font-medium">Every Engine.</span>
+          </p>
+        </div>
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+          {HERO_VIDEOS.map((v, idx) => (
+            <button key={idx} onClick={() => {
+              if (idx !== currentVideoIndex) {
+                setNextVideoIndex(idx);
+                setIsVideoTransitioning(true);
+                setTimeout(() => {
+                  setCurrentVideoIndex(idx);
+                  setNextVideoIndex((idx + 1) % HERO_VIDEOS.length);
+                  setIsVideoTransitioning(false);
+                }, 700);
+              }
+            }}
+              className={`transition-all duration-300 rounded-full ${currentVideoIndex === idx
+                ? 'w-8 h-2 bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.5)]'
+                : 'w-2 h-2 bg-white/30 hover:bg-white/50'}`}
+              data-testid={`video-dot-${idx}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-10 sm:pb-12 w-full">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-10"
         >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/[0.08] text-cyan-400 text-[10px] font-mono tracking-[0.2em] uppercase mb-6 shadow-[0_0_30px_rgba(6,182,212,0.15)] backdrop-blur-sm"
-          >
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_12px_rgba(6,182,212,0.8)]" />
-            Navigation Hub
-          </motion.div>
-
-          <h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-tech font-black uppercase tracking-tight mb-3 sm:mb-4"
-            data-testid="heading-explore"
-          >
-            <span className="text-cyan-400 drop-shadow-[0_0_40px_rgba(6,182,212,0.9)]">Explore</span>{" "}
-            <span className="text-white/90">Everything</span>
-          </h1>
-          <p className="text-white/40 max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed mb-5 sm:mb-6 px-2 sm:px-0">
-            <span className="text-cyan-400 font-medium">{totalFeatures} features</span> and{" "}
-            <span className="text-cyan-400 font-medium">{totalSubFeatures}+ capabilities</span> at your fingertips.
-            Find exactly what you need in seconds.
-          </p>
-
           <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-5 sm:mb-6">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
