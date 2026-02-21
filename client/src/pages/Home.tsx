@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -22,11 +22,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
-import heroAutomotive from "@/assets/videos/hero-automotive.mp4";
-import heroPowersports from "@/assets/videos/hero-powersports.mp4";
-import heroMarine from "@/assets/videos/hero-marine.mp4";
-import heroOffroad from "@/assets/videos/hero-offroad.mp4";
-import heroPerformance from "@/assets/videos/hero-performance.mp4";
 import MarketTicker from "@/components/MarketTicker";
 import Footer from "@/components/Footer";
 import TrustLayerReviews from "@/components/TrustLayerReviews";
@@ -44,14 +39,6 @@ function getTimeGreeting(): string {
   return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
 }
 
-const HERO_VIDEOS = [
-  { src: heroAutomotive, label: "Automotive" },
-  { src: heroPowersports, label: "Powersports" },
-  { src: heroMarine, label: "Marine" },
-  { src: heroOffroad, label: "Off-Road" },
-  { src: heroPerformance, label: "Performance" },
-];
-
 export default function Home() {
   const [_, setLocation] = useLocation();
   const [isSearching, setIsSearching] = useState(false);
@@ -65,42 +52,6 @@ export default function Home() {
   const [showVinScanner, setShowVinScanner] = useState(false);
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
   const [showVoiceSearch, setShowVoiceSearch] = useState(false);
-
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  const [nextVideoIndex, setNextVideoIndex] = useState(1);
-  const [isVideoTransitioning, setIsVideoTransitioning] = useState(false);
-  const currentVideoRef = useRef<HTMLVideoElement>(null);
-  const nextVideoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const handleVideoEnd = () => {
-      setIsVideoTransitioning(true);
-      setTimeout(() => {
-        setCurrentVideoIndex(nextVideoIndex);
-        setNextVideoIndex((nextVideoIndex + 1) % HERO_VIDEOS.length);
-        setIsVideoTransitioning(false);
-      }, 400);
-    };
-    const video = currentVideoRef.current;
-    if (video) {
-      video.addEventListener('ended', handleVideoEnd);
-      return () => video.removeEventListener('ended', handleVideoEnd);
-    }
-  }, [nextVideoIndex]);
-
-  useEffect(() => {
-    if (nextVideoRef.current) {
-      nextVideoRef.current.load();
-    }
-  }, [nextVideoIndex]);
-
-  useEffect(() => {
-    if (currentVideoRef.current && !isVideoTransitioning) {
-      const video = currentVideoRef.current;
-      video.volume = 0;
-      video.play().catch(() => {});
-    }
-  }, [currentVideoIndex, isVideoTransitioning]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,66 +91,7 @@ export default function Home() {
       <Nav />
       <MarketTicker />
 
-      {/* Cinematic Video Hero Background */}
-      <section className="relative min-h-[70vh] lg:min-h-[80vh] overflow-hidden">
-        <div className="absolute inset-0 bg-black">
-          <video
-            ref={currentVideoRef}
-            key={`current-${currentVideoIndex}`}
-            autoPlay
-            muted
-            playsInline
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isVideoTransitioning ? 'opacity-0' : 'opacity-100'}`}
-          >
-            <source src={HERO_VIDEOS[currentVideoIndex].src} type="video/mp4" />
-          </video>
-          <video
-            ref={nextVideoRef}
-            key={`next-${nextVideoIndex}`}
-            muted
-            playsInline
-            preload="auto"
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isVideoTransitioning ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <source src={HERO_VIDEOS[nextVideoIndex].src} type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
-        </div>
-
-        {/* Video category label */}
-        <div className="absolute top-[90px] lg:top-[85px] right-4 z-30">
-          <span className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-[10px] font-mono text-primary/80 tracking-wider uppercase">
-            {HERO_VIDEOS[currentVideoIndex].label}
-          </span>
-        </div>
-
-        {/* Dot indicators */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-          {HERO_VIDEOS.map((v, idx) => (
-            <button key={idx} onClick={() => {
-              if (idx !== currentVideoIndex) {
-                setNextVideoIndex(idx);
-                setIsVideoTransitioning(true);
-                setTimeout(() => {
-                  setCurrentVideoIndex(idx);
-                  setNextVideoIndex((idx + 1) % HERO_VIDEOS.length);
-                  setIsVideoTransitioning(false);
-                }, 700);
-              }
-            }}
-              className={`transition-all duration-300 rounded-full ${currentVideoIndex === idx
-                ? 'w-8 h-2 bg-primary shadow-[0_0_10px_rgba(6,182,212,0.5)]'
-                : 'w-2 h-2 bg-white/30 hover:bg-white/50'}`}
-              data-testid={`video-dot-${idx}`}
-            />
-          ))}
-        </div>
-
-      </section>
-
-      {/* Main Page Content */}
-      <div className="pt-[85px] lg:pt-[80px] min-h-screen pb-16 -mt-[70vh] lg:-mt-[80vh] relative z-10">
+      <div className="pt-[85px] lg:pt-[80px] min-h-screen pb-16">
 
         {/* DESKTOP BENTO LAYOUT - Only visible on lg+ screens */}
         <div className="hidden lg:block w-full px-2 xl:px-4 2xl:px-8">

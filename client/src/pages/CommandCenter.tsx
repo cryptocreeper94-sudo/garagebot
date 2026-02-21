@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
@@ -69,6 +69,19 @@ import imgBlockchainVerifier from "@/assets/images/cc/blockchain-verifier.png";
 import imgUserManagement from "@/assets/images/cc/user-management.png";
 import imgExplorePage from "@/assets/images/cc/explore-page.png";
 import imgInvestorPortal from "@/assets/images/cc/investor-portal.png";
+import heroAutomotive from "@/assets/videos/hero-automotive.mp4";
+import heroPowersports from "@/assets/videos/hero-powersports.mp4";
+import heroMarine from "@/assets/videos/hero-marine.mp4";
+import heroOffroad from "@/assets/videos/hero-offroad.mp4";
+import heroPerformance from "@/assets/videos/hero-performance.mp4";
+
+const HERO_VIDEOS = [
+  { src: heroAutomotive, label: "Automotive" },
+  { src: heroPowersports, label: "Powersports" },
+  { src: heroMarine, label: "Marine" },
+  { src: heroOffroad, label: "Off-Road" },
+  { src: heroPerformance, label: "Performance" },
+];
 
 interface LaunchCard {
   label: string;
@@ -400,6 +413,42 @@ export default function CommandCenter() {
 
   const totalFeatures = categories.reduce((sum, c) => sum + c.cards.length, 0);
 
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [nextVideoIndex, setNextVideoIndex] = useState(1);
+  const [isVideoTransitioning, setIsVideoTransitioning] = useState(false);
+  const currentVideoRef = useRef<HTMLVideoElement>(null);
+  const nextVideoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const handleVideoEnd = () => {
+      setIsVideoTransitioning(true);
+      setTimeout(() => {
+        setCurrentVideoIndex(nextVideoIndex);
+        setNextVideoIndex((nextVideoIndex + 1) % HERO_VIDEOS.length);
+        setIsVideoTransitioning(false);
+      }, 400);
+    };
+    const video = currentVideoRef.current;
+    if (video) {
+      video.addEventListener('ended', handleVideoEnd);
+      return () => video.removeEventListener('ended', handleVideoEnd);
+    }
+  }, [nextVideoIndex]);
+
+  useEffect(() => {
+    if (nextVideoRef.current) {
+      nextVideoRef.current.load();
+    }
+  }, [nextVideoIndex]);
+
+  useEffect(() => {
+    if (currentVideoRef.current && !isVideoTransitioning) {
+      const video = currentVideoRef.current;
+      video.volume = 0;
+      video.play().catch(() => {});
+    }
+  }, [currentVideoIndex, isVideoTransitioning]);
+
   useEffect(() => {
     if (user?.role === "admin") {
       setAuthenticated(true);
@@ -489,7 +538,66 @@ export default function CommandCenter() {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-6 pt-24 pb-16 space-y-16">
+      {/* Cinematic Video Hero */}
+      <div className="relative h-[40vh] overflow-hidden">
+        <div className="absolute inset-0 bg-black">
+          <video
+            ref={currentVideoRef}
+            key={`current-${currentVideoIndex}`}
+            autoPlay
+            muted
+            playsInline
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isVideoTransitioning ? 'opacity-0' : 'opacity-100'}`}
+          >
+            <source src={HERO_VIDEOS[currentVideoIndex].src} type="video/mp4" />
+          </video>
+          <video
+            ref={nextVideoRef}
+            key={`next-${nextVideoIndex}`}
+            muted
+            playsInline
+            preload="auto"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isVideoTransitioning ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <source src={HERO_VIDEOS[nextVideoIndex].src} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#070b16]/80 via-black/40 to-[#070b16]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+        </div>
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-16">
+          <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-[10px] font-mono text-cyan-400 tracking-wider uppercase mb-4">
+            {HERO_VIDEOS[currentVideoIndex].label} Category
+          </span>
+          <h2 className="text-2xl md:text-4xl font-bold text-white mb-2">
+            Command <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Center</span>
+          </h2>
+          <p className="text-sm text-white/50 max-w-md">
+            {totalFeatures} tools across {categories.length} categories — everything at your fingertips
+          </p>
+        </div>
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+          {HERO_VIDEOS.map((v, idx) => (
+            <button key={idx} onClick={() => {
+              if (idx !== currentVideoIndex) {
+                setNextVideoIndex(idx);
+                setIsVideoTransitioning(true);
+                setTimeout(() => {
+                  setCurrentVideoIndex(idx);
+                  setNextVideoIndex((idx + 1) % HERO_VIDEOS.length);
+                  setIsVideoTransitioning(false);
+                }, 700);
+              }
+            }}
+              className={`transition-all duration-300 rounded-full ${currentVideoIndex === idx
+                ? 'w-8 h-2 bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.5)]'
+                : 'w-2 h-2 bg-white/30 hover:bg-white/50'}`}
+              data-testid={`video-dot-${idx}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-6 pt-8 pb-16 space-y-16">
         {!loaded ? (
           [1,2,3,4].map(i => <SkeletonSection key={i} />)
         ) : (
