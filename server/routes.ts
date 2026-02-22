@@ -365,6 +365,66 @@ ${pages.map(p => `  <url>
     }
   });
 
+  app.post('/api/auth/ecosystem-login', async (req, res) => {
+    try {
+      const { identifier, credential } = req.body;
+      if (!identifier || !credential || typeof identifier !== "string" || typeof credential !== "string") {
+        return res.status(400).json({ message: "Trust Layer ID or email and credential are required" });
+      }
+      const trimmedId = identifier.trim();
+      const trimmedCred = credential.trim();
+      if (!trimmedId || !trimmedCred) {
+        return res.status(400).json({ message: "Trust Layer ID or email and credential are required" });
+      }
+
+      let user;
+      if (trimmedId.startsWith("tl-")) {
+        user = await storage.getUserByTrustLayerId(trimmedId);
+      }
+      if (!user) {
+        user = await storage.getUserByEmail(trimmedId.toLowerCase());
+      }
+      if (!user) {
+        return res.status(401).json({ message: "No ecosystem account found. Check your Trust Layer ID or email." });
+      }
+      if (!user.trustLayerId) {
+        return res.status(401).json({ message: "This account is not linked to the Trust Layer ecosystem. Please sign in with your email and password instead." });
+      }
+
+      let authenticated = false;
+      if (user.ecosystemPinHash && trimmedCred.length <= 8 && /^\d+$/.test(trimmedCred)) {
+        authenticated = authService.verifyPassword(trimmedCred, user.ecosystemPinHash);
+      }
+      if (!authenticated && user.passwordHash) {
+        authenticated = authService.verifyPassword(trimmedCred, user.passwordHash);
+      }
+      if (!authenticated) {
+        return res.status(401).json({ message: "Invalid credential. Please check your password or ecosystem PIN." });
+      }
+
+      await storage.updateUser(user.id, { lastLoginAt: new Date() });
+
+      (req.session as any).userId = user.id;
+      (req.session as any).isCustomAuth = true;
+
+      console.log(`[Ecosystem Login] ${user.email} authenticated via Trust Layer (${user.trustLayerId})`);
+      return res.json({
+        user: {
+          id: user.id,
+          username: user.username,
+          firstName: user.firstName,
+          role: user.role,
+          subscriptionTier: user.subscriptionTier,
+          ecosystemApp: user.ecosystemApp,
+          trustLayerId: user.trustLayerId,
+        }
+      });
+    } catch (error) {
+      console.error("Ecosystem login error:", error);
+      return res.status(500).json({ message: "Login failed. Please try again." });
+    }
+  });
+
   app.post('/api/auth/quick-login', async (req, res) => {
     try {
       const { username, quickPin } = req.body;

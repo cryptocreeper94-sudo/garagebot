@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 
-type View = "signup" | "signup-terms" | "login" | "forgot" | "reset-sent";
+type View = "signup" | "signup-terms" | "login" | "forgot" | "reset-sent" | "ecosystem";
 
 interface PasswordCheck {
   length: boolean;
@@ -189,6 +189,8 @@ export default function WelcomeGate() {
   });
 
   const [forgotEmail, setForgotEmail] = useState("");
+  const [ecosystemLoading, setEcosystemLoading] = useState(false);
+  const [ecosystemForm, setEcosystemForm] = useState({ identifier: "", credential: "" });
 
   const [termsScrolled, setTermsScrolled] = useState(false);
   const [privacyScrolled, setPrivacyScrolled] = useState(false);
@@ -343,6 +345,34 @@ export default function WelcomeGate() {
     }
   };
 
+  const handleEcosystemLogin = async () => {
+    if (!ecosystemForm.identifier.trim() || !ecosystemForm.credential.trim()) {
+      toast({ title: "Missing info", description: "Please enter your Trust Layer ID or email and your credential", variant: "destructive" });
+      return;
+    }
+    setEcosystemLoading(true);
+    try {
+      const res = await fetch("/api/auth/ecosystem-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ identifier: ecosystemForm.identifier.trim(), credential: ecosystemForm.credential }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Could not verify your ecosystem credentials.");
+
+      await queryClient.invalidateQueries({ queryKey: ["auth-user"] });
+      localStorage.setItem("garagebot_onboarding_seen", "true");
+      setIsOpen(false);
+
+      toast({ title: "Welcome back!", description: `Signed in via Trust Layer ecosystem${data.user?.ecosystemApp ? ` (${data.user.ecosystemApp})` : ""}` });
+    } catch (error: any) {
+      toast({ title: "Sign In Failed", description: error.message, variant: "destructive" });
+    } finally {
+      setEcosystemLoading(false);
+    }
+  };
+
   const handleForgotPassword = async () => {
     if (!forgotEmail.trim()) {
       toast({ title: "Missing email", description: "Please enter your email address", variant: "destructive" });
@@ -435,6 +465,16 @@ export default function WelcomeGate() {
                     </h2>
                     <p className="text-sm text-muted-foreground">
                       Log in to access your Garage
+                    </p>
+                  </>
+                )}
+                {view === "ecosystem" && (
+                  <>
+                    <h2 className="text-2xl font-tech font-bold uppercase mb-1">
+                      Trust Layer <span className="text-emerald-400">Ecosystem</span>
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Sign in from any DarkWave Studios app
                     </p>
                   </>
                 )}
@@ -801,6 +841,21 @@ export default function WelcomeGate() {
                     )}
                   </Button>
 
+                  <div className="relative flex items-center my-2">
+                    <div className="flex-1 border-t border-white/10" />
+                    <span className="px-3 text-[10px] text-muted-foreground uppercase tracking-wider">or</span>
+                    <div className="flex-1 border-t border-white/10" />
+                  </div>
+
+                  <button
+                    onClick={() => { setView("ecosystem"); setShowPassword(false); }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10 transition text-xs font-tech uppercase"
+                    data-testid="link-switch-to-ecosystem"
+                  >
+                    <Globe className="w-4 h-4" />
+                    Sign In with Trust Layer Ecosystem
+                  </button>
+
                   <p className="text-center text-xs text-muted-foreground">
                     Don't have an account?{" "}
                     <button
@@ -811,6 +866,83 @@ export default function WelcomeGate() {
                       Sign up free
                     </button>
                   </p>
+                </div>
+              )}
+
+              {view === "ecosystem" && (
+                <div className="space-y-4">
+                  <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+                    <p className="text-xs text-muted-foreground">
+                      Sign in with your Trust Layer ID or the email from any DarkWave ecosystem app
+                      (Happy Eats, TrustHome, Signal, TrustVault, Verdara, etc.)
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase font-mono flex items-center gap-1.5 mb-1.5">
+                      <Globe className="w-3 h-3" /> Trust Layer ID or Email
+                    </Label>
+                    <Input
+                      placeholder="tl-xxxx-xxxx or you@example.com"
+                      value={ecosystemForm.identifier}
+                      onChange={(e) => setEcosystemForm(f => ({ ...f, identifier: e.target.value }))}
+                      className="bg-white/5 border-white/10 focus:border-emerald-500/50"
+                      autoComplete="username"
+                      autoCapitalize="off"
+                      data-testid="input-ecosystem-identifier"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase font-mono flex items-center gap-1.5 mb-1.5">
+                      <Lock className="w-3 h-3" /> Password or Ecosystem PIN
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password or PIN"
+                        value={ecosystemForm.credential}
+                        onChange={(e) => setEcosystemForm(f => ({ ...f, credential: e.target.value }))}
+                        className="bg-white/5 border-white/10 focus:border-emerald-500/50 pr-10"
+                        onKeyDown={(e) => e.key === "Enter" && handleEcosystemLogin()}
+                        autoComplete="current-password"
+                        data-testid="input-ecosystem-credential"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground/70 mt-1">
+                      Use your full password or your ecosystem PIN if you've been whitelisted
+                    </p>
+                  </div>
+
+                  <Button
+                    className="w-full h-12 font-tech uppercase bg-emerald-600 text-white hover:bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                    onClick={handleEcosystemLogin}
+                    disabled={ecosystemLoading}
+                    data-testid="button-ecosystem-submit"
+                  >
+                    {ecosystemLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <Shield className="w-5 h-5 mr-2" />
+                        Sign In with Trust Layer
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full font-tech uppercase border-white/20"
+                    onClick={() => { setView("login"); setShowPassword(false); }}
+                    data-testid="button-back-to-login-from-ecosystem"
+                  >
+                    Sign in with email instead
+                  </Button>
                 </div>
               )}
 
@@ -879,7 +1011,7 @@ export default function WelcomeGate() {
                 </div>
               )}
 
-              {(view === "signup" || view === "login") && (
+              {(view === "signup" || view === "login" || view === "ecosystem") && (
                 <button
                   onClick={handleDismiss}
                   className="w-full text-center text-[11px] text-muted-foreground hover:text-white transition-colors py-3 mt-2"

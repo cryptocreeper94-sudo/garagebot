@@ -56,6 +56,8 @@ export const users = pgTable("users", {
   referralPointsBalance: integer("referral_points_balance").default(0),
   trustLayerId: text("trust_layer_id"),
   trustLayerMemberCard: text("trust_layer_member_card"),
+  ecosystemPinHash: text("ecosystem_pin_hash"),
+  ecosystemApp: text("ecosystem_app"),
   membershipTier: text("membership_tier").default("free"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

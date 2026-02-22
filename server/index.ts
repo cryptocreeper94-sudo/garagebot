@@ -167,6 +167,13 @@ async function initStripe() {
     log(`Marketing content seed error: ${err.message}`, "marketing");
   }
 
+  try {
+    const { seedEcosystemMembers } = await import("./seeds/ecosystemMembers");
+    await seedEcosystemMembers();
+  } catch (err: any) {
+    log(`Ecosystem members seed error: ${err.message}`, "ecosystem");
+  }
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
