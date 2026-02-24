@@ -382,6 +382,7 @@ export class OrbitEcosystemClient {
       const payload = {
         appId: GARAGEBOT_APP_ID,
         appName: 'GarageBot',
+        appSlug: 'garagebot',
         owner: GARAGEBOT_OWNER,
         ownerEmail: 'jason@darkwavestudios.io',
         description: 'Parts aggregator platform for all motorized vehicles — 68+ retailers, AI assistant, fleet management, TORQUE shop OS',
