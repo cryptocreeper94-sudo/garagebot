@@ -1,9 +1,34 @@
 import crypto from 'crypto';
 
-const ORBIT_HUB_URL = (process.env.ORBIT_HUB_URL || 'https://orbitstaffing.replit.app').replace(/\/$/, '');
+const ORBIT_HUB_URL = (process.env.ORBIT_HUB_URL || 'https://orbitstaffing.io').replace(/\/$/, '');
 const ORBIT_API_KEY = process.env.ORBIT_ECOSYSTEM_API_KEY;
 const ORBIT_API_SECRET = process.env.ORBIT_ECOSYSTEM_API_SECRET;
 const GARAGEBOT_WEBHOOK_SECRET = process.env.GARAGEBOT_WEBHOOK_SECRET;
+
+const GARAGEBOT_OWNER = 'Jason Andrews';
+const GARAGEBOT_APP_ID = 'dw_app_garagebot';
+
+interface PricingTier {
+  id: string;
+  name: string;
+  type: 'subscription' | 'one-time' | 'marketplace-fee';
+  priceMonthly?: number;
+  priceAnnual?: number;
+  priceFixed?: number;
+  percentageFee?: number;
+  description: string;
+}
+
+const GARAGEBOT_PRICING: PricingTier[] = [
+  { id: 'pro_monthly', name: 'Pro Founders Circle (Monthly)', type: 'subscription', priceMonthly: 19.99, description: 'Full Pro access with AI, fleet management, TORQUE shop tools' },
+  { id: 'pro_annual', name: 'Pro Founders Circle (Annual)', type: 'subscription', priceAnnual: 199.99, description: 'Annual Pro access — save vs monthly' },
+  { id: 'ad_free_monthly', name: 'Ad-Free Experience (Monthly)', type: 'subscription', priceMonthly: 5.00, description: 'Remove all ads from GarageBot' },
+  { id: 'ad_free_annual', name: 'Ad-Free Experience (Annual)', type: 'subscription', priceAnnual: 50.00, description: 'Annual ad-free — save vs monthly' },
+  { id: 'marketplace_fee_free', name: 'Marketplace Fee (Free/Basic Sellers)', type: 'marketplace-fee', percentageFee: 10, description: '10% marketplace facilitation fee charged to buyers' },
+  { id: 'marketplace_fee_pro', name: 'Marketplace Fee (Pro Sellers)', type: 'marketplace-fee', percentageFee: 6, description: '6% marketplace facilitation fee charged to buyers (Pro discount)' },
+  { id: 'torque_basic', name: 'TORQUE Basic', type: 'subscription', priceMonthly: 0, description: 'Free TORQUE shop management tier' },
+  { id: 'torque_pro', name: 'TORQUE Pro', type: 'subscription', priceMonthly: 49.99, description: 'Full TORQUE shop management with integrations' },
+];
 
 interface WorkerData {
   id: string;
@@ -349,6 +374,143 @@ export class OrbitEcosystemClient {
       jobId: job.id,
       status: 'approved',
     }]);
+  }
+
+  async registerApp(): Promise<OrbitResponse | null> {
+    console.log('[ORBIT] Registering GarageBot as ecosystem app...');
+    try {
+      const payload = {
+        appId: GARAGEBOT_APP_ID,
+        appName: 'GarageBot',
+        owner: GARAGEBOT_OWNER,
+        ownerEmail: 'jason@darkwavestudios.io',
+        description: 'Parts aggregator platform for all motorized vehicles — 68+ retailers, AI assistant, fleet management, TORQUE shop OS',
+        webhookUrl: `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'garagebot.io'}/api/orbit/webhook`,
+        capabilities: [
+          'subscription-revenue',
+          'marketplace-fees',
+          'parts-orders',
+          'shop-management',
+          'affiliate-commissions',
+        ],
+        pricingTiers: GARAGEBOT_PRICING,
+      };
+
+      const response = await fetch(`${ORBIT_HUB_URL}/api/admin/ecosystem/register-app`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(ORBIT_API_KEY ? { 'X-API-Key': ORBIT_API_KEY } : {}),
+          ...(ORBIT_API_SECRET ? { 'X-API-Secret': ORBIT_API_SECRET } : {}),
+          'X-App-Name': 'GarageBot',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        console.error(`[ORBIT] Registration error ${response.status}:`, data);
+        return { success: false, error: `Registration failed: ${response.status}` };
+      }
+
+      console.log('[ORBIT] GarageBot registered successfully:', data);
+      return { success: true, data };
+    } catch (error) {
+      console.error('[ORBIT] Registration request failed:', error);
+      return { success: false, error: String(error) };
+    }
+  }
+
+  async syncPricingCatalog(): Promise<OrbitResponse | null> {
+    console.log('[ORBIT] Syncing pricing catalog to ORBIT...');
+    return this.reportFinancialEvent({
+      eventType: 'revenue',
+      grossAmount: 0,
+      description: 'GarageBot pricing catalog sync',
+      metadata: {
+        syncType: 'pricing-catalog',
+        owner: GARAGEBOT_OWNER,
+        tiers: GARAGEBOT_PRICING,
+        lastUpdated: new Date().toISOString(),
+      },
+    });
+  }
+
+  async reportCheckoutRevenue(params: {
+    customerId: string;
+    customerEmail?: string;
+    amount: number;
+    plan: string;
+    billingPeriod?: 'monthly' | 'annual';
+    stripeSessionId?: string;
+  }): Promise<OrbitResponse | null> {
+    console.log(`[ORBIT] Reporting ${params.plan} revenue: $${params.amount}`);
+    return this.reportFinancialEvent({
+      eventType: 'revenue',
+      grossAmount: params.amount,
+      description: `GarageBot ${params.plan} — ${params.billingPeriod || 'one-time'}`,
+      metadata: {
+        owner: GARAGEBOT_OWNER,
+        customerId: params.customerId,
+        customerEmail: params.customerEmail,
+        plan: params.plan,
+        billingPeriod: params.billingPeriod,
+        stripeSessionId: params.stripeSessionId,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  async reportMarketplaceFee(params: {
+    listingId: string;
+    sellerId: string;
+    buyerTotal: number;
+    platformFee: number;
+    sellerPayout: number;
+    stripeSessionId?: string;
+  }): Promise<OrbitResponse | null> {
+    console.log(`[ORBIT] Reporting marketplace fee: $${params.platformFee}`);
+    return this.reportFinancialEvent({
+      eventType: 'revenue',
+      grossAmount: params.platformFee,
+      description: 'GarageBot Marketplace facilitation fee',
+      metadata: {
+        owner: GARAGEBOT_OWNER,
+        listingId: params.listingId,
+        sellerId: params.sellerId,
+        buyerTotal: params.buyerTotal,
+        sellerPayout: params.sellerPayout,
+        stripeSessionId: params.stripeSessionId,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  async reportPartsOrderRevenue(params: {
+    orderId: string;
+    customerId: string;
+    totalAmount: number;
+    itemCount: number;
+    stripeSessionId?: string;
+  }): Promise<OrbitResponse | null> {
+    console.log(`[ORBIT] Reporting parts order: $${params.totalAmount}`);
+    return this.reportFinancialEvent({
+      eventType: 'revenue',
+      grossAmount: params.totalAmount,
+      description: 'GarageBot parts order',
+      metadata: {
+        owner: GARAGEBOT_OWNER,
+        orderId: params.orderId,
+        customerId: params.customerId,
+        itemCount: params.itemCount,
+        stripeSessionId: params.stripeSessionId,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  getPricingCatalog(): PricingTier[] {
+    return GARAGEBOT_PRICING;
   }
 
   getWebhookSecret(): string {

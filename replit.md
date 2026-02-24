@@ -154,7 +154,7 @@ Preferred communication style: Simple, everyday language.
 - **AI**: OpenAI GPT-4.
 - **Blockchain**: Solana (via Helius API).
 - **Weather Radar**: RainViewer API, NOAA Weather Alerts API.
-- **ORBIT Staffing OS**: `https://orbitstaffing.replit.app` for payroll and staffing platform integration, including worker management, timesheets, and payroll processing.
+- **ORBIT Staffing OS**: `https://orbitstaffing.io` (production) for payroll, staffing, and bookkeeping integration. GarageBot registers as ecosystem app via `/api/admin/ecosystem/register-app`, pushes all subscription/marketplace/order revenue to ORBIT's financial hub under Jason Andrews. Revenue auto-reported on every Stripe checkout (Pro, Ad-Free, parts orders, marketplace fees). Pricing catalog available at `/api/orbit/pricing`.
 - **Meta Graph API**: For Facebook auto-posting and ad campaign management.
 
 ## Unified Business Integrations Hub

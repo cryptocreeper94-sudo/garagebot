@@ -2198,10 +2198,11 @@ ${pages.map(p => `  <url>
         },
       });
 
+      const subtotal = items.reduce((sum: number, item: any) => sum + parseFloat(item.unitPrice) * item.quantity, 0);
+
       if (customerEmail) {
         try {
           const { sendOrderConfirmationEmail } = await import('./services/emailService');
-          const subtotal = items.reduce((sum: number, item: any) => sum + parseFloat(item.unitPrice) * item.quantity, 0);
           sendOrderConfirmationEmail({
             orderNumber: session.id.slice(-8).toUpperCase(),
             customerName: currentUser?.firstName || currentUser?.username || 'Customer',
@@ -2213,6 +2214,14 @@ ${pages.map(p => `  <url>
           }).catch(e => console.error('[Checkout] Order email failed:', e));
         } catch {}
       }
+
+      orbitClient.reportPartsOrderRevenue({
+        orderId: session.id.slice(-8).toUpperCase(),
+        customerId: uid || 'guest',
+        totalAmount: subtotal,
+        itemCount: items.length,
+        stripeSessionId: session.id,
+      }).catch(e => console.error('[ORBIT] Parts order revenue report failed:', e));
       
       res.json({ url: session.url, sessionId: session.id });
     } catch (error: any) {
@@ -3966,6 +3975,22 @@ ${pages.map(p => `  <url>
         } catch {}
       }
 
+      const subAmounts: Record<string, Record<string, number>> = {
+        pro: { monthly: 19.99, annual: 199.99 },
+        'ad-free': { monthly: 5.00, annual: 50.00 },
+      };
+      const revenueAmount = subAmounts[subscriptionTier]?.[billingPeriod] || 0;
+      if (revenueAmount > 0) {
+        orbitClient.reportCheckoutRevenue({
+          customerId: userId,
+          customerEmail: user.email || undefined,
+          amount: revenueAmount,
+          plan: subscriptionTier === 'pro' ? 'Pro Founders Circle' : 'Ad-Free Experience',
+          billingPeriod: billingPeriod as 'monthly' | 'annual',
+          stripeSessionId: session.id,
+        }).catch(e => console.error('[ORBIT] Subscription revenue report failed:', e));
+      }
+
       res.json({ checkoutUrl: session.url });
     } catch (error) {
       console.error("Subscription checkout error:", error);
@@ -4323,6 +4348,39 @@ ${pages.map(p => `  <url>
         error: "Failed to check ORBIT status" 
       });
     }
+  });
+
+  app.post('/api/orbit/register', isAuthenticated, async (req: any, res) => {
+    try {
+      const result = await orbitClient.registerApp();
+      res.json(result || { success: false, message: 'ORBIT client not configured' });
+    } catch (error) {
+      console.error("ORBIT registration error:", error);
+      res.status(500).json({ success: false, error: "Failed to register with ORBIT" });
+    }
+  });
+
+  app.post('/api/orbit/sync-pricing', isAuthenticated, async (req: any, res) => {
+    try {
+      const result = await orbitClient.syncPricingCatalog();
+      res.json({
+        success: !!result,
+        pricing: orbitClient.getPricingCatalog(),
+        message: result ? 'Pricing synced to ORBIT' : 'ORBIT client not configured — pricing logged locally',
+      });
+    } catch (error) {
+      console.error("ORBIT pricing sync error:", error);
+      res.status(500).json({ error: "Failed to sync pricing to ORBIT" });
+    }
+  });
+
+  app.get('/api/orbit/pricing', async (req, res) => {
+    res.json({
+      owner: 'Jason Andrews',
+      app: 'GarageBot',
+      appId: 'dw_app_garagebot',
+      tiers: orbitClient.getPricingCatalog(),
+    });
   });
 
   app.post('/api/orbit/test-sync', isAuthenticated, async (req: any, res) => {
@@ -11416,6 +11474,15 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       });
 
       await storage.updatePartListing(listing.id, { status: 'pending_sale' });
+
+      orbitClient.reportMarketplaceFee({
+        listingId: listing.id,
+        sellerId: listing.sellerId,
+        buyerTotal: price + shippingPrice + platformFee,
+        platformFee,
+        sellerPayout: price,
+        stripeSessionId: session.id,
+      }).catch(e => console.error('[ORBIT] Marketplace fee report failed:', e));
 
       res.json({ url: session.url, sessionId: session.id });
     } catch (error: any) {
