@@ -2,7 +2,7 @@
 
 This document tracks potential affiliate partnerships, their networks, commission rates, and signup steps.
 
-## Current Active Affiliates (9 Partners)
+## Current Active Affiliates (16 Partners)
 
 | Retailer | Network | Status | Commission | Cookie | Notes |
 |----------|---------|--------|------------|--------|-------|
@@ -15,6 +15,13 @@ This document tracks potential affiliate partnerships, their networks, commissio
 | CarParts.com | CJ Affiliate | ✅ Active | 4-6% | 30d | Large inventory |
 | PartsGeek | ShareASale | ✅ Active | 3-5% | 30d | Good for rare parts |
 | CARiD | CJ Affiliate | ✅ Active | 3% | 30d | Accessories focus |
+| EKR Cover | Awin | ✅ Active | Varies | 30d | Custom-fit seat covers, top-rated on Amazon |
+| HCalory | Awin | ✅ Active | 1.8-10% | 30d | MID: 72063, diesel heaters, AOV $180 |
+| Redodo Power | Direct | ✅ Active | Varies | 30d | LiFePO4 batteries, RV/marine/solar |
+| Mokwheel | Awin | ✅ Active | 8% | 30d | MID: 119149, electric bikes |
+| Vanpowers | Awin | ✅ Active | 15% | 30d | Electric bikes, AOV $1,287 |
+| MaXpeedingRods | Awin | ✅ Active | 8-12% | 45d | MID: 16673, performance parts |
+| xLaserLab | Awin | ✅ Active | 8% | 90d | Laser engravers/cutters |
 
 ## Pending Applications
 

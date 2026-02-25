@@ -18,7 +18,10 @@ export type VendorCategory =
   | "RC & Hobby"
   | "Drones & FPV"
   | "Travel & Rental"
-  | "Tools & Equipment";
+  | "Tools & Equipment"
+  | "Electric Bikes & Scooters"
+  | "Power & Energy"
+  | "Interior & Accessories";
 
 export interface VendorInfo {
   id: string;
@@ -90,6 +93,13 @@ const VENDOR_DOMAINS: Record<string, string> = {
   autopartstoys: "autopartstoys.com",
   "seats-aero": "seats.aero",
   tcmt: "tcmtco.com",
+  ekrcover: "ekrauto.com",
+  hcalory: "hcalory.com",
+  "redodo-power": "redodopower.com",
+  mokwheel: "mokwheel.com",
+  vanpowers: "vanpowers.com",
+  maxpeedingrods: "maxpeedingrods.com",
+  xlaserlab: "xlaserlab.com",
 };
 
 export function getVendorLogoUrl(vendor: VendorInfo, size: number = 128): string {
@@ -899,6 +909,111 @@ export const VENDORS: VendorInfo[] = [
     affiliateNetwork: "CJ Affiliate",
     logoColor: "#6366F1"
   },
+  {
+    id: "ekrcover",
+    name: "EKR Cover",
+    slug: "ekrcover",
+    description: "Top-rated custom-fit seat covers on Amazon. Premium materials, vehicle-specific designs, and family-friendly durability. Leather, fabric, and neoprene options for cars, trucks, and SUVs.",
+    vendorCategory: "Interior & Accessories",
+    searchTemplate: "https://ekrauto.com/collections/all?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 75,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Awin",
+    logoColor: "#1E3A5F"
+  },
+  {
+    id: "hcalory",
+    name: "HCalory",
+    slug: "hcalory",
+    description: "Premium diesel air heaters and portable heating solutions for vehicles, RVs, boats, and off-grid setups. Trusted brand with 8% off sitewide and $180 average order value.",
+    vendorCategory: "Tools & Equipment",
+    searchTemplate: "https://www.hcalory.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "rv", "boats", "diesel"],
+    priority: 74,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Awin",
+    logoColor: "#E85D26"
+  },
+  {
+    id: "redodo-power",
+    name: "Redodo Power",
+    slug: "redodo-power",
+    description: "High-performance LiFePO4 lithium batteries for RVs, marine, solar, off-grid, and vehicle applications. Eco-friendly, long-lasting, and safe energy solutions with industry-leading warranties.",
+    vendorCategory: "Power & Energy",
+    searchTemplate: "https://www.redodopower.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "rv", "boats", "diesel", "smallengines", "generators"],
+    priority: 73,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Direct",
+    logoColor: "#DC2626"
+  },
+  {
+    id: "mokwheel",
+    name: "Mokwheel",
+    slug: "mokwheel",
+    description: "High-performance electric bikes for urban commuting, adventure, and everyday riding. Stylish, durable, and eco-friendly e-bikes with powerful motors and long-range batteries. Ships across the U.S.",
+    vendorCategory: "Electric Bikes & Scooters",
+    searchTemplate: "https://mokwheel.com/collections/all?q={query}",
+    hasLocalPickup: false,
+    categories: ["motorcycles", "powersports"],
+    priority: 72,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "Awin",
+    logoColor: "#22C55E"
+  },
+  {
+    id: "vanpowers",
+    name: "Vanpowers",
+    slug: "vanpowers",
+    description: "Premium electric bikes built for performance and style. Urban commuters and adventure riders love the sleek designs and powerful drivetrains. $1,200+ avg order with exclusive affiliate discounts.",
+    vendorCategory: "Electric Bikes & Scooters",
+    searchTemplate: "https://www.vanpowers.com/collections/all?q={query}",
+    hasLocalPickup: false,
+    categories: ["motorcycles", "powersports"],
+    priority: 71,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "Awin",
+    logoColor: "#0EA5E9"
+  },
+  {
+    id: "maxpeedingrods",
+    name: "MaXpeedingRods",
+    slug: "maxpeedingrods",
+    description: "10+ years in motorsport engineering. High-performance aftermarket parts: forged connecting rods, turbochargers, coilovers, exhaust manifolds, crankshafts, and ignition components at competitive prices.",
+    vendorCategory: "Performance & Racing",
+    searchTemplate: "https://www.maxpeedingrods.com/catalogsearch/result/?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "exotics"],
+    priority: 82,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Awin",
+    logoColor: "#FF4500"
+  },
+  {
+    id: "xlaserlab",
+    name: "xLaserLab",
+    slug: "xlaserlab",
+    description: "Professional laser engravers and cutters for workshops, garages, and makers. Engrave parts, create custom signage, personalize tools, and cut materials with precision laser technology.",
+    vendorCategory: "Tools & Equipment",
+    searchTemplate: "https://www.xlaserlab.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "motorcycles"],
+    priority: 68,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "Awin",
+    logoColor: "#7C3AED"
+  },
 ];
 
 export const VENDOR_CATEGORY_ORDER: VendorCategory[] = [
@@ -915,7 +1030,10 @@ export const VENDOR_CATEGORY_ORDER: VendorCategory[] = [
   "Small Engine & Outdoor",
   "Vehicle Electronics",
   "Coatings & Detailing",
+  "Interior & Accessories",
   "Tools & Equipment",
+  "Electric Bikes & Scooters",
+  "Power & Energy",
   "RC & Hobby",
   "Drones & FPV",
   "Travel & Rental",
@@ -935,7 +1053,10 @@ export const VENDOR_CATEGORY_ICONS: Record<VendorCategory, string> = {
   "Small Engine & Outdoor": "leaf",
   "Vehicle Electronics": "zap",
   "Coatings & Detailing": "paintBucket",
+  "Interior & Accessories": "sofa",
   "Tools & Equipment": "wrench",
+  "Electric Bikes & Scooters": "bike",
+  "Power & Energy": "battery",
   "RC & Hobby": "gamepad",
   "Drones & FPV": "radio",
   "Travel & Rental": "plane",
