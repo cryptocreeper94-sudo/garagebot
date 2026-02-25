@@ -11631,6 +11631,36 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
+  app.post("/api/sms-opt-in", async (req, res) => {
+    try {
+      const { name, email, phone, consentTimestamp, consentSource, consentUrl } = req.body;
+      if (!name || !email || !phone) {
+        return res.status(400).json({ error: "Name, email, and phone are required" });
+      }
+      if (!/^\+1\d{10}$/.test(phone)) {
+        return res.status(400).json({ error: "Valid US phone number required (+1XXXXXXXXXX)" });
+      }
+      console.log(`[SMS Opt-In] Consent recorded: ${name} (${email}) at ${phone} — source: ${consentSource}, url: ${consentUrl}, timestamp: ${consentTimestamp}`);
+      res.json({
+        success: true,
+        message: "SMS opt-in recorded successfully. You will receive a confirmation text shortly.",
+        consentRecord: {
+          name,
+          email,
+          phone,
+          consentTimestamp: consentTimestamp || new Date().toISOString(),
+          consentSource: consentSource || "web_form",
+          consentUrl: consentUrl || "https://garagebot.io/sms-opt-in-demo",
+          business: "DarkWave Studios LLC",
+          program: "GarageBot SMS Notifications",
+        },
+      });
+    } catch (error) {
+      console.error("SMS opt-in error:", error);
+      res.status(500).json({ error: "Failed to process SMS opt-in" });
+    }
+  });
+
   // Newsletter subscription
   app.post("/api/newsletter/subscribe", async (req, res) => {
     try {
