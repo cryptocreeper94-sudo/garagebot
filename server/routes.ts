@@ -60,6 +60,15 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
+  // Subdomain redirect for TORQUE (torque.lid.io → /torque)
+  app.use((req, res, next) => {
+    const host = req.hostname || req.headers.host || '';
+    if (host.startsWith('torque.') && req.path === '/') {
+      return res.redirect(301, '/torque');
+    }
+    next();
+  });
+
   // Auth middleware
   await setupAuth(app);
 
