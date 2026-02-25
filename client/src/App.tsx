@@ -123,6 +123,7 @@ function Router() {
       <Route path="/oem-parts">{() => <OEMParts />}</Route>
       <Route path="/affiliates">{() => <AffiliateProgram />}</Route>
       <Route path="/command-center">{() => <CommandCenter />}</Route>
+      <Route path="/sms-opt-in">{() => <SMSOptInDemo />}</Route>
       <Route path="/sms-opt-in-demo">{() => <SMSOptInDemo />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>

@@ -11650,7 +11650,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
           phone,
           consentTimestamp: consentTimestamp || new Date().toISOString(),
           consentSource: consentSource || "web_form",
-          consentUrl: consentUrl || "https://garagebot.io/sms-opt-in-demo",
+          consentUrl: consentUrl || "https://garagebot.io/sms-opt-in",
           business: "DarkWave Studios LLC",
           program: "GarageBot SMS Notifications",
         },
