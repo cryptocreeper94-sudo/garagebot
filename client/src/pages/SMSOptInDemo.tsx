@@ -82,13 +82,12 @@ export default function SMSOptInDemo() {
           </div>
           <div className="ml-8 space-y-2 text-sm text-slate-300">
             <p>
-              GarageBot by <strong>DarkWave Studios LLC</strong> sends text messages related to:
+              GarageBot by <strong>DarkWave Studios LLC</strong> sends text messages in the following categories:
             </p>
             <ul className="list-disc list-inside space-y-1.5 ml-2 text-slate-400">
-              <li><strong className="text-slate-300">Account Notifications:</strong> Login verifications, security alerts, and account updates</li>
-              <li><strong className="text-slate-300">Order Updates:</strong> Status notifications for parts orders placed through GarageBot</li>
-              <li><strong className="text-slate-300">Appointment Reminders:</strong> Service appointment reminders from TORQUE partner shops</li>
-              <li><strong className="text-slate-300">Vehicle Alerts:</strong> Maintenance reminders and recall notifications for your saved vehicles</li>
+              <li><strong className="text-slate-300">Account Notifications:</strong> Login verifications, security alerts, account updates, and subscription confirmations for your GarageBot account</li>
+              <li><strong className="text-slate-300">Customer Care:</strong> Support responses, service appointment reminders, vehicle-ready alerts, and follow-up messages related to your inquiries or service requests</li>
+              <li><strong className="text-slate-300">Delivery Notifications:</strong> Order confirmations, shipping updates, delivery status, and parts order tracking for purchases made through GarageBot</li>
             </ul>
           </div>
         </div>
@@ -180,7 +179,7 @@ export default function SMSOptInDemo() {
                   data-testid="checkbox-sms-opt-in"
                 />
                 <label htmlFor="sms-opt-in" className="text-sm text-slate-200 leading-relaxed cursor-pointer" data-testid="text-sms-consent">
-                  By checking this box, I consent to receive automated text messages from <strong>GarageBot (DarkWave Studios LLC)</strong> at the mobile number provided above. Messages may include account notifications, order updates, appointment reminders, and vehicle alerts. Message frequency varies (estimated 1–10 messages/month). <strong>Message and data rates may apply.</strong> Reply <strong>STOP</strong> to cancel at any time. Reply <strong>HELP</strong> for help. Consent to receive text messages is not a condition of any purchase.
+                  By checking this box, I consent to receive automated text messages from <strong>GarageBot (DarkWave Studios LLC)</strong> at the mobile number provided above. Messages include: <strong>Account Notifications</strong> (login alerts, security updates, subscription confirmations), <strong>Customer Care</strong> (support responses, appointment reminders, vehicle-ready alerts), and <strong>Delivery Notifications</strong> (order confirmations, shipping updates, parts order tracking). Message frequency varies (estimated 1–10 messages/month). <strong>Message and data rates may apply.</strong> Reply <strong>STOP</strong> to cancel at any time. Reply <strong>HELP</strong> for help. Consent to receive text messages is not a condition of any purchase.
                 </label>
               </div>
             </div>
