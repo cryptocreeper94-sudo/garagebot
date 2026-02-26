@@ -104,6 +104,7 @@ const VENDOR_DOMAINS: Record<string, string> = {
   yearone: "yearone.com",
   holley: "holley.com",
   roughcountry: "roughcountry.com",
+  vtoman: "vtoman.com",
   ekrcover: "ekrauto.com",
   hcalory: "hcalory.com",
   "redodo-power": "redodopower.com",
@@ -1191,6 +1192,21 @@ export const VENDORS: VendorInfo[] = [
     supportsAftermarket: true,
     affiliateNetwork: "AvantLink",
     logoColor: "#B22222"
+  },
+  {
+    id: "vtoman",
+    name: "VTOMAN",
+    slug: "vtoman",
+    description: "Advanced portable power stations and energy solutions for outdoor adventures, emergency backup, and off-grid living. Trusted across the US, UK, Canada, and Australia with an average order value of $600.",
+    vendorCategory: "Power & Energy",
+    searchTemplate: "https://www.vtoman.com/search?q={query}",
+    hasLocalPickup: false,
+    categories: ["cars", "rv", "boats", "atvs"],
+    priority: 75,
+    supportsOEM: false,
+    supportsAftermarket: false,
+    affiliateNetwork: "Awin",
+    logoColor: "#00B4D8"
   },
 ];
 
