@@ -688,3 +688,83 @@ Set vehicleInfo or partInfo to null if not applicable. If you cannot identify th
     };
   }
 }
+
+export interface DiagnosisCause {
+  cause: string;
+  likelihood: "high" | "medium" | "low";
+  explanation: string;
+  partsNeeded: { name: string; searchQuery: string; estimatedCost: string }[];
+  diyDifficulty: "easy" | "moderate" | "hard" | "professional";
+  urgency: "immediate" | "soon" | "monitor";
+}
+
+export interface DiagnosisResult {
+  symptomSummary: string;
+  possibleCauses: DiagnosisCause[];
+  safetyWarning?: string;
+  nextSteps: string[];
+  estimatedDIYSavings?: string;
+}
+
+export async function diagnoseSymptom(
+  symptom: string,
+  vehicle?: VehicleContext
+): Promise<DiagnosisResult> {
+  const vehicleInfo = vehicle
+    ? `Vehicle: ${vehicle.year || ''} ${vehicle.make || ''} ${vehicle.model || ''}${vehicle.trim ? ` ${vehicle.trim}` : ''}${vehicle.mileage ? ` with ${vehicle.mileage.toLocaleString()} miles` : ''}`
+    : "No specific vehicle provided";
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content: `You are an expert ASE-certified master mechanic and diagnostic specialist for GarageBot, a parts aggregator platform. When a user describes a vehicle symptom, provide a thorough diagnosis.
+
+Return ONLY valid JSON matching this exact structure:
+{
+  "symptomSummary": "Brief restatement of the problem",
+  "possibleCauses": [
+    {
+      "cause": "Name of the issue",
+      "likelihood": "high" | "medium" | "low",
+      "explanation": "2-3 sentence explanation of why this causes the symptom and how to confirm it",
+      "partsNeeded": [
+        { "name": "Part name", "searchQuery": "optimized search query for auto parts stores", "estimatedCost": "$XX-$XX" }
+      ],
+      "diyDifficulty": "easy" | "moderate" | "hard" | "professional",
+      "urgency": "immediate" | "soon" | "monitor"
+    }
+  ],
+  "safetyWarning": "Only include if there's a genuine safety concern, otherwise null",
+  "nextSteps": ["Step 1 to narrow down the cause", "Step 2", "Step 3"],
+  "estimatedDIYSavings": "Estimated savings doing DIY vs shop repair"
+}
+
+Rules:
+- List 3-5 possible causes ranked by likelihood (most likely first)
+- Make search queries vehicle-specific when possible (e.g. "2019 Ford F-150 brake pads front" not just "brake pads")
+- Include realistic price ranges for parts
+- Be practical and actionable — these are real people trying to fix their vehicles
+- If the symptom could indicate a safety issue, always include a safetyWarning`
+      },
+      {
+        role: "user",
+        content: `${vehicleInfo}\n\nSymptom: ${symptom}`
+      }
+    ],
+    max_tokens: 1500,
+    temperature: 0.4,
+  });
+
+  const content = response.choices[0]?.message?.content || "{}";
+  const parsed = extractJsonFromResponse(content);
+
+  return {
+    symptomSummary: parsed.symptomSummary || symptom,
+    possibleCauses: parsed.possibleCauses || [],
+    safetyWarning: parsed.safetyWarning || undefined,
+    nextSteps: parsed.nextSteps || [],
+    estimatedDIYSavings: parsed.estimatedDIYSavings || undefined,
+  };
+}

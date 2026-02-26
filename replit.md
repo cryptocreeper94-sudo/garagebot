@@ -41,7 +41,8 @@ Preferred communication style: Simple, everyday language.
 
 ## AI Features (Buddy AI)
 - **Core Service**: Unified AI assistant powered by OpenAI.
-- **Capabilities**: Conversational AI with memory, intelligent part recommendations, AI-generated DIY repair guides, mechanic estimates, proactive vehicle alerts, and part definitions.
+- **Capabilities**: Conversational AI with memory, intelligent part recommendations, AI-generated DIY repair guides, mechanic estimates, proactive vehicle alerts, part definitions, and AI symptom diagnosis engine.
+- **Symptom Diagnosis**: Route `/diagnose` — Users describe vehicle symptoms in plain English, AI diagnoses likely causes ranked by probability, lists parts needed with direct vendor search links, shows DIY difficulty, urgency level, and estimated savings.
 
 ## Data Storage
 - **Database**: PostgreSQL, accessed via Neon serverless driver.

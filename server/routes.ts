@@ -84,6 +84,7 @@ export async function registerRoutes(
       { path: '/affiliate-disclosure', priority: '0.5', changefreq: 'monthly' },
       { path: '/support', priority: '0.6', changefreq: 'monthly' },
       { path: '/blog', priority: '0.8', changefreq: 'weekly' },
+      { path: '/diagnose', priority: '0.9', changefreq: 'daily' },
       { path: '/diy-guides', priority: '0.8', changefreq: 'weekly' },
       { path: '/pro', priority: '0.7', changefreq: 'monthly' },
       { path: '/torque', priority: '0.8', changefreq: 'weekly' },
@@ -976,6 +977,23 @@ ${pages.map(p => `  <url>
     } catch (error) {
       console.error("Estimate error:", error);
       res.status(500).json({ error: "Failed to get estimate" });
+    }
+  });
+
+  // AI Symptom Diagnosis
+  app.post('/api/ai/diagnose', async (req, res) => {
+    if (!checkAIRateLimit(req, res)) return;
+    try {
+      const { symptom, vehicle } = req.body;
+      if (!symptom || typeof symptom !== 'string' || symptom.trim().length < 5) {
+        return res.status(400).json({ error: "Please describe the symptom in at least a few words" });
+      }
+      
+      const result = await aiAssistant.diagnoseSymptom(symptom.trim(), vehicle || undefined);
+      res.json(result);
+    } catch (error) {
+      console.error("Diagnosis error:", error);
+      res.status(500).json({ error: "Failed to diagnose symptom" });
     }
   });
 

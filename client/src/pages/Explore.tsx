@@ -148,6 +148,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     icon: BookOpen,
     gradient: "from-emerald-500 to-teal-500",
     features: [
+      { name: "AI Symptom Diagnosis", description: "Describe what's wrong with your vehicle and AI diagnoses the problem, identifies parts needed, and links you to vendors.", href: "/diagnose", icon: Wrench, image: imgDiyGuides, glowColor: "cyan", featured: true, subFeatures: ["AI Powered", "Part Finder", "Cost Estimates", "DIY Tips"] },
       { name: "DIY Repair Guides", description: "Step-by-step guides for every skill level with videos, tools needed, and difficulty ratings.", href: "/diy-guides", icon: Wrench, image: imgDiyGuides, glowColor: "emerald", featured: true, subFeatures: ["28+ Guides", "Video Tutorials", "Tool Lists", "Difficulty"] },
       { name: "Shade Tree Mechanics", description: "Community hub for DIY enthusiasts. Browse tips, tricks, and estimated savings vs shop prices.", href: "/shade-tree", icon: Star, image: imgShadeTree, glowColor: "yellow", subFeatures: ["Community Tips", "Savings Calc", "Skill Levels", "Photo Guides"] },
       { name: "Auto Trivia", description: "Test your automotive knowledge with fun trivia. Challenge friends and learn cool car facts.", href: "/trivia", icon: Gamepad2, image: imgTriviaQuiz, glowColor: "pink", subFeatures: ["Categories", "Score Tracking", "Fun Facts", "Challenge Mode"] },

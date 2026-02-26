@@ -28,6 +28,7 @@ import CheckoutCancel from "@/pages/CheckoutCancel";
 import ShopPortal from "@/pages/ShopPortal";
 import MechanicsGarage from "@/pages/MechanicsGarage";
 import TorqueLanding from "@/pages/TorqueLanding";
+import Diagnose from "@/pages/Diagnose";
 import TorqueOnboard from "@/pages/TorqueOnboard";
 import Insurance from "@/pages/Insurance";
 import Auth from "@/pages/Auth";
@@ -102,6 +103,7 @@ function Router() {
       <Route path="/dev">{() => <DevPortal />}</Route>
       <Route path="/pro">{() => <Pro />}</Route>
       <Route path="/hallmark">{() => <GenesisHallmark />}</Route>
+      <Route path="/diagnose">{() => <Diagnose />}</Route>
       <Route path="/diy-guides">{() => <DIYGuides />}</Route>
       <Route path="/invite">{() => <InviteFriends />}</Route>
       <Route path="/vendor-signup">{() => <VendorSignup />}</Route>
