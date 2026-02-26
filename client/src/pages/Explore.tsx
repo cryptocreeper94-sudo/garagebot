@@ -14,7 +14,8 @@ import {
   Globe, Crown, ChevronRight, Sparkles, MapPin, Star,
   BookOpen, Blocks, Compass, Award, Home,
   HeadphonesIcon, Mail, Settings, Rocket, Eye, ArrowRight, KeyRound,
-  Download, Smartphone, Share, Plus, X, Monitor, Factory
+  Download, Smartphone, Share, Plus, X, Monitor, Factory,
+  ChevronLeft
 } from "lucide-react";
 
 import imgPartsSearch from "@/assets/images/cc/parts-search.png";
@@ -241,7 +242,7 @@ function FeatureCard({ feature, index, catIdx }: { feature: Feature; index: numb
         whileHover={{ scale: 1.02, y: -4 }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
-        className={`relative cursor-pointer rounded-2xl overflow-hidden group ${feature.featured ? "h-[200px] sm:h-[240px]" : "h-[180px] sm:h-[220px]"} border transition-all duration-300 ${isHovered ? "border-white/20" : "border-white/[0.06]"}`}
+        className={`relative cursor-pointer rounded-2xl overflow-hidden group h-[200px] sm:h-[230px] border transition-all duration-300 ${isHovered ? "border-white/20" : "border-white/[0.06]"}`}
         style={{ boxShadow: isHovered ? glowShadow : "0 4px 30px rgba(0,0,0,0.3)" }}
         data-testid={`card-feature-${feature.name.toLowerCase().replace(/\s+/g, "-")}`}
       >
@@ -296,6 +297,81 @@ function FeatureCard({ feature, index, catIdx }: { feature: Feature; index: numb
         </div>
       </motion.div>
     </Link>
+  );
+}
+
+function CategoryCarousel({ features, catIdx }: { features: Feature[]; catIdx: number }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll]);
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector<HTMLElement>(":scope > div")?.offsetWidth || 320;
+    el.scrollBy({ left: dir === "left" ? -cardWidth - 16 : cardWidth + 16, behavior: "smooth" });
+  };
+
+  return (
+    <div className="relative group/carousel">
+      {canScrollLeft && (
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-20 w-10 h-10 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:border-white/20 hover:bg-black/90 transition-all shadow-lg opacity-0 group-hover/carousel:opacity-100"
+          data-testid="carousel-scroll-left"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+      )}
+      {canScrollRight && (
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-20 w-10 h-10 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:border-white/20 hover:bg-black/90 transition-all shadow-lg opacity-0 group-hover/carousel:opacity-100"
+          data-testid="carousel-scroll-right"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      )}
+      <div
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-1 px-1"
+        style={{ scrollSnapType: "x mandatory" }}
+      >
+        {features.map((feature, idx) => (
+          <div
+            key={feature.name}
+            className="flex-shrink-0 w-[85vw] sm:w-[320px] lg:w-[calc(33.333%-11px)]"
+            style={{ scrollSnapAlign: "start" }}
+          >
+            <FeatureCard feature={feature} index={idx} catIdx={catIdx} />
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-center gap-1.5 mt-3 lg:hidden">
+        {features.map((f, i) => (
+          <div key={i} className="w-1.5 h-1.5 rounded-full bg-white/15" />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -699,16 +775,20 @@ export default function Explore() {
                     </Badge>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                    {category.features.map((feature, idx) => (
-                      <FeatureCard
-                        key={feature.name}
-                        feature={feature}
-                        index={idx}
-                        catIdx={catIdx}
-                      />
-                    ))}
-                  </div>
+                  {category.features.length > 3 ? (
+                    <CategoryCarousel features={category.features} catIdx={catIdx} />
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                      {category.features.map((feature, idx) => (
+                        <FeatureCard
+                          key={feature.name}
+                          feature={feature}
+                          index={idx}
+                          catIdx={catIdx}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ))}
           </AnimatePresence>
