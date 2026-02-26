@@ -267,7 +267,7 @@ export const VENDORS: VendorInfo[] = [
     priority: 81,
     supportsOEM: true,
     supportsAftermarket: true,
-    affiliateNetwork: "AWIN",
+    affiliateNetwork: "Awin",
     logoColor: "#E63946"
   },
   {
@@ -297,7 +297,7 @@ export const VENDORS: VendorInfo[] = [
     priority: 82,
     supportsOEM: true,
     supportsAftermarket: true,
-    affiliateNetwork: "AWIN",
+    affiliateNetwork: "Awin",
     logoColor: "#7C3AED"
   },
   {
@@ -693,7 +693,7 @@ export const VENDORS: VendorInfo[] = [
     priority: 80,
     supportsOEM: true,
     supportsAftermarket: false,
-    affiliateNetwork: "AWIN",
+    affiliateNetwork: "Awin",
     logoColor: "#0EA5E9"
   },
   {

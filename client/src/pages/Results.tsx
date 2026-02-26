@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearch, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, Award, Globe, ArrowRight, Star, TrendingDown, ShoppingCart, Loader2, BarChart3, Mountain, Waves, CircleDot, Sparkles, Gamepad2, Radio } from "lucide-react";
+import { ExternalLink, AlertCircle, MapPin, Truck, Info, Store, DollarSign, Search, Package, Wrench, Bell, ChevronDown, ChevronUp, Zap, Shield, Tag, Car, Award, Globe, ArrowRight, Star, TrendingDown, ShoppingCart, Loader2, BarChart3, Mountain, Waves, CircleDot, Sparkles, Gamepad2, Radio, Sofa, Bike, Battery } from "lucide-react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { AdSenseHorizontal } from "@/components/AdSense";
@@ -1240,6 +1240,9 @@ export default function Results() {
                           "Vehicle Electronics": Zap,
                           "Coatings & Detailing": Sparkles,
                           "Tools & Equipment": Wrench,
+                          "Interior & Accessories": Sofa,
+                          "Electric Bikes & Scooters": Bike,
+                          "Power & Energy": Battery,
                           "RC & Hobby": Gamepad2,
                           "Drones & FPV": Radio,
                           "Travel & Rental": Globe,
