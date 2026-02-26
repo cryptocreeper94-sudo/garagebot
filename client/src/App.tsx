@@ -65,6 +65,7 @@ import OEMParts from "@/pages/OEMParts";
 import AffiliateProgram from "@/pages/AffiliateProgram";
 import CommandCenter from "@/pages/CommandCenter";
 import SMSOptInDemo from "@/pages/SMSOptInDemo";
+import Ecosystem from "@/pages/Ecosystem";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -127,6 +128,7 @@ function Router() {
       <Route path="/command-center">{() => <CommandCenter />}</Route>
       <Route path="/sms-opt-in">{() => <SMSOptInDemo />}</Route>
       <Route path="/sms-opt-in-demo">{() => <SMSOptInDemo />}</Route>
+      <Route path="/ecosystem">{() => <Ecosystem />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );

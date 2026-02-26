@@ -199,6 +199,10 @@ export default function Footer() {
               <Wrench className="w-2.5 h-2.5" />
               Developers
             </Link>
+            <Link href="/ecosystem" className="hover:text-primary transition-colors inline-flex items-center gap-1" data-testid="footer-link-ecosystem">
+              <Shield className="w-2.5 h-2.5" />
+              Trust Layer
+            </Link>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[9px] text-muted-foreground/70">
