@@ -33,7 +33,7 @@ interface NativeProductRecsProps {
 }
 
 function amazonSearchUrl(query: string): string {
-  return `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=garagebot0e-20`;
+  return `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=garagebot-20`;
 }
 
 const CONTEXTUAL_PRODUCTS: Record<string, ProductRec[]> = {

@@ -132,7 +132,7 @@ async function fetchEbayProducts(query: string, vehicle?: { year?: string; make?
 
 async function fetchAmazonProducts(query: string, vehicle?: { year?: string; make?: string; model?: string }): Promise<ProductResult[]> {
   const fullQuery = buildSearchQuery(query, vehicle);
-  const associateTag = process.env.AMAZON_ASSOCIATE_ID || 'garagebot0e-20';
+  const associateTag = process.env.AMAZON_ASSOCIATE_ID || 'garagebot-20';
   const searchUrl = `https://www.amazon.com/s?k=${encodeURIComponent(fullQuery)}&i=automotive&tag=${associateTag}`;
 
   try {
@@ -678,7 +678,7 @@ export async function comparePrice(
     { name: 'Advance Auto', slug: 'advance', searchUrl: `https://shop.advanceautoparts.com/web/SearchResults?searchTerm=${encodeURIComponent(fullQuery)}${aaZip}`, color: '#CC0000', isAffiliate: true },
     { name: 'NAPA', slug: 'napa', searchUrl: `https://www.napaonline.com/en/search?q=${encodeURIComponent(fullQuery)}${napaZip}`, color: '#003DA5', isAffiliate: false },
     { name: 'RockAuto', slug: 'rockauto', searchUrl: `https://www.rockauto.com/en/catalog/?a=${encodeURIComponent(fullQuery)}`, color: '#336699', isAffiliate: false },
-    { name: 'Amazon', slug: 'amazon', searchUrl: `https://www.amazon.com/s?k=${encodeURIComponent(fullQuery)}&i=automotive&tag=${process.env.AMAZON_ASSOCIATE_ID || 'garagebot0e-20'}`, color: '#FF9900', isAffiliate: true },
+    { name: 'Amazon', slug: 'amazon', searchUrl: `https://www.amazon.com/s?k=${encodeURIComponent(fullQuery)}&i=automotive&tag=${process.env.AMAZON_ASSOCIATE_ID || 'garagebot-20'}`, color: '#FF9900', isAffiliate: true },
     { name: 'eBay Motors', slug: 'ebay', searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(fullQuery)}&_sacat=6000&mkcid=1&mkrid=711-53200-19255-0&campid=${process.env.EBAY_CAMPAIGN_ID || '5339140935'}&toolid=10001`, color: '#E53238', isAffiliate: true },
     { name: 'Walmart', slug: 'walmart', searchUrl: `https://www.walmart.com/search?q=${encodeURIComponent(fullQuery)}&cat_id=91083${wmZip}`, color: '#0071CE', isAffiliate: false },
     { name: 'Rexing', slug: 'rexing', searchUrl: `https://rexing.com/?s=${encodeURIComponent(fullQuery)}&post_type=product&ref=5357356`, color: '#1A1A2E', isAffiliate: true },

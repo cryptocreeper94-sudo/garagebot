@@ -238,7 +238,7 @@ export const VENDORS: VendorInfo[] = [
     slug: "amazon",
     description: "World's largest online marketplace with millions of auto parts listings. Prime shipping, easy returns, garage vehicle fit checker, and competitive pricing across every category.",
     vendorCategory: "Online Auto Parts",
-    searchTemplate: "https://www.amazon.com/s?k={query}&i=automotive&tag=garagebot0e-20",
+    searchTemplate: "https://www.amazon.com/s?k={query}&i=automotive&tag=garagebot-20",
     hasLocalPickup: false,
     categories: ["cars", "classics", "motorcycles", "atvs", "boats", "rv", "diesel", "powersports", "rc", "drones", "modelaircraft", "slotcars"],
     priority: 90,
