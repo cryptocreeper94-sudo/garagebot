@@ -83,7 +83,7 @@ We may suspend or terminate your account at our discretion for violations of the
 These Terms are governed by the laws of the State of Delaware, USA. Any disputes shall be resolved in the courts of Delaware.
 
 13. CONTACT
-For questions about these Terms, contact us at support@darkwavestudios.io or through our in-app support system.`;
+For questions about these Terms, contact us at team@dwsc.io or through our in-app support system.`;
 
 const PRIVACY_TEXT = `PRIVACY POLICY — GarageBot by DarkWave Studios LLC
 Last Updated: February 2026

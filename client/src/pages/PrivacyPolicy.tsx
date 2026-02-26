@@ -178,7 +178,7 @@ export default function PrivacyPolicy() {
                     <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
                     <li><strong>SMS Reminders:</strong> Enable or disable service notifications</li>
                   </ul>
-                  <p className="mt-4">Contact us at <a href="mailto:privacy@garagebot.io" className="text-primary hover:underline">privacy@garagebot.io</a> for any privacy-related requests.</p>
+                  <p className="mt-4">Contact us at <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a> for any privacy-related requests.</p>
                 </div>
               </div>
             </div>
@@ -190,10 +190,10 @@ export default function PrivacyPolicy() {
               <p className="font-bold text-foreground">DarkWave Studios LLC</p>
               <p>GarageBot Platform</p>
               <p className="mt-2">
-                For privacy inquiries: <a href="mailto:privacy@garagebot.io" className="text-primary hover:underline">privacy@garagebot.io</a>
+                For privacy inquiries: <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a>
               </p>
               <p>
-                For general support: <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a>
+                For general support: <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a>
               </p>
             </div>
           </Card>

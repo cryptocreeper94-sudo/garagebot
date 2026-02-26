@@ -171,7 +171,7 @@ export default function About() {
                   <h2 className="text-xl font-tech uppercase mb-3">Get In Touch</h2>
                   <div className="space-y-3 text-muted-foreground">
                     <p>We'd love to hear from you — whether you have feedback, partnership ideas, or just want to talk shop.</p>
-                    <p>Email: <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a></p>
+                    <p>Email: <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a></p>
                     <p className="text-sm mt-4">GarageBot is operated by <strong className="text-foreground">DarkWave Studios LLC</strong>.</p>
                   </div>
                 </div>

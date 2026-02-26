@@ -493,7 +493,7 @@ export default function Investors() {
               </Button>
             </div>
             <p className="text-center text-sm text-muted-foreground mt-4">
-              Or email us directly at <a href="mailto:investors@garagebot.io" className="text-primary hover:underline">investors@garagebot.io</a>
+              Or email us directly at <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a>
             </p>
           </Card>
 

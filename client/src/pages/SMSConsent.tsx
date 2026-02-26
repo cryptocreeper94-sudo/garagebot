@@ -103,7 +103,7 @@ export default function SMSConsent() {
                   <ul className="list-disc list-inside space-y-2 ml-4">
                     <li><strong>Replying STOP</strong> to any message you receive from GarageBot. You will receive a one-time confirmation message that you have been unsubscribed.</li>
                     <li>Updating your notification preferences in your <strong>Account Settings</strong> on the GarageBot platform.</li>
-                    <li>Contacting us directly at <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a>.</li>
+                    <li>Contacting us directly at <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a>.</li>
                   </ul>
                   <p className="mt-3">After opting out, you will no longer receive SMS messages from GarageBot unless you re-subscribe. Please note that opting out of SMS does not affect email or in-app notifications.</p>
                 </div>
@@ -122,7 +122,7 @@ export default function SMSConsent() {
                   <p>If you are experiencing issues with our SMS program, you can:</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
                     <li><strong>Reply HELP</strong> to any message from GarageBot for assistance.</li>
-                    <li>Email us at <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a>.</li>
+                    <li>Email us at <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a>.</li>
                     <li>Visit our <Link href="/support"><span className="text-primary hover:underline cursor-pointer">Support page</span></Link> for additional resources.</li>
                   </ul>
                 </div>
@@ -155,7 +155,7 @@ export default function SMSConsent() {
                 <h2 className="text-xl font-tech uppercase mb-3" data-testid="text-section-contact">Contact Information</h2>
                 <div className="space-y-3 text-muted-foreground">
                   <p><strong>DarkWave Studios LLC</strong></p>
-                  <p>Email: <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a></p>
+                  <p>Email: <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a></p>
                   <p>Website: <a href="https://garagebot.io" className="text-primary hover:underline">https://garagebot.io</a></p>
                 </div>
               </div>

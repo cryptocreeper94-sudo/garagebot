@@ -177,11 +177,11 @@ export default function Support() {
                   <div>
                     <p className="text-xs text-muted-foreground uppercase font-mono mb-1">Email</p>
                     <a
-                      href="mailto:support@darkwavestudios.io"
+                      href="mailto:team@dwsc.io"
                       className="text-amber-300 hover:text-amber-200 transition-colors font-mono text-sm"
                       data-testid="link-priority-email"
                     >
-                      support@darkwavestudios.io
+                      team@dwsc.io
                     </a>
                   </div>
                 </div>

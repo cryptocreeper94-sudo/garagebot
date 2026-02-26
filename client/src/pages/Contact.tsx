@@ -167,7 +167,7 @@ export default function Contact() {
                   </div>
                   <h3 className="text-lg font-tech uppercase">Email</h3>
                 </div>
-                <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a>
+                <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a>
               </Card>
             </motion.div>
 

@@ -103,7 +103,7 @@ export default function SMSOptInDemo() {
               <p className="text-xs text-slate-500 leading-relaxed">
                 You can opt out at any time by replying <strong className="text-slate-300">STOP</strong> to any message.
                 Reply <strong className="text-slate-300">HELP</strong> for assistance.
-                For support, email <a href="mailto:support@garagebot.io" className="text-cyan-400">support@garagebot.io</a>.
+                For support, email <a href="mailto:team@dwsc.io" className="text-cyan-400">team@dwsc.io</a>.
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function SMSOptInDemo() {
                   <p><strong className="text-slate-300">Message Frequency:</strong> Varies based on your account activity. Estimated 1–10 messages per month.</p>
                   <p><strong className="text-slate-300">Message & Data Rates:</strong> Standard message and data rates from your wireless carrier may apply.</p>
                   <p><strong className="text-slate-300">Opt-Out:</strong> Text <strong className="text-white">STOP</strong> to any message to unsubscribe immediately.</p>
-                  <p><strong className="text-slate-300">Help:</strong> Text <strong className="text-white">HELP</strong> to any message or email <a href="mailto:support@garagebot.io" className="text-cyan-400 underline">support@garagebot.io</a></p>
+                  <p><strong className="text-slate-300">Help:</strong> Text <strong className="text-white">HELP</strong> to any message or email <a href="mailto:team@dwsc.io" className="text-cyan-400 underline">team@dwsc.io</a></p>
                   <p><strong className="text-slate-300">Supported Carriers:</strong> AT&T, T-Mobile, Verizon, US Cellular, and most major US carriers.</p>
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function SMSOptInDemo() {
               DarkWave Studios LLC
             </p>
             <p className="text-xs text-slate-600">
-              Email: <a href="mailto:support@garagebot.io" className="text-cyan-400/60 hover:text-cyan-400">support@garagebot.io</a>
+              Email: <a href="mailto:team@dwsc.io" className="text-cyan-400/60 hover:text-cyan-400">team@dwsc.io</a>
               {" "}&bull;{" "}
               Website: <a href="https://garagebot.io" className="text-cyan-400/60 hover:text-cyan-400">garagebot.io</a>
             </p>

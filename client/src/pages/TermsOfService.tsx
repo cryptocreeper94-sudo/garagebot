@@ -165,10 +165,10 @@ export default function TermsOfService() {
               <p>GarageBot Platform</p>
               <p className="mt-4">These terms are governed by the laws of the State of Texas, USA.</p>
               <p className="mt-2">
-                For questions about these terms: <a href="mailto:legal@garagebot.io" className="text-primary hover:underline">legal@garagebot.io</a>
+                For questions about these terms: <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a>
               </p>
               <p>
-                For general support: <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a>
+                For general support: <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a>
               </p>
             </div>
           </Card>

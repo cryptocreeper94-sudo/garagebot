@@ -159,7 +159,7 @@ export default function AffiliateDisclosure() {
                   <h2 className="text-xl font-tech uppercase mb-3">Contact Us</h2>
                   <div className="space-y-3 text-muted-foreground">
                     <p>If you have questions about our affiliate relationships or this disclosure, please contact us:</p>
-                    <p>Email: <a href="mailto:support@garagebot.io" className="text-primary hover:underline">support@garagebot.io</a></p>
+                    <p>Email: <a href="mailto:team@dwsc.io" className="text-primary hover:underline">team@dwsc.io</a></p>
                     <p className="text-sm mt-4">GarageBot is operated by <strong className="text-foreground">DarkWave Studios LLC</strong>.</p>
                   </div>
                 </div>
