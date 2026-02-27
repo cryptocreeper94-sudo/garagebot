@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated, getUserId } from "./replitAuth";
 import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations, insertPartListingSchema, updatePartListingSchema, insertPartListingMessageSchema, partListings, newsletterSubscribers } from "@shared/schema";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
+import { twilioService } from "./services/twilio";
 import { comparePrice } from "./services/price-comparison";
 import { fromZodError } from "zod-validation-error";
 import { z } from "zod";
@@ -553,10 +554,12 @@ ${pages.map(p => `  <url>
       (req.session as any).recoveryUserId = user.id;
       (req.session as any).recoveryExpires = Date.now() + 10 * 60 * 1000; // 10 min
       
-      // TODO: Send via Twilio when approved
-      // Recovery code generated for phone verification
+      const smsResult = await twilioService.sendVerificationCode(phone);
+      if (smsResult.success) {
+        (req.session as any).recoveryCode = smsResult.code;
+      }
       
-      res.json({ success: true, message: "Recovery code sent (pending Twilio)" });
+      res.json({ success: true, message: "Recovery code sent" });
     } catch (error) {
       console.error("Recovery SMS error:", error);
       res.status(500).json({ error: "Failed to send recovery code" });
@@ -8546,21 +8549,62 @@ ${pages.map(p => `  <url>
   });
 
   app.post("/api/sms/verify", isAuthenticated, async (req: any, res) => {
-    // Stub - would send verification SMS via Twilio
-    res.json({ 
-      success: true, 
-      message: "SMS verification not yet configured. Twilio integration pending.",
-      stubbed: true 
-    });
+    try {
+      const { phoneNumber } = req.body;
+      if (!phoneNumber) {
+        return res.status(400).json({ error: "Phone number is required" });
+      }
+
+      const result = await twilioService.sendVerificationCode(phoneNumber);
+      if (result.success && result.code) {
+        (req.session as any).smsVerifyCode = result.code;
+        (req.session as any).smsVerifyPhone = phoneNumber;
+        (req.session as any).smsVerifyExpires = Date.now() + 10 * 60 * 1000;
+      }
+
+      res.json({
+        success: result.success,
+        message: result.success ? "Verification code sent" : (result.error || "Failed to send code"),
+        stubbed: false,
+      });
+    } catch (error: any) {
+      console.error("SMS verify error:", error);
+      res.status(500).json({ error: "Failed to send verification SMS" });
+    }
   });
 
   app.post("/api/sms/confirm", isAuthenticated, async (req: any, res) => {
-    // Stub - would verify the code
-    res.json({ 
-      success: false, 
-      message: "SMS verification not yet configured. Twilio integration pending.",
-      stubbed: true 
-    });
+    try {
+      const { code } = req.body;
+      const storedCode = (req.session as any)?.smsVerifyCode;
+      const storedPhone = (req.session as any)?.smsVerifyPhone;
+      const expires = (req.session as any)?.smsVerifyExpires;
+
+      if (!storedCode || !storedPhone || Date.now() > expires) {
+        return res.json({ success: false, message: "Verification expired. Please request a new code." });
+      }
+
+      if (code !== storedCode) {
+        return res.json({ success: false, message: "Invalid verification code" });
+      }
+
+      delete (req.session as any).smsVerifyCode;
+      delete (req.session as any).smsVerifyExpires;
+
+      res.json({
+        success: true,
+        message: "Phone number verified",
+        phone: storedPhone,
+        stubbed: false,
+      });
+    } catch (error: any) {
+      console.error("SMS confirm error:", error);
+      res.status(500).json({ error: "Failed to verify code" });
+    }
+  });
+
+  app.get("/api/sms/status", isAuthenticated, async (req: any, res) => {
+    res.json(twilioService.getStatus());
   });
 
   // ============================================
