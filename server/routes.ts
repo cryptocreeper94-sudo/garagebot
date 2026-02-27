@@ -314,6 +314,13 @@ ${pages.map(p => `  <url>
         });
       }
 
+      // Send welcome SMS if phone provided
+      if (phone) {
+        twilioService.sendWelcome(phone, firstName || username).catch(err => {
+          console.error('[Signup] Failed to send welcome SMS:', err);
+        });
+      }
+
       res.json({ 
         user: { 
           id: user.id, 

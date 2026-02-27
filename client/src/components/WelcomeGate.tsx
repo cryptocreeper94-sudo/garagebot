@@ -11,11 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import {
   X, Eye, EyeOff, Loader2, CheckCircle, AlertCircle,
   Car, Mail, User, Lock, ArrowRight, KeyRound, Shield,
-  FileText, ChevronDown, Globe
+  FileText, ChevronDown, Globe, Phone, Bell, DollarSign, Package, Megaphone
 } from "lucide-react";
 import gbEmblem from "@assets/generated_images/gb_emblem_no_bg.png";
 
-type View = "signup" | "signup-terms" | "login" | "forgot" | "reset-sent" | "ecosystem";
+type View = "signup" | "signup-terms" | "signup-phone" | "login" | "forgot" | "reset-sent" | "ecosystem";
 
 interface PasswordCheck {
   length: boolean;
@@ -192,6 +192,14 @@ export default function WelcomeGate() {
   const [ecosystemLoading, setEcosystemLoading] = useState(false);
   const [ecosystemForm, setEcosystemForm] = useState({ identifier: "", credential: "" });
 
+  const [phoneForm, setPhoneForm] = useState({
+    phoneNumber: "",
+    serviceReminders: true,
+    priceAlerts: true,
+    orderUpdates: true,
+    promotions: false,
+  });
+
   const [termsScrolled, setTermsScrolled] = useState(false);
   const [privacyScrolled, setPrivacyScrolled] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -289,6 +297,7 @@ export default function WelcomeGate() {
           email: signupForm.email.trim(),
           username: signupForm.username.trim(),
           mainPin: signupForm.password,
+          phone: phoneForm.phoneNumber.trim() || undefined,
           enablePersistence: signupForm.stayLoggedIn,
           agreeTerms: true,
         }),
@@ -296,6 +305,25 @@ export default function WelcomeGate() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Signup failed");
+
+      if (phoneForm.phoneNumber.trim()) {
+        try {
+          await fetch("/api/sms/preferences", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              phoneNumber: phoneForm.phoneNumber.trim(),
+              serviceReminders: phoneForm.serviceReminders,
+              priceAlerts: phoneForm.priceAlerts,
+              orderUpdates: phoneForm.orderUpdates,
+              promotions: phoneForm.promotions,
+            }),
+          });
+        } catch (e) {
+          console.error("Failed to save SMS preferences:", e);
+        }
+      }
 
       await queryClient.invalidateQueries({ queryKey: ["auth-user"] });
       localStorage.setItem("garagebot_onboarding_seen", "true");
@@ -455,6 +483,16 @@ export default function WelcomeGate() {
                     </h2>
                     <p className="text-sm text-muted-foreground">
                       Please read and accept before creating your account
+                    </p>
+                  </>
+                )}
+                {view === "signup-phone" && (
+                  <>
+                    <h2 className="text-2xl font-tech font-bold uppercase mb-1">
+                      Stay <span className="text-primary">Connected</span>
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Get alerts for service reminders, price drops & more
                     </p>
                   </>
                 )}
@@ -745,8 +783,128 @@ export default function WelcomeGate() {
                     </Button>
                     <Button
                       className="flex-1 h-12 font-tech uppercase bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)] disabled:opacity-40 disabled:cursor-not-allowed"
+                      onClick={() => setView("signup-phone")}
+                      disabled={!termsAccepted || !privacyAccepted}
+                      data-testid="button-terms-continue"
+                    >
+                      <Phone className="w-5 h-5 mr-2" />
+                      Continue
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {view === "signup-phone" && (
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs text-muted-foreground uppercase font-mono flex items-center gap-1.5 mb-1.5">
+                      <Phone className="w-3 h-3" /> Phone Number
+                    </Label>
+                    <Input
+                      type="tel"
+                      placeholder="(555) 123-4567"
+                      value={phoneForm.phoneNumber}
+                      onChange={(e) => setPhoneForm(f => ({ ...f, phoneNumber: e.target.value }))}
+                      className="bg-white/5 border-white/10 focus:border-primary/50"
+                      data-testid="input-signup-phone"
+                    />
+                    <p className="text-[10px] text-muted-foreground mt-1">Optional — you can add this later in Settings</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground uppercase font-mono flex items-center gap-1.5">
+                      <Bell className="w-3 h-3" /> Notify me about
+                    </p>
+
+                    <div className="space-y-1.5">
+                      <div
+                        className={`flex items-center gap-3 p-2.5 rounded-lg border transition-all cursor-pointer ${phoneForm.serviceReminders ? "bg-primary/10 border-primary/30" : "bg-white/5 border-white/10 hover:bg-white/[0.08]"}`}
+                        onClick={() => setPhoneForm(f => ({ ...f, serviceReminders: !f.serviceReminders }))}
+                        data-testid="toggle-sms-service-reminders"
+                      >
+                        <Checkbox
+                          checked={phoneForm.serviceReminders}
+                          onCheckedChange={(checked) => setPhoneForm(f => ({ ...f, serviceReminders: !!checked }))}
+                          className="pointer-events-none"
+                        />
+                        <Bell className="w-4 h-4 text-primary shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium">Service Reminders</p>
+                          <p className="text-[10px] text-muted-foreground">Oil changes, tire rotations, scheduled maintenance</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-3 p-2.5 rounded-lg border transition-all cursor-pointer ${phoneForm.priceAlerts ? "bg-primary/10 border-primary/30" : "bg-white/5 border-white/10 hover:bg-white/[0.08]"}`}
+                        onClick={() => setPhoneForm(f => ({ ...f, priceAlerts: !f.priceAlerts }))}
+                        data-testid="toggle-sms-price-alerts"
+                      >
+                        <Checkbox
+                          checked={phoneForm.priceAlerts}
+                          onCheckedChange={(checked) => setPhoneForm(f => ({ ...f, priceAlerts: !!checked }))}
+                          className="pointer-events-none"
+                        />
+                        <DollarSign className="w-4 h-4 text-green-400 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium">Price Drop Alerts</p>
+                          <p className="text-[10px] text-muted-foreground">Get notified when parts you're watching drop in price</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-3 p-2.5 rounded-lg border transition-all cursor-pointer ${phoneForm.orderUpdates ? "bg-primary/10 border-primary/30" : "bg-white/5 border-white/10 hover:bg-white/[0.08]"}`}
+                        onClick={() => setPhoneForm(f => ({ ...f, orderUpdates: !f.orderUpdates }))}
+                        data-testid="toggle-sms-order-updates"
+                      >
+                        <Checkbox
+                          checked={phoneForm.orderUpdates}
+                          onCheckedChange={(checked) => setPhoneForm(f => ({ ...f, orderUpdates: !!checked }))}
+                          className="pointer-events-none"
+                        />
+                        <Package className="w-4 h-4 text-blue-400 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium">Order Updates</p>
+                          <p className="text-[10px] text-muted-foreground">Shipping confirmations, delivery tracking, order status</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-3 p-2.5 rounded-lg border transition-all cursor-pointer ${phoneForm.promotions ? "bg-primary/10 border-primary/30" : "bg-white/5 border-white/10 hover:bg-white/[0.08]"}`}
+                        onClick={() => setPhoneForm(f => ({ ...f, promotions: !f.promotions }))}
+                        data-testid="toggle-sms-promotions"
+                      >
+                        <Checkbox
+                          checked={phoneForm.promotions}
+                          onCheckedChange={(checked) => setPhoneForm(f => ({ ...f, promotions: !!checked }))}
+                          className="pointer-events-none"
+                        />
+                        <Megaphone className="w-4 h-4 text-yellow-400 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium">Deals & Promotions</p>
+                          <p className="text-[10px] text-muted-foreground">Exclusive deals, flash sales, and special offers</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+                    Msg & data rates may apply. Reply STOP to unsubscribe anytime. You can manage these preferences in Settings.
+                  </p>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1 font-tech uppercase border-white/20"
+                      onClick={() => setView("signup-terms")}
+                      data-testid="button-back-to-terms"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      className="flex-1 h-12 font-tech uppercase bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)] disabled:opacity-40 disabled:cursor-not-allowed"
                       onClick={handleSignup}
-                      disabled={isLoading || !termsAccepted || !privacyAccepted}
+                      disabled={isLoading}
                       data-testid="button-signup-submit"
                     >
                       {isLoading ? (
@@ -759,6 +917,18 @@ export default function WelcomeGate() {
                       )}
                     </Button>
                   </div>
+
+                  <button
+                    onClick={() => {
+                      setPhoneForm(f => ({ ...f, phoneNumber: "" }));
+                      handleSignup();
+                    }}
+                    className="w-full text-center text-xs text-muted-foreground hover:text-white transition-colors py-1"
+                    disabled={isLoading}
+                    data-testid="button-skip-phone"
+                  >
+                    Skip for now
+                  </button>
                 </div>
               )}
 
