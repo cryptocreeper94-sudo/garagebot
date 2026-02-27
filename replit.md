@@ -1,6 +1,6 @@
 # Overview
 
-GarageBot is a comprehensive parts aggregator platform designed to unify inventory from 97 retailers into a single searchable interface. Its primary purpose is to ensure users find the "Right Part. First Time. Every Engine." for ALL motorized vehicles and equipment, including a dedicated Motorized Hobby section. The platform aims to revolutionize the parts market by offering advanced search capabilities, AI-powered recommendations, vehicle fleet management with VIN decoding, and integrated DIY repair guides. It also features a robust e-commerce system with Stripe payments, a Genesis Hallmark NFT system for early adopters, and a Pro "Founders Circle" subscription for enhanced functionalities. The business vision is to become the go-to platform for both casual users, professional mechanics, and hobby enthusiasts.
+GarageBot is a comprehensive parts aggregator platform designed to unify inventory from 102 retailers into a single searchable interface. Its primary purpose is to ensure users find the "Right Part. First Time. Every Engine." for ALL motorized vehicles and equipment, including a dedicated Motorized Hobby section. The platform aims to revolutionize the parts market by offering advanced search capabilities, AI-powered recommendations, vehicle fleet management with VIN decoding, and integrated DIY repair guides. It also features a robust e-commerce system with Stripe payments, a Genesis Hallmark NFT system for early adopters, and a Pro "Founders Circle" subscription for enhanced functionalities. The business vision is to become the go-to platform for both casual users, professional mechanics, and hobby enthusiasts.
 
 # User Preferences
 
@@ -78,7 +78,7 @@ Preferred communication style: Simple, everyday language.
 - **API Routes**: `/api/marketplace/fee-info`, `/api/marketplace/calculate-fees`, `/api/marketplace/checkout`, plus existing listing CRUD routes.
 
 ## Affiliate Strategy
-- **Current**: Vehicle-aware search links to over 50 retailers, with 17 active affiliate integrations across Amazon Associates, eBay Partner Network, CJ Affiliate, ShareASale, Awin (EKR Cover, HCalory, Mokwheel, Vanpowers, MaXpeedingRods, xLaserLab, Guta, CARLUEX, GOOLOO), and direct partnerships (Redodo Power).
+- **Current**: Vehicle-aware search links to over 50 retailers, with 17 active affiliate integrations across Amazon Associates, eBay Partner Network, CJ Affiliate, ShareASale, Awin (EKR Cover, HCalory, Mokwheel, Vanpowers, MaXpeedingRods, xLaserLab, Guta, CARLUEX, GOOLOO, OEDRO, Promeed, AstroAI, Carputech, SEALIGHT, TCMT, Ottocast, Dunford, AutoPartsToys, Redodo Power).
 
 ## Blockchain Verification
 - **Purpose**: Tamper-proof verification of Genesis Hallmarks and Vehicle Passports on the Solana blockchain.

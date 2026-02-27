@@ -385,7 +385,7 @@ export class OrbitEcosystemClient {
         appSlug: 'garagebot',
         owner: GARAGEBOT_OWNER,
         ownerEmail: 'jason@darkwavestudios.io',
-        description: 'Parts aggregator platform for all motorized vehicles — 97 retailers, AI assistant, fleet management, TORQUE shop OS',
+        description: 'Parts aggregator platform for all motorized vehicles — 102 retailers, AI assistant, fleet management, TORQUE shop OS',
         webhookUrl: `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'garagebot.io'}/api/orbit/webhook`,
         capabilities: [
           'subscription-revenue',

@@ -68,7 +68,7 @@ const COMPARISON = [
   { feature: "Monthly Price", us: "$49", them: "$179+" },
   { feature: "Repair Orders", us: "Unlimited", them: "Unlimited" },
   { feature: "Users", us: "Unlimited", them: "Per-seat pricing" },
-  { feature: "Parts Search (97 retailers)", us: true, them: false },
+  { feature: "Parts Search (102 retailers)", us: true, them: false },
   { feature: "AI Assistant (Buddy)", us: true, them: false },
   { feature: "DIY Guides Library", us: true, them: false },
   { feature: "Marketing Hub", us: "Add-on", them: "$345+/mo" },
