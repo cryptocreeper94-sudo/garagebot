@@ -1109,6 +1109,21 @@ export const VENDORS: VendorInfo[] = [
     logoColor: "#7C3AED"
   },
   {
+    id: "owleys",
+    name: "Owleys",
+    slug: "owleys",
+    description: "Premium car accessories designed for travel, comfort, and everyday use. Seat covers, sun shades, organizers, steering wheel covers, and interior upgrades trusted by thousands of car owners worldwide.",
+    vendorCategory: "Interior & Accessories",
+    searchTemplate: "https://www.awin1.com/cread.php?awinmid=OWLEYS&awinaffid=2752166&ued=https%3A%2F%2Fowleys.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv"],
+    priority: 76,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Awin",
+    logoColor: "#2D6A4F"
+  },
+  {
     id: "oedro",
     name: "OEDRO",
     slug: "oedro",

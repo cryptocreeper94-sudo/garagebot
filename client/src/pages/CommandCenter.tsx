@@ -159,9 +159,9 @@ const categories: Category[] = [
     title: "Vehicle & Parts",
     icon: Car,
     gradient: "from-red-500 to-orange-500",
-    description: "The core product experience. Search parts across 102 retailers, manage vehicle fleets, follow DIY guides, browse the marketplace, and track wishlists.",
+    description: "The core product experience. Search parts across 103 retailers, manage vehicle fleets, follow DIY guides, browse the marketplace, and track wishlists.",
     cards: [
-      { label: "Parts Search", description: "102 retailers, 16 categories, vehicle-aware", href: "/results", icon: Search, image: imgPartsSearch, featured: true },
+      { label: "Parts Search", description: "103 retailers, 16 categories, vehicle-aware", href: "/results", icon: Search, image: imgPartsSearch, featured: true },
       { label: "OEM Parts", description: "12+ OEM brands, factory warranty, dealer-direct", href: "/oem-parts", icon: Package, image: imgOemParts, badge: "New" },
       { label: "My Garage", description: "Fleet management, VIN decoding & service records", href: "/garage", icon: Car, image: imgMyGarage },
       { label: "DIY Guides", description: "AI repair guides with YouTube integration", href: "/diy-guides", icon: BookOpen, image: imgDiyGuides },

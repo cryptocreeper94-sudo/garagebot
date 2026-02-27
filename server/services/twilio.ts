@@ -107,7 +107,7 @@ class TwilioService {
   }
 
   async sendWelcome(phoneNumber: string, userName: string): Promise<SMSResult> {
-    const message = `Welcome to GarageBot, ${userName}! You're all set to search 102 retailers, get AI diagnoses, and manage your vehicles. Reply STOP to opt out. — garagebot.io`;
+    const message = `Welcome to GarageBot, ${userName}! You're all set to search 103 retailers, get AI diagnoses, and manage your vehicles. Reply STOP to opt out. — garagebot.io`;
     return this.sendSMS({ to: phoneNumber, body: message });
   }
 

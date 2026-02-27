@@ -116,16 +116,16 @@ const BADGE_STYLES: Record<string, string> = {
 const FEATURE_CATEGORIES: FeatureCategory[] = [
   {
     title: "Parts & Shopping",
-    description: "Search, compare, and save across 102 retailers",
+    description: "Search, compare, and save across 103 retailers",
     icon: ShoppingCart,
     gradient: "from-cyan-500 to-blue-600",
     features: [
-      { name: "Parts Search", description: "Search 15M+ parts across 102 retailers with price comparison and vehicle-aware results.", href: "/home", icon: Search, image: imgPartsSearch, glowColor: "cyan", featured: true, subFeatures: ["94 Retailers", "Price Compare", "Local Pickup", "Vehicle-Aware"] },
+      { name: "Parts Search", description: "Search 15M+ parts across 103 retailers with price comparison and vehicle-aware results.", href: "/home", icon: Search, image: imgPartsSearch, glowColor: "cyan", featured: true, subFeatures: ["94 Retailers", "Price Compare", "Local Pickup", "Vehicle-Aware"] },
       { name: "OEM Parts", description: "Genuine manufacturer parts from 12+ brands. Factory-spec fit, full warranty, zero compromises.", href: "/oem-parts", icon: Factory, image: imgOemParts, glowColor: "green", badge: "NEW", badgeVariant: "new", featured: true, subFeatures: ["12+ OEM Brands", "Factory Warranty", "Perfect Fit", "Dealer Direct"] },
       { name: "Parts Marketplace", description: "Buy and sell used parts directly. List spare parts, search by fitment, and message sellers.", href: "/marketplace", icon: Tag, image: imgPartsMarketplace, glowColor: "green", badge: "NEW", badgeVariant: "new", subFeatures: ["List Parts", "Fitment Search", "Messaging", "Photos"] },
       { name: "Wishlists", description: "Save parts to organized lists. Share with friends or your mechanic and track price changes.", href: "/wishlists", icon: Heart, image: imgWishlists, glowColor: "pink", subFeatures: ["Multiple Lists", "Share Link", "Price Tracking", "Priority Sort"] },
       { name: "Build Projects", description: "Plan vehicle builds with parts lists, spending vs budget tracking, and purchase progress.", href: "/projects", icon: FolderOpen, image: imgBuildProjects, glowColor: "amber", subFeatures: ["Budget Tracking", "Parts Checklist", "Progress", "Cost Estimate"] },
-      { name: "Price Alerts", description: "Set alerts on parts you need. Get notified when prices drop at any of the 102 retailers.", href: "/garage", icon: TrendingDown, image: imgPriceAlerts, glowColor: "yellow", subFeatures: ["Price Drops", "Multi-Retailer", "Target Price", "History"] },
+      { name: "Price Alerts", description: "Set alerts on parts you need. Get notified when prices drop at any of the 103 retailers.", href: "/garage", icon: TrendingDown, image: imgPriceAlerts, glowColor: "yellow", subFeatures: ["Price Drops", "Multi-Retailer", "Target Price", "History"] },
     ],
   },
   {
@@ -592,7 +592,7 @@ export default function Explore() {
                     Build Your Free <span className="text-cyan-400">Garage</span>
                   </h3>
                   <p className="text-xs text-white/50">
-                    Search 102 retailers, save vehicles, get AI recommendations — all free
+                    Search 103 retailers, save vehicles, get AI recommendations — all free
                   </p>
                 </div>
                 <div className="flex gap-2">

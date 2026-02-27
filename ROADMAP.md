@@ -5,7 +5,7 @@
 ## AI-Powered Features (Priority Order)
 
 ### 1. AI Symptom Diagnosis Engine ✅ BUILDING NOW
-- **What**: User describes a vehicle problem in plain English ("my truck shakes at 60mph"), AI diagnoses likely causes, explains each one, and links directly to the parts needed from our 102 vendors
+- **What**: User describes a vehicle problem in plain English ("my truck shakes at 60mph"), AI diagnoses likely causes, explains each one, and links directly to the parts needed from our 103 vendors
 - **Why First**: Highest user value — turns GarageBot from a search tool into a diagnostic tool. No competitor does this. Drives part searches and affiliate revenue
 - **Route**: Integrated into Buddy AI + standalone `/diagnose` page
 - **Status**: In progress

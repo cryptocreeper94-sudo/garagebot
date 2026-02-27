@@ -710,7 +710,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mb-3">
-                Tell Buddy what you need - he'll find the right part across 102 retailers.
+                Tell Buddy what you need - he'll find the right part across 103 retailers.
               </p>
               <Button onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()} className="w-full btn-cyber font-tech uppercase text-xs" data-testid="button-chat-buddy-mobile">
                 <MessageCircle className="w-4 h-4 mr-2" />
@@ -738,7 +738,7 @@ export default function Home() {
                       <span className="px-1.5 py-0.5 text-[9px] font-mono uppercase bg-green-500/20 text-green-400 border border-green-500/30 rounded">FREE</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Join 102 retailers. Get featured, earn badges, compete for Vendor of the Month!
+                      Join 103 retailers. Get featured, earn badges, compete for Vendor of the Month!
                     </p>
                   </div>
                   <ArrowRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
@@ -832,7 +832,7 @@ export default function Home() {
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { step: 1, icon: Search, title: "Search Once", desc: "Enter your part name, number, or vehicle info. GarageBot searches 102 retailers simultaneously.", color: "from-cyan-500/20 to-cyan-600/10", iconColor: "text-cyan-400", borderColor: "border-cyan-500/30" },
+              { step: 1, icon: Search, title: "Search Once", desc: "Enter your part name, number, or vehicle info. GarageBot searches 103 retailers simultaneously.", color: "from-cyan-500/20 to-cyan-600/10", iconColor: "text-cyan-400", borderColor: "border-cyan-500/30" },
               { step: 2, icon: TrendingUp, title: "Compare Prices", desc: "See prices, availability, and shipping from every store side-by-side. No more tab-hopping.", color: "from-green-500/20 to-green-600/10", iconColor: "text-green-400", borderColor: "border-green-500/30" },
               { step: 3, icon: CheckCircle2, title: "Buy & Save", desc: "Click through to buy from the store with the best deal. Average users save $50-$200 per repair.", color: "from-purple-500/20 to-purple-600/10", iconColor: "text-purple-400", borderColor: "border-purple-500/30" },
             ].map((item, i) => (
