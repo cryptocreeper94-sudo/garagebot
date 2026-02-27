@@ -682,7 +682,7 @@ export async function comparePrice(
     { name: 'eBay Motors', slug: 'ebay', searchUrl: `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(fullQuery)}&_sacat=6000&mkcid=1&mkrid=711-53200-19255-0&campid=${process.env.EBAY_CAMPAIGN_ID || '5339140935'}&toolid=10001`, color: '#E53238', isAffiliate: true },
     { name: 'Walmart', slug: 'walmart', searchUrl: `https://www.walmart.com/search?q=${encodeURIComponent(fullQuery)}&cat_id=91083${wmZip}`, color: '#0071CE', isAffiliate: false },
     { name: 'Rexing', slug: 'rexing', searchUrl: `https://rexing.com/?s=${encodeURIComponent(fullQuery)}&post_type=product&ref=5357356`, color: '#1A1A2E', isAffiliate: true },
-    { name: 'SILAZANE50', slug: 'silazane50', searchUrl: `https://www.anrdoezrs.net/click-101643977-7675405?url=${encodeURIComponent(`https://silazane50usa.com/collections/all?q=${fullQuery}`)}`, color: '#C4A35A', isAffiliate: true },
+    { name: 'SILAZANE50', slug: 'silazane50', searchUrl: `https://www.anrdoezrs.net/click-7860436-7675405?url=${encodeURIComponent(`https://silazane50usa.com/collections/all?q=${fullQuery}`)}`, color: '#C4A35A', isAffiliate: true },
     { name: 'GARVEE', slug: 'garvee', searchUrl: `https://www.garvee.com/search?q=${encodeURIComponent(fullQuery)}`, color: '#2D3748', isAffiliate: true },
     { name: 'OEDRO', slug: 'oedro', searchUrl: `https://www.awin1.com/cread.php?awinmid=28349&awinaffid=2752166&clickref=garagebot&p=${encodeURIComponent(`https://www.oedro.com/search?q=${fullQuery}`)}`, color: '#1A1A1A', isAffiliate: true },
   ];
