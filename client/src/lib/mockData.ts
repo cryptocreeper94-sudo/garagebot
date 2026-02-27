@@ -719,6 +719,21 @@ export const VENDORS: VendorInfo[] = [
     logoColor: "#0EA5E9"
   },
   {
+    id: "carluex",
+    name: "CARLUEX",
+    slug: "carluex",
+    description: "Innovative automotive accessories including wireless CarPlay and Android Auto adapters, in-car streaming solutions for YouTube, Netflix, and Hulu, and smart vehicle tech upgrades.",
+    vendorCategory: "Vehicle Electronics",
+    searchTemplate: "https://www.awin1.com/cread.php?awinmid=51067&awinaffid=2752166&ued=https%3A%2F%2Fwww.carluex.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv", "exotics"],
+    priority: 78,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Awin",
+    logoColor: "#2563EB"
+  },
+  {
     id: "silazane50",
     name: "SILAZANE50",
     slug: "silazane50",

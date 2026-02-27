@@ -78,7 +78,7 @@ Preferred communication style: Simple, everyday language.
 - **API Routes**: `/api/marketplace/fee-info`, `/api/marketplace/calculate-fees`, `/api/marketplace/checkout`, plus existing listing CRUD routes.
 
 ## Affiliate Strategy
-- **Current**: Vehicle-aware search links to over 50 retailers, with 16 active affiliate integrations across Amazon Associates, eBay Partner Network, CJ Affiliate, ShareASale, Awin (EKR Cover, HCalory, Mokwheel, Vanpowers, MaXpeedingRods, xLaserLab, Guta), and direct partnerships (Redodo Power).
+- **Current**: Vehicle-aware search links to over 50 retailers, with 17 active affiliate integrations across Amazon Associates, eBay Partner Network, CJ Affiliate, ShareASale, Awin (EKR Cover, HCalory, Mokwheel, Vanpowers, MaXpeedingRods, xLaserLab, Guta, CARLUEX), and direct partnerships (Redodo Power).
 
 ## Blockchain Verification
 - **Purpose**: Tamper-proof verification of Genesis Hallmarks and Vehicle Passports on the Solana blockchain.
