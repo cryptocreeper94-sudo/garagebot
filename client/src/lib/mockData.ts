@@ -764,6 +764,21 @@ export const VENDORS: VendorInfo[] = [
     logoColor: "#E11D48"
   },
   {
+    id: "guta",
+    name: "GUTA",
+    slug: "guta",
+    description: "Premium tire inflators, digital pressure gauges, and portable air compressors for cars, trucks, motorcycles, and RVs. Reliable roadside and garage essentials for every vehicle owner.",
+    vendorCategory: "Tools & Equipment",
+    searchTemplate: "https://www.awin1.com/cread.php?awinmid=105913&awinaffid=2752166&ued=https%3A%2F%2Fwww.gutatire.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv", "motorcycles", "atvs"],
+    priority: 76,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Awin",
+    logoColor: "#FF6B00"
+  },
+  {
     id: "amainhobbies",
     name: "AMain Hobbies",
     slug: "amainhobbies",

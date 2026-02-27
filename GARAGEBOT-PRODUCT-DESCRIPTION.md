@@ -2,7 +2,7 @@
 
 ## Platform Overview
 
-GarageBot is a full-stack AI-powered parts aggregator and vehicle management platform built by DarkWave Studios LLC. It unifies inventory from 95 retailers into a single searchable interface, serving casual DIYers, professional mechanics, fleet managers, and hobby enthusiasts across ALL motorized vehicle categories.
+GarageBot is a full-stack AI-powered parts aggregator and vehicle management platform built by DarkWave Studios LLC. It unifies inventory from 96 retailers into a single searchable interface, serving casual DIYers, professional mechanics, fleet managers, and hobby enthusiasts across ALL motorized vehicle categories.
 
 ## By the Numbers
 
@@ -18,7 +18,7 @@ GarageBot is a full-stack AI-powered parts aggregator and vehicle management pla
 ## Core Platform Features
 
 ### Search & Discovery
-- Universal parts search across 95 retailers (AutoZone, O'Reilly, RockAuto, Amazon, NAPA, Advance Auto Parts, and more)
+- Universal parts search across 96 retailers (AutoZone, O'Reilly, RockAuto, Amazon, NAPA, Advance Auto Parts, and more)
 - 20 vehicle/equipment categories: Cars, Trucks, Motorcycles, ATVs/UTVs, Boats/Marine, RVs, Powersports, Heavy Equipment, Agricultural, Aviation, Electric Bikes & Scooters, Go-Karts, Snowmobiles, Jet Skis, Lawn & Garden, Power & Energy, Interior & Accessories, Tools & Garage, Performance & Racing, OEM Parts
 - Vehicle-aware search with Year/Make/Model/Engine filtering
 - OEM genuine parts directory with 12+ manufacturer brands
@@ -93,11 +93,11 @@ React 18 + TypeScript + Vite | Node.js + Express | PostgreSQL + Drizzle ORM | Ta
 
 ## Marketing Description (Short)
 
-Search 95 retailers. AI diagnoses your vehicle problems and finds the right parts at the best price. Cars, trucks, motorcycles, ATVs, boats, RVs, and everything with an engine. Compare prices, get DIY guides, manage your fleet — all in one place. Right Part. First Time. Every Engine.
+Search 96 retailers. AI diagnoses your vehicle problems and finds the right parts at the best price. Cars, trucks, motorcycles, ATVs, boats, RVs, and everything with an engine. Compare prices, get DIY guides, manage your fleet — all in one place. Right Part. First Time. Every Engine.
 
 ## Marketing Description (Long)
 
-GarageBot is the only parts platform you'll ever need. Search 95 retailers — from AutoZone and O'Reilly to Amazon and RockAuto — in one place. Our AI-powered Buddy assistant doesn't just find parts; it diagnoses your vehicle's symptoms, recommends exactly what you need, walks you through DIY repairs step by step, and shows you how much you'll save doing it yourself. Manage your entire fleet with VIN decoding, maintenance scheduling, and recall alerts. Professional shops get TORQUE, a full shop management OS with digital inspections, repair orders, and blockchain-verified credentials. Whether you're a weekend wrench-turner or running a 10-bay shop, GarageBot puts the right part in your hands — first time, every time, for every engine.
+GarageBot is the only parts platform you'll ever need. Search 96 retailers — from AutoZone and O'Reilly to Amazon and RockAuto — in one place. Our AI-powered Buddy assistant doesn't just find parts; it diagnoses your vehicle's symptoms, recommends exactly what you need, walks you through DIY repairs step by step, and shows you how much you'll save doing it yourself. Manage your entire fleet with VIN decoding, maintenance scheduling, and recall alerts. Professional shops get TORQUE, a full shop management OS with digital inspections, repair orders, and blockchain-verified credentials. Whether you're a weekend wrench-turner or running a 10-bay shop, GarageBot puts the right part in your hands — first time, every time, for every engine.
 
 ## Contact
 
