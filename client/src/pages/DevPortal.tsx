@@ -393,12 +393,12 @@ const OUTREACH_LETTERS = {
     subject: "GarageBot.io Partnership Inquiry - Auto Parts Search Platform",
     body: `Dear RockAuto Team,
 
-I'm Jason, the founder of GarageBot.io, a comprehensive auto parts search aggregator that helps vehicle owners find the right parts across 94 retailers.
+I'm Jason, the founder of GarageBot.io, a comprehensive auto parts search aggregator that helps vehicle owners find the right parts across 95 retailers.
 
 I understand RockAuto works with automotive communities through discount code partnerships rather than traditional affiliate programs. I'd love to explore a similar arrangement.
 
 **About GarageBot:**
-• Unified search across 94 auto parts retailers
+• Unified search across 95 auto parts retailers
 • Covers all vehicle types: cars, trucks, boats, ATVs, motorcycles, RVs, and more
 • AI-powered part recommendations and DIY repair guides
 • Growing community of DIY enthusiasts and professional mechanics
@@ -425,7 +425,7 @@ https://garagebot.io`
 I'm reaching out regarding potential partnership opportunities between O'Reilly Auto Parts and GarageBot.io.
 
 **About GarageBot:**
-GarageBot.io is a comprehensive auto parts search aggregator that unifies inventory from 94 retailers into a single searchable interface. We serve DIY enthusiasts, professional mechanics, and fleet managers.
+GarageBot.io is a comprehensive auto parts search aggregator that unifies inventory from 95 retailers into a single searchable interface. We serve DIY enthusiasts, professional mechanics, and fleet managers.
 
 **Key Features:**
 • VIN-based vehicle identification and part matching
@@ -459,7 +459,7 @@ I'm Jason, founder of GarageBot.io, and I'm reaching out about a potential refer
 Your specialization in Chinese-built ATV, UTV, scooter, go-kart, and dirt bike parts fills an important niche that major retailers don't serve well. Our users often struggle to find parts for these vehicles.
 
 **About GarageBot:**
-• Auto parts search aggregator covering 94 retailers
+• Auto parts search aggregator covering 95 retailers
 • Strong focus on ALL vehicle types including ATVs, UTVs, scooters, and motorcycles
 • AI-powered part identification and recommendations
 • Growing user base of powersports enthusiasts
@@ -489,7 +489,7 @@ I'm Jason, founder of GarageBot.io, a comprehensive auto parts search aggregator
 Your marketplace represents the gold standard for recycled/used auto parts - a category our users frequently request but we currently can't serve well. With $80 billion in annual part searches, your data would add tremendous value to our platform.
 
 **About GarageBot:**
-• Unified search across 94 auto parts retailers (new parts focus currently)
+• Unified search across 95 auto parts retailers (new parts focus currently)
 • VIN decoding and vehicle-specific part matching
 • AI-powered recommendations and DIY repair guides
 • "TORQUE" portal for professional shops
@@ -519,7 +519,7 @@ P.S. I'm particularly impressed by your CIECA API Standards work - proper data e
 I'm Jason, founder of GarageBot.io, a comprehensive parts search aggregator that recently expanded to cover the RC hobby, drone, and model aircraft markets.
 
 **About GarageBot:**
-• Parts search aggregator covering 94 retailers across automotive AND hobby categories
+• Parts search aggregator covering 95 retailers across automotive AND hobby categories
 • Dedicated sections for RC Cars, Drones/FPV, Model Aircraft, and Slot Cars
 • AI-powered part recommendations and DIY build/upgrade guides
 • Growing community of enthusiasts across all motorized categories
@@ -544,10 +544,10 @@ https://garagebot.io`
     subject: "GarageBot.io — OEM Parts Distribution Partnership Inquiry",
     body: `Dear Partnership/Business Development Team,
 
-I'm Jason, founder of GarageBot.io, a comprehensive auto parts search aggregator that unifies inventory from 94 retailers into a single searchable interface for ALL motorized vehicles.
+I'm Jason, founder of GarageBot.io, a comprehensive auto parts search aggregator that unifies inventory from 95 retailers into a single searchable interface for ALL motorized vehicles.
 
 **About GarageBot:**
-• Search aggregator covering 94 retailers — auto, powersports, marine, diesel, RV, small engine, and hobby
+• Search aggregator covering 95 retailers — auto, powersports, marine, diesel, RV, small engine, and hobby
 • AI-powered Buddy assistant for part recommendations and DIY repair guides
 • VIN decoding and vehicle-specific part matching
 • "TORQUE" portal for professional shops with repair orders, estimates, scheduling
@@ -578,7 +578,7 @@ https://garagebot.io`
 I'm Jason, founder of GarageBot.io, a comprehensive parts search aggregator with a dedicated Drones & FPV section.
 
 **About GarageBot:**
-• Parts search aggregator covering 94 retailers including a dedicated FPV/drone category
+• Parts search aggregator covering 95 retailers including a dedicated FPV/drone category
 • AI-powered part recommendations for drone builds
 • DIY build guides including "Build Your First FPV Drone" tutorials
 • Growing community of FPV enthusiasts

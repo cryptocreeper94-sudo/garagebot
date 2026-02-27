@@ -749,6 +749,21 @@ export const VENDORS: VendorInfo[] = [
     logoColor: "#C4A35A"
   },
   {
+    id: "chemicalguys",
+    name: "Chemical Guys",
+    slug: "chemicalguys",
+    description: "Leading car care and detailing brand with hundreds of thousands of reviews. Premium soaps, cleaners, conditioners, protectants, specialized applicators, and innovative detailing equipment for every vehicle.",
+    vendorCategory: "Coatings & Detailing",
+    searchTemplate: "https://www.anrdoezrs.net/click-101643977-4615063?url=https%3A%2F%2Fwww.chemicalguys.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "exotics", "motorcycles", "boats", "rv", "diesel", "atvs"],
+    priority: 85,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "CJ Affiliate",
+    logoColor: "#E11D48"
+  },
+  {
     id: "amainhobbies",
     name: "AMain Hobbies",
     slug: "amainhobbies",
