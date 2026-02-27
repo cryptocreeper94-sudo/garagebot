@@ -764,6 +764,21 @@ export const VENDORS: VendorInfo[] = [
     logoColor: "#E11D48"
   },
   {
+    id: "gooloo",
+    name: "GOOLOO",
+    slug: "gooloo",
+    description: "Reliable car jump starters and emergency power solutions trusted worldwide. Portable battery boosters, power stations, and roadside emergency kits for cars, trucks, motorcycles, boats, and RVs.",
+    vendorCategory: "Tools & Equipment",
+    searchTemplate: "https://www.awin1.com/cread.php?awinmid=82857&awinaffid=2752166&ued=https%3A%2F%2Fwww.gooloo.com%2Fsearch%3Fq%3D{query}",
+    hasLocalPickup: false,
+    categories: ["cars", "classics", "diesel", "rv", "motorcycles", "boats", "atvs"],
+    priority: 77,
+    supportsOEM: false,
+    supportsAftermarket: true,
+    affiliateNetwork: "Awin",
+    logoColor: "#F59E0B"
+  },
+  {
     id: "guta",
     name: "GUTA",
     slug: "guta",

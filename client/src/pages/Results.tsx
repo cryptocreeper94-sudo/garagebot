@@ -52,7 +52,7 @@ function isAffiliatePartner(vendor: VendorInfo): boolean {
 }
 
 const SCANNING_MESSAGES = [
-  "Connecting to 96 retailers...",
+  "Connecting to 97 retailers...",
   "Checking AutoZone inventory...",
   "Scanning Amazon Automotive...",
   "Searching RockAuto catalog...",
