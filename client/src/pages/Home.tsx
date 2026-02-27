@@ -114,7 +114,7 @@ export default function Home() {
                 {/* Status Badge */}
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-mono tracking-wider mb-3 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_12px_var(--color-primary)]" />
-                  SYSTEM ONLINE // 68+ RETAILERS
+                  SYSTEM ONLINE // 94 RETAILERS
                 </div>
                 
                 {/* Full Welcome Title */}
@@ -144,7 +144,7 @@ export default function Home() {
                   <Link href="/results">
                     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 cursor-pointer hover:border-primary/50 hover:bg-primary/10 transition-all group icon-bounce">
                       <Database className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-[10px] font-medium">68+ Retailers</span>
+                      <span className="text-[10px] font-medium">94 Retailers</span>
                     </div>
                   </Link>
                   <Link href="/diy-guides">
@@ -518,7 +518,7 @@ export default function Home() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-xs font-mono tracking-wider mb-6 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              SYSTEM ONLINE // 68+ RETAILERS
+              SYSTEM ONLINE // 94 RETAILERS
             </div>
             
             {/* Welcome Title */}
@@ -543,7 +543,7 @@ export default function Home() {
               <Link href="/results">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/30 border border-white/10">
                   <Database className="w-4 h-4 text-primary" />
-                  <span className="text-xs">68+ Retailers</span>
+                  <span className="text-xs">94 Retailers</span>
                 </div>
               </Link>
               <Link href="/diy-guides">
@@ -710,7 +710,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mb-3">
-                Tell Buddy what you need - he'll find the right part across 68+ retailers.
+                Tell Buddy what you need - he'll find the right part across 94 retailers.
               </p>
               <Button onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ai-mascot-toggle"]')?.click()} className="w-full btn-cyber font-tech uppercase text-xs" data-testid="button-chat-buddy-mobile">
                 <MessageCircle className="w-4 h-4 mr-2" />
@@ -738,7 +738,7 @@ export default function Home() {
                       <span className="px-1.5 py-0.5 text-[9px] font-mono uppercase bg-green-500/20 text-green-400 border border-green-500/30 rounded">FREE</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Join 68+ retailers. Get featured, earn badges, compete for Vendor of the Month!
+                      Join 94 retailers. Get featured, earn badges, compete for Vendor of the Month!
                     </p>
                   </div>
                   <ArrowRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
@@ -782,7 +782,7 @@ export default function Home() {
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px]">
                       <CheckCircle2 className="w-3 h-3 text-green-400" />
-                      <span>68+ Parts Vendors</span>
+                      <span>94 Parts Vendors</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px]">
                       <CheckCircle2 className="w-3 h-3 text-green-400" />
@@ -832,7 +832,7 @@ export default function Home() {
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { step: 1, icon: Search, title: "Search Once", desc: "Enter your part name, number, or vehicle info. GarageBot searches 68+ retailers simultaneously.", color: "from-cyan-500/20 to-cyan-600/10", iconColor: "text-cyan-400", borderColor: "border-cyan-500/30" },
+              { step: 1, icon: Search, title: "Search Once", desc: "Enter your part name, number, or vehicle info. GarageBot searches 94 retailers simultaneously.", color: "from-cyan-500/20 to-cyan-600/10", iconColor: "text-cyan-400", borderColor: "border-cyan-500/30" },
               { step: 2, icon: TrendingUp, title: "Compare Prices", desc: "See prices, availability, and shipping from every store side-by-side. No more tab-hopping.", color: "from-green-500/20 to-green-600/10", iconColor: "text-green-400", borderColor: "border-green-500/30" },
               { step: 3, icon: CheckCircle2, title: "Buy & Save", desc: "Click through to buy from the store with the best deal. Average users save $50-$200 per repair.", color: "from-purple-500/20 to-purple-600/10", iconColor: "text-purple-400", borderColor: "border-purple-500/30" },
             ].map((item, i) => (

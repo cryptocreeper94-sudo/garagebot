@@ -48,7 +48,7 @@ export default function Investors() {
             {[
               { icon: DollarSign, value: "$400B+", label: "US Aftermarket Industry" },
               { icon: Users, value: "280M", label: "Vehicles in the US" },
-              { icon: Zap, value: "68+", label: "Integrated Retailers" },
+              { icon: Zap, value: "94", label: "Integrated Retailers" },
               { icon: Shield, value: "100%", label: "On-Chain Verified" },
             ].map((stat, i) => (
               <motion.div
@@ -228,7 +228,7 @@ export default function Investors() {
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                      <span><strong>Parts Aggregator MVP:</strong> 68+ retailers integrated with unified search</span>
+                      <span><strong>Parts Aggregator MVP:</strong> 94 retailers integrated with unified search</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
