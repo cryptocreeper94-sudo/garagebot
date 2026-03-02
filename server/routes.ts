@@ -926,6 +926,21 @@ ${pages.map(p => `  <url>
     }
   });
 
+  app.post('/api/ai/assembly-parts', async (req: any, res) => {
+    if (!checkAIRateLimit(req, res)) return;
+    try {
+      const { partName, vehicle } = req.body;
+      if (!partName) {
+        return res.status(400).json({ error: "Part name required" });
+      }
+      const result = await aiAssistant.getAssemblyParts(partName, vehicle);
+      res.json(result);
+    } catch (error) {
+      console.error("Assembly parts error:", error);
+      res.status(500).json({ error: "Failed to get assembly parts" });
+    }
+  });
+
   // Smart recommendations based on vehicle
   app.post('/api/ai/recommendations', async (req: any, res) => {
     if (!checkAIRateLimit(req, res)) return;

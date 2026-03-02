@@ -8,6 +8,7 @@ import { AdSenseHorizontal } from "@/components/AdSense";
 import VehicleFunFacts from "@/components/VehicleFunFacts";
 import { PriceAlertButton, PriceAlertsPanel } from "@/components/PriceAlerts";
 import ShareButton from "@/components/ShareButton";
+import CompleteAssembly from "@/components/CompleteAssembly";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -1201,6 +1202,18 @@ export default function Results() {
                     searchQuery={displayQuery}
                     requireAuth={requireAuth}
                   />
+
+                  {hasSearchQuery && displayQuery && (
+                    <CompleteAssembly
+                      partName={displayQuery}
+                      vehicle={{
+                        year: aiYear || year,
+                        make: aiMake || make,
+                        model: aiModel || model,
+                        type: aiVehicleType || vehicleType,
+                      }}
+                    />
+                  )}
 
                   {vendorsWithUrls.length > 0 && (
                     <section>

@@ -497,6 +497,113 @@ export async function getPartSuggestions(partType: string, vehicleInfo: string):
   }
 }
 
+export interface AssemblyPart {
+  name: string;
+  partNumber?: string;
+  description: string;
+  searchQuery: string;
+  isBasePart: boolean;
+  estimatedPrice?: string;
+  importance: "required" | "recommended" | "optional";
+}
+
+export interface AssemblyResult {
+  assemblyName: string;
+  description: string;
+  totalParts: number;
+  parts: AssemblyPart[];
+  tips: string;
+  vehicleInfo?: string;
+}
+
+export async function getAssemblyParts(
+  partName: string,
+  vehicleInfo?: { year?: string; make?: string; model?: string; type?: string }
+): Promise<AssemblyResult> {
+  try {
+    const vehicle = vehicleInfo
+      ? [vehicleInfo.year, vehicleInfo.make, vehicleInfo.model].filter(Boolean).join(" ")
+      : "";
+    const vehicleDesc = vehicle || "a general vehicle";
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert automotive parts specialist. When given a specific part, identify the COMPLETE assembly it belongs to and list ALL parts needed to complete that assembly or repair job.
+
+Think like a parts counter pro: if someone buys brake pads, they probably need rotors, hardware kit, and brake cleaner. If someone buys an antenna base, they need the mast, cable, gasket, and mounting hardware.
+
+Return ONLY valid JSON in this exact format:
+{
+  "assemblyName": "Name of the complete assembly/job",
+  "description": "Brief explanation of why these parts go together",
+  "totalParts": 5,
+  "parts": [
+    {
+      "name": "Part Name",
+      "partNumber": "OEM part number if known, or null",
+      "description": "What this part does in the assembly",
+      "searchQuery": "Optimized search query to find this part for the specific vehicle",
+      "isBasePart": true,
+      "estimatedPrice": "$XX-$XX range",
+      "importance": "required"
+    }
+  ],
+  "tips": "Pro tip or installation note"
+}
+
+Rules:
+- Mark the original searched part as isBasePart: true
+- Include ALL parts needed for a complete assembly/repair
+- importance: "required" = won't work without it, "recommended" = should replace while you're in there, "optional" = nice to have
+- searchQuery should include the vehicle year/make/model when relevant for fitment
+- Include consumables like grease, sealant, cleaner when applicable
+- Be specific to the vehicle when vehicle info is provided
+- Typically 3-8 parts per assembly`
+        },
+        {
+          role: "user",
+          content: `Part: "${partName}" for ${vehicleDesc}. What other parts complete this assembly?`
+        }
+      ],
+      max_tokens: 800,
+      temperature: 0.3,
+    });
+
+    const content = response.choices[0]?.message?.content || "{}";
+    const cleaned = content.replace(/```json\n?|\n?```/g, "").trim();
+    const parsed = JSON.parse(cleaned);
+
+    return {
+      assemblyName: parsed.assemblyName || `${partName} Assembly`,
+      description: parsed.description || "",
+      totalParts: parsed.totalParts || parsed.parts?.length || 0,
+      parts: (parsed.parts || []).map((p: any) => ({
+        name: p.name || "",
+        partNumber: p.partNumber || undefined,
+        description: p.description || "",
+        searchQuery: p.searchQuery || p.name || "",
+        isBasePart: !!p.isBasePart,
+        estimatedPrice: p.estimatedPrice || undefined,
+        importance: p.importance || "recommended",
+      })),
+      tips: parsed.tips || "",
+      vehicleInfo: vehicle || undefined,
+    };
+  } catch (error) {
+    console.error("Assembly parts error:", error);
+    return {
+      assemblyName: `${partName} Assembly`,
+      description: "We couldn't determine the full assembly at this time.",
+      totalParts: 0,
+      parts: [],
+      tips: "",
+    };
+  }
+}
+
 export async function getMascotGreeting(context?: string): Promise<string> {
   const greetings = [
     "Hey there! Ready to find some parts? Just tell me what you need!",

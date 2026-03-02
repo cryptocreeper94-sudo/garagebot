@@ -60,6 +60,7 @@ Preferred communication style: Simple, everyday language.
 ## Search Functionality
 - **Part Search Modal**: First-visit modal on Explore page (`/`) asking "What Are You Working On?" with vehicle/part fields, stored in localStorage to show once.
 - **Part Search Banner**: Persistent compact search banner always visible on Explore page for return visitors.
+- **Complete Assembly**: AI-powered "Complete This Assembly" section on Results page (`/results`). Uses GPT-4o-mini via `/api/ai/assembly-parts` to identify companion parts for any searched part (e.g., search "brake pads" and see rotors, hardware kit, brake cleaner). Collapsible card with selectable parts, importance badges (required/recommended/optional), estimated prices, and one-click search for each companion part.
 
 ## Build & Deployment
 - **Development**: Client (Vite) and backend (tsx) development servers with HMR.
