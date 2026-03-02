@@ -81,7 +81,7 @@ export default function SearchHero() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono mb-6">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            SYSTEM ONLINE // AGGREGATING 58 VENDORS
+            SYSTEM ONLINE // AGGREGATING 104 VENDORS
           </div>
           
           <h1 className="text-5xl md:text-7xl font-tech font-bold uppercase tracking-tight mb-6 text-white leading-none">
@@ -91,7 +91,7 @@ export default function SearchHero() {
           </h1>
           
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-light">
-            From RC cars to heavy equipment — compare prices across 58 retailers and go straight to the exact part that fits your vehicle.
+            From RC cars to heavy equipment — compare prices across 104 retailers and go straight to the exact part that fits your vehicle.
           </p>
         </motion.div>
 
@@ -173,7 +173,7 @@ export default function SearchHero() {
                 data-testid="button-find-parts"
               >
                 {isSearching ? (
-                  <span className="animate-pulse">Scanning 58 Stores...</span>
+                  <span className="animate-pulse">Scanning 104 Stores...</span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <Zap className="w-5 h-5" /> Find Parts
@@ -193,7 +193,7 @@ export default function SearchHero() {
               <span className="font-bold text-xs text-blue-500">NAPA</span>
               <span className="font-bold text-xs text-red-500">Summit Racing</span>
               <span className="font-bold text-xs text-blue-400">eBay Motors</span>
-              <span className="text-xs font-mono text-primary">+ 51 more</span>
+              <span className="text-xs font-mono text-primary">+ 97 more</span>
             </div>
           </div>
         </motion.div>

@@ -42,6 +42,7 @@ import imgProMembership from "@/assets/images/cc/pro-membership.png";
 import imgPriceAlerts from "@/assets/images/cc/price-alerts.png";
 import imgReferralProgram from "@/assets/images/cc/referral-program.png";
 
+import { PartSearchModal, PartSearchBanner } from "@/components/PartSearchModal";
 import imgWarrantyTracker from "@/assets/images/hub/warranty-tracker.png";
 import imgFuelTracker from "@/assets/images/hub/fuel-tracker.png";
 import imgExpenseTracker from "@/assets/images/hub/expense-tracker.png";
@@ -541,6 +542,8 @@ export default function Explore() {
       </div>
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-10 sm:pb-12 w-full">
+        <PartSearchBanner />
+
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -895,6 +898,7 @@ export default function Explore() {
       </div>
 
       <Footer />
+      <PartSearchModal />
     </div>
   );
 }

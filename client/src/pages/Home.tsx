@@ -114,7 +114,7 @@ export default function Home() {
                 {/* Status Badge */}
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-mono tracking-wider mb-3 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_12px_var(--color-primary)]" />
-                  SYSTEM ONLINE // 94 RETAILERS
+                  SYSTEM ONLINE // 104 RETAILERS
                 </div>
                 
                 {/* Full Welcome Title */}
@@ -144,7 +144,7 @@ export default function Home() {
                   <Link href="/results">
                     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 cursor-pointer hover:border-primary/50 hover:bg-primary/10 transition-all group icon-bounce">
                       <Database className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-[10px] font-medium">94 Retailers</span>
+                      <span className="text-[10px] font-medium">104 Retailers</span>
                     </div>
                   </Link>
                   <Link href="/diy-guides">
