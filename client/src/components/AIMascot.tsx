@@ -181,6 +181,14 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
     if (isOpen && messages.length === 0) {
       fetchGreeting();
     }
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+      return () => {
+        document.body.style.overflow = '';
+        document.body.style.touchAction = '';
+      };
+    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -549,8 +557,9 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
             animate={{ opacity: isExiting ? 0 : 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 pointer-events-none"
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]"
             onClick={handleClose}
+            onTouchMove={(e) => e.preventDefault()}
             data-testid="ai-mascot-overlay"
           >
             {/* Buddy swings in from random direction */}
@@ -583,8 +592,9 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                 rotate: getExitAnimation(entryDirection).rotate, 
                 scale: 0.7 
               }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center max-w-[96vw] sm:max-w-none pointer-events-auto"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center max-w-[96vw] sm:max-w-none"
               onClick={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
               data-testid="ai-mascot-chat"
             >
               <div className="relative w-full sm:w-[400px] md:w-[480px] mb-[-30px]">
@@ -656,7 +666,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                     </motion.div>
                   )}
 
-                  <ScrollArea className="h-28 sm:h-36 mb-2" ref={scrollRef}>
+                  <ScrollArea className="h-28 sm:h-36 mb-2" ref={scrollRef} style={{ overscrollBehavior: 'contain', touchAction: 'pan-y' }}>
                     <div className="space-y-3 pr-2">
                       {messages.map((msg, i) => (
                         <motion.div
@@ -776,7 +786,7 @@ export default function AIMascot({ mascotName = "Buddy" }: AIMascotProps) {
                     <Input
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); sendMessage(); } }}
                       placeholder={rateLimitError ? "Please wait..." : "Describe what you need..."}
                       className="flex-1 text-sm h-9"
                       disabled={isLoading || isUploading || !!rateLimitError}
