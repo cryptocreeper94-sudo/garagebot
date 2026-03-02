@@ -8,5 +8,21 @@ Disallow: /checkout/cancel
 Disallow: /account
 Disallow: /dashboard
 Disallow: /ws/
+Disallow: /vite-hmr
 
-Sitemap: https://garagebot.replit.app/sitemap.xml
+User-agent: AdsBot-Google
+Allow: /
+Disallow: /api/
+Disallow: /auth/callback
+Disallow: /checkout
+Disallow: /account
+Disallow: /dashboard
+Disallow: /ws/
+
+User-agent: Mediapartners-Google
+Allow: /
+Disallow: /api/
+Disallow: /auth/callback
+Disallow: /ws/
+
+Sitemap: https://garagebot.io/sitemap.xml

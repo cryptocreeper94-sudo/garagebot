@@ -1,6 +1,6 @@
 # Overview
 
-GarageBot is a comprehensive parts aggregator platform designed to unify inventory from 104 retailers into a single searchable interface. Its primary purpose is to ensure users find the "Right Part. First Time. Every Engine." for ALL motorized vehicles and equipment, including a dedicated Motorized Hobby section. The platform aims to revolutionize the parts market by offering advanced search capabilities, AI-powered recommendations, vehicle fleet management with VIN decoding, and integrated DIY repair guides. It also features a robust e-commerce system with Stripe payments, a Genesis Hallmark NFT system for early adopters, and a Pro "Founders Circle" subscription for enhanced functionalities. The business vision is to become the go-to platform for both casual users, professional mechanics, and hobby enthusiasts.
+GarageBot is a comprehensive parts aggregator platform designed to unify inventory from 104 retailers, enabling users to find the "Right Part. First Time. Every Engine." for all motorized vehicles and equipment, including a dedicated Motorized Hobby section. The platform offers advanced search, AI-powered recommendations, vehicle fleet management with VIN decoding, and integrated DIY repair guides. It features an e-commerce system with Stripe payments, a Genesis Hallmark NFT system, and a Pro "Founders Circle" subscription. The vision is to become the leading platform for casual users, professional mechanics, and hobby enthusiasts.
 
 # User Preferences
 
@@ -28,120 +28,106 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend
 - **Framework**: React 18 with TypeScript and Vite.
-- **UI/UX**: shadcn/ui on Radix UI primitives, styled with Tailwind CSS, featuring a "Deep Space / Future Forward" theme with electric cyan accents, custom fonts (Rajdhani, Inter, JetBrains Mono), and a dark color palette. Custom CSS provides glow effects, 3D buttons, and neon text.
-- **State Management**: TanStack Query for server state, React Context for cart management, and a custom `useAuth` hook.
+- **UI/UX**: shadcn/ui on Radix UI, Tailwind CSS, "Deep Space / Future Forward" theme with electric cyan accents, custom fonts (Rajdhani, Inter, JetBrains Mono), dark palette, glow effects, 3D buttons, neon text.
+- **State Management**: TanStack Query for server state, React Context for cart, custom `useAuth` hook.
 - **Routing**: Wouter for client-side navigation.
-- **Animation**: Framer Motion for UI animations, including the Buddy AI mascot.
+- **Animation**: Framer Motion for UI animations, including Buddy AI mascot.
 
 ## Backend
 - **Runtime**: Node.js with Express.js.
 - **API Design**: RESTful API with authentication middleware.
 - **Session Management**: Express-session with PostgreSQL session store.
-- **Authentication**: Custom PIN-based login system requiring Name, Email, and a secure 8+ character PIN.
+- **Authentication**: Custom PIN-based login (Name, Email, 8+ char PIN).
 
 ## AI Features (Buddy AI)
 - **Core Service**: Unified AI assistant powered by OpenAI.
 - **Capabilities**: Conversational AI with memory, intelligent part recommendations, AI-generated DIY repair guides, mechanic estimates, proactive vehicle alerts, part definitions, and AI symptom diagnosis engine.
-- **Symptom Diagnosis**: Route `/diagnose` — Users describe vehicle symptoms in plain English, AI diagnoses likely causes ranked by probability, lists parts needed with direct vendor search links, shows DIY difficulty, urgency level, and estimated savings.
+- **Symptom Diagnosis**: Route `/diagnose` provides ranked diagnoses, required parts with vendor links, DIY difficulty, urgency, and estimated savings.
 
 ## Data Storage
-- **Database**: PostgreSQL, accessed via Neon serverless driver.
-- **ORM**: Drizzle ORM for type-safe database interactions.
-- **Core Tables**: Users, vehicles, vendors, deals, hallmarks, carts, orders, sessions, and affiliate tracking tables.
+- **Database**: PostgreSQL via Neon serverless driver.
+- **ORM**: Drizzle ORM.
+- **Core Tables**: Users, vehicles, vendors, deals, hallmarks, carts, orders, sessions, and affiliate tracking.
 
 ## Payment Processing
-- **Provider**: Stripe, integrated using Stripe Elements React components and Stripe's backend SDK.
-- **Ad-Free Subscription**: $5/month tier removes all ads; Pro users automatically ad-free.
+- **Provider**: Stripe, integrated with Elements React components and backend SDK.
+- **Ad-Free Subscription**: $5/month tier.
 
 ## Ad Monetization
-- **Google AdSense**: Ads are shown to free users on Dashboard, Results, DIY Guides, Blog, Break Room, but never on login/signup/checkout flows. Ads are hidden for Pro and ad-free subscribers.
+- **Google AdSense**: Ads for free users on Dashboard, Results, DIY Guides, Blog, Break Room; hidden for Pro/ad-free subscribers.
+- **SEO Prerender for AdSense**: Server-side bot detection serves pre-rendered HTML with AdSense slots to crawlers.
+
+## Search Functionality
+- **Part Search Modal**: First-visit modal on Explore page (`/`) asking "What Are You Working On?" with vehicle/part fields, stored in localStorage to show once.
+- **Part Search Banner**: Persistent compact search banner always visible on Explore page for return visitors.
 
 ## Build & Deployment
-- **Development Environment**: Client (Vite) and backend (tsx) development servers with Hot Module Replacement (HMR).
-- **Production Build**: Vite for client-side, esbuild for server-side.
+- **Development**: Client (Vite) and backend (tsx) development servers with HMR.
+- **Production**: Vite for client, esbuild for server.
 - **Deployment**: Replit Autoscale.
 
 ## DIY Repair Guides System
-- **Content**: Comprehensive vehicle taxonomy, including YouTube search queries and per-step video links, with cross-industry terminology translation.
+- **Content**: Comprehensive vehicle taxonomy, YouTube search queries, per-step video links, cross-industry terminology translation.
 
 ## Break Room Hub
-- **Functionality**: A central hub (`/break-room`) with tabs for motorsports/automotive news, tools (Receipt/Document Scanner, Mileage Tracker, NHTSA Recall Checker, Maintenance Scheduler), community features (Speed Trap Alerts, Fuel Price Finder, Directories), and opportunities (CDL Schools & Trucking Programs).
+- **Functionality**: A central hub (`/break-room`) with motorsports/automotive news, tools (Receipt/Document Scanner, Mileage Tracker, NHTSA Recall Checker, Maintenance Scheduler), community features (Speed Trap Alerts, Fuel Price Finder, Directories), and opportunities (CDL Schools & Trucking Programs).
 
 ## Parts Marketplace (Sell Your Parts)
-- **Route**: `/parts-marketplace` — Peer-to-peer marketplace for buying/selling auto parts.
-- **Fee Structure**: GarageBot charges a marketplace facilitation fee added to the buyer's total. Sellers receive 100% of their listed price.
-  - **Free/Basic sellers**: 10% marketplace fee charged to buyers.
-  - **Pro sellers**: 6% marketplace fee charged to buyers (incentivizes Pro upgrades).
-  - **Stripe processing**: 2.9% + $0.30 per transaction (standard Stripe fees).
-- **Checkout**: Stripe Checkout Sessions with line items for part price, shipping, and marketplace fee. Metadata tracks seller payout, platform fee, and listing details.
-- **Seller Requirements**: Basic or Pro subscription required to list parts.
-- **API Routes**: `/api/marketplace/fee-info`, `/api/marketplace/calculate-fees`, `/api/marketplace/checkout`, plus existing listing CRUD routes.
+- **Route**: `/parts-marketplace` for peer-to-peer selling.
+- **Fee Structure**: Marketplace fee charged to buyer (10% for basic, 6% for Pro sellers), plus standard Stripe processing fees.
+- **Checkout**: Stripe Checkout Sessions with line items for part, shipping, and marketplace fee.
+- **Seller Requirements**: Basic or Pro subscription needed to list parts.
 
 ## Affiliate Strategy
-- **Current**: Vehicle-aware search links to over 50 retailers, with 17 active affiliate integrations across Amazon Associates, eBay Partner Network, CJ Affiliate, ShareASale, Awin (EKR Cover, HCalory, Mokwheel, Vanpowers, MaXpeedingRods, xLaserLab, Guta, CARLUEX, GOOLOO, OEDRO, Promeed, AstroAI, Carputech, SEALIGHT, TCMT, Ottocast, Dunford, AutoPartsToys, Redodo Power, Owleys).
+- **Current**: Vehicle-aware search links to over 50 retailers, with 17 active affiliate integrations (Amazon Associates, eBay Partner Network, CJ Affiliate, ShareASale, Awin).
 
 ## Blockchain Verification
-- **Purpose**: Tamper-proof verification of Genesis Hallmarks and Vehicle Passports on the Solana blockchain.
-- **Technology**: Solana network via Helius RPC and `@solana/web3.js`, featuring SHA-256 hashing and on-chain transaction submission.
+- **Purpose**: Tamper-proof verification of Genesis Hallmarks and Vehicle Passports on Solana blockchain.
+- **Technology**: Solana network via Helius RPC and `@solana/web3.js` using SHA-256 hashing.
 
 ## Member Referral Program
-- **System**: Points-based system rewarding user signups and Pro membership conversions, redeemable for Pro membership tiers.
+- **System**: Points-based system rewarding signups and Pro conversions, redeemable for Pro membership tiers.
 
 ## TORQUE - Shop Management OS
-- **Route**: `/torque` (landing), `/torque/onboard` (5-step setup), `/torque/app` (shop dashboard)
-- **Branding**: "TORQUE — Shop Management OS powered by Trust Layer" — blockchain-verified shop identities
-- **PWA**: Standalone PWA with custom manifest (`/torque-manifest.json`), app icons (192x192, 512x512), splash screen with animated logo
-- **Landing Page**: Premium UI with 3-column bento grid, testimonial carousel, FAQ accordion, animated counters, parallax effects, PWA install prompt
-- **Onboarding**: 5-step ultra-professional setup flow (Shop Info → Team → Services → Integrations → Verify)
-- **Legacy**: `/mechanics-garage` redirects to `/torque/app` for backward compatibility
-- **Formerly**: "Mechanics Garage" — rebranded to TORQUE across all major UI references
+- **Routes**: `/torque` (landing), `/torque/onboard` (5-step setup), `/torque/app` (shop dashboard).
+- **Branding**: "TORQUE — Shop Management OS powered by Trust Layer" with blockchain-verified shop identities.
+- **PWA**: Standalone PWA with custom manifest, icons, and splash screen.
+- **Landing Page**: Premium UI with bento grid, testimonial carousel, FAQ, animated counters, parallax, PWA install prompt.
+- **Onboarding**: 5-step setup flow.
 
 ## Partner API System
-- **Purpose**: Provides B2B API access for TORQUE shops with API Key + Secret authentication, granular scopes, and rate limiting.
+- **Purpose**: B2B API access for TORQUE shops with API Key + Secret authentication, granular scopes, and rate limiting.
 
 ## Ecosystem API v1
-- **Route prefix**: `/api/ecosystem/v1/`
-- **Purpose**: Trust Layer JWT-authenticated API for cross-ecosystem app integration (Verdara, etc.)
-- **Auth**: Bearer token using shared Trust Layer SSO JWT (HS256, shared JWT_SECRET)
-- **Endpoints**:
-  - `GET /equipment` — List user's vehicles/equipment by Trust Layer ID
-  - `GET /equipment/:id` — Equipment details with service history, maintenance schedule, and reminders
-  - `GET /maintenance-alerts` — Overdue and upcoming (30-day) maintenance alerts
-  - `POST /equipment` — Create new equipment entry (write access)
-  - `PATCH /equipment/:id` — Update equipment fields (limited: mileage, notes, engine, fuel, type, trim)
-- **Rate Limits**: 120/min per Trust Layer ID, 10,000/day
-- **Handoff Doc**: `GARAGEBOT-ECOSYSTEM-API-HANDOFF.md`
+- **Route prefix**: `/api/ecosystem/v1/`.
+- **Purpose**: Trust Layer JWT-authenticated API for cross-ecosystem app integration.
+- **Auth**: Bearer token using shared Trust Layer SSO JWT.
+- **Endpoints**: `GET /equipment`, `GET /equipment/:id`, `GET /maintenance-alerts`, `POST /equipment`, `PATCH /equipment/:id`.
+- **Rate Limits**: 120/min per Trust Layer ID, 10,000/day.
 
 ## Weather Radar System
-- **Integration**: Utilizes Leaflet map and RainViewer radar tiles with NOAA Weather Alerts API for severe weather warnings.
+- **Integration**: Leaflet map and RainViewer radar tiles with NOAA Weather Alerts API.
 
 ## CDL & Trucking Company Directory
-- **Functionality**: A portable directory (`/cdl-directory`) of trucking companies and CDL programs with search, filter, and interest/referral forms.
+- **Functionality**: Portable directory (`/cdl-directory`) with search, filter, and interest forms.
 
 ## Signal Chat (Community Messaging)
-- **Route**: `/chat` — Full-featured community chat integrated into GarageBot with a WebSocket layer.
-- **Backend**: Extensive database tables (e.g., communities, channels, messages), CommunityHubService, REST API endpoints, and WebSocket support.
-- **Trust Layer SSO**: Cross-app identity via JWT tokens and Trust Layer IDs, matching DarkWave Studios API format.
-- **Frontend**: SignalChat page with real-time messaging via `useSignalChat` hook, Deep Space themed UI.
+- **Route**: `/chat` — Full-featured community chat with WebSocket layer, REST API, and `CommunityHubService`.
+- **Trust Layer SSO**: Cross-app identity via JWT tokens.
+- **Frontend**: SignalChat page with real-time messaging, Deep Space themed UI.
 - **Buddy AI Bot**: Auto-responds in `#garagebot-support` channel using OpenAI GPT-4o-mini.
-- **Auth Gating**: Unauthenticated users see a login prompt; authenticated users auto-join the GarageBot community.
 
 ## Shade Tree Mechanics (DIY Community)
-- **Purpose**: A community hub (`/shade-tree`) for DIY enthusiasts, providing categorized repair guides, community tips, and estimated savings.
+- **Purpose**: Community hub (`/shade-tree`) for DIY enthusiasts with categorized repair guides, tips, and estimated savings.
 
 ## Marketing Hub & Social Media Integration
-- **Add-on**: Premium add-on for TORQUE shops supporting various social media platforms.
-- **GarageBot Marketing Hub** (`/marketing-hub`): Auto-posting to Facebook (GarageBot.io page) every 3 hours via Meta Graph API with 60+ unique posts.
+- **GarageBot Marketing Hub** (`/marketing-hub`): Auto-posting to Facebook (GarageBot.io page) every 3 hours via Meta Graph API.
 - **Meta Ads Campaigns**: Manages paid ad campaigns via Meta Marketing API with configurable targeting.
-- **Analytics**: Tracks top-performing content and provides performance insights from Meta Graph API.
+- **Analytics**: Tracks top-performing content and provides insights from Meta Graph API.
 
 ## OEM Parts
 - **Route**: `/oem-parts` — Full OEM genuine parts directory page with 12+ manufacturer brands.
-- **Layout**: Premium bento grid header, 3-column partner cards with photorealistic images, parts category carousel, OEM vs aftermarket comparison table, warranty section, FAQ accordion, bottom CTA bento.
-- **Brands**: Toyota, Ford/Motorcraft, GM/ACDelco, Mopar, Honda, BMW, Nissan, Mercedes-Benz, Hyundai, Subaru, Volkswagen/Audi, Kia.
-- **Images**: Unique photorealistic images per brand in `client/src/assets/images/oem/`.
-- **Explore/CC**: Card added to "Parts & Shopping" in Explore page and "Vehicle & Parts" in Command Center.
-- **Affiliate**: URLs placeholder-ready for affiliate link integration.
+- **Layout**: Premium bento grid header, 3-column partner cards, parts category carousel, OEM vs aftermarket comparison, warranty section, FAQ, bottom CTA.
 
 ## Rental Cars
 - **Route**: `/rentals` — Full rental car comparison page with partners like Carla Car Rental, Expedia, and Hotels.com.
@@ -155,23 +141,20 @@ Preferred communication style: Simple, everyday language.
 - **AI**: OpenAI GPT-4.
 - **Blockchain**: Solana (via Helius API).
 - **Weather Radar**: RainViewer API, NOAA Weather Alerts API.
-- **ORBIT Staffing OS**: `https://orbitstaffing.io` (production) for payroll, staffing, and bookkeeping integration. GarageBot registers as ecosystem app via `/api/admin/ecosystem/register-app`, pushes all subscription/marketplace/order revenue to ORBIT's financial hub under Jason Andrews. Revenue auto-reported on every Stripe checkout (Pro, Ad-Free, parts orders, marketplace fees). Pricing catalog available at `/api/orbit/pricing`.
+- **ORBIT Staffing OS**: `https://orbitstaffing.io` for payroll, staffing, and bookkeeping integration, handling revenue reporting.
 - **Meta Graph API**: For Facebook auto-posting and ad campaign management.
 
 ## Unified Business Integrations Hub
-- **Purpose**: Allows TORQUE shops to connect their existing business software via OAuth.
+- **Purpose**: Allows TORQUE shops to connect existing business software via OAuth.
 - **Supported Integrations**:
-    - **Accounting**: QuickBooks Online, FreshBooks, Xero, Sage Business Cloud, Wave Accounting
-    - **Payroll/HR**: UKG Pro, ADP Workforce Now, Gusto, Paychex Flex
-    - **Scheduling/Communication**: Google Calendar, Twilio, Mailchimp
-    - **Parts/Inventory**: PartsTech, Nexpart
+    - **Accounting**: QuickBooks Online, FreshBooks, Xero, Sage Business Cloud, Wave Accounting.
+    - **Payroll/HR**: UKG Pro, ADP Workforce Now, Gusto, Paychex Flex.
+    - **Scheduling/Communication**: Google Calendar, Twilio, Mailchimp.
+    - **Parts/Inventory**: PartsTech, Nexpart.
 
 ## Inbound Affiliate Program (GB-XXXXXX)
 - **Route**: `/affiliates` — Full affiliate program page with enrollment, dashboard, and Trust Layer handoff.
-- **Code Format**: `GB-XXXXXX` (6 alphanumeric uppercase, no ambiguous chars like 0/O/1/I).
-- **Commission Rules**: 10% of GarageBot's affiliate commission on referred user purchases, $5 one-time Pro conversion bonus, $2/month recurring per active Pro referral.
-- **Thresholds**: $100 total referred purchase amount before affiliate starts earning. $20 minimum payout balance before payout request.
-- **Payouts**: PayPal, admin-approved. Admin gets alerts when affiliates reach $20 threshold.
-- **Trust Layer**: Handoff endpoint at `/api/affiliate-program/trustlayer/:code` returns full JSON payload for cross-ecosystem tracking.
-- **Database Tables**: `affiliate_accounts`, `affiliate_referrals`, `affiliate_earnings`, `affiliate_payouts_inbound`.
-- **API**: All routes prefixed with `/api/affiliate-program/`.
+- **Commission Rules**: 10% of GarageBot's affiliate commission, $5 one-time Pro conversion bonus, $2/month recurring per active Pro referral.
+- **Thresholds**: $100 total referred purchase, $20 minimum payout.
+- **Payouts**: PayPal, admin-approved.
+- **Trust Layer**: Handoff endpoint at `/api/affiliate-program/trustlayer/:code`.

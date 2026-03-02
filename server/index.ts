@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
+import { seoPrerenderMiddleware } from "./seo-prerender";
 import { createServer } from "http";
 import { runMigrations } from 'stripe-replit-sync';
 import { getStripeSync } from "./stripeClient";
@@ -181,6 +182,8 @@ async function initStripe() {
     res.status(status).json({ message });
     console.error(err);
   });
+
+  app.use(seoPrerenderMiddleware);
 
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);

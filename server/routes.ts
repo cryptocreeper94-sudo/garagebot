@@ -75,32 +75,34 @@ export async function registerRoutes(
 
   // SEO: Sitemap.xml
   app.get('/sitemap.xml', (_req, res) => {
-    const baseUrl = 'https://garagebot.replit.app';
+    const baseUrl = 'https://garagebot.io';
     const pages = [
       { path: '/', priority: '1.0', changefreq: 'daily' },
+      { path: '/home', priority: '1.0', changefreq: 'daily' },
+      { path: '/results', priority: '0.9', changefreq: 'daily' },
+      { path: '/diagnose', priority: '0.9', changefreq: 'daily' },
+      { path: '/diy-guides', priority: '0.8', changefreq: 'weekly' },
+      { path: '/blog', priority: '0.8', changefreq: 'weekly' },
+      { path: '/torque', priority: '0.8', changefreq: 'weekly' },
+      { path: '/marketplace', priority: '0.8', changefreq: 'daily' },
+      { path: '/oem-parts', priority: '0.8', changefreq: 'monthly' },
       { path: '/about', priority: '0.8', changefreq: 'monthly' },
+      { path: '/pro', priority: '0.7', changefreq: 'monthly' },
+      { path: '/shade-tree', priority: '0.7', changefreq: 'weekly' },
+      { path: '/break-room', priority: '0.7', changefreq: 'daily' },
       { path: '/contact', priority: '0.7', changefreq: 'monthly' },
+      { path: '/hallmark', priority: '0.6', changefreq: 'monthly' },
+      { path: '/insurance', priority: '0.6', changefreq: 'monthly' },
+      { path: '/rentals', priority: '0.6', changefreq: 'monthly' },
+      { path: '/chat', priority: '0.6', changefreq: 'daily' },
+      { path: '/support', priority: '0.6', changefreq: 'monthly' },
+      { path: '/cdl-directory', priority: '0.6', changefreq: 'weekly' },
       { path: '/terms', priority: '0.5', changefreq: 'monthly' },
       { path: '/privacy', priority: '0.5', changefreq: 'monthly' },
       { path: '/affiliate-disclosure', priority: '0.5', changefreq: 'monthly' },
-      { path: '/support', priority: '0.6', changefreq: 'monthly' },
-      { path: '/blog', priority: '0.8', changefreq: 'weekly' },
-      { path: '/diagnose', priority: '0.9', changefreq: 'daily' },
-      { path: '/diy-guides', priority: '0.8', changefreq: 'weekly' },
-      { path: '/pro', priority: '0.7', changefreq: 'monthly' },
-      { path: '/torque', priority: '0.8', changefreq: 'weekly' },
-      { path: '/torque/onboard', priority: '0.7', changefreq: 'monthly' },
-      { path: '/torque/app', priority: '0.7', changefreq: 'monthly' },
-      { path: '/mechanics-garage', priority: '0.5', changefreq: 'monthly' },
-      { path: '/mechanics-garage/info', priority: '0.5', changefreq: 'monthly' },
-      { path: '/shade-tree', priority: '0.6', changefreq: 'weekly' },
-      { path: '/break-room', priority: '0.6', changefreq: 'daily' },
-      { path: '/hallmark', priority: '0.6', changefreq: 'monthly' },
-      { path: '/investors', priority: '0.5', changefreq: 'monthly' },
       { path: '/vendor-signup', priority: '0.5', changefreq: 'monthly' },
-      { path: '/insurance', priority: '0.6', changefreq: 'monthly' },
-      { path: '/cdl-directory', priority: '0.5', changefreq: 'weekly' },
-      { path: '/chat', priority: '0.5', changefreq: 'daily' },
+      { path: '/investors', priority: '0.5', changefreq: 'monthly' },
+      { path: '/torque/onboard', priority: '0.5', changefreq: 'monthly' },
     ];
     const today = new Date().toISOString().split('T')[0];
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
