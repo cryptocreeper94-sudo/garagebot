@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ComingSoonCard } from "@/components/ComingSoonBadge";
 import { AffiliatesDashboard } from "@/components/AffiliatesDashboard";
+import ShareAndEarnCard from "@/components/ShareAndEarnCard";
 import { 
   Activity, 
   Server, 
@@ -309,6 +310,10 @@ export default function Dashboard() {
         </div>
 
         <div className="divider-gradient" />
+
+        <div className="mt-8 mb-6">
+          <ShareAndEarnCard />
+        </div>
 
         {/* Parts Marketplace Section */}
         <div className="mt-12 mb-8">

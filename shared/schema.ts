@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, boolean, decimal, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, serial, timestamp, boolean, decimal, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -54,6 +54,8 @@ export const users = pgTable("users", {
   referralCode: text("referral_code").unique(),
   referredByUserId: varchar("referred_by_user_id"),
   referralPointsBalance: integer("referral_points_balance").default(0),
+  uniqueHash: text("unique_hash").unique(),
+  affiliateTier: text("affiliate_tier").default("base"),
   trustLayerId: text("trust_layer_id"),
   trustLayerMemberCard: text("trust_layer_member_card"),
   ecosystemPinHash: text("ecosystem_pin_hash"),
@@ -437,31 +439,45 @@ export const deals = pgTable("deals", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Hallmarks (Genesis NFT system) - Per Vehicle
+// Hallmarks (Trust Layer Ecosystem - GB prefix)
 export const hallmarks = pgTable("hallmarks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  thId: text("th_id").unique(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
   vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  appId: text("app_id"),
+  appName: text("app_name"),
+  productName: text("product_name"),
+  releaseType: text("release_type"),
   assetNumber: integer("asset_number").unique(),
+  hallmarkId: integer("hallmark_id"),
   tokenId: text("token_id"),
   transactionHash: text("transaction_hash"),
+  dataHash: text("data_hash"),
+  txHash: text("tx_hash"),
+  blockHeight: text("block_height"),
   walletAddress: text("wallet_address"),
   displayName: text("display_name"),
   assetType: text("asset_type").default("vehicle"),
   customImageUrl: text("custom_image_url"),
   generatedArtUrl: text("generated_art_url"),
   qrCodeData: text("qr_code_data"),
+  qrCodeSvg: text("qr_code_svg"),
+  verificationUrl: text("verification_url"),
   metadata: jsonb("metadata"),
   isGenesis: boolean("is_genesis").default(true),
   stripePaymentId: text("stripe_payment_id"),
   mintPrice: decimal("mint_price", { precision: 10, scale: 2 }).default("2.00"),
   mintedAt: timestamp("minted_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("IDX_hallmark_asset").on(table.assetNumber),
+  index("IDX_hallmark_th_id").on(table.thId),
   index("IDX_hallmark_wallet").on(table.walletAddress),
   index("IDX_hallmark_name").on(table.displayName),
   index("IDX_hallmark_vehicle").on(table.vehicleId),
+  index("IDX_hallmark_release_type").on(table.releaseType),
 ]);
 
 // Vendors (parts retailers)
@@ -1642,14 +1658,91 @@ export const blockchainVerifications = pgTable("blockchain_verifications", {
   index("IDX_blockchain_status").on(table.status),
 ]);
 
-export const insertBlockchainVerificationSchema = createInsertSchema(blockchainVerifications).omit({ 
-  id: true, 
+export const insertBlockchainVerificationSchema = createInsertSchema(blockchainVerifications).omit({
+  id: true,
   createdAt: true,
   submittedAt: true,
   confirmedAt: true,
 });
 export type InsertBlockchainVerification = z.infer<typeof insertBlockchainVerificationSchema>;
 export type BlockchainVerification = typeof blockchainVerifications.$inferSelect;
+
+// ============================================
+// TRUST LAYER — TRUST STAMPS
+// ============================================
+
+export const trustStamps = pgTable("trust_stamps", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  category: text("category").notNull(),
+  data: jsonb("data"),
+  dataHash: text("data_hash").notNull(),
+  txHash: text("tx_hash"),
+  blockHeight: text("block_height"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_trust_stamps_user").on(table.userId),
+  index("IDX_trust_stamps_category").on(table.category),
+  index("IDX_trust_stamps_created").on(table.createdAt),
+]);
+
+export const insertTrustStampSchema = createInsertSchema(trustStamps).omit({ id: true, createdAt: true });
+export type InsertTrustStamp = z.infer<typeof insertTrustStampSchema>;
+export type TrustStamp = typeof trustStamps.$inferSelect;
+
+// ============================================
+// TRUST LAYER — HALLMARK COUNTER
+// ============================================
+
+export const hallmarkCounter = pgTable("hallmark_counter", {
+  id: text("id").primaryKey().default("gb-master"),
+  currentSequence: text("current_sequence").notNull().default("0"),
+});
+
+export type HallmarkCounter = typeof hallmarkCounter.$inferSelect;
+
+// ============================================
+// TRUST LAYER — ECOSYSTEM AFFILIATE (SIG-based)
+// ============================================
+
+export const ecosystemAffiliateReferrals = pgTable("ecosystem_affiliate_referrals", {
+  id: serial("id").primaryKey(),
+  referrerId: varchar("referrer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  referredUserId: varchar("referred_user_id").references(() => users.id, { onDelete: "set null" }),
+  referralHash: text("referral_hash").notNull(),
+  platform: text("platform").notNull().default("garagebot"),
+  status: text("status").notNull().default("pending"),
+  convertedAt: timestamp("converted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_eco_aff_ref_referrer").on(table.referrerId),
+  index("IDX_eco_aff_ref_referred").on(table.referredUserId),
+  index("IDX_eco_aff_ref_hash").on(table.referralHash),
+  index("IDX_eco_aff_ref_status").on(table.status),
+]);
+
+export const insertEcosystemAffiliateReferralSchema = createInsertSchema(ecosystemAffiliateReferrals).omit({ id: true, createdAt: true });
+export type InsertEcosystemAffiliateReferral = z.infer<typeof insertEcosystemAffiliateReferralSchema>;
+export type EcosystemAffiliateReferral = typeof ecosystemAffiliateReferrals.$inferSelect;
+
+export const ecosystemAffiliateCommissions = pgTable("ecosystem_affiliate_commissions", {
+  id: serial("id").primaryKey(),
+  referrerId: varchar("referrer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  referralId: integer("referral_id"),
+  amount: text("amount").notNull(),
+  currency: text("currency").default("SIG"),
+  tier: text("tier").default("base"),
+  status: text("status").default("pending"),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_eco_aff_comm_referrer").on(table.referrerId),
+  index("IDX_eco_aff_comm_status").on(table.status),
+]);
+
+export const insertEcosystemAffiliateCommissionSchema = createInsertSchema(ecosystemAffiliateCommissions).omit({ id: true, createdAt: true });
+export type InsertEcosystemAffiliateCommission = z.infer<typeof insertEcosystemAffiliateCommissionSchema>;
+export type EcosystemAffiliateCommission = typeof ecosystemAffiliateCommissions.$inferSelect;
 
 // ============================================
 // REFERRAL SYSTEM

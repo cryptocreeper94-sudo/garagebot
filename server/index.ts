@@ -13,6 +13,7 @@ import { initBuddyBot } from "./services/buddy-chat-bot";
 import { seedChatChannels } from "./seedChat";
 import { startMarketingScheduler } from "./marketing-scheduler";
 import { seedMarketingContent } from "./seeds/marketingContent";
+import { seedGenesisHallmark } from "./services/hallmarkService";
 
 const app = express();
 const httpServer = createServer(app);
@@ -142,6 +143,13 @@ async function initStripe() {
   app.use(createChatRouter());
 
   setupChatWebSocket(httpServer);
+
+  try {
+    await seedGenesisHallmark();
+    log("Genesis hallmark verified", "hallmark");
+  } catch (err: any) {
+    log(`Genesis hallmark error: ${err.message}`, "hallmark");
+  }
 
   try {
     await communityHubService.seedGarageBotCommunity();

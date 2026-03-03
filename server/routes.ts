@@ -4,7 +4,8 @@ import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, getUserId } from "./replitAuth";
-import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations, insertPartListingSchema, updatePartListingSchema, insertPartListingMessageSchema, partListings, newsletterSubscribers } from "@shared/schema";
+import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations, insertPartListingSchema, updatePartListingSchema, insertPartListingMessageSchema, partListings, newsletterSubscribers, ecosystemAffiliateReferrals, ecosystemAffiliateCommissions } from "@shared/schema";
+import * as hallmarkService from "./services/hallmarkService";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
 import { twilioService } from "./services/twilio";
 import { comparePrice } from "./services/price-comparison";
@@ -259,8 +260,8 @@ ${pages.map(p => `  <url>
       // Generate recovery codes
       const { codes, hashedCodes } = authService.generateRecoveryCodes();
       
-      // Create user with referral info
       const userId = crypto.randomUUID();
+      const uniqueHash = hallmarkService.generateUniqueHash();
       const user = await storage.upsertUser({
         id: userId,
         username,
@@ -278,6 +279,7 @@ ${pages.map(p => `  <url>
         persistenceEnabled: enablePersistence || false,
         persistenceExpiresAt: enablePersistence ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null,
         referredByUserId: referrer?.id || null,
+        uniqueHash,
       });
       
       // Process referral if valid
@@ -323,6 +325,8 @@ ${pages.map(p => `  <url>
         });
       }
 
+      hallmarkService.createTrustStamp(user.id, "auth-register", { username: user.username, email }).catch(() => {});
+
       res.json({ 
         user: { 
           id: user.id, 
@@ -354,20 +358,20 @@ ${pages.map(p => `  <url>
         return res.status(401).json({ error: "Invalid username or PIN" });
       }
       
-      // Update last login
       await storage.updateUser(user.id, { 
         lastLoginAt: new Date(),
         persistenceEnabled: enablePersistence || false,
         persistenceExpiresAt: enablePersistence ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null,
       });
       
-      // Set session
       (req.session as any).userId = user.id;
       (req.session as any).isCustomAuth = true;
       
       if (enablePersistence) {
-        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
       }
+
+      hallmarkService.createTrustStamp(user.id, "auth-login", { username: user.username }).catch(() => {});
       
       res.json({ 
         user: { 
@@ -11780,6 +11784,206 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     } catch (error) {
       console.error("Newsletter subscribe error:", error);
       res.status(500).json({ error: "Failed to subscribe" });
+    }
+  });
+
+  app.get("/api/hallmark/genesis", async (_req, res) => {
+    try {
+      const genesis = await hallmarkService.getGenesisHallmark();
+      if (!genesis) {
+        return res.status(404).json({ error: "Genesis hallmark not yet created" });
+      }
+      res.json({
+        thId: genesis.thId,
+        appName: genesis.appName || "GarageBot",
+        productName: genesis.productName,
+        releaseType: genesis.releaseType,
+        dataHash: genesis.dataHash,
+        txHash: genesis.txHash,
+        blockHeight: genesis.blockHeight,
+        verificationUrl: genesis.verificationUrl,
+        createdAt: genesis.createdAt || genesis.mintedAt,
+        metadata: genesis.metadata,
+        isGenesis: true,
+      });
+    } catch (error) {
+      console.error("Genesis hallmark error:", error);
+      res.status(500).json({ error: "Failed to fetch genesis hallmark" });
+    }
+  });
+
+  app.get("/api/hallmark/:id/verify", async (req, res) => {
+    try {
+      const result = await hallmarkService.verifyHallmark(req.params.id);
+      if (!result.verified) {
+        return res.status(404).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      console.error("Hallmark verify error:", error);
+      res.status(500).json({ error: "Failed to verify hallmark" });
+    }
+  });
+
+  app.get("/api/ecosystem-affiliate/dashboard", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getUserId(req);
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      const referrals = await db.select().from(ecosystemAffiliateReferrals)
+        .where(eq(ecosystemAffiliateReferrals.referrerId, userId));
+
+      const commissions = await db.select().from(ecosystemAffiliateCommissions)
+        .where(eq(ecosystemAffiliateCommissions.referrerId, userId));
+
+      const convertedCount = referrals.filter(r => r.status === "converted").length;
+      const tier = hallmarkService.computeAffiliateTier(convertedCount);
+      const tierInfo = hallmarkService.AFFILIATE_TIERS[tier];
+
+      const totalEarned = commissions.reduce((sum, c) => sum + parseFloat(c.amount), 0);
+      const pendingPayout = commissions.filter(c => c.status === "pending").reduce((sum, c) => sum + parseFloat(c.amount), 0);
+      const paidOut = commissions.filter(c => c.status === "paid").reduce((sum, c) => sum + parseFloat(c.amount), 0);
+
+      if (user.affiliateTier !== tier) {
+        await storage.updateUser(userId, { affiliateTier: tier });
+      }
+
+      res.json({
+        tier,
+        tierLabel: tierInfo.label,
+        commissionRate: tierInfo.rate,
+        referralCount: referrals.length,
+        convertedCount,
+        totalEarned: totalEarned.toFixed(2),
+        pendingPayout: pendingPayout.toFixed(2),
+        paidOut: paidOut.toFixed(2),
+        currency: "SIG",
+        minPayout: 10,
+        referrals: referrals.map(r => ({
+          id: r.id,
+          status: r.status,
+          platform: r.platform,
+          createdAt: r.createdAt,
+          convertedAt: r.convertedAt,
+        })),
+        commissions: commissions.slice(-20).map(c => ({
+          id: c.id,
+          amount: c.amount,
+          currency: c.currency,
+          tier: c.tier,
+          status: c.status,
+          createdAt: c.createdAt,
+        })),
+        allTiers: Object.entries(hallmarkService.AFFILIATE_TIERS).map(([key, val]) => ({
+          key,
+          label: val.label,
+          rate: val.rate,
+          minReferrals: val.minReferrals,
+          active: key === tier,
+        })),
+      });
+    } catch (error) {
+      console.error("Affiliate dashboard error:", error);
+      res.status(500).json({ error: "Failed to load affiliate dashboard" });
+    }
+  });
+
+  app.get("/api/ecosystem-affiliate/link", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getUserId(req);
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      let hash = user.uniqueHash;
+      if (!hash) {
+        hash = hallmarkService.generateUniqueHash();
+        await storage.updateUser(userId, { uniqueHash: hash });
+      }
+
+      res.json({
+        referralLink: `https://garagebot.io/ref/${hash}`,
+        uniqueHash: hash,
+        crossPlatformLinks: {
+          garagebot: `https://garagebot.io/ref/${hash}`,
+          trustLayer: `https://dwtl.io/ref/${hash}?app=garagebot`,
+        },
+      });
+    } catch (error) {
+      console.error("Affiliate link error:", error);
+      res.status(500).json({ error: "Failed to get affiliate link" });
+    }
+  });
+
+  app.post("/api/ecosystem-affiliate/track", async (req, res) => {
+    try {
+      const { hash, platform } = req.body;
+      if (!hash) return res.status(400).json({ error: "Hash is required" });
+
+      const [referrer] = await db.select().from(users)
+        .where(eq(users.uniqueHash, hash)).limit(1);
+      if (!referrer) return res.status(404).json({ error: "Invalid referral link" });
+
+      await db.insert(ecosystemAffiliateReferrals).values({
+        referrerId: referrer.id,
+        referralHash: hash,
+        platform: platform || "garagebot",
+        status: "pending",
+      });
+
+      res.json({ tracked: true, referrer: referrer.firstName || referrer.username });
+    } catch (error) {
+      console.error("Affiliate track error:", error);
+      res.status(500).json({ error: "Failed to track referral" });
+    }
+  });
+
+  app.post("/api/ecosystem-affiliate/request-payout", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getUserId(req);
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const commissions = await db.select().from(ecosystemAffiliateCommissions)
+        .where(and(
+          eq(ecosystemAffiliateCommissions.referrerId, userId),
+          eq(ecosystemAffiliateCommissions.status, "pending")
+        ));
+
+      const pendingTotal = commissions.reduce((sum, c) => sum + parseFloat(c.amount), 0);
+
+      if (pendingTotal < 10) {
+        return res.status(400).json({
+          error: "Minimum payout is 10 SIG",
+          pending: pendingTotal.toFixed(2),
+          currency: "SIG",
+        });
+      }
+
+      for (const c of commissions) {
+        await db.update(ecosystemAffiliateCommissions)
+          .set({ status: "processing" })
+          .where(eq(ecosystemAffiliateCommissions.id, c.id));
+      }
+
+      hallmarkService.createTrustStamp(userId, "affiliate-payout-request", {
+        amount: pendingTotal.toFixed(2),
+        currency: "SIG",
+        commissionCount: commissions.length,
+      }).catch(() => {});
+
+      res.json({
+        payoutRequested: true,
+        amount: pendingTotal.toFixed(2),
+        currency: "SIG",
+        commissionsProcessing: commissions.length,
+      });
+    } catch (error) {
+      console.error("Payout request error:", error);
+      res.status(500).json({ error: "Failed to request payout" });
     }
   });
 

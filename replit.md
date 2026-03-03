@@ -86,6 +86,23 @@ Preferred communication style: Simple, everyday language.
 - **Purpose**: Tamper-proof verification of Genesis Hallmarks and Vehicle Passports on Solana blockchain.
 - **Technology**: Solana network via Helius RPC and `@solana/web3.js` using SHA-256 hashing.
 
+## Trust Layer Hallmark System
+- **Genesis**: `GB-00000001` auto-seeded on boot with Trust Layer metadata (ecosystem, chain, SIG, Shells, parentGenesis TH-00000001, launchDate 2026-08-23).
+- **Service**: `server/services/hallmarkService.ts` — `generateHallmark()`, `createTrustStamp()`, `seedGenesisHallmark()`, `verifyHallmark()`.
+- **ID Format**: `GB-XXXXXXXX` (8-digit zero-padded), atomic counter in `hallmark_counter` table.
+- **Trust Stamps**: Logged on auth-login, auth-register, purchase, affiliate events. Stored in `trust_stamps` table with SHA-256 hashing.
+- **API**: `GET /api/hallmark/genesis` (public), `GET /api/hallmark/:id/verify` (public).
+- **Frontend**: `GenesisHallmarkBadge` in Footer — clickable badge opens modal with app info, blockchain record, ecosystem details.
+
+## Ecosystem Affiliate System (SIG-based)
+- **Separate from inbound affiliate program** (GB-XXXXXX PayPal system remains intact).
+- **Referral Links**: `https://garagebot.io/ref/[uniqueHash]` — uniqueHash generated on registration, stored in `users.unique_hash`.
+- **Tiers**: Base 10% (0 refs), Silver 12.5% (5), Gold 15% (15), Platinum 17.5% (30), Diamond 20% (50) — all in SIG.
+- **Min Payout**: 10 SIG.
+- **API**: `GET /api/ecosystem-affiliate/dashboard`, `GET /api/ecosystem-affiliate/link`, `POST /api/ecosystem-affiliate/track` (public), `POST /api/ecosystem-affiliate/request-payout`.
+- **Frontend**: `ShareAndEarnCard` on Dashboard, `/ref/:hash` route in App.tsx tracks + redirects.
+- **Tables**: `ecosystem_affiliate_referrals`, `ecosystem_affiliate_commissions`.
+
 ## Member Referral Program
 - **System**: Points-based system rewarding signups and Pro conversions, redeemable for Pro membership tiers.
 

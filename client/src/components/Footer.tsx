@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Shield, Fingerprint, Mail, Send, CheckCircle2, Users, Gift, MessageCircle, Wrench, Lock } from "lucide-react";
+import GenesisHallmarkBadge from "./GenesisHallmarkBadge";
 
 interface Release {
   id: string;
@@ -205,7 +206,7 @@ export default function Footer() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[9px] text-muted-foreground/70">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[9px] text-muted-foreground/70">
             <span className="font-medium text-foreground/80">&copy; {new Date().getFullYear()} DarkWave Studios, LLC</span>
             <span className="text-border/50">|</span>
             {latestRelease?.version ? (
@@ -219,6 +220,8 @@ export default function Footer() {
             ) : (
               <span className="font-mono text-primary/60">v1.0.0</span>
             )}
+            <span className="text-border/50">|</span>
+            <GenesisHallmarkBadge />
           </div>
         </div>
       </div>

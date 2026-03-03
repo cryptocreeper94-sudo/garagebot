@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useParams, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/hooks/useCart";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 import WelcomeGate from "@/components/WelcomeGate";
 import AIMascot from "@/components/AIMascot";
 
@@ -129,9 +130,29 @@ function Router() {
       <Route path="/sms-opt-in">{() => <SMSOptInDemo />}</Route>
       <Route path="/sms-opt-in-demo">{() => <SMSOptInDemo />}</Route>
       <Route path="/ecosystem">{() => <Ecosystem />}</Route>
+      <Route path="/ref/:hash">{() => <ReferralRedirect />}</Route>
       <Route>{() => <NotFound />}</Route>
     </Switch>
   );
+}
+
+function ReferralRedirect() {
+  const params = useParams<{ hash: string }>();
+  const [, navigate] = useLocation();
+
+  useEffect(() => {
+    if (params.hash) {
+      fetch("/api/ecosystem-affiliate/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hash: params.hash, platform: "garagebot" }),
+      }).catch(() => {});
+      localStorage.setItem("gb_ref", params.hash);
+    }
+    navigate("/", { replace: true });
+  }, [params.hash, navigate]);
+
+  return null;
 }
 
 function AuthAwareExtras() {
