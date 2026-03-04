@@ -3,14 +3,33 @@ import { db } from "@db";
 import { hallmarks, hallmarkCounter, trustStamps } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 
-const APP_PREFIX = "GB";
-const APP_NAME = "GarageBot";
-const APP_DOMAIN = "garagebot.tlid.io";
+interface AppIdentity {
+  prefix: string;
+  name: string;
+  domain: string;
+  counterId: string;
+}
 
-export async function getNextSequence(): Promise<number> {
+const APPS: Record<string, AppIdentity> = {
+  garagebot: {
+    prefix: "GB",
+    name: "GarageBot",
+    domain: "garagebot.tlid.io",
+    counterId: "gb-master",
+  },
+  torque: {
+    prefix: "TQ",
+    name: "TORQUE",
+    domain: "torque.tlid.io",
+    counterId: "tq-master",
+  },
+};
+
+export async function getNextSequence(appKey: string = "garagebot"): Promise<number> {
+  const app = APPS[appKey] || APPS.garagebot;
   const result = await db
     .insert(hallmarkCounter)
-    .values({ id: "gb-master", currentSequence: "1" })
+    .values({ id: app.counterId, currentSequence: "1" })
     .onConflictDoUpdate({
       target: hallmarkCounter.id,
       set: {
@@ -22,8 +41,8 @@ export async function getNextSequence(): Promise<number> {
   return parseInt(result[0].currentSequence, 10);
 }
 
-export function formatHallmarkId(sequence: number): string {
-  return `${APP_PREFIX}-${sequence.toString().padStart(8, "0")}`;
+export function formatHallmarkId(prefix: string, sequence: number): string {
+  return `${prefix}-${sequence.toString().padStart(8, "0")}`;
 }
 
 export function computeDataHash(payload: Record<string, unknown>): string {
@@ -42,6 +61,7 @@ function simulateBlockHeight(): string {
 export interface GenerateHallmarkOptions {
   userId?: string | null;
   vehicleId?: string | null;
+  appKey?: string;
   appId: string;
   productName: string;
   releaseType: string;
@@ -49,15 +69,17 @@ export interface GenerateHallmarkOptions {
 }
 
 export async function generateHallmark(opts: GenerateHallmarkOptions) {
-  const sequence = await getNextSequence();
-  const thId = formatHallmarkId(sequence);
+  const appKey = opts.appKey || "garagebot";
+  const app = APPS[appKey] || APPS.garagebot;
+  const sequence = await getNextSequence(appKey);
+  const thId = formatHallmarkId(app.prefix, sequence);
   const timestamp = new Date().toISOString();
 
   const hashPayload = {
     thId,
     userId: opts.userId || null,
     appId: opts.appId,
-    appName: APP_NAME,
+    appName: app.name,
     productName: opts.productName,
     releaseType: opts.releaseType,
     timestamp,
@@ -67,7 +89,7 @@ export async function generateHallmark(opts: GenerateHallmarkOptions) {
   const dataHash = computeDataHash(hashPayload);
   const txHash = simulateTxHash();
   const blockHeight = simulateBlockHeight();
-  const verificationUrl = `https://${APP_DOMAIN}/api/hallmark/${thId}/verify`;
+  const verificationUrl = `https://${app.domain}/api/hallmark/${thId}/verify`;
 
   const [hallmark] = await db
     .insert(hallmarks)
@@ -76,7 +98,7 @@ export async function generateHallmark(opts: GenerateHallmarkOptions) {
       vehicleId: opts.vehicleId || undefined,
       thId,
       appId: opts.appId,
-      appName: APP_NAME,
+      appName: app.name,
       productName: opts.productName,
       releaseType: opts.releaseType,
       hallmarkId: sequence,
@@ -105,7 +127,7 @@ export async function createTrustStamp(
     category,
     data: {
       ...data,
-      appContext: "garagebot",
+      appContext: data.appContext || "garagebot",
       timestamp,
     },
   };
@@ -119,7 +141,7 @@ export async function createTrustStamp(
     .values({
       userId,
       category,
-      data: { ...data, appContext: "garagebot", timestamp },
+      data: { ...data, appContext: data.appContext || "garagebot", timestamp },
       dataHash,
       txHash,
       blockHeight,
@@ -129,8 +151,11 @@ export async function createTrustStamp(
   return stamp;
 }
 
-export async function seedGenesisHallmark() {
-  const genesisId = `${APP_PREFIX}-00000001`;
+async function seedAppGenesis(appKey: string) {
+  const app = APPS[appKey];
+  if (!app) throw new Error(`Unknown app: ${appKey}`);
+
+  const genesisId = `${app.prefix}-00000001`;
 
   const [existing] = await db
     .select()
@@ -139,29 +164,30 @@ export async function seedGenesisHallmark() {
     .limit(1);
 
   if (existing) {
-    console.log(`[Hallmark] Genesis hallmark ${genesisId} already exists.`);
+    console.log(`[Hallmark] Genesis hallmark ${genesisId} (${app.name}) already exists.`);
     return existing;
   }
 
   await db
     .insert(hallmarkCounter)
-    .values({ id: "gb-master", currentSequence: "0" })
+    .values({ id: app.counterId, currentSequence: "0" })
     .onConflictDoUpdate({
       target: hallmarkCounter.id,
       set: { currentSequence: "0" },
     });
 
-  console.log(`[Hallmark] Creating genesis hallmark ${genesisId}...`);
+  console.log(`[Hallmark] Creating genesis hallmark ${genesisId} for ${app.name}...`);
 
   const genesis = await generateHallmark({
     userId: null,
-    appId: "garagebot-genesis",
+    appKey,
+    appId: `${appKey}-genesis`,
     productName: "Genesis Block",
     releaseType: "genesis",
     metadata: {
       ecosystem: "Trust Layer",
       version: "1.0.0",
-      domain: APP_DOMAIN,
+      domain: app.domain,
       operator: "DarkWave Studios LLC",
       chain: "Trust Layer Blockchain",
       consensus: "Proof of Trust",
@@ -173,8 +199,13 @@ export async function seedGenesisHallmark() {
     },
   });
 
-  console.log(`[Hallmark] Genesis hallmark ${genesisId} created with hash ${genesis.dataHash}`);
+  console.log(`[Hallmark] Genesis ${genesisId} (${app.name}) created — hash: ${genesis.dataHash}`);
   return genesis;
+}
+
+export async function seedGenesisHallmark() {
+  await seedAppGenesis("garagebot");
+  await seedAppGenesis("torque");
 }
 
 export async function verifyHallmark(thId: string) {
@@ -192,7 +223,7 @@ export async function verifyHallmark(thId: string) {
     verified: true,
     hallmark: {
       thId: hallmark.thId,
-      appName: hallmark.appName || APP_NAME,
+      appName: hallmark.appName,
       productName: hallmark.productName,
       releaseType: hallmark.releaseType,
       dataHash: hallmark.dataHash,
@@ -204,8 +235,9 @@ export async function verifyHallmark(thId: string) {
   };
 }
 
-export async function getGenesisHallmark() {
-  const genesisId = `${APP_PREFIX}-00000001`;
+export async function getGenesisHallmark(appKey: string = "garagebot") {
+  const app = APPS[appKey] || APPS.garagebot;
+  const genesisId = `${app.prefix}-00000001`;
   const [genesis] = await db
     .select()
     .from(hallmarks)
@@ -234,3 +266,5 @@ export function computeAffiliateTier(convertedCount: number): keyof typeof AFFIL
   if (convertedCount >= 5) return "silver";
   return "base";
 }
+
+export { APPS };

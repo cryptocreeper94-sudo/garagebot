@@ -91,7 +91,8 @@ Preferred communication style: Simple, everyday language.
 - **Service**: `server/services/hallmarkService.ts` — `generateHallmark()`, `createTrustStamp()`, `seedGenesisHallmark()`, `verifyHallmark()`.
 - **ID Format**: `GB-XXXXXXXX` (8-digit zero-padded), atomic counter in `hallmark_counter` table.
 - **Trust Stamps**: Logged on auth-login, auth-register, purchase, affiliate events. Stored in `trust_stamps` table with SHA-256 hashing.
-- **API**: `GET /api/hallmark/genesis` (public), `GET /api/hallmark/:id/verify` (public).
+- **Multi-App Support**: Service supports multiple app identities (GarageBot=GB, TORQUE=TQ) with independent counters.
+- **API**: `GET /api/hallmark/genesis` (public, `?app=torque` for TORQUE), `GET /api/hallmark/genesis/torque` (TORQUE-specific), `GET /api/hallmark/:id/verify` (public, works for any app prefix).
 - **Frontend**: `GenesisHallmarkBadge` in Footer — clickable badge opens modal with app info, blockchain record, ecosystem details.
 
 ## Ecosystem Affiliate System (SIG-based)
@@ -109,6 +110,7 @@ Preferred communication style: Simple, everyday language.
 ## TORQUE - Shop Management OS
 - **Routes**: `/torque` (landing), `/torque/onboard` (5-step setup), `/torque/app` (shop dashboard).
 - **Branding**: "TORQUE — Shop Management OS powered by Trust Layer" with blockchain-verified shop identities.
+- **Blockchain Identity**: Separate genesis hallmark `TQ-00000001`, own counter (`tq-master`), own verification endpoint. TORQUE is a distinct app in the Trust Layer ecosystem (prefix TQ, #23 in registry).
 - **PWA**: Standalone PWA with custom manifest, icons, and splash screen.
 - **Landing Page**: Premium UI with bento grid, testimonial carousel, FAQ, animated counters, parallax, PWA install prompt.
 - **Onboarding**: 5-step setup flow.

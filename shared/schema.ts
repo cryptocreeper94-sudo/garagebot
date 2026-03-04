@@ -449,7 +449,7 @@ export const hallmarks = pgTable("hallmarks", {
   appName: text("app_name"),
   productName: text("product_name"),
   releaseType: text("release_type"),
-  assetNumber: integer("asset_number").unique(),
+  assetNumber: integer("asset_number"),
   hallmarkId: integer("hallmark_id"),
   tokenId: text("token_id"),
   transactionHash: text("transaction_hash"),

@@ -11787,15 +11787,16 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     }
   });
 
-  app.get("/api/hallmark/genesis", async (_req, res) => {
+  app.get("/api/hallmark/genesis", async (req, res) => {
     try {
-      const genesis = await hallmarkService.getGenesisHallmark();
+      const appKey = (req.query.app as string) || "garagebot";
+      const genesis = await hallmarkService.getGenesisHallmark(appKey);
       if (!genesis) {
         return res.status(404).json({ error: "Genesis hallmark not yet created" });
       }
       res.json({
         thId: genesis.thId,
-        appName: genesis.appName || "GarageBot",
+        appName: genesis.appName,
         productName: genesis.productName,
         releaseType: genesis.releaseType,
         dataHash: genesis.dataHash,
@@ -11809,6 +11810,31 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
     } catch (error) {
       console.error("Genesis hallmark error:", error);
       res.status(500).json({ error: "Failed to fetch genesis hallmark" });
+    }
+  });
+
+  app.get("/api/hallmark/genesis/torque", async (_req, res) => {
+    try {
+      const genesis = await hallmarkService.getGenesisHallmark("torque");
+      if (!genesis) {
+        return res.status(404).json({ error: "TORQUE genesis hallmark not yet created" });
+      }
+      res.json({
+        thId: genesis.thId,
+        appName: genesis.appName,
+        productName: genesis.productName,
+        releaseType: genesis.releaseType,
+        dataHash: genesis.dataHash,
+        txHash: genesis.txHash,
+        blockHeight: genesis.blockHeight,
+        verificationUrl: genesis.verificationUrl,
+        createdAt: genesis.createdAt || genesis.mintedAt,
+        metadata: genesis.metadata,
+        isGenesis: true,
+      });
+    } catch (error) {
+      console.error("TORQUE genesis hallmark error:", error);
+      res.status(500).json({ error: "Failed to fetch TORQUE genesis hallmark" });
     }
   });
 
