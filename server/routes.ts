@@ -3842,6 +3842,19 @@ ${pages.map(p => `  <url>
           contactEmail: "parts@snowmobile.com",
           apiStatus: "Contact for partnership",
         },
+        {
+          name: "Labwork Auto",
+          slug: "labworkauto",
+          websiteUrl: "https://www.labworkauto.com",
+          hasAffiliateProgram: true,
+          affiliateNetwork: "AWIN",
+          commissionRate: "5.00",
+          hasLocalPickup: false,
+          priority: 91,
+          vehicleTypes: ["car", "truck", "suv", "atv", "motorcycle"],
+          contactEmail: "market@labworkauto.com",
+          apiStatus: "AWIN affiliate program (ID 74394) — 4,494 products",
+        },
       ];
 
       const results = [];
@@ -12192,6 +12205,12 @@ function getVendorSearchPathWithVehicle(
       return `/search?q=${encodeURIComponent(searchTerm)}`;
 
     case 'ottocast':
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
+
+    case 'labworkauto':
+      if (hasVehicle) {
+        return `/search?q=${encodeURIComponent(`${year} ${make} ${model} ${searchTerm}`)}`;
+      }
       return `/search?q=${encodeURIComponent(searchTerm)}`;
       
     default:
