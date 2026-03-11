@@ -3855,6 +3855,19 @@ ${pages.map(p => `  <url>
           contactEmail: "market@labworkauto.com",
           apiStatus: "AWIN affiliate program (ID 74394) — 4,494 products",
         },
+        {
+          name: "AUTO-VOX",
+          slug: "auto-vox",
+          websiteUrl: "https://www.auto-vox.com",
+          hasAffiliateProgram: true,
+          affiliateNetwork: "AWIN",
+          commissionRate: "15.00",
+          hasLocalPickup: false,
+          priority: 92,
+          vehicleTypes: ["car", "truck", "suv"],
+          contactEmail: "support@auto-vox.com",
+          apiStatus: "AWIN affiliate program — 15% commission, regular coupons & campaigns",
+        },
       ];
 
       const results = [];
@@ -12211,6 +12224,9 @@ function getVendorSearchPathWithVehicle(
       if (hasVehicle) {
         return `/search?q=${encodeURIComponent(`${year} ${make} ${model} ${searchTerm}`)}`;
       }
+      return `/search?q=${encodeURIComponent(searchTerm)}`;
+
+    case 'auto-vox':
       return `/search?q=${encodeURIComponent(searchTerm)}`;
       
     default:
