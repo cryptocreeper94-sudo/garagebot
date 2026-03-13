@@ -53,7 +53,7 @@ class QuickBooksService {
   constructor() {
     this.clientId = process.env.QUICKBOOKS_CLIENT_ID || '';
     this.clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET || '';
-    this.redirectUri = `${process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : 'http://localhost:5000'}/api/quickbooks/callback`;
+    this.redirectUri = `${process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : 'http://localhost:5000'}/api/quickbooks/callback`;
     this.useSandbox = process.env.NODE_ENV !== 'production';
   }
 

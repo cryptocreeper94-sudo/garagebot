@@ -203,9 +203,7 @@ const INTEGRATIONS: Record<string, IntegrationConfig> = {
 
 class BusinessIntegrationService {
   private getRedirectUri(service: string): string {
-    const base = process.env.REPLIT_DEV_DOMAIN
-      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-      : 'http://localhost:5000';
+    const base = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : 'http://localhost:5000';
     return `${base}/api/integrations/${service}/callback`;
   }
 

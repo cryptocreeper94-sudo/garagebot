@@ -3,7 +3,6 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { seoPrerenderMiddleware } from "./seo-prerender";
 import { createServer } from "http";
-import { runMigrations } from 'stripe-replit-sync';
 import { getStripeSync } from "./stripeClient";
 import { WebhookHandlers } from "./webhookHandlers";
 import { setupChatWebSocket } from "./services/chat-websocket";
@@ -36,23 +35,13 @@ export function log(message: string, source = "express") {
 }
 
 async function initStripe() {
-  const databaseUrl = process.env.DATABASE_URL;
-
-  if (!databaseUrl) {
-    log('DATABASE_URL not found, skipping Stripe initialization', 'stripe');
-    return;
-  }
-
   try {
-    log('Initializing Stripe schema...', 'stripe');
-    await runMigrations({ databaseUrl });
-    log('Stripe schema ready', 'stripe');
-
+    log('Initializing Stripe...', 'stripe');
     const stripeSync = await getStripeSync();
 
-    log('Setting up managed webhook...', 'stripe');
-    const webhookBaseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
-    const { webhook, uuid } = await stripeSync.findOrCreateManagedWebhook(
+    log('Setting up webhook...', 'stripe');
+    const webhookBaseUrl = `https://${process.env.APP_DOMAIN || 'garagebot.io'}`;
+    const { webhook } = await stripeSync.findOrCreateManagedWebhook(
       `${webhookBaseUrl}/api/stripe/webhook`,
       {
         enabled_events: ['*'],
@@ -60,11 +49,6 @@ async function initStripe() {
       }
     );
     log(`Webhook configured: ${webhook.url}`, 'stripe');
-
-    log('Syncing Stripe data...', 'stripe');
-    stripeSync.syncBackfill()
-      .then(() => log('Stripe data synced', 'stripe'))
-      .catch((err: any) => log(`Error syncing Stripe data: ${err.message}`, 'stripe'));
   } catch (error: any) {
     log(`Failed to initialize Stripe: ${error.message}`, 'stripe');
   }

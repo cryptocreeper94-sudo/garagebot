@@ -133,9 +133,7 @@ ${pages.map(p => `  <url>
 
   // Trust Layer SSO Routes
   app.get('/api/auth/sso/login', (req, res) => {
-    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-      : 'https://garagebot.io';
+    const baseUrl = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : 'https://garagebot.io';
     const callbackUrl = `${baseUrl}/auth/callback`;
     const state = crypto.randomUUID();
     
@@ -1998,7 +1996,7 @@ ${pages.map(p => `  <url>
       // If shop already has a Stripe account, return account link for onboarding refresh
       if (shop.stripeAccountId) {
         const stripe = await getUncachableStripeClient();
-        const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+        const baseUrl = `https://${process.env.APP_DOMAIN}`;
         
         const accountLink = await stripe.accountLinks.create({
           account: shop.stripeAccountId,
@@ -2015,7 +2013,7 @@ ${pages.map(p => `  <url>
       }
 
       const stripe = await getUncachableStripeClient();
-      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const baseUrl = `https://${process.env.APP_DOMAIN}`;
 
       // Create Express connected account
       const account = await stripe.accounts.create({
@@ -2237,7 +2235,7 @@ ${pages.map(p => `  <url>
         quantity: item.quantity,
       }));
       
-      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const baseUrl = `https://${process.env.APP_DOMAIN}`;
       
       const uid = getUserId(req);
       const currentUser = uid ? await storage.getUser(uid) : null;
@@ -3000,7 +2998,7 @@ ${pages.map(p => `  <url>
       const stripe = await getUncachableStripeClient();
       
       // Get base URL with fallback for production
-      const replitDomain = process.env.REPLIT_DOMAINS?.split(',')[0];
+      const replitDomain = process.env.APP_DOMAIN;
       const baseUrl = replitDomain 
         ? `https://${replitDomain}` 
         : (process.env.BASE_URL || 'https://garagebot.io');
@@ -4017,7 +4015,7 @@ ${pages.map(p => `  <url>
       }
       
       const stripe = await getUncachableStripeClient();
-      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const baseUrl = `https://${process.env.APP_DOMAIN}`;
       
       let customerId = user.stripeCustomerId;
       if (!customerId) {
@@ -11535,7 +11533,7 @@ Make it helpful for DIY mechanics and vehicle owners looking for parts and maint
       const platformFee = Math.round(price * feeConfig.rate * 100) / 100;
 
       const stripe = await getUncachableStripeClient();
-      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const baseUrl = `https://${process.env.APP_DOMAIN}`;
       const buyer = await storage.getUser(userId);
 
       const lineItems: any[] = [{
