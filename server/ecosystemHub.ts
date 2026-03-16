@@ -212,7 +212,7 @@ export class EcosystemClient {
 }
 
 export function createDevHubClient(): EcosystemClient | null {
-  const hubUrl = process.env.DEV_HUB_URL || process.env.ORBIT_HUB_URL || "https://orbitstaffing.replit.app";
+  const hubUrl = process.env.DEV_HUB_URL || process.env.ORBIT_HUB_URL || "https://orbitstaffing.tlid.io";
   const apiKey = process.env.ORBIT_ECOSYSTEM_API_KEY;
   const apiSecret = process.env.ORBIT_ECOSYSTEM_API_SECRET;
 

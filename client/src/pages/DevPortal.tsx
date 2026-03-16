@@ -159,7 +159,7 @@ const AFFILIATE_NETWORKS = [
     ],
     steps: [
       "Go to affiliate-program.amazon.com and click 'Sign Up'",
-      "Enter your website URL (use garagebot.io or garagebot.replit.app)",
+      "Enter your website URL (e.g. garagebot.io)",
       "Describe your site: 'Auto parts search aggregator helping users find parts across retailers'",
       "Choose 'Automotive' as primary category",
       "Enter your payment/tax info",
