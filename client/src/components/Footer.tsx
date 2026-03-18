@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,18 @@ export default function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const { toast } = useToast();
+  const dwscClickRef = useRef({ count: 0, timer: null as any });
+  const handleDWSCClick = () => {
+    dwscClickRef.current.count++;
+    if (dwscClickRef.current.count === 3) {
+      dwscClickRef.current.count = 0;
+      clearTimeout(dwscClickRef.current.timer);
+      window.open('https://dwsc.io/#portal', '_blank');
+    } else {
+      clearTimeout(dwscClickRef.current.timer);
+      dwscClickRef.current.timer = setTimeout(() => { dwscClickRef.current.count = 0; }, 800);
+    }
+  };
 
   const { data: latestRelease } = useQuery<Release | null>({
     queryKey: ['latestRelease'],
@@ -208,6 +220,8 @@ export default function Footer() {
 
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[9px] text-muted-foreground/70">
             <span className="font-medium text-foreground/80">&copy; {new Date().getFullYear()} DarkWave Studios, LLC</span>
+            <span className="text-border/50">|</span>
+            <span onClick={handleDWSCClick} className="cursor-default select-none text-muted-foreground/50 hover:text-primary/50 transition-colors" title="◈ DWSC">◈</span>
             <span className="text-border/50">|</span>
             {latestRelease?.version ? (
               <Badge
