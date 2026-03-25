@@ -13,6 +13,8 @@ import { seedChatChannels } from "./seedChat";
 import { startMarketingScheduler } from "./marketing-scheduler";
 import { seedMarketingContent } from "./seeds/marketingContent";
 import { seedGenesisHallmark } from "./services/hallmarkService";
+import { registerHallmarkRoutes } from "./hallmark";
+import { registerAffiliateRoutes } from "./affiliate";
 
 const app = express();
 const httpServer = createServer(app);
