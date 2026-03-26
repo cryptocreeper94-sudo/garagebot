@@ -95,6 +95,7 @@ export class TrustLayerClient {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!response.ok) {
@@ -138,6 +139,7 @@ export class TrustLayerClient {
           'x-app-signature': signature,
           'x-app-timestamp': timestamp,
         },
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!response.ok) {
@@ -171,6 +173,7 @@ export class TrustLayerClient {
           'x-app-signature': signature,
           'x-app-timestamp': timestamp,
         },
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!response.ok) {
