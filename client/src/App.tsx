@@ -67,6 +67,7 @@ import AffiliateProgram from "@/pages/AffiliateProgram";
 import CommandCenter from "@/pages/CommandCenter";
 import SMSOptInDemo from "@/pages/SMSOptInDemo";
 import Ecosystem from "@/pages/Ecosystem";
+import { FloatingThemeToggle } from "@/components/theme-toggle";
 
 function AnalyticsTracker() {
   useAnalytics();
@@ -76,6 +77,7 @@ function AnalyticsTracker() {
 function Router() {
   return (
     <Switch>
+      <FloatingThemeToggle />
       <Route path="/">{() => <Explore />}</Route>
       <Route path="/home">{() => <Home />}</Route>
       <Route path="/results">{() => <Results />}</Route>
