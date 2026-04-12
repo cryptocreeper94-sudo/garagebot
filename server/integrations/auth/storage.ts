@@ -13,7 +13,7 @@ export type UpsertUser = {
 };
 
 // Interface for auth storage operations
-// (IMPORTANT) These user operations are mandatory for Replit Auth.
+// (IMPORTANT) These user operations are mandatory for Trust Layer Auth.
 export interface IAuthStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;

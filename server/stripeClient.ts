@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 
-// Direct Stripe client using environment variables (no Replit connectors)
+// Direct Stripe client using environment variables (no service connectors)
 const secretKey = process.env.STRIPE_SECRET_KEY || '';
 const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY || '';
 
@@ -21,7 +21,7 @@ export async function getStripeSecretKey() {
   return secretKey;
 }
 
-// Stub for getStripeSync — stripe-replit-sync removed for Render compatibility
+// Stub for getStripeSync — stripe-sync removed for Render compatibility
 export async function getStripeSync(): Promise<any> {
   // Return a stub that provides no-op sync operations
   return {

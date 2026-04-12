@@ -15,7 +15,7 @@ export class WebhookHandlers {
 
     const sync = await getStripeSync();
     
-    // First, process through stripe-replit-sync which verifies the signature
+    // First, process through stripe-sync which verifies the signature
     // This will throw if signature is invalid
     await sync.processWebhook(payload, signature, uuid);
     

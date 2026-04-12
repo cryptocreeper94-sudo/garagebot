@@ -9,7 +9,7 @@ if (!REMOVE_BG_API_KEY) {
   console.log('1. Go to https://www.remove.bg/api');
   console.log('2. Sign up for a free account');
   console.log('3. Get your API key from the dashboard');
-  console.log('4. Add it as a secret in Replit');
+  console.log('4. Add it as a secret in environment');
   process.exit(1);
 }
 

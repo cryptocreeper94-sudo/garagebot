@@ -1,15 +1,15 @@
 import Stripe from 'stripe';
 
 async function getCredentials() {
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY
-    ? 'repl ' + process.env.REPL_IDENTITY
+  const hostname = process.env.SERVICE_CONNECTORS_HOSTNAME;
+  const xServiceToken = process.env.SERVICE_IDENTITY
+    ? 'repl ' + process.env.SERVICE_IDENTITY
     : process.env.WEB_REPL_RENEWAL
       ? 'depl ' + process.env.WEB_REPL_RENEWAL
       : null;
 
-  if (!xReplitToken) {
-    throw new Error('X_REPLIT_TOKEN not found');
+  if (!xServiceToken) {
+    throw new Error('X_SERVICE_TOKEN not found');
   }
 
   const connectorName = 'stripe';
@@ -23,7 +23,7 @@ async function getCredentials() {
   const response = await fetch(url.toString(), {
     headers: {
       'Accept': 'application/json',
-      'X_REPLIT_TOKEN': xReplitToken
+      'X_SERVICE_TOKEN': xServiceToken
     }
   });
 

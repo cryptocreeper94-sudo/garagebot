@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import crypto from "crypto";
 import OpenAI from "openai";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, getUserId } from "./replitAuth";
+import { setupAuth, isAuthenticated, getUserId } from "./auth";
 import { users, insertVehicleSchema, insertDealSchema, insertHallmarkSchema, insertVendorSchema, insertWaitlistSchema, insertServiceRecordSchema, insertServiceReminderSchema, insertAffiliatePartnerSchema, insertAffiliateNetworkSchema, insertAffiliateCommissionSchema, insertAffiliateClickSchema, insertPriceAlertSchema, insertSeoPageSchema, insertAnalyticsSessionSchema, insertAnalyticsPageViewSchema, insertAnalyticsEventSchema, marketingPosts, marketingImages, socialIntegrations, scheduledPosts, contentBundles, adCampaigns, marketingMessageTemplates, marketingHubSubscriptions, shopSocialCredentials, shopMarketingContent, shops, shopStaff, userBadges, userAchievements, giveawayEntries, giveawayWinners, referralInvites, sponsoredProducts, insertSponsoredProductSchema, mileageEntries, speedTraps, specialtyShops, carEvents, cdlPrograms, cdlReferrals, fuelReports, scannedDocuments, insertMileageEntrySchema, insertSpeedTrapSchema, insertSpecialtyShopSchema, insertCarEventSchema, insertCdlProgramSchema, insertCdlReferralSchema, insertFuelReportSchema, insertScannedDocumentSchema, insertWarrantySchema, insertWarrantyClaimSchema, insertFuelLogSchema, insertVehicleExpenseSchema, insertPriceHistorySchema, insertEmergencyContactSchema, insertMaintenanceScheduleSchema, orbitConnections, orbitEmployees, orbitTimesheets, orbitPayrollRuns, businessIntegrations, insertPartListingSchema, updatePartListingSchema, insertPartListingMessageSchema, partListings, newsletterSubscribers, ecosystemAffiliateReferrals, ecosystemAffiliateCommissions } from "@shared/schema";
 import * as hallmarkService from "./services/hallmarkService";
 import { getAutoNewsByCategory, getNHTSARecalls, scanDocument } from "./services/breakRoomService";
@@ -119,7 +119,7 @@ ${pages.map(p => `  <url>
     res.send(xml);
   });
 
-  // Auth routes (Replit OIDC)
+  // Auth routes (OIDC)
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const userId = getUserId(req)!;
@@ -2998,9 +2998,9 @@ ${pages.map(p => `  <url>
       const stripe = await getUncachableStripeClient();
       
       // Get base URL with fallback for production
-      const replitDomain = process.env.APP_DOMAIN;
-      const baseUrl = replitDomain 
-        ? `https://${replitDomain}` 
+      const renderDomain = process.env.APP_DOMAIN;
+      const baseUrl = renderDomain 
+        ? `https://${renderDomain}` 
         : (process.env.BASE_URL || 'https://garagebot.io');
       
       const amountInCents = Math.round(parseFloat(String(order.grandTotal)) * 100);

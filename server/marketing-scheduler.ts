@@ -38,8 +38,8 @@ const ECOSYSTEM_URLS = {
 };
 
 function getBaseUrl(): string {
-  if (process.env.REPLIT_DOMAINS) {
-    return `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`;
+  if (process.env.render_DOMAINS) {
+    return `https://${process.env.render_DOMAINS.split(',')[0]}`;
   }
   return process.env.BASE_URL || 'https://garagebot.io';
 }

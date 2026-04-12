@@ -1,7 +1,7 @@
 // Email service using Resend integration
 import { Resend } from 'resend';
 
-// Direct Resend client using environment variables (no Replit connectors)
+// Direct Resend client using environment variables (no service connectors)
 async function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
