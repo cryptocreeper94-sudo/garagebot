@@ -87,6 +87,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7386731030203849" crossorigin="anonymous"></script>
+  
+    <!-- DarkWave Studios Ecosystem Analytics -->
+    <script>
+      (function(){
+        var appId = document.querySelector('meta[name="dw-app-id"]');
+        var id = appId ? appId.content : window.location.hostname;
+        function track(type, data) {
+          try {
+            navigator.sendBeacon('https://darkwavestudios.io/api/analytics', JSON.stringify({
+              app: id, type: type, url: window.location.href,
+              ref: document.referrer, ts: Date.now(), ...data
+            }));
+          } catch(e) {}
+        }
+        track('pageview');
+        window.addEventListener('popstate', function(){ track('navigate'); });
+        var origPush = history.pushState;
+        history.pushState = function(){ origPush.apply(this, arguments); track('navigate'); };
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
