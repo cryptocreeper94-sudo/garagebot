@@ -387,6 +387,56 @@ ${pages.map(p => `  <url>
     }
   });
 
+  // ── Firebase Auth (Google/GitHub OAuth) ──
+  app.post('/api/auth/firebase', async (req: any, res) => {
+    try {
+      const { idToken } = req.body;
+      if (!idToken) return res.status(400).json({ error: "Firebase ID token required" });
+
+      const { verifyFirebaseToken } = await import("./firebase-admin");
+      const decoded = await verifyFirebaseToken(idToken);
+      if (!decoded) return res.status(401).json({ error: "Invalid Firebase token" });
+
+      const email = decoded.email || "";
+      const name = decoded.name || decoded.email?.split("@")[0] || "User";
+      if (!email) return res.status(400).json({ error: "No email associated with this account" });
+
+      let user = await storage.getUserByEmail(email.toLowerCase());
+      if (!user) {
+        const userId = crypto.randomUUID();
+        const uniqueHash = hallmarkService.generateUniqueHash();
+        user = await storage.upsertUser({
+          id: userId,
+          email: email.toLowerCase(),
+          username: name.replace(/\s+/g, '_').toLowerCase() + '_' + Math.floor(Math.random() * 9999),
+          firstName: name.split(' ')[0] || '',
+          lastName: name.split(' ').slice(1).join(' ') || '',
+          uniqueHash,
+        });
+      }
+
+      await storage.updateUser(user.id, { lastLoginAt: new Date() });
+      (req.session as any).userId = user.id;
+      (req.session as any).isCustomAuth = true;
+      req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+
+      hallmarkService.createTrustStamp(user.id, "auth-firebase", { email, appContext: "garagebot" }).catch(() => {});
+
+      res.json({
+        user: {
+          id: user.id,
+          username: user.username,
+          firstName: user.firstName,
+          role: user.role,
+          subscriptionTier: user.subscriptionTier,
+        }
+      });
+    } catch (error: any) {
+      console.error("[Firebase Auth] Error:", error.message);
+      res.status(500).json({ error: "Firebase authentication failed" });
+    }
+  });
+
   app.post('/api/auth/ecosystem-login', async (req, res) => {
     try {
       const { identifier, credential } = req.body;
