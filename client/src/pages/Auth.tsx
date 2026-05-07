@@ -27,23 +27,16 @@ export default function Auth() {
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
 
   const [signupForm, setSignupForm] = useState({
-    username: "",
     mainPin: "",
-    quickPin: "",
-    firstName: "",
-    lastName: "",
-    phone: "",
     email: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
+    displayName: "",
+    phone: "",
     enablePersistence: false,
     agreeTerms: false
   });
 
   const [loginForm, setLoginForm] = useState({
-    username: "",
+    email: "",
     mainPin: "",
     enablePersistence: false
   });
@@ -72,7 +65,11 @@ export default function Auth() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(signupForm)
+        body: JSON.stringify({
+          ...signupForm,
+          username: signupForm.email.split("@")[0].replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 20),
+          firstName: signupForm.displayName || signupForm.email.split("@")[0],
+        })
       });
       
       const data = await res.json();
@@ -98,7 +95,11 @@ export default function Auth() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginForm)
+        body: JSON.stringify({
+          username: loginForm.email,
+          mainPin: loginForm.mainPin,
+          enablePersistence: loginForm.enablePersistence,
+        })
       });
       
       const data = await res.json();
@@ -336,15 +337,16 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">Username</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">Email</Label>
                       <div className="relative mt-1">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input 
-                          value={loginForm.username}
-                          onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
+                          type="email"
+                          value={loginForm.email}
+                          onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                           className="pl-10"
-                          placeholder="Enter username"
-                          data-testid="input-login-username"
+                          placeholder="you@example.com"
+                          data-testid="input-login-email"
                         />
                       </div>
                     </div>
@@ -396,7 +398,7 @@ export default function Auth() {
                     <Button 
                       className="w-full font-tech uppercase glow-primary"
                       onClick={handleLogin}
-                      disabled={isLoading || !loginForm.username || loginForm.mainPin.length < 8}
+                      disabled={isLoading || !loginForm.email || loginForm.mainPin.length < 8}
                       data-testid="button-login"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <KeyRound className="w-4 h-4 mr-2" />}
@@ -410,17 +412,6 @@ export default function Auth() {
                 <Card className="p-6 glass-ultra border-primary/20">
                   <div className="space-y-4">
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">Name *</Label>
-                      <Input 
-                        value={signupForm.firstName}
-                        onChange={(e) => setSignupForm({ ...signupForm, firstName: e.target.value })}
-                        className="mt-1"
-                        placeholder="Your full name"
-                        data-testid="input-signup-firstname"
-                      />
-                    </div>
-
-                    <div>
                       <Label className="text-xs uppercase text-muted-foreground">Email *</Label>
                       <div className="relative mt-1">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -429,11 +420,13 @@ export default function Auth() {
                           value={signupForm.email}
                           onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                           className="pl-10"
-                          placeholder="your@email.com"
+                          placeholder="you@example.com"
                           data-testid="input-signup-email"
                         />
                       </div>
                     </div>
+
+
 
                     <div>
                       <Label className="text-xs uppercase text-muted-foreground">Secure PIN *</Label>
@@ -464,61 +457,16 @@ export default function Auth() {
                     </div>
 
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">Phone (Optional)</Label>
-                      <div className="relative mt-1">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input 
-                          type="tel"
-                          value={signupForm.phone}
-                          onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
-                          className="pl-10"
-                          placeholder="(555) 123-4567"
-                          data-testid="input-signup-phone"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs uppercase text-muted-foreground">Address</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">Display Name (Optional)</Label>
                       <Input 
-                        value={signupForm.address}
-                        onChange={(e) => setSignupForm({ ...signupForm, address: e.target.value })}
+                        value={signupForm.displayName}
+                        onChange={(e) => setSignupForm({ ...signupForm, displayName: e.target.value })}
                         className="mt-1"
-                        placeholder="Street address"
-                        data-testid="input-signup-address"
+                        placeholder="How you want to appear"
+                        data-testid="input-signup-displayname"
                       />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
-                      <div>
-                        <Label className="text-xs uppercase text-muted-foreground">City</Label>
-                        <Input 
-                          value={signupForm.city}
-                          onChange={(e) => setSignupForm({ ...signupForm, city: e.target.value })}
-                          className="mt-1"
-                          data-testid="input-signup-city"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs uppercase text-muted-foreground">State</Label>
-                        <Input 
-                          value={signupForm.state}
-                          onChange={(e) => setSignupForm({ ...signupForm, state: e.target.value.toUpperCase().slice(0, 2) })}
-                          className="mt-1"
-                          maxLength={2}
-                          data-testid="input-signup-state"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs uppercase text-muted-foreground">ZIP</Label>
-                        <Input 
-                          value={signupForm.zipCode}
-                          onChange={(e) => setSignupForm({ ...signupForm, zipCode: e.target.value })}
-                          className="mt-1"
-                          data-testid="input-signup-zip"
-                        />
-                      </div>
-                    </div>
 
                     <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
                       <div className="flex items-start gap-2">
@@ -557,7 +505,7 @@ export default function Auth() {
                     <Button 
                       className="w-full font-tech uppercase glow-primary"
                       onClick={handleSignup}
-                      disabled={isLoading || !signupForm.firstName || !signupForm.email || signupForm.mainPin.length < 8 || !/[A-Z]/.test(signupForm.mainPin) || !/[a-z]/.test(signupForm.mainPin) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(signupForm.mainPin) || !signupForm.agreeTerms}
+                      disabled={isLoading || !signupForm.email || signupForm.mainPin.length < 8 || !/[A-Z]/.test(signupForm.mainPin) || !/[a-z]/.test(signupForm.mainPin) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(signupForm.mainPin) || !signupForm.agreeTerms}
                       data-testid="button-signup"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Shield className="w-4 h-4 mr-2" />}
