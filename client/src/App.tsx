@@ -10,7 +10,6 @@ import { useEffect } from "react";
 import WelcomeGate from "@/components/WelcomeGate";
 import AIMascot from "@/components/AIMascot";
 import { EcosystemAccountHub } from "@/components/EcosystemAccountHub";
-import { EcosystemAccountHub } from "@/components/EcosystemAccountHub";
 
 import RatingPrompt from "@/components/RatingPrompt";
 import BuddyHideSeek from "@/components/BuddyHideSeek";
