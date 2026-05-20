@@ -94,7 +94,7 @@ const DEV_COMMAND_CATEGORIES: DevCommandCategory[] = [
   {
     title: "Releases & Blockchain",
     icon: Rocket,
-    gradient: "from-purple-500 to-violet-500",
+    gradient: "from-sky-500 to-cyan-500",
     description: "Publish new versions, verify releases on Solana blockchain, and manage the Genesis Hallmark NFT system.",
     cards: [
       { label: "Release Manager", description: "Publish new versions & changelogs", tab: "releases", icon: Tag, image: imgReleaseManager, featured: true },
@@ -1169,7 +1169,7 @@ const CATEGORIES = [
   { id: "features", name: "Feature Development", icon: Zap, color: "text-yellow-400" },
   { id: "marketing", name: "Marketing & Monetization", icon: DollarSign, color: "text-pink-400" },
   { id: "oem_distributors", name: "OEM Parts Distributors", icon: Car, color: "text-emerald-400" },
-  { id: "partnerships", name: "Partnerships", icon: Users, color: "text-purple-400" },
+  { id: "partnerships", name: "Partnerships", icon: Users, color: "text-sky-400" },
   { id: "infrastructure", name: "Infrastructure", icon: Settings, color: "text-cyan-400" },
 ];
 
@@ -1815,7 +1815,7 @@ export default function DevPortal() {
               {[
                 { label: "Tasks", value: `${stats.completed}/${stats.total}`, sub: `${stats.percentage}% complete`, color: "from-cyan-500/20 to-blue-600/10", border: "border-cyan-500/30", glow: "shadow-[0_0_20px_rgba(6,182,212,0.1)]", accent: "text-cyan-400", testId: "text-total-tasks" },
                 { label: "Affiliates", value: String(connectedAffiliates), sub: `${AFFILIATE_NETWORKS.length} total networks`, color: "from-green-500/20 to-emerald-600/10", border: "border-green-500/30", glow: "shadow-[0_0_20px_rgba(34,197,94,0.1)]", accent: "text-green-400", testId: "text-connected-affiliates" },
-                { label: "Release", value: latestRelease?.version || "—", sub: blockchainHealth?.connected ? "Solana Live" : "Offline", color: "from-violet-500/20 to-purple-600/10", border: "border-violet-500/30", glow: "shadow-[0_0_20px_rgba(139,92,246,0.1)]", accent: "text-violet-400", testId: "text-latest-version" },
+                { label: "Release", value: latestRelease?.version || "—", sub: blockchainHealth?.connected ? "Solana Live" : "Offline", color: "from-cyan-500/20 to-sky-600/10", border: "border-cyan-500/30", glow: "shadow-[0_0_20px_rgba(14,165,233,0.1)]", accent: "text-cyan-400", testId: "text-latest-version" },
                 { label: "Pending", value: String(pendingTasks), sub: "tasks remaining", color: "from-amber-500/20 to-orange-600/10", border: "border-amber-500/30", glow: "shadow-[0_0_20px_rgba(245,158,11,0.1)]", accent: "text-amber-400", testId: "text-pending-tasks" },
               ].map((stat, i) => (
                 <motion.div
@@ -2343,7 +2343,7 @@ export default function DevPortal() {
                         <Badge 
                           variant="outline" 
                           className={
-                            release.versionType === 'major' ? 'border-purple-500/50 text-purple-400' :
+                            release.versionType === 'major' ? 'border-sky-500/50 text-sky-400' :
                             release.versionType === 'stable' ? 'border-green-500/50 text-green-400' :
                             release.versionType === 'hotfix' ? 'border-red-500/50 text-red-400' :
                             'border-yellow-500/50 text-yellow-400'
@@ -2461,7 +2461,7 @@ export default function DevPortal() {
                       <p className="text-xs text-muted-foreground">Vehicles</p>
                     </div>
                     <div>
-                      <p className="text-lg font-bold text-purple-400">{blockchainAssets.filter(a => a.entityType === 'release').length}</p>
+                      <p className="text-lg font-bold text-sky-400">{blockchainAssets.filter(a => a.entityType === 'release').length}</p>
                       <p className="text-xs text-muted-foreground">Releases</p>
                     </div>
                   </div>
@@ -2489,14 +2489,14 @@ export default function DevPortal() {
                             <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
                               asset.entityType === 'hallmark' ? 'bg-primary/20' :
                               asset.entityType === 'vehicle' ? 'bg-cyan-500/20' :
-                              'bg-purple-500/20'
+                              'bg-sky-500/20'
                             }`}>
                               {asset.entityType === 'hallmark' ? (
                                 <Shield className={`w-5 h-5 text-primary`} />
                               ) : asset.entityType === 'vehicle' ? (
                                 <Car className={`w-5 h-5 text-cyan-400`} />
                               ) : (
-                                <Tag className={`w-5 h-5 text-purple-400`} />
+                                <Tag className={`w-5 h-5 text-sky-400`} />
                               )}
                             </div>
                             <div>
@@ -2794,7 +2794,7 @@ export default function DevPortal() {
                           variant="outline" 
                           className={`text-xs ${
                             (retailer.status || "").includes("✓") ? "border-green-500/50 text-green-400" :
-                            retailer.status === "API Partnership" ? "border-purple-500/50 text-purple-400" :
+                            retailer.status === "API Partnership" ? "border-sky-500/50 text-sky-400" :
                             "border-yellow-500/50 text-yellow-400"
                           }`}
                         >
@@ -2864,10 +2864,10 @@ export default function DevPortal() {
                           )}
                           {'apiUrl' in retailer && (
                             <div className="flex items-center gap-2">
-                              <Link2 className="w-4 h-4 text-purple-400" />
+                              <Link2 className="w-4 h-4 text-sky-400" />
                               <div>
                                 <p className="text-xs text-muted-foreground">API/Web Services</p>
-                                <a href={retailer.apiUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-purple-400 hover:underline">
+                                <a href={retailer.apiUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-sky-400 hover:underline">
                                   View API Docs
                                 </a>
                               </div>
@@ -2969,8 +2969,8 @@ export default function DevPortal() {
                 <p className="text-xs font-medium">AvantLink + Impact</p>
                 <p className="text-[10px] text-muted-foreground">Powersports</p>
               </Card>
-              <Card className="glass-card border-purple-500/30 p-3 text-center">
-                <span className="w-8 h-8 rounded-full bg-purple-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">4</span>
+              <Card className="glass-card border-sky-500/30 p-3 text-center">
+                <span className="w-8 h-8 rounded-full bg-sky-500 text-black text-sm flex items-center justify-center mx-auto mb-2 font-bold">4</span>
                 <p className="text-xs font-medium">Direct Outreach</p>
                 <p className="text-[10px] text-muted-foreground">Custom deals</p>
               </Card>
@@ -3154,8 +3154,8 @@ export default function DevPortal() {
                             <li>12. Car-Part.com (API partner)</li>
                           </ul>
                         </div>
-                        <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-                          <p className="font-tech text-xs text-purple-400 mb-2">PHASE 4: Niche Coverage</p>
+                        <div className="bg-sky-500/10 border border-sky-500/20 rounded-lg p-3">
+                          <p className="font-tech text-xs text-sky-400 mb-2">PHASE 4: Niche Coverage</p>
                           <ul className="space-y-1 text-xs text-muted-foreground">
                             <li>13. Sky Supply USA (direct)</li>
                             <li>14. Diesel Laptops (15%!)</li>

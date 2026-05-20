@@ -105,7 +105,7 @@ export default function CategoryGrid() {
                       {cat.name}
                     </span>
                   </div>
-                  <div className="absolute inset-0 border lg:border-2 border-white/10 rounded-xl group-hover:border-secondary/50 lg:group-hover:border-secondary/60 lg:group-hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all duration-300" />
+                  <div className="absolute inset-0 border lg:border-2 border-white/10 rounded-xl group-hover:border-secondary/50 lg:group-hover:border-secondary/60 lg:group-hover:shadow-[0_0_25px_rgba(14,165,233,0.3)] transition-all duration-300" />
                 </motion.div>
               </Link>
             ))}

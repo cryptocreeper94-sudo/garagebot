@@ -7,10 +7,10 @@ const ecosystemSites = [
     name: "DarkWave Studios",
     tagline: "Creative Tech Ecosystem",
     url: "https://dwsc.io",
-    gradient: "from-purple-600 via-violet-500 to-fuchsia-500",
-    shadowColor: "shadow-purple-500/50",
+    gradient: "from-sky-600 via-cyan-500 to-teal-500",
+    shadowColor: "shadow-sky-500/50",
     icon: Sparkles,
-    flagColor: "bg-gradient-to-br from-purple-500 to-fuchsia-600"
+    flagColor: "bg-gradient-to-br from-sky-500 to-teal-600"
   },
   {
     id: "trustlayer",
@@ -146,7 +146,7 @@ export function EcosystemFlags() {
 export function EcosystemBanner() {
   return (
     <div className="relative overflow-hidden rounded-2xl mb-8" data-testid="ecosystem-banner">
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/50 via-blue-900/50 to-emerald-900/50" />
+      <div className="absolute inset-0 bg-gradient-to-r from-sky-900/50 via-blue-900/50 to-emerald-900/50" />
       
       <motion.div
         className="absolute inset-0 opacity-30"
@@ -160,7 +160,7 @@ export function EcosystemBanner() {
       <div className="relative p-6">
         <div className="text-center mb-6">
           <motion.h3 
-            className="font-tech text-xl font-bold uppercase bg-gradient-to-r from-purple-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent"
+            className="font-tech text-xl font-bold uppercase bg-gradient-to-r from-sky-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent"
             animate={{ 
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
             }}

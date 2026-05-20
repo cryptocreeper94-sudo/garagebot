@@ -397,7 +397,7 @@ function VendorDirectLink({ vendorWithUrl, displayQuery, requireAuth, index }: {
               <span className="text-[8px] text-blue-400/70 bg-blue-400/10 px-1.5 py-0.5 rounded-full">OEM</span>
             )}
             {vendor.supportsAftermarket && (
-              <span className="text-[8px] text-purple-400/70 bg-purple-400/10 px-1.5 py-0.5 rounded-full">Aftermarket</span>
+              <span className="text-[8px] text-sky-400/70 bg-sky-400/10 px-1.5 py-0.5 rounded-full">Aftermarket</span>
             )}
           </div>
         </div>
@@ -1101,7 +1101,7 @@ export default function Results() {
                         data-testid="checkbox-aftermarket-only"
                       />
                       <label htmlFor="aftermarketOnly" className="text-xs font-medium flex items-center gap-1">
-                        <Wrench className="w-3 h-3 text-purple-400" /> Aftermarket
+                        <Wrench className="w-3 h-3 text-sky-400" /> Aftermarket
                       </label>
                     </div>
                   </div>

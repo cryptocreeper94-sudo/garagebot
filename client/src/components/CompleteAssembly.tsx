@@ -97,7 +97,7 @@ export default function CompleteAssembly({ partName, vehicle }: CompleteAssembly
         <Card className="overflow-hidden border-cyan-500/15 bg-gradient-to-br from-[#0a0f1e] via-[#0d1225] to-[#0a0f1e]">
           <div className="p-4 sm:p-5">
             <div className="flex items-center gap-3 mb-4">
-              <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/20 flex items-center justify-center shrink-0">
+              <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-sky-500/20 border border-cyan-500/20 flex items-center justify-center shrink-0">
                 <Layers className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-pulse" />
                 <div className="absolute inset-0 rounded-xl border border-cyan-400/30 animate-ping opacity-30" />
               </div>
@@ -126,7 +126,7 @@ export default function CompleteAssembly({ partName, vehicle }: CompleteAssembly
             </div>
             <div className="mt-3 h-1 rounded-full bg-white/[0.03] overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-cyan-500/40 via-purple-500/30 to-cyan-500/40 rounded-full"
+                className="h-full bg-gradient-to-r from-cyan-500/40 via-sky-500/30 to-cyan-500/40 rounded-full"
                 animate={{ x: ["-100%", "100%"] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
                 style={{ width: "60%" }}
@@ -207,10 +207,10 @@ export default function CompleteAssembly({ partName, vehicle }: CompleteAssembly
           data-testid="assembly-toggle"
         >
           <div className="relative shrink-0">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/20 flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.15)] sm:group-hover:shadow-[0_0_35px_rgba(6,182,212,0.25)] transition-shadow duration-300">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-sky-500/20 border border-cyan-500/20 flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.15)] sm:group-hover:shadow-[0_0_35px_rgba(6,182,212,0.25)] transition-shadow duration-300">
               <Layers className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
             </div>
-            <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-[0_0_10px_rgba(168,85,247,0.4)]">
+            <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-[0_0_10px_rgba(14,165,233,0.4)]">
               <Zap className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-white" />
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function CompleteAssembly({ partName, vehicle }: CompleteAssembly
               <h3 className="font-tech font-bold text-[13px] sm:text-base uppercase tracking-wider text-white sm:group-hover:text-cyan-50 transition-colors">
                 Complete Assembly
               </h3>
-              <Badge className="bg-gradient-to-r from-cyan-500/15 to-purple-500/15 text-cyan-400 border-cyan-500/25 text-[8px] sm:text-[9px] font-mono h-4 sm:h-5 px-1.5">
+              <Badge className="bg-gradient-to-r from-cyan-500/15 to-sky-500/15 text-cyan-400 border-cyan-500/25 text-[8px] sm:text-[9px] font-mono h-4 sm:h-5 px-1.5">
                 <Sparkles className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5" />
                 AI
               </Badge>

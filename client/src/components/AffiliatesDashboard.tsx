@@ -108,7 +108,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
 const categoryColors: Record<string, string> = {
   parts: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   tools: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-  car_care: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  car_care: "bg-sky-500/10 text-sky-400 border-sky-500/20",
   marine: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
 };
 

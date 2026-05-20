@@ -73,7 +73,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   Engineering: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
   "Pop Culture": "bg-pink-500/20 text-pink-400 border-pink-500/30",
   "Speed Records": "bg-red-500/20 text-red-400 border-red-500/30",
-  "Weird Facts": "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  "Weird Facts": "bg-sky-500/20 text-sky-400 border-sky-500/30",
 };
 
 export default function TriviaQuiz() {
@@ -213,7 +213,7 @@ export default function TriviaQuiz() {
                 <div>
                   <Button
                     onClick={startQuiz}
-                    className="bg-gradient-to-r from-primary to-purple-600 text-white font-tech uppercase tracking-wider px-8 py-3 text-lg shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+                    className="bg-gradient-to-r from-primary to-sky-600 text-white font-tech uppercase tracking-wider px-8 py-3 text-lg shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
                     data-testid="button-start-quiz"
                   >
                     Start Quiz
@@ -349,7 +349,7 @@ export default function TriviaQuiz() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
-                  className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/30 to-purple-500/30 flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(6,182,212,0.3)]"
+                  className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/30 to-sky-500/30 flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(6,182,212,0.3)]"
                 >
                   <Trophy className="w-12 h-12 text-yellow-400" />
                 </motion.div>
@@ -394,7 +394,7 @@ export default function TriviaQuiz() {
                 <div className="flex items-center justify-center gap-3">
                   <Button
                     onClick={startQuiz}
-                    className="bg-gradient-to-r from-primary to-purple-600 text-white font-tech uppercase tracking-wider px-6"
+                    className="bg-gradient-to-r from-primary to-sky-600 text-white font-tech uppercase tracking-wider px-6"
                     data-testid="button-play-again"
                   >
                     <RotateCw className="w-4 h-4 mr-2" />

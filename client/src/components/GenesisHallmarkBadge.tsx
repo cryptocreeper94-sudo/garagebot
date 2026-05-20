@@ -97,8 +97,8 @@ export default function GenesisHallmarkBadge() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-gradient-to-r from-purple-500/5 to-pink-500/5 border border-purple-500/20">
-                  <h3 className="text-sm font-semibold text-purple-300 mb-3 flex items-center gap-2">
+                <div className="p-4 rounded-xl bg-gradient-to-r from-sky-500/5 to-pink-500/5 border border-sky-500/20">
+                  <h3 className="text-sm font-semibold text-sky-300 mb-3 flex items-center gap-2">
                     <Lock className="w-4 h-4" /> Blockchain Record
                   </h3>
                   <div className="space-y-2">

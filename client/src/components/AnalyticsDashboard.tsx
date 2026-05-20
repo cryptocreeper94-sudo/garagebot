@@ -47,7 +47,7 @@ interface AnalyticsSummary {
   bounceRate: number;
 }
 
-const CHART_COLORS = ['#00d4ff', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#6366f1'];
+const CHART_COLORS = ['#00d4ff', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#6366f1'];
 
 export default function AnalyticsDashboard() {
   const { toast } = useToast();
@@ -230,8 +230,8 @@ export default function AnalyticsDashboard() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <Card className="glass-dark border-purple-500/30 p-4 text-center">
-            <Users className="w-5 h-5 mx-auto mb-2 text-purple-400" />
+          <Card className="glass-dark border-sky-500/30 p-4 text-center">
+            <Users className="w-5 h-5 mx-auto mb-2 text-sky-400" />
             <p className="text-2xl font-bold">{summary?.uniqueVisitors?.toLocaleString() || 0}</p>
             <p className="text-xs text-muted-foreground">Unique Visitors</p>
           </Card>
@@ -296,7 +296,7 @@ export default function AnalyticsDashboard() {
                   <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--primary)/0.3)' }} />
                   <Legend />
                   <Line type="monotone" dataKey="pageViews" stroke="#00d4ff" strokeWidth={2} dot={false} name="Page Views" />
-                  <Line type="monotone" dataKey="visitors" stroke="#8b5cf6" strokeWidth={2} dot={false} name="Visitors" />
+                  <Line type="monotone" dataKey="visitors" stroke="#0ea5e9" strokeWidth={2} dot={false} name="Visitors" />
                 </LineChart>
               </ResponsiveContainer>
             )}

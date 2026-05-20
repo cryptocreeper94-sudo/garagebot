@@ -103,7 +103,7 @@ const SLIDES = [
     title: "Dashboard Overview",
     description: "See your entire shop at a glance - active jobs, pending estimates, today's appointments, and revenue tracking.",
     image: "/marketing/dashboard-preview.png",
-    fallbackGradient: "from-cyan-500/20 via-blue-500/10 to-purple-500/20"
+    fallbackGradient: "from-cyan-500/20 via-blue-500/10 to-sky-500/20"
   },
   {
     title: "Repair Orders",
@@ -121,13 +121,13 @@ const SLIDES = [
     title: "Scheduling Calendar",
     description: "Visual bay management and appointment scheduling. Customers can book online 24/7.",
     image: "/marketing/calendar-preview.png",
-    fallbackGradient: "from-purple-500/20 via-pink-500/10 to-rose-500/20"
+    fallbackGradient: "from-sky-500/20 via-pink-500/10 to-rose-500/20"
   },
   {
     title: "Customer Portal",
     description: "Customers view their vehicle history, approve estimates, and pay invoices from their phone.",
     image: "/marketing/portal-preview.png",
-    fallbackGradient: "from-blue-500/20 via-indigo-500/10 to-violet-500/20"
+    fallbackGradient: "from-blue-500/20 via-indigo-500/10 to-cyan-500/20"
   }
 ];
 
@@ -498,8 +498,8 @@ export default function MechanicsGarageSales() {
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                      <Zap className="w-5 h-5 text-purple-400" />
+                    <div className="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center flex-shrink-0">
+                      <Zap className="w-5 h-5 text-sky-400" />
                     </div>
                     <div>
                       <p className="text-white font-medium">Free Data Migration</p>

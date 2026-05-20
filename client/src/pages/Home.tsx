@@ -154,9 +154,9 @@ export default function Home() {
                     </div>
                   </Link>
                   <Link href="/hallmark">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-900/40 to-primary/10 border border-purple-500/30 cursor-pointer hover:border-purple-400/50 transition-all group icon-bounce">
-                      <Shield className="w-3.5 h-3.5 text-purple-400" />
-                      <span className="text-[10px] font-medium text-purple-300">Blockchain</span>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-sky-900/40 to-primary/10 border border-sky-500/30 cursor-pointer hover:border-sky-400/50 transition-all group icon-bounce">
+                      <Shield className="w-3.5 h-3.5 text-sky-400" />
+                      <span className="text-[10px] font-medium text-sky-300">Blockchain</span>
                     </div>
                   </Link>
                 </div>
@@ -261,7 +261,7 @@ export default function Home() {
                           data-testid="input-web-url"
                         />
                         <Button 
-                          className="h-9 px-3 shrink-0 bg-secondary text-black hover:bg-secondary/90 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.3)]"
+                          className="h-9 px-3 shrink-0 bg-secondary text-black hover:bg-secondary/90 rounded-lg shadow-[0_0_15px_rgba(14,165,233,0.3)]"
                           onClick={handleWebNavigate}
                           data-testid="button-navigate"
                         >
@@ -306,7 +306,7 @@ export default function Home() {
 
                   <Dialog open={showPhotoSearch} onOpenChange={setShowPhotoSearch}>
                     <DialogTrigger asChild>
-                      <button className="relative h-[72px] rounded-lg overflow-hidden border border-purple-500/20 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)] transition-all group" data-testid="button-photo-search">
+                      <button className="relative h-[72px] rounded-lg overflow-hidden border border-sky-500/20 hover:border-sky-500/50 hover:shadow-[0_0_15px_rgba(14,165,233,0.2)] transition-all group" data-testid="button-photo-search">
                         <img src="/generated_images/photo_search_tool.png" alt="Photo Search" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                         <span className="absolute bottom-1.5 left-0 right-0 text-center text-[9px] font-tech uppercase text-white drop-shadow-lg">Photo</span>
@@ -433,13 +433,13 @@ export default function Home() {
                 </Link>
                 
                 <Link href="/hallmark">
-                  <Card className="bento-glass p-2 rounded-lg cursor-pointer group hover:border-purple-500/50 transition-all h-full">
+                  <Card className="bento-glass p-2 rounded-lg cursor-pointer group hover:border-sky-500/50 transition-all h-full">
                     <div className="flex flex-col items-center gap-1.5 text-center">
-                      <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                        <Shield className="w-4 h-4 text-purple-400" />
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-sky-400" />
                       </div>
                       <div>
-                        <span className="text-[10px] font-tech uppercase text-foreground group-hover:text-purple-400 transition-colors">Hallmark</span>
+                        <span className="text-[10px] font-tech uppercase text-foreground group-hover:text-sky-400 transition-colors">Hallmark</span>
                       </div>
                     </div>
                   </Card>
@@ -553,9 +553,9 @@ export default function Home() {
                 </div>
               </Link>
               <Link href="/hallmark">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-900/40 to-primary/20 border border-purple-500/30">
-                  <Shield className="w-4 h-4 text-purple-400" />
-                  <span className="text-xs text-purple-300">Blockchain</span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-sky-900/40 to-primary/20 border border-sky-500/30">
+                  <Shield className="w-4 h-4 text-sky-400" />
+                  <span className="text-xs text-sky-300">Blockchain</span>
                 </div>
               </Link>
             </div>
@@ -667,7 +667,7 @@ export default function Home() {
                 </Dialog>
                 <Dialog open={showPhotoSearch} onOpenChange={setShowPhotoSearch}>
                   <DialogTrigger asChild>
-                    <button className="relative h-[60px] rounded-lg overflow-hidden border border-purple-500/20 hover:border-purple-500/50 transition-all group" data-testid="button-photo-search-mobile">
+                    <button className="relative h-[60px] rounded-lg overflow-hidden border border-sky-500/20 hover:border-sky-500/50 transition-all group" data-testid="button-photo-search-mobile">
                       <img src="/generated_images/photo_search_tool.png" alt="Photo Search" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                       <span className="absolute bottom-1 left-0 right-0 text-center text-[8px] font-tech uppercase text-white drop-shadow-lg">Photo</span>
@@ -834,7 +834,7 @@ export default function Home() {
             {[
               { step: 1, icon: Search, title: "Search Once", desc: "Enter your part name, number, or vehicle info. GarageBot searches 104 retailers simultaneously.", color: "from-cyan-500/20 to-cyan-600/10", iconColor: "text-cyan-400", borderColor: "border-cyan-500/30" },
               { step: 2, icon: TrendingUp, title: "Compare Prices", desc: "See prices, availability, and shipping from every store side-by-side. No more tab-hopping.", color: "from-green-500/20 to-green-600/10", iconColor: "text-green-400", borderColor: "border-green-500/30" },
-              { step: 3, icon: CheckCircle2, title: "Buy & Save", desc: "Click through to buy from the store with the best deal. Average users save $50-$200 per repair.", color: "from-purple-500/20 to-purple-600/10", iconColor: "text-purple-400", borderColor: "border-purple-500/30" },
+              { step: 3, icon: CheckCircle2, title: "Buy & Save", desc: "Click through to buy from the store with the best deal. Average users save $50-$200 per repair.", color: "from-sky-500/20 to-sky-600/10", iconColor: "text-sky-400", borderColor: "border-sky-500/30" },
             ].map((item, i) => (
               <motion.div key={item.step} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}>
                 <Card className={`glass-card card-3d p-6 h-full ${item.borderColor} relative overflow-hidden`} data-testid={`card-how-step-${item.step}`}>
@@ -945,7 +945,7 @@ export default function Home() {
                       { label: "Powersports", Icon: Snowflake, color: "text-sky-400", bg: "from-sky-500/20 to-sky-600/10" },
                       { label: "Aviation", Icon: Plane, color: "text-indigo-400", bg: "from-indigo-500/20 to-indigo-600/10" },
                       { label: "RC & Hobby", Icon: Gamepad2, color: "text-pink-400", bg: "from-pink-500/20 to-pink-600/10" },
-                      { label: "Drones & FPV", Icon: Radio, color: "text-violet-400", bg: "from-violet-500/20 to-violet-600/10" },
+                      { label: "Drones & FPV", Icon: Radio, color: "text-cyan-400", bg: "from-cyan-500/20 to-cyan-600/10" },
                       { label: "Model Aircraft", Icon: Navigation, color: "text-teal-400", bg: "from-teal-500/20 to-teal-600/10" },
                       { label: "Slot Cars", Icon: Trophy, color: "text-amber-300", bg: "from-amber-400/20 to-amber-500/10" },
                       { label: "Go-Karts", Icon: Gauge, color: "text-lime-400", bg: "from-lime-500/20 to-lime-600/10" },

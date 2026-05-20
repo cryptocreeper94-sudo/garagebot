@@ -138,7 +138,7 @@ export default function OrderTracking() {
     switch (status) {
       case 'processing': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
       case 'shipped': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'in_transit': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+      case 'in_transit': return 'bg-sky-500/20 text-sky-400 border-sky-500/30';
       case 'out_for_delivery': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
       case 'delivered': return 'bg-green-500/20 text-green-400 border-green-500/30';
       case 'issue': return 'bg-red-500/20 text-red-400 border-red-500/30';
@@ -166,8 +166,8 @@ export default function OrderTracking() {
       <div className="p-4 border-b border-border/40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center">
-              <Truck className="w-5 h-5 text-purple-400" />
+            <div className="w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center">
+              <Truck className="w-5 h-5 text-sky-400" />
             </div>
             <div>
               <h3 className="font-tech text-lg uppercase text-primary">Order Tracking</h3>

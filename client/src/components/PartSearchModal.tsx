@@ -236,7 +236,7 @@ export function PartSearchBanner() {
       data-testid="part-search-banner"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.06] via-blue-500/[0.04] to-cyan-500/[0.06] backdrop-blur-xl border border-cyan-500/15 rounded-2xl" />
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.03] via-transparent to-purple-500/[0.03] rounded-2xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.03] via-transparent to-sky-500/[0.03] rounded-2xl" />
       <div className="relative z-10 p-4 sm:p-5">
         <div className="flex items-center gap-2 mb-3">
           <Search className="w-4 h-4 text-cyan-400" />
@@ -300,7 +300,7 @@ export function PartSearchModal() {
           >
             <div className="relative overflow-hidden rounded-2xl border border-cyan-500/20 shadow-[0_0_80px_rgba(6,182,212,0.15),0_0_200px_rgba(6,182,212,0.05)]">
               <div className="absolute inset-0 bg-[#0a0f1e]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/[0.06] via-transparent to-purple-500/[0.04]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/[0.06] via-transparent to-sky-500/[0.04]" />
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-cyan-500/[0.06] rounded-full blur-[100px]" />
 
               <button

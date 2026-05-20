@@ -42,7 +42,7 @@ export default function Ecosystem() {
             </Link>
 
             <div className="flex items-start sm:items-center gap-4 mb-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/10">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-sky-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/10">
                 <Shield className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400" />
               </div>
               <div>
@@ -77,9 +77,9 @@ export default function Ecosystem() {
               <h3 className="text-sm font-semibold mb-1.5">Single Sign-On</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">One set of credentials across all DarkWave apps. No redirects — each app has its own login, synced behind the scenes.</p>
             </Card>
-            <Card className="bg-card/40 backdrop-blur-sm border-white/5 p-4 sm:p-5 hover:border-purple-500/20 transition-all group" data-testid="card-feature-blockchain">
-              <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-3 group-hover:bg-purple-500/15 transition-colors">
-                <Zap className="w-4 h-4 text-purple-400" />
+            <Card className="bg-card/40 backdrop-blur-sm border-white/5 p-4 sm:p-5 hover:border-sky-500/20 transition-all group" data-testid="card-feature-blockchain">
+              <div className="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center mb-3 group-hover:bg-sky-500/15 transition-colors">
+                <Zap className="w-4 h-4 text-sky-400" />
               </div>
               <h3 className="text-sm font-semibold mb-1.5">Blockchain Verified</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">Identity and credentials anchored on Solana. Tamper-proof verification for shops, vehicles, and digital assets.</p>

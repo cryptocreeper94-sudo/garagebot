@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 
 const FEATURES = [
   { icon: FileText, title: "Repair Orders & Estimates", description: "Create professional estimates and repair orders in seconds. Convert estimates to work orders with one click.", highlight: "Save 2+ hours daily", color: "#00D9FF" },
-  { icon: Calendar, title: "Smart Scheduling", description: "Online booking, automated reminders, and a visual calendar that keeps your bays full and customers happy.", highlight: "Reduce no-shows by 60%", color: "#8B5CF6" },
+  { icon: Calendar, title: "Smart Scheduling", description: "Online booking, automated reminders, and a visual calendar that keeps your bays full and customers happy.", highlight: "Reduce no-shows by 60%", color: "#0ea5e9" },
   { icon: Users, title: "Customer Management", description: "Complete customer history, vehicle records, and communication tools all in one place.", highlight: "Build lasting relationships", color: "#10B981" },
   { icon: BarChart3, title: "Real-Time Analytics", description: "Track revenue, technician productivity, and shop efficiency with live dashboards.", highlight: "Data-driven decisions", color: "#F59E0B" },
   { icon: DollarSign, title: "Integrated Payments", description: "Accept cards, send digital invoices, and get paid faster with built-in Stripe payment processing.", highlight: "Get paid same-day", color: "#EC4899" },
@@ -25,12 +25,12 @@ const FEATURES = [
 
 const BENTO_ITEMS = [
   { id: "orders", title: "Repair Orders", stat: "∞", desc: "Unlimited", icon: FileText, span: "col-span-1", accent: "#00D9FF" },
-  { id: "search", title: "Parts Search", stat: "68+", desc: "Retailers", icon: Package, span: "col-span-1", accent: "#8B5CF6" },
+  { id: "search", title: "Parts Search", stat: "68+", desc: "Retailers", icon: Package, span: "col-span-1", accent: "#0ea5e9" },
   { id: "analytics", title: "Live Analytics", stat: "24/7", desc: "Real-time", icon: BarChart3, span: "col-span-1", accent: "#10B981" },
   { id: "ai", title: "AI Assistant", stat: "Buddy", desc: "AI-Powered", icon: Sparkles, span: "md:col-span-2", accent: "#F59E0B" },
   { id: "blockchain", title: "Trust Layer", stat: "L1", desc: "Blockchain Verified", icon: Shield, span: "col-span-1", accent: "#EC4899" },
   { id: "payments", title: "Stripe Payments", stat: "$0", desc: "Processing fees", icon: DollarSign, span: "col-span-1", accent: "#06B6D4" },
-  { id: "schedule", title: "Smart Scheduling", stat: "60%", desc: "Fewer no-shows", icon: Calendar, span: "col-span-1", accent: "#8B5CF6" },
+  { id: "schedule", title: "Smart Scheduling", stat: "60%", desc: "Fewer no-shows", icon: Calendar, span: "col-span-1", accent: "#0ea5e9" },
   { id: "vehicles", title: "Vehicle Types", stat: "12", desc: "Categories", icon: Car, span: "md:col-span-2", accent: "#00D9FF" },
   { id: "api", title: "Partner API", stat: "REST", desc: "Full access", icon: Globe, span: "col-span-1", accent: "#10B981" },
 ];
@@ -292,7 +292,7 @@ export default function TorqueLanding() {
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full opacity-20" style={{ background: "radial-gradient(circle, rgba(0,217,255,0.4) 0%, transparent 60%)" }} />
           <div className="absolute top-10 left-10 w-72 h-72 bg-[#00D9FF]/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,217,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0,217,255,0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
         </div>
 
@@ -518,10 +518,10 @@ export default function TorqueLanding() {
 
       {/* TRUST LAYER */}
       <section id="trustlayer" className="py-24 px-4 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/[0.03] to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-sky-500/[0.03] to-transparent pointer-events-none" />
         <div className="max-w-6xl mx-auto relative">
           <motion.div {...fadeInUp} className="text-center mb-16">
-            <Badge className="bg-purple-500/10 border-purple-500/30 text-purple-400 mb-4 text-sm px-5 py-2" data-testid="badge-trust-layer-section">
+            <Badge className="bg-sky-500/10 border-sky-500/30 text-sky-400 mb-4 text-sm px-5 py-2" data-testid="badge-trust-layer-section">
               <Shield className="w-4 h-4 mr-2" /> Layer 1 Blockchain
             </Badge>
             <h2 className="text-4xl sm:text-5xl font-tech font-bold text-white mb-4">Blockchain-Powered Trust</h2>
@@ -531,7 +531,7 @@ export default function TorqueLanding() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { icon: Shield, title: "Verified Shop Identity", description: "Your shop's identity is verified and recorded on the Trust Layer blockchain. Customers can verify your legitimacy instantly.", color: "#00D9FF" },
-              { icon: Lock, title: "Tamper-Proof Records", description: "Every repair order, estimate, and transaction is cryptographically signed. Records cannot be altered or fabricated.", color: "#8B5CF6" },
+              { icon: Lock, title: "Tamper-Proof Records", description: "Every repair order, estimate, and transaction is cryptographically signed. Records cannot be altered or fabricated.", color: "#0ea5e9" },
               { icon: Award, title: "Signal Rewards", description: "Earn and use Signal points within the Trust Layer ecosystem. Reward loyal customers and incentivize referrals with your shop's own loyalty program.", color: "#F59E0B" },
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}>
@@ -584,7 +584,7 @@ export default function TorqueLanding() {
 
             <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
               <Card className="p-8 bg-[#0f172a]/60 border-[#00D9FF]/20 h-full rounded-2xl relative overflow-hidden" data-testid="card-pricing-pro">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00D9FF] via-[#8B5CF6] to-[#00D9FF]" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00D9FF] via-[#0ea5e9] to-[#00D9FF]" />
                 <div className="absolute top-0 right-0 w-40 h-40 bg-[#00D9FF]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                 <div className="relative">
                   <Badge className="bg-[#00D9FF]/10 border-[#00D9FF]/30 text-[#00D9FF] mb-3">Most Popular</Badge>

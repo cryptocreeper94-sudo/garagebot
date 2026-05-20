@@ -356,7 +356,7 @@ function AdCampaignsTab({ images, posts }: { images: MarketingImage[]; posts: Ma
         </div>
         <div className="p-4 bg-muted/50 rounded-lg border border-muted">
           <div className="text-sm text-muted-foreground">Total Spend</div>
-          <div className="text-2xl font-bold text-purple-400" data-testid="text-total-spend">${totalSpent.toFixed(2)}</div>
+          <div className="text-2xl font-bold text-sky-400" data-testid="text-total-spend">${totalSpent.toFixed(2)}</div>
         </div>
         <div className="p-4 bg-muted/50 rounded-lg border border-muted">
           <div className="text-sm text-muted-foreground">Impressions</div>
@@ -933,7 +933,7 @@ export default function MarketingHub() {
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-purple-400">{analyticsData.totalImpressions.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-sky-400">{analyticsData.totalImpressions.toLocaleString()}</div>
               <div className="text-sm text-muted-foreground">Impressions</div>
             </CardContent>
           </Card>
@@ -1266,7 +1266,7 @@ export default function MarketingHub() {
                         {getStatusBadge(bundle.status)}
                         <Badge variant="outline">{bundle.platform}</Badge>
                         {bundle.postType === "paid_ad" && (
-                          <Badge className="bg-purple-500/20 text-purple-400">
+                          <Badge className="bg-sky-500/20 text-sky-400">
                             <DollarSign className="w-3 h-3 mr-1" />
                             Paid
                           </Badge>
@@ -1501,7 +1501,7 @@ export default function MarketingHub() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Clock className="w-5 h-5 text-purple-400" />
+                  <Clock className="w-5 h-5 text-sky-400" />
                   Best Posting Times
                 </CardTitle>
                 <CardDescription>Average engagement by time of day</CardDescription>

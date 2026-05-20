@@ -212,7 +212,7 @@ export function FeatureInventory() {
   const partialFeatures = FEATURE_CATEGORIES.reduce((sum, cat) => sum + cat.features.filter(f => f.status === "partial").length, 0);
 
   const colorMap: Record<string, string> = {
-    purple: "from-purple-600 to-purple-800 border-purple-500",
+    purple: "from-sky-600 to-sky-800 border-sky-500",
     blue: "from-blue-600 to-blue-800 border-blue-500",
     green: "from-green-600 to-green-800 border-green-500",
     red: "from-red-600 to-red-800 border-red-500",
@@ -223,7 +223,7 @@ export function FeatureInventory() {
     orange: "from-orange-600 to-orange-800 border-orange-500",
     emerald: "from-emerald-600 to-emerald-800 border-emerald-500",
     indigo: "from-indigo-600 to-indigo-800 border-indigo-500",
-    violet: "from-violet-600 to-violet-800 border-violet-500",
+    violet: "from-cyan-600 to-cyan-800 border-cyan-500",
   };
 
   return (
@@ -253,10 +253,10 @@ export function FeatureInventory() {
             <div className="text-blue-200 text-xs">Verified ✓</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-purple-900 to-purple-800 border-purple-500">
+        <Card className="bg-gradient-to-br from-sky-900 to-sky-800 border-sky-500">
           <CardContent className="p-4 text-center">
             <div className="text-3xl font-bold text-white">{PUBLISH_LOG.length}</div>
-            <div className="text-purple-200 text-xs">Publishes</div>
+            <div className="text-sky-200 text-xs">Publishes</div>
           </CardContent>
         </Card>
       </div>

@@ -386,7 +386,7 @@ export default function WeatherRadar({
                       <span>Intense</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-2 rounded bg-purple-500" />
+                      <div className="w-4 h-2 rounded bg-sky-500" />
                       <span>Extreme</span>
                     </div>
                   </div>

@@ -244,7 +244,7 @@ export default function TorqueOnboard() {
         <motion.div
           animate={{ width: `${(step / 6) * 100}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="h-full bg-gradient-to-r from-[#00D9FF] to-[#8B5CF6]"
+          className="h-full bg-gradient-to-r from-[#00D9FF] to-[#0ea5e9]"
         />
       </div>
 
@@ -378,8 +378,8 @@ export default function TorqueOnboard() {
               {step === 2 && (
                 <Card className="p-8 bg-[#0f172a]/60 border-white/[0.08] rounded-2xl" data-testid="step-2">
                   <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-[#8B5CF6]/10 flex items-center justify-center mx-auto mb-4">
-                      <Building2 className="w-8 h-8 text-[#8B5CF6]" />
+                    <div className="w-16 h-16 rounded-2xl bg-[#0ea5e9]/10 flex items-center justify-center mx-auto mb-4">
+                      <Building2 className="w-8 h-8 text-[#0ea5e9]" />
                     </div>
                     <h2 className="text-2xl font-tech font-bold text-white mb-2">Your Shop</h2>
                     <p className="text-zinc-500 text-sm">Tell us about your business</p>
@@ -389,39 +389,39 @@ export default function TorqueOnboard() {
                     <div>
                       <Label className="text-zinc-400 text-sm mb-1.5 block">Shop Name *</Label>
                       <Input value={shop.name} onChange={e => setShop({ ...shop, name: e.target.value })}
-                        placeholder="Mike's Auto Care" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50"
+                        placeholder="Mike's Auto Care" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50"
                         data-testid="input-shop-name" />
                     </div>
                     <div>
                       <Label className="text-zinc-400 text-sm mb-1.5 block">Description</Label>
                       <Textarea value={shop.description} onChange={e => setShop({ ...shop, description: e.target.value })}
                         placeholder="Full-service auto repair for all makes and models..."
-                        className="bg-white/[0.05] border-white/[0.1] text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50 min-h-[80px]"
+                        className="bg-white/[0.05] border-white/[0.1] text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50 min-h-[80px]"
                         data-testid="input-shop-desc" />
                     </div>
                     <div>
                       <Label className="text-zinc-400 text-sm mb-1.5 block">Street Address</Label>
                       <Input value={shop.address} onChange={e => setShop({ ...shop, address: e.target.value })}
-                        placeholder="123 Main Street" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50"
+                        placeholder="123 Main Street" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50"
                         data-testid="input-shop-address" />
                     </div>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <Label className="text-zinc-400 text-sm mb-1.5 block">City</Label>
                         <Input value={shop.city} onChange={e => setShop({ ...shop, city: e.target.value })}
-                          placeholder="Dallas" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50"
+                          placeholder="Dallas" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50"
                           data-testid="input-shop-city" />
                       </div>
                       <div>
                         <Label className="text-zinc-400 text-sm mb-1.5 block">State</Label>
                         <Input value={shop.state} onChange={e => setShop({ ...shop, state: e.target.value })}
-                          placeholder="TX" maxLength={2} className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50"
+                          placeholder="TX" maxLength={2} className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50"
                           data-testid="input-shop-state" />
                       </div>
                       <div>
                         <Label className="text-zinc-400 text-sm mb-1.5 block">ZIP</Label>
                         <Input value={shop.zipCode} onChange={e => setShop({ ...shop, zipCode: e.target.value })}
-                          placeholder="75001" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50"
+                          placeholder="75001" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50"
                           data-testid="input-shop-zip" />
                       </div>
                     </div>
@@ -429,20 +429,20 @@ export default function TorqueOnboard() {
                       <div>
                         <Label className="text-zinc-400 text-sm mb-1.5 block">Shop Phone</Label>
                         <Input value={shop.phone} onChange={e => setShop({ ...shop, phone: e.target.value })}
-                          placeholder="(555) 123-4567" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50"
+                          placeholder="(555) 123-4567" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50"
                           data-testid="input-shop-phone" />
                       </div>
                       <div>
                         <Label className="text-zinc-400 text-sm mb-1.5 block">Shop Email</Label>
                         <Input value={shop.email} onChange={e => setShop({ ...shop, email: e.target.value })}
-                          placeholder="info@myshop.com" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50"
+                          placeholder="info@myshop.com" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50"
                           data-testid="input-shop-email" />
                       </div>
                     </div>
                     <div>
                       <Label className="text-zinc-400 text-sm mb-1.5 block">Website</Label>
                       <Input value={shop.website} onChange={e => setShop({ ...shop, website: e.target.value })}
-                        placeholder="https://myshop.com" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#8B5CF6]/50"
+                        placeholder="https://myshop.com" className="bg-white/[0.05] border-white/[0.1] h-12 text-white placeholder:text-zinc-600 focus:border-[#0ea5e9]/50"
                         data-testid="input-shop-website" />
                     </div>
                   </div>
@@ -580,8 +580,8 @@ export default function TorqueOnboard() {
               {step === 5 && (
                 <Card className="p-8 bg-[#0f172a]/60 border-white/[0.08] rounded-2xl" data-testid="step-5">
                   <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-[#8B5CF6]/10 flex items-center justify-center mx-auto mb-4">
-                      <Users className="w-8 h-8 text-[#8B5CF6]" />
+                    <div className="w-16 h-16 rounded-2xl bg-[#0ea5e9]/10 flex items-center justify-center mx-auto mb-4">
+                      <Users className="w-8 h-8 text-[#0ea5e9]" />
                     </div>
                     <h2 className="text-2xl font-tech font-bold text-white mb-2">Invite Your Team</h2>
                     <p className="text-zinc-500 text-sm">Add technicians and staff (you can do this later too)</p>

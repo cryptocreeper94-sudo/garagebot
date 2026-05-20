@@ -320,7 +320,7 @@ export const VENDORS: VendorInfo[] = [
     supportsOEM: true,
     supportsAftermarket: true,
     affiliateNetwork: "Awin",
-    logoColor: "#7C3AED"
+    logoColor: "#0369a1"
   },
   {
     id: "rockymountain",
@@ -1121,7 +1121,7 @@ export const VENDORS: VendorInfo[] = [
     supportsOEM: false,
     supportsAftermarket: false,
     affiliateNetwork: "Awin",
-    logoColor: "#7C3AED"
+    logoColor: "#0369a1"
   },
   {
     id: "owleys",

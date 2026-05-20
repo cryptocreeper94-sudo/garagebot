@@ -200,8 +200,8 @@ export default function VehicleFunFacts({ query = '', make = '', model = '', veh
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <Card className="bg-gradient-to-br from-primary/10 via-card to-purple-500/5 border-primary/30 overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-cyan-400 to-purple-500" />
+      <Card className="bg-gradient-to-br from-primary/10 via-card to-sky-500/5 border-primary/30 overflow-hidden relative">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-cyan-400 to-sky-500" />
         
         <div className="p-4 md:p-5">
           <div className="flex items-center justify-between mb-3">
@@ -253,7 +253,7 @@ export default function VehicleFunFacts({ query = '', make = '', model = '', veh
               transition={{ duration: 0.3 }}
               className="flex items-start gap-3"
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/30 to-purple-500/20 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/30 to-sky-500/20 flex items-center justify-center shrink-0 mt-0.5">
                 <IconComponent className="w-5 h-5 text-primary" />
               </div>
               <p className="text-sm text-foreground leading-relaxed">

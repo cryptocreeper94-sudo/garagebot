@@ -317,7 +317,7 @@ export default function Dashboard() {
 
         {/* Parts Marketplace Section */}
         <div className="mt-12 mb-8">
-          <Card className="card-3d relative overflow-hidden bg-gradient-to-r from-cyan-500/10 via-blue-500/5 to-purple-500/10 border-cyan-500/30 p-8">
+          <Card className="card-3d relative overflow-hidden bg-gradient-to-r from-cyan-500/10 via-blue-500/5 to-sky-500/10 border-cyan-500/30 p-8">
             <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8">
               <div className="w-24 h-24 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center shrink-0">
                 <Tag className="w-12 h-12 text-cyan-400" />
@@ -374,7 +374,7 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {[
-              { name: "My Garage", desc: "Vehicles & VIN decode", icon: Car, href: "/garage", color: "text-purple-400", glow: "rgba(168,85,247,0.3)" },
+              { name: "My Garage", desc: "Vehicles & VIN decode", icon: Car, href: "/garage", color: "text-sky-400", glow: "rgba(14,165,233,0.3)" },
               { name: "Wishlists", desc: "Save & share parts", icon: Heart, href: "/wishlists", color: "text-pink-400", glow: "rgba(244,114,182,0.3)" },
               { name: "Build Projects", desc: "Track your builds", icon: FolderOpen, href: "/projects", color: "text-amber-400", glow: "rgba(251,191,36,0.3)" },
               { name: "DIY Guides", desc: "Step-by-step repairs", icon: Wrench, href: "/diy-guides", color: "text-emerald-400", glow: "rgba(52,211,153,0.3)" },
@@ -805,8 +805,8 @@ export default function Dashboard() {
                 </div>
 
                 {/* API Contacts */}
-                <div className="p-3 rounded bg-purple-500/5 border border-purple-500/20">
-                  <p className="font-medium text-purple-400 mb-2">API INTEGRATION CONTACTS</p>
+                <div className="p-3 rounded bg-sky-500/5 border border-sky-500/20">
+                  <p className="font-medium text-sky-400 mb-2">API INTEGRATION CONTACTS</p>
                   <div className="space-y-1 text-muted-foreground">
                     <p>• PartsTech: partstech.com/partners - Multi-supplier API</p>
                     <p>• WHI Nexpart: nexpart.com - Catalog data feeds</p>

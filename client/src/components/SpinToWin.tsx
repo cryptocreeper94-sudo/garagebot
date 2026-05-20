@@ -11,12 +11,12 @@ interface Prize {
 
 const SEGMENTS: Prize[] = [
   { label: "10% Off Pro", color: "#0891b2" },
-  { label: "25% Off Pro", color: "#7c3aed" },
+  { label: "25% Off Pro", color: "#0369a1" },
   { label: "10% Off Pro", color: "#d97706" },
   { label: "Free Month Pro", color: "#059669" },
   { label: "10% Off Pro", color: "#0891b2" },
   { label: "AutoZone $100 Entry", color: "#dc2626" },
-  { label: "25% Off Pro", color: "#7c3aed" },
+  { label: "25% Off Pro", color: "#0369a1" },
   { label: "Mystery Bonus", color: "#ca8a04" },
 ];
 
@@ -43,7 +43,7 @@ function Confetti() {
         const delay = Math.random() * 0.5;
         const duration = 1.5 + Math.random() * 1.5;
         const size = 4 + Math.random() * 6;
-        const colors = ["#06b6d4", "#7c3aed", "#f59e0b", "#10b981", "#ef4444", "#ec4899"];
+        const colors = ["#06b6d4", "#0369a1", "#f59e0b", "#10b981", "#ef4444", "#ec4899"];
         const color = colors[Math.floor(Math.random() * colors.length)];
         const rotation = Math.random() * 360;
         return (
@@ -191,7 +191,7 @@ export default function SpinToWin() {
     <>
       <motion.button
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-shadow"
+        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-sky-600 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-shadow"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         data-testid="button-open-spin"
@@ -276,7 +276,7 @@ export default function SpinToWin() {
                     <Button
                       onClick={handleSpin}
                       disabled={spinning}
-                      className="bg-gradient-to-r from-primary to-purple-600 text-white font-tech uppercase tracking-wider px-8 py-3 text-base shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+                      className="bg-gradient-to-r from-primary to-sky-600 text-white font-tech uppercase tracking-wider px-8 py-3 text-base shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
                       data-testid="button-spin"
                     >
                       {spinning ? "Spinning..." : "SPIN!"}

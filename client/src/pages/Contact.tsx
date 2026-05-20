@@ -174,8 +174,8 @@ export default function Contact() {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={sectionVariants}>
               <Card className="p-6 bg-card/50">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-lg bg-purple-500/20">
-                    <Clock className="w-5 h-5 text-purple-400" />
+                  <div className="p-2 rounded-lg bg-sky-500/20">
+                    <Clock className="w-5 h-5 text-sky-400" />
                   </div>
                   <h3 className="text-lg font-tech uppercase">Business Hours</h3>
                 </div>

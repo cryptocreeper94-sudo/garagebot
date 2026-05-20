@@ -103,7 +103,7 @@ const categories: Category[] = [
   {
     title: "Marketing & Growth",
     icon: Megaphone,
-    gradient: "from-purple-500 to-pink-500",
+    gradient: "from-sky-500 to-pink-500",
     description: "Grow your audience and drive engagement. Manage social media auto-posting, schedule content, run Meta ad campaigns, and publish blog content.",
     cards: [
       { label: "Marketing Hub", description: "Meta auto-posting, 60+ posts, 3-hour rotation", href: "/marketing", icon: Megaphone, image: imgMarketingHub, featured: true },
@@ -259,7 +259,7 @@ function CardComponent({ card, index, catIndex }: { card: LaunchCard; index: num
               card.badge === "Live" ? "bg-gradient-to-r from-green-500 to-emerald-500" :
               card.badge === "New" ? "bg-gradient-to-r from-cyan-500 to-blue-500" :
               card.badge === "Earn" ? "bg-gradient-to-r from-orange-500 to-rose-500" :
-              "bg-gradient-to-r from-purple-500 to-pink-500"
+              "bg-gradient-to-r from-sky-500 to-pink-500"
             }`}>
               {card.badge}
             </span>

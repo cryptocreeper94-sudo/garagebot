@@ -112,7 +112,7 @@ export default function AchievementBadges({ compact = true }: AchievementBadgesP
 
   return (
     <Card className="bento-glass border-primary/20 overflow-hidden relative" data-testid="achievement-badges">
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary via-cyan-400 to-purple-500" />
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary via-cyan-400 to-sky-500" />
 
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">

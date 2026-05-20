@@ -177,7 +177,7 @@ const oemRetailers: OEMRetailer[] = [
     rating: 4.9,
     features: ["Uncompromising quality", "AMG performance parts", "StarParts value line", "Premium OEM electronics", "German precision engineering", "Factory-sealed components"],
     highlight: "LUXURY",
-    highlightColor: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    highlightColor: "bg-sky-500/20 text-sky-400 border-sky-500/30",
     partsLine: "Mercedes-Benz Genuine",
     vehicles: "Mercedes-Benz, AMG, Maybach",
     warrantyInfo: "24 months / unlimited miles",
@@ -245,7 +245,7 @@ const oemRetailers: OEMRetailer[] = [
 const oemAdvantages = [
   { icon: BadgeCheck, title: "Perfect Fit Guaranteed", desc: "OEM parts are engineered to the exact specifications of your vehicle — no guessing, no modifications needed", color: "#00D9FF" },
   { icon: Shield, title: "Factory Warranty Backed", desc: "Genuine parts come with manufacturer warranty protection that aftermarket parts simply can't match", color: "#10B981" },
-  { icon: Cog, title: "Engineered to Spec", desc: "Tested to the same standards as original equipment — same materials, tolerances, and performance ratings", color: "#8B5CF6" },
+  { icon: Cog, title: "Engineered to Spec", desc: "Tested to the same standards as original equipment — same materials, tolerances, and performance ratings", color: "#0ea5e9" },
   { icon: Clock, title: "Longer Lifespan", desc: "OEM parts consistently outlast aftermarket alternatives, saving you money on replacements over time", color: "#F59E0B" },
   { icon: Lock, title: "Safety Certified", desc: "Genuine parts meet the exact safety standards your vehicle was designed and crash-tested with", color: "#EC4899" },
   { icon: DollarSign, title: "Protects Resale Value", desc: "Vehicles maintained with OEM parts retain higher resale value than those with aftermarket replacements", color: "#06B6D4" },
@@ -415,8 +415,8 @@ export default function OEMParts() {
             transition={{ delay: 0.25 }}
           >
             <Card className="glass-card card-3d p-4 h-full flex flex-col items-center justify-center gap-1">
-              <ThumbsUp className="w-6 h-6 text-purple-400 mb-1" />
-              <p className="text-xl font-tech font-bold text-purple-400">Perfect</p>
+              <ThumbsUp className="w-6 h-6 text-sky-400 mb-1" />
+              <p className="text-xl font-tech font-bold text-sky-400">Perfect</p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">Factory Fit</p>
             </Card>
           </motion.div>
@@ -631,7 +631,7 @@ export default function OEMParts() {
           className="mb-14"
         >
           <div className="flex items-center gap-3 mb-5">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-sky-500 to-pink-500 shadow-lg">
               <Package className="w-5 h-5 text-white" />
             </div>
             <div>

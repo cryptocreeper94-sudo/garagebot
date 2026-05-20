@@ -53,8 +53,8 @@ const REWARDS = [
     points: 1000, 
     icon: Crown,
     description: 'Get a full year of Pro features',
-    color: 'text-purple-400',
-    bgColor: 'from-purple-900/40 to-purple-800/20'
+    color: 'text-sky-400',
+    bgColor: 'from-sky-900/40 to-sky-800/20'
   },
   { 
     id: 'pro_lifetime', 
@@ -223,9 +223,9 @@ export default function InviteFriends() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <Card className="p-6 glass-card card-3d border-purple-500/30 text-center">
-                <Trophy className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                <div className="text-3xl font-bold text-purple-400" data-testid="text-pro-conversions">
+              <Card className="p-6 glass-card card-3d border-sky-500/30 text-center">
+                <Trophy className="w-8 h-8 text-sky-400 mx-auto mb-2" />
+                <div className="text-3xl font-bold text-sky-400" data-testid="text-pro-conversions">
                   {summary?.convertedToPro || 0}
                 </div>
                 <div className="text-sm text-muted-foreground">Upgraded to Pro</div>
@@ -290,7 +290,7 @@ export default function InviteFriends() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs font-bold text-purple-400">3</div>
+                    <div className="w-6 h-6 rounded-full bg-sky-500/20 flex items-center justify-center text-xs font-bold text-sky-400">3</div>
                     <div>
                       <div className="font-medium">They Go Pro</div>
                       <div className="text-muted-foreground text-xs">You earn 500 more points</div>

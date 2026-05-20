@@ -157,9 +157,9 @@ export default function GenesisHallmark() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 mb-4">
-            <Hexagon className="w-5 h-5 text-purple-500" />
-            <span className="font-tech text-sm uppercase text-purple-400">Genesis Hallmark</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-sky-500/20 to-pink-500/20 border border-sky-500/30 mb-4">
+            <Hexagon className="w-5 h-5 text-sky-500" />
+            <span className="font-tech text-sm uppercase text-sky-400">Genesis Hallmark</span>
           </div>
           
           <h1 className="text-3xl md:text-4xl font-tech font-bold uppercase mb-3">
@@ -178,10 +178,10 @@ export default function GenesisHallmark() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="glass-ultra border-purple-500/30 p-6">
+            <Card className="glass-ultra border-sky-500/30 p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
-                  <Award className="w-6 h-6 text-purple-400" />
+                <div className="w-12 h-12 rounded-lg bg-sky-500/20 border border-sky-500/30 flex items-center justify-center">
+                  <Award className="w-6 h-6 text-sky-400" />
                 </div>
                 <div>
                   <h2 className="font-tech text-xl uppercase">Mint Your Hallmark</h2>
@@ -196,12 +196,12 @@ export default function GenesisHallmark() {
                     <img 
                       src={hallmarkBadge} 
                       alt="Genesis Hallmark Badge" 
-                      className="w-full h-full object-contain rounded-xl shadow-[0_0_40px_rgba(168,85,247,0.3)]"
+                      className="w-full h-full object-contain rounded-xl shadow-[0_0_40px_rgba(14,165,233,0.3)]"
                       data-testid="img-hallmark-badge"
                     />
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="font-tech text-[10px] uppercase tracking-wider text-purple-300/80 mb-1">Genesis Hallmark</span>
-                      <span className="font-mono font-bold text-lg text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">
+                      <span className="font-tech text-[10px] uppercase tracking-wider text-sky-300/80 mb-1">Genesis Hallmark</span>
+                      <span className="font-mono font-bold text-lg text-white drop-shadow-[0_0_10px_rgba(14,165,233,0.8)]">
                         GB-{hallmark.assetNumber.toString().padStart(6, '0')}
                       </span>
                       <span className="font-tech text-[8px] uppercase tracking-wider text-cyan-300/80 mt-1">Verified</span>
@@ -334,7 +334,7 @@ export default function GenesisHallmark() {
                     disabled={!selectedVehicle || mintMutation.isPending || !isAuthenticated}
                     className={`w-full h-12 font-tech uppercase ${isPro 
                       ? 'bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-500/90 hover:to-amber-500/90 text-black' 
-                      : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-500/90 hover:to-pink-500/90 text-white'
+                      : 'bg-gradient-to-r from-sky-500 to-pink-500 hover:from-sky-500/90 hover:to-pink-500/90 text-white'
                     }`}
                     data-testid="button-mint-hallmark"
                   >
@@ -409,7 +409,7 @@ export default function GenesisHallmark() {
                       data-testid={`hallmark-entry-${h.assetNumber}`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 font-mono">
+                        <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30 font-mono">
                           GB-{h.assetNumber.toString().padStart(6, '0')}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
@@ -449,7 +449,7 @@ export default function GenesisHallmark() {
                 </div>
               </Card>
               <Card className="p-4 text-center stat-card-premium border-border/40">
-                <p className="text-2xl font-bold text-purple-400">∞</p>
+                <p className="text-2xl font-bold text-sky-400">∞</p>
                 <p className="text-xs text-muted-foreground">Validity</p>
               </Card>
             </div>

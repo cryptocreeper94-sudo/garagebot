@@ -21,7 +21,7 @@ interface RewardTier {
 const REWARD_TIERS: RewardTier[] = [
   { referrals: 1, name: "Early Supporter", reward: "Exclusive Badge", icon: Star, color: "text-zinc-400" },
   { referrals: 3, name: "Part Finder", reward: "1 Month Pro FREE", icon: Zap, color: "text-cyan-400" },
-  { referrals: 5, name: "Gear Head", reward: "Genesis Hallmark NFT", icon: Medal, color: "text-purple-400" },
+  { referrals: 5, name: "Gear Head", reward: "Genesis Hallmark NFT", icon: Medal, color: "text-sky-400" },
   { referrals: 10, name: "Crew Chief", reward: "3 Months Pro + Founding Member Status", icon: Trophy, color: "text-yellow-400" },
   { referrals: 25, name: "Shop Foreman", reward: "1 Year Pro + Featured Profile", icon: Crown, color: "text-orange-400" },
   { referrals: 50, name: "Legend", reward: "LIFETIME Pro + Custom Hallmark", icon: Sparkles, color: "text-red-400" },
@@ -79,7 +79,7 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
 
   if (compact) {
     return (
-      <Card className="p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/20" data-testid="rewards-compact-card">
+      <Card className="p-4 bg-gradient-to-r from-cyan-500/10 to-sky-500/10 border-cyan-500/20" data-testid="rewards-compact-card">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
@@ -132,7 +132,7 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
         </Card>
         <Card className="p-4 bg-zinc-900/50 border-zinc-800" data-testid="card-giveaway-entries">
           <div className="flex items-center gap-3">
-            <Gift className="w-8 h-8 text-purple-400" />
+            <Gift className="w-8 h-8 text-sky-400" />
             <div>
               <p className="text-2xl font-bold text-white" data-testid="text-giveaway-entries">{userStats.giveawayEntries}</p>
               <p className="text-xs text-zinc-500">Giveaway Entries</p>
@@ -218,7 +218,7 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
       {/* Badges */}
       <Card className="p-6 bg-zinc-900/50 border-zinc-800" data-testid="card-badges">
         <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
-          <Medal className="w-5 h-5 text-purple-400" />
+          <Medal className="w-5 h-5 text-sky-400" />
           Your Badges
         </h3>
 
@@ -231,14 +231,14 @@ export default function RewardsProgress({ userId, compact = false }: RewardsProg
                 data-testid={`badge-${badge.id}`}
                 className={`text-center p-4 rounded-lg border transition-all ${
                   badge.earned
-                    ? "bg-purple-500/10 border-purple-500/30"
+                    ? "bg-sky-500/10 border-sky-500/30"
                     : "bg-zinc-800/30 border-zinc-700/30 opacity-60"
                 }`}
               >
                 <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2 ${
-                  badge.earned ? "bg-purple-500/20" : "bg-zinc-700/30"
+                  badge.earned ? "bg-sky-500/20" : "bg-zinc-700/30"
                 }`}>
-                  <BadgeIcon className={`w-6 h-6 ${badge.earned ? "text-purple-400" : "text-zinc-500"}`} />
+                  <BadgeIcon className={`w-6 h-6 ${badge.earned ? "text-sky-400" : "text-zinc-500"}`} />
                 </div>
                 <p className={`text-sm font-medium ${badge.earned ? "text-white" : "text-zinc-500"}`}>
                   {badge.name}

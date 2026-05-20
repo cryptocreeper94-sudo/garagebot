@@ -294,8 +294,8 @@ export default function Rentals() {
             transition={{ delay: 0.25 }}
           >
             <Card className="glass-card card-3d p-4 h-full flex flex-col items-center justify-center gap-1">
-              <ThumbsUp className="w-6 h-6 text-purple-400 mb-1" />
-              <p className="text-xl font-tech font-bold text-purple-400">Free</p>
+              <ThumbsUp className="w-6 h-6 text-sky-400 mb-1" />
+              <p className="text-xl font-tech font-bold text-sky-400">Free</p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">Cancellation</p>
             </Card>
           </motion.div>
@@ -309,7 +309,7 @@ export default function Rentals() {
           className="mb-12"
         >
           <Card className="glass-ultra border-primary/30 p-5 md:p-7 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-purple-500/5 opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-sky-500/5 opacity-50" />
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-5">
                 <div className="p-2.5 rounded-xl bg-primary/20 border border-primary/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
@@ -551,7 +551,7 @@ export default function Rentals() {
           className="mb-14"
         >
           <div className="flex items-center gap-3 mb-5">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-sky-500 to-pink-500 shadow-lg">
               <Truck className="w-5 h-5 text-white" />
             </div>
             <div>

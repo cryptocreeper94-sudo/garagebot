@@ -82,7 +82,7 @@ const fadeUp = {
 const earningTypeBadge: Record<string, { label: string; cls: string }> = {
   purchase_commission: { label: "Purchase", cls: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" },
   pro_bonus: { label: "Pro Bonus", cls: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
-  pro_recurring: { label: "Recurring", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  pro_recurring: { label: "Recurring", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
 };
 
 const payoutStatusBadge: Record<string, { cls: string }> = {
@@ -265,7 +265,7 @@ function PublicLanding({
         </div>
 
         <h1
-          className="text-4xl md:text-5xl lg:text-6xl font-tech font-bold uppercase mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500"
+          className="text-4xl md:text-5xl lg:text-6xl font-tech font-bold uppercase mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-sky-500"
           style={{ textShadow: "0 0 40px rgba(0,229,255,0.3)" }}
         >
           GarageBot Affiliate Program
@@ -281,7 +281,7 @@ function PublicLanding({
           transition={{ delay: 0.3 }}
         >
           <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-purple-500/30 rounded-2xl blur-lg" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-sky-500/30 rounded-2xl blur-lg" />
             <Card className="relative bg-black/40 backdrop-blur-xl border border-cyan-500/20 p-6 rounded-2xl">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <DollarSign className="w-8 h-8 text-cyan-400" />
@@ -303,7 +303,7 @@ function PublicLanding({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             { icon: Share2, title: "Share Your Link", desc: "Get your unique GB-XXXXXX code and share it everywhere — social media, forums, YouTube, anywhere gearheads gather.", color: "text-cyan-400", glow: "rgba(0,229,255,0.2)" },
-            { icon: ShoppingCart, title: "Friends Join & Shop", desc: "Your referrals sign up and use GarageBot to find and purchase auto parts from 50+ retailers.", color: "text-purple-400", glow: "rgba(168,85,247,0.2)" },
+            { icon: ShoppingCart, title: "Friends Join & Shop", desc: "Your referrals sign up and use GarageBot to find and purchase auto parts from 50+ retailers.", color: "text-sky-400", glow: "rgba(14,165,233,0.2)" },
             { icon: DollarSign, title: "You Get Paid", desc: "Earn commissions on their purchases and subscriptions. Real money, deposited to your PayPal.", color: "text-green-400", glow: "rgba(74,222,128,0.2)" },
           ].map((item, i) => (
             <motion.div
@@ -333,7 +333,7 @@ function PublicLanding({
           {[
             { icon: TrendingUp, value: "10%", label: "of GarageBot's commission on referred purchases", color: "text-cyan-400", border: "border-cyan-500/30", glow: "shadow-[0_0_20px_rgba(0,229,255,0.15)]" },
             { icon: Crown, value: "$5", label: "bonus per Pro subscription conversion", color: "text-yellow-400", border: "border-yellow-500/30", glow: "shadow-[0_0_20px_rgba(250,204,21,0.15)]" },
-            { icon: Zap, value: "$2/mo", label: "recurring per active Pro referral", color: "text-purple-400", border: "border-purple-500/30", glow: "shadow-[0_0_20px_rgba(168,85,247,0.15)]" },
+            { icon: Zap, value: "$2/mo", label: "recurring per active Pro referral", color: "text-sky-400", border: "border-sky-500/30", glow: "shadow-[0_0_20px_rgba(14,165,233,0.15)]" },
           ].map((item) => (
             <motion.div key={item.value} whileHover={{ scale: 1.03 }}>
               <Card className={`bg-black/30 backdrop-blur-xl ${item.border} p-6 text-center ${item.glow} hover:shadow-lg transition-all`}>
@@ -371,13 +371,13 @@ function PublicLanding({
       </motion.div>
 
       <motion.div variants={fadeUp}>
-        <Card className="bg-gradient-to-r from-purple-500/10 via-blue-500/5 to-cyan-500/10 border border-purple-500/20 p-6 max-w-2xl mx-auto text-center">
-          <Shield className="w-10 h-10 text-purple-400 mx-auto mb-3" />
+        <Card className="bg-gradient-to-r from-sky-500/10 via-blue-500/5 to-cyan-500/10 border border-sky-500/20 p-6 max-w-2xl mx-auto text-center">
+          <Shield className="w-10 h-10 text-sky-400 mx-auto mb-3" />
           <h3 className="font-tech text-lg font-bold uppercase text-white mb-2">Verified by DarkWave Trust Layer</h3>
           <p className="text-sm text-muted-foreground mb-3">
             Cross-ecosystem recognition — your GB code works across all DarkWave apps.
           </p>
-          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+          <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30">
             <Globe className="w-3 h-3 mr-1" /> Cross-Ecosystem Tracking
           </Badge>
         </Card>
@@ -468,7 +468,7 @@ function EnrolledDashboard({
   return (
     <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-8">
       <motion.div variants={fadeUp} className="relative">
-        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 rounded-2xl blur-lg" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-sky-500/20 rounded-2xl blur-lg" />
         <Card className="relative bg-black/40 backdrop-blur-xl border border-cyan-500/20 p-6 rounded-2xl">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -509,7 +509,7 @@ function EnrolledDashboard({
             </div>
 
             <div className="flex items-center gap-2">
-              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+              <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30">
                 <Shield className="w-3 h-3 mr-1" /> Trust Layer Verified
               </Badge>
             </div>
@@ -521,7 +521,7 @@ function EnrolledDashboard({
         {[
           { label: "Total Earnings", value: `$${affiliate.totalEarnings.toFixed(2)}`, icon: DollarSign, color: "text-cyan-400", glow: "shadow-[0_0_15px_rgba(0,229,255,0.15)]", testId: "text-total-earnings" },
           { label: "Available Balance", value: `$${affiliate.availableBalance.toFixed(2)}`, icon: Wallet, color: "text-green-400", glow: "shadow-[0_0_15px_rgba(74,222,128,0.15)]", testId: "text-available-balance" },
-          { label: "Total Referrals", value: affiliate.totalReferrals.toString(), icon: Users, color: "text-purple-400", glow: "shadow-[0_0_15px_rgba(168,85,247,0.15)]", testId: undefined },
+          { label: "Total Referrals", value: affiliate.totalReferrals.toString(), icon: Users, color: "text-sky-400", glow: "shadow-[0_0_15px_rgba(14,165,233,0.15)]", testId: undefined },
           { label: "Qualified Referrals", value: affiliate.qualifiedReferrals.toString(), icon: CheckCircle, color: "text-yellow-400", glow: "shadow-[0_0_15px_rgba(250,204,21,0.15)]", testId: undefined },
         ].map((stat) => (
           <motion.div key={stat.label} whileHover={{ scale: 1.03 }}>
@@ -757,7 +757,7 @@ function EnrolledDashboard({
             <Card className="bg-black/30 backdrop-blur-xl border border-cyan-500/20 p-6 space-y-6">
               <div>
                 <h3 className="font-tech text-lg font-bold text-white flex items-center gap-2 mb-2">
-                  <Shield className="w-5 h-5 text-purple-400" /> DarkWave Trust Layer
+                  <Shield className="w-5 h-5 text-sky-400" /> DarkWave Trust Layer
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   Your affiliate identity is verified and recognized across the entire DarkWave ecosystem. When you refer someone,
@@ -765,8 +765,8 @@ function EnrolledDashboard({
                 </p>
               </div>
 
-              <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                <h4 className="font-tech text-sm font-bold uppercase text-purple-400 mb-2 flex items-center gap-2">
+              <div className="p-4 bg-sky-500/10 border border-sky-500/20 rounded-lg">
+                <h4 className="font-tech text-sm font-bold uppercase text-sky-400 mb-2 flex items-center gap-2">
                   <Globe className="w-4 h-4" /> Cross-Ecosystem Tracking
                 </h4>
                 <p className="text-xs text-muted-foreground">

@@ -337,7 +337,7 @@ export default function WeatherRadarFull({ weather, onClose }: WeatherRadarFullP
                       <div className="flex items-center gap-2"><div className="w-4 h-2 rounded bg-yellow-500" /><span>Moderate</span></div>
                       <div className="flex items-center gap-2"><div className="w-4 h-2 rounded bg-orange-500" /><span>Heavy</span></div>
                       <div className="flex items-center gap-2"><div className="w-4 h-2 rounded bg-red-500" /><span>Intense</span></div>
-                      <div className="flex items-center gap-2"><div className="w-4 h-2 rounded bg-purple-500" /><span>Extreme</span></div>
+                      <div className="flex items-center gap-2"><div className="w-4 h-2 rounded bg-sky-500" /><span>Extreme</span></div>
                     </div>
                   </div>
                 </Card>

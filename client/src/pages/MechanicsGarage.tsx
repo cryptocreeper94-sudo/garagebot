@@ -46,7 +46,7 @@ const VEHICLE_TYPES = [
 const ORDER_STATUSES = [
   { id: "pending", name: "Pending", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
   { id: "checked_in", name: "Checked In", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-  { id: "in_progress", name: "In Progress", color: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  { id: "in_progress", name: "In Progress", color: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
   { id: "waiting_parts", name: "Waiting Parts", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
   { id: "waiting_approval", name: "Waiting Approval", color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" },
   { id: "completed", name: "Completed", color: "bg-green-500/20 text-green-400 border-green-500/30" },
@@ -706,7 +706,7 @@ function BusinessIntegrationsTab({ shopId, selectedShop, toast }: { shopId: stri
   };
 
   const COLOR_MAP: Record<string, { bg: string; bgLight: string; border: string; borderHover: string; borderActive: string; shadow: string; text: string; icon: string; btnGrad: string; btnHover: string }> = {
-    purple: { bg: "bg-purple-500/10", bgLight: "bg-purple-500/5", border: "border-purple-500/20", borderHover: "hover:border-purple-500/40", borderActive: "border-purple-500/40", shadow: "shadow-purple-500/5", text: "text-purple-500", icon: "text-purple-400", btnGrad: "from-purple-500/80 to-purple-600/80", btnHover: "hover:from-purple-500 hover:to-purple-600" },
+    purple: { bg: "bg-sky-500/10", bgLight: "bg-sky-500/5", border: "border-sky-500/20", borderHover: "hover:border-sky-500/40", borderActive: "border-sky-500/40", shadow: "shadow-sky-500/5", text: "text-sky-500", icon: "text-sky-400", btnGrad: "from-sky-500/80 to-sky-600/80", btnHover: "hover:from-sky-500 hover:to-sky-600" },
     green: { bg: "bg-green-500/10", bgLight: "bg-green-500/5", border: "border-green-500/20", borderHover: "hover:border-green-500/40", borderActive: "border-green-500/40", shadow: "shadow-green-500/5", text: "text-green-500", icon: "text-green-400", btnGrad: "from-green-500/80 to-green-600/80", btnHover: "hover:from-green-500 hover:to-green-600" },
     blue: { bg: "bg-blue-500/10", bgLight: "bg-blue-500/5", border: "border-blue-500/20", borderHover: "hover:border-blue-500/40", borderActive: "border-blue-500/40", shadow: "shadow-blue-500/5", text: "text-blue-500", icon: "text-blue-400", btnGrad: "from-blue-500/80 to-blue-600/80", btnHover: "hover:from-blue-500 hover:to-blue-600" },
     orange: { bg: "bg-orange-500/10", bgLight: "bg-orange-500/5", border: "border-orange-500/20", borderHover: "hover:border-orange-500/40", borderActive: "border-orange-500/40", shadow: "shadow-orange-500/5", text: "text-orange-500", icon: "text-orange-400", btnGrad: "from-orange-500/80 to-orange-600/80", btnHover: "hover:from-orange-500 hover:to-orange-600" },
@@ -775,7 +775,7 @@ function BusinessIntegrationsTab({ shopId, selectedShop, toast }: { shopId: stri
 
   return (
     <div>
-      <Card className="p-6 mb-6 bg-gradient-to-r from-primary/20 via-purple-500/10 to-blue-500/20 border-primary/30 relative overflow-hidden">
+      <Card className="p-6 mb-6 bg-gradient-to-r from-primary/20 via-sky-500/10 to-blue-500/20 border-primary/30 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="relative">
           <div className="flex items-center gap-3 mb-3">
@@ -797,7 +797,7 @@ function BusinessIntegrationsTab({ shopId, selectedShop, toast }: { shopId: stri
               <span>Auto-sync data both ways</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <Shield className="w-4 h-4 text-purple-500" />
+              <Shield className="w-4 h-4 text-sky-500" />
               <span>Secure OAuth connections</span>
             </div>
           </div>
@@ -1776,7 +1776,7 @@ function PartnerApiTab({ shopId, toast }: { shopId: string; toast: any }) {
               <span>Scoped permissions</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <Activity className="w-4 h-4 text-purple-500" />
+              <Activity className="w-4 h-4 text-sky-500" />
               <span>Usage analytics</span>
             </div>
           </div>
@@ -2405,7 +2405,7 @@ export default function MechanicsGarage() {
           transition={{ delay: 0.1 }}
           className="mb-6"
         >
-          <Card className="p-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 border-blue-500/20">
+          <Card className="p-4 bg-gradient-to-r from-blue-500/10 via-sky-500/10 to-cyan-500/10 border-blue-500/20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-blue-500/20">
@@ -2881,7 +2881,7 @@ export default function MechanicsGarage() {
                       <TabsContent value="dashboard">
                         {/* Integration Highlight Banner */}
                         <Card 
-                          className="p-4 mb-6 bg-gradient-to-r from-purple-500/10 via-primary/10 to-blue-500/10 border-primary/30 cursor-pointer hover:border-primary/50 transition-colors"
+                          className="p-4 mb-6 bg-gradient-to-r from-sky-500/10 via-primary/10 to-blue-500/10 border-primary/30 cursor-pointer hover:border-primary/50 transition-colors"
                           onClick={() => setActiveTab("integrations")}
                         >
                           <div className="flex items-center justify-between">

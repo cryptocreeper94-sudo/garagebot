@@ -15,10 +15,10 @@ import {
 const CATEGORIES = [
   { id: "engine", label: "Engine & Drivetrain", icon: Wrench, image: "/generated_images/marketplace_engine_parts.png", color: "from-orange-500/20 to-red-500/20" },
   { id: "brakes", label: "Brakes & Suspension", icon: CircleDot, image: "/generated_images/marketplace_brake_parts.png", color: "from-cyan-500/20 to-blue-500/20" },
-  { id: "body", label: "Body & Exterior", icon: Car, image: "/generated_images/marketplace_body_parts.png", color: "from-purple-500/20 to-pink-500/20" },
+  { id: "body", label: "Body & Exterior", icon: Car, image: "/generated_images/marketplace_body_parts.png", color: "from-sky-500/20 to-pink-500/20" },
   { id: "electrical", label: "Electrical & Lighting", icon: Zap, image: "/generated_images/marketplace_electrical.png", color: "from-yellow-500/20 to-green-500/20" },
   { id: "wheels", label: "Wheels & Tires", icon: CircleDot, image: "/generated_images/marketplace_wheels_tires.png", color: "from-emerald-500/20 to-teal-500/20" },
-  { id: "interior", label: "Interior & Accessories", icon: Package, image: "/generated_images/marketplace_hero.png", color: "from-indigo-500/20 to-violet-500/20" },
+  { id: "interior", label: "Interior & Accessories", icon: Package, image: "/generated_images/marketplace_hero.png", color: "from-indigo-500/20 to-cyan-500/20" },
 ];
 
 const VEHICLE_TYPES = [
@@ -61,7 +61,7 @@ function GlassCard({ children, className = "", onClick, hover3d = false }: { chi
       whileHover={onClick ? { scale: 1.02, borderColor: 'rgba(6,182,212,0.4)' } : undefined}
       transition={{ duration: 0.2 }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-sky-500/5 pointer-events-none" />
       {children}
     </motion.div>
   );
@@ -838,7 +838,7 @@ export default function PartsMarketplace() {
         </div>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]" />
-          <div className="absolute top-40 right-1/4 w-80 h-80 bg-purple-500/8 rounded-full blur-[100px]" />
+          <div className="absolute top-40 right-1/4 w-80 h-80 bg-sky-500/8 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-12">
@@ -886,7 +886,7 @@ export default function PartsMarketplace() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-4xl sm:text-5xl font-bold font-rajdhani mb-3">
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">Parts Marketplace</span>
+              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-sky-400 bg-clip-text text-transparent">Parts Marketplace</span>
             </h1>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
               Buy and sell parts from fellow gearheads. Find exactly what you need by make, model, and year.

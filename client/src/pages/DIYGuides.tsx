@@ -56,7 +56,7 @@ const EQUIPMENT_CATEGORIES = [
   { id: "boat", name: "Boats & Marine", icon: Anchor, color: "from-cyan-500/20 to-cyan-600/10" },
   { id: "atv", name: "ATVs & UTVs", icon: Zap, color: "from-green-500/20 to-green-600/10" },
   { id: "small-engine", name: "Small Engines", icon: Wrench, color: "from-amber-500/20 to-amber-600/10" },
-  { id: "rv", name: "RVs & Motorhomes", icon: Truck, color: "from-purple-500/20 to-purple-600/10" },
+  { id: "rv", name: "RVs & Motorhomes", icon: Truck, color: "from-sky-500/20 to-sky-600/10" },
   { id: "diesel", name: "Diesel & Commercial", icon: Ship, color: "from-slate-500/20 to-slate-600/10" },
   { id: "classic", name: "Classics & Hot Rods", icon: Flame, color: "from-red-500/20 to-red-600/10" },
   { id: "rc", name: "RC & Hobby", icon: Gamepad2, color: "from-pink-500/20 to-pink-600/10" },
@@ -368,7 +368,7 @@ export default function DIYGuides() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="mt-8 p-6 rounded-lg border border-primary/30 glass-ultra bg-gradient-to-r from-primary/10 to-purple-500/10"
+            className="mt-8 p-6 rounded-lg border border-primary/30 glass-ultra bg-gradient-to-r from-primary/10 to-sky-500/10"
           >
             <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
               <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">

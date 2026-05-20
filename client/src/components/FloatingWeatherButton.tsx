@@ -59,8 +59,8 @@ function getWeatherGlow(description: string, isNight: boolean): string {
   
   if (desc.includes('thunder') || desc.includes('storm')) {
     return isNight 
-      ? 'shadow-[0_0_30px_rgba(139,92,246,0.8),0_0_60px_rgba(139,92,246,0.5)]'
-      : 'shadow-[0_0_30px_rgba(147,51,234,0.7),0_0_60px_rgba(147,51,234,0.4)]';
+      ? 'shadow-[0_0_30px_rgba(14,165,233,0.8),0_0_60px_rgba(14,165,233,0.5)]'
+      : 'shadow-[0_0_30px_rgba(2,132,199,0.7),0_0_60px_rgba(2,132,199,0.4)]';
   }
   if (desc.includes('rain') || desc.includes('drizzle') || desc.includes('shower')) {
     return isNight
@@ -84,7 +84,7 @@ function getWeatherGlow(description: string, isNight: boolean): string {
   }
   if (desc.includes('clear') || desc.includes('sunny')) {
     return isNight
-      ? 'shadow-[0_0_30px_rgba(129,140,248,0.7),0_0_60px_rgba(129,140,248,0.4)]'
+      ? 'shadow-[0_0_30px_rgba(34,211,238,0.7),0_0_60px_rgba(34,211,238,0.4)]'
       : 'shadow-[0_0_30px_rgba(250,204,21,0.8),0_0_60px_rgba(250,204,21,0.5)]';
   }
   if (desc.includes('partly')) {
@@ -102,7 +102,7 @@ function getGlowColor(description: string, isNight: boolean): string {
   const desc = description.toLowerCase();
   
   if (desc.includes('thunder') || desc.includes('storm')) {
-    return isNight ? 'from-violet-600/40 to-purple-900/30' : 'from-purple-500/30 to-purple-700/20';
+    return isNight ? 'from-cyan-600/40 to-sky-900/30' : 'from-sky-500/30 to-sky-700/20';
   }
   if (desc.includes('rain') || desc.includes('drizzle')) {
     return isNight ? 'from-indigo-600/40 to-blue-900/30' : 'from-blue-500/30 to-blue-700/20';
@@ -117,13 +117,13 @@ function getGlowColor(description: string, isNight: boolean): string {
     return isNight ? 'from-slate-500/30 to-slate-700/20' : 'from-gray-400/30 to-gray-600/20';
   }
   if (desc.includes('clear') || desc.includes('sunny')) {
-    return isNight ? 'from-indigo-500/40 to-violet-800/30' : 'from-yellow-400/40 to-orange-500/20';
+    return isNight ? 'from-indigo-500/40 to-cyan-800/30' : 'from-yellow-400/40 to-orange-500/20';
   }
   if (desc.includes('partly')) {
-    return isNight ? 'from-indigo-400/30 to-purple-700/20' : 'from-amber-400/30 to-yellow-500/20';
+    return isNight ? 'from-indigo-400/30 to-sky-700/20' : 'from-amber-400/30 to-yellow-500/20';
   }
   
-  return isNight ? 'from-indigo-500/30 to-violet-700/20' : 'from-cyan-500/30 to-primary/20';
+  return isNight ? 'from-indigo-500/30 to-cyan-700/20' : 'from-cyan-500/30 to-primary/20';
 }
 
 function getWeatherIcon(description: string, isNight: boolean): string {

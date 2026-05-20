@@ -171,11 +171,11 @@
 
 /* Secondary Glow Effect (Purple) - Additive to Button component styling */
 .glow-secondary {
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4), 0 0 5px rgba(168, 85, 247, 0.3) inset;
+  box-shadow: 0 0 15px rgba(14,165,233, 0.4), 0 0 5px rgba(14,165,233, 0.3) inset;
   transition: all 0.3s ease;
 }
 .glow-secondary:hover {
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.6), 0 0 50px rgba(168, 85, 247, 0.25), 0 0 8px rgba(168, 85, 247, 0.4) inset;
+  box-shadow: 0 0 25px rgba(14,165,233, 0.6), 0 0 50px rgba(14,165,233, 0.25), 0 0 8px rgba(14,165,233, 0.4) inset;
   transform: translateY(-1px);
 }
 
@@ -281,7 +281,7 @@
   border-radius: inherit;
   background: linear-gradient(
     45deg,
-    #06b6d4, #8b5cf6, #ec4899, #f97316, #eab308, #22c55e, #06b6d4
+    #06b6d4, #0ea5e9, #ec4899, #f97316, #eab308, #22c55e, #06b6d4
   );
   background-size: 400% 400%;
   animation: rainbow-shift 8s linear infinite;
@@ -366,7 +366,7 @@
   position: relative;
   background: linear-gradient(135deg, 
     rgba(6, 182, 212, 0.1) 0%,
-    rgba(139, 92, 246, 0.05) 50%,
+    rgba(14,165,233, 0.05) 50%,
     rgba(6, 182, 212, 0.1) 100%
   );
   border: 1px solid rgba(6, 182, 212, 0.2);
@@ -380,7 +380,7 @@
     135deg,
     transparent 20%,
     rgba(6, 182, 212, 0.1) 40%,
-    rgba(139, 92, 246, 0.1) 60%,
+    rgba(14,165,233, 0.1) 60%,
     transparent 80%
   );
   background-size: 200% 200%;
@@ -412,7 +412,7 @@
 
 /* Gradient Text */
 .text-gradient {
-  background: linear-gradient(135deg, #06b6d4, #8b5cf6, #06b6d4);
+  background: linear-gradient(135deg, #06b6d4, #0ea5e9, #06b6d4);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -437,7 +437,7 @@
   position: absolute;
   inset: -2px;
   border-radius: inherit;
-  background: linear-gradient(90deg, #06b6d4, #8b5cf6, #06b6d4);
+  background: linear-gradient(90deg, #06b6d4, #0ea5e9, #06b6d4);
   background-size: 200% 100%;
   animation: neon-flow 3s linear infinite;
   z-index: -1;
@@ -763,7 +763,7 @@
   background: linear-gradient(
     45deg,
     rgba(6, 182, 212, 0.5),
-    rgba(139, 92, 246, 0.5),
+    rgba(14,165,233, 0.5),
     rgba(6, 182, 212, 0.5),
     rgba(16, 185, 129, 0.5)
   );
@@ -1096,7 +1096,7 @@ button, a, [role="button"] {
 
 /* Premium Badge */
 .badge-premium {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.2));
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(14,165,233, 0.2));
   border: 1px solid rgba(6, 182, 212, 0.3);
   color: hsl(190 90% 60%);
   padding: 2px 8px;

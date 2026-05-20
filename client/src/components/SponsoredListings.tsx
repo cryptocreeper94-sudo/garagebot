@@ -86,7 +86,7 @@ export default function SponsoredListings({ listings = mockListings, searchQuery
         );
       case 'featured':
         return (
-          <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0 gap-1">
+          <Badge className="bg-gradient-to-r from-sky-500 to-indigo-600 text-white border-0 gap-1">
             <Zap className="w-3 h-3" /> Featured
           </Badge>
         );
@@ -102,7 +102,7 @@ export default function SponsoredListings({ listings = mockListings, searchQuery
   const getTierGlow = (tier: SponsoredListing['sponsorTier']) => {
     switch (tier) {
       case 'premium': return 'shadow-lg shadow-yellow-500/20 border-yellow-500/30';
-      case 'featured': return 'shadow-md shadow-purple-500/15 border-purple-500/30';
+      case 'featured': return 'shadow-md shadow-sky-500/15 border-sky-500/30';
       default: return 'border-border/40';
     }
   };

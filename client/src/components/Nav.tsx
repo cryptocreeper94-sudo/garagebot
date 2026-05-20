@@ -218,11 +218,11 @@ export default function Nav() {
           <div className="relative">
             <button
               onClick={() => setShowVerifiedDetails(!showVerifiedDetails)}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-all cursor-pointer group"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 hover:bg-sky-500/20 transition-all cursor-pointer group"
               data-testid="badge-app-hallmark"
             >
-              <Shield className="w-4 h-4 text-purple-400" />
-              <span className="text-xs font-mono text-purple-400 font-bold hidden sm:inline">
+              <Shield className="w-4 h-4 text-sky-400" />
+              <span className="text-xs font-mono text-sky-400 font-bold hidden sm:inline">
                 GB-000001
               </span>
               {isVerified && <BadgeCheck className="w-3.5 h-3.5 text-green-500" />}
@@ -230,14 +230,14 @@ export default function Nav() {
               
               {showVerifiedDetails && (
                 <div 
-                  className="fixed sm:absolute top-[34px] sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-1 z-[100] w-auto sm:w-[420px] p-4 rounded-xl border-2 border-purple-500/40 max-h-[80vh] overflow-y-auto"
+                  className="fixed sm:absolute top-[34px] sm:top-full left-4 right-4 sm:left-auto sm:right-0 sm:mt-1 z-[100] w-auto sm:w-[420px] p-4 rounded-xl border-2 border-sky-500/40 max-h-[80vh] overflow-y-auto"
                   style={{
                     background: 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.9), 0 0 40px rgba(168,85,247,0.25)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.9), 0 0 40px rgba(14,165,233,0.25)',
                   }}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-tech uppercase text-purple-400 flex items-center gap-2">
+                    <span className="text-sm font-tech uppercase text-sky-400 flex items-center gap-2">
                       <Shield className="w-5 h-5" /> Genesis Hallmark
                     </span>
                     <button
@@ -251,7 +251,7 @@ export default function Nav() {
                   
                   {/* QR Code with Buddy */}
                   <div className="flex items-end gap-4 mb-4">
-                    <div className="relative flex-shrink-0 bg-white p-3 rounded-xl" style={{ boxShadow: '0 0 30px rgba(168,85,247,0.4)' }}>
+                    <div className="relative flex-shrink-0 bg-white p-3 rounded-xl" style={{ boxShadow: '0 0 30px rgba(14,165,233,0.4)' }}>
                       <QRCodeSVG 
                         value="https://garagebot.io/verify/GB-000001"
                         size={120}
@@ -260,7 +260,7 @@ export default function Nav() {
                         bgColor="#FFFFFF"
                         fgColor="#0d1117"
                       />
-                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full font-mono whitespace-nowrap">
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-sky-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full font-mono whitespace-nowrap">
                         GB-000001
                       </div>
                     </div>
@@ -273,12 +273,12 @@ export default function Nav() {
                   </div>
                   
                   {/* Serial Number */}
-                  <div className="bg-black/40 rounded-lg p-3 mb-3 border border-purple-500/20">
+                  <div className="bg-black/40 rounded-lg p-3 mb-3 border border-sky-500/20">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] text-gray-500 uppercase font-mono">Serial Number</span>
                       <BadgeCheck className="w-4 h-4 text-green-500" />
                     </div>
-                    <p className="text-lg font-mono font-bold text-purple-400">GB-000001</p>
+                    <p className="text-lg font-mono font-bold text-sky-400">GB-000001</p>
                     <p className="text-[10px] text-gray-500">GarageBot Application Genesis Certificate</p>
                   </div>
                   
@@ -334,11 +334,11 @@ export default function Nav() {
           {userHallmark && (
             <Link href="/hallmark">
               <div 
-                className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-colors cursor-pointer group"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 hover:bg-sky-500/20 transition-colors cursor-pointer group"
                 data-testid="badge-user-hallmark"
               >
-                <Shield className="w-3.5 h-3.5 text-purple-400" />
-                <span className="text-xs font-mono text-purple-400 font-bold">
+                <Shield className="w-3.5 h-3.5 text-sky-400" />
+                <span className="text-xs font-mono text-sky-400 font-bold">
                   GB-{userHallmark.assetNumber.toString().padStart(6, '0')}
                 </span>
               </div>
@@ -501,16 +501,16 @@ export default function Nav() {
                     <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider px-3 mb-2 block">Features</span>
                     
                     <Link href="/hallmark" onClick={() => setIsOpen(false)}>
-                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/hallmark' ? 'bg-purple-500/10 text-purple-400' : 'text-foreground hover:bg-purple-500/5'}`} data-testid="menu-hallmark">
-                        <Shield className="w-5 h-5 text-purple-400" />
+                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${location === '/hallmark' ? 'bg-sky-500/10 text-sky-400' : 'text-foreground hover:bg-sky-500/5'}`} data-testid="menu-hallmark">
+                        <Shield className="w-5 h-5 text-sky-400" />
                         <span className="font-medium">View Hallmark</span>
                         {userHallmark && (
-                          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[9px] font-mono ml-auto">
+                          <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30 text-[9px] font-mono ml-auto">
                             GB-{userHallmark.assetNumber.toString().padStart(6, '0')}
                           </Badge>
                         )}
                         {!userHallmark && (
-                          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[9px] font-mono ml-auto">NFT</Badge>
+                          <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30 text-[9px] font-mono ml-auto">NFT</Badge>
                         )}
                       </div>
                     </Link>

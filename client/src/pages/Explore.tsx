@@ -92,7 +92,7 @@ interface FeatureCategory {
 const GLOW_MAP: Record<string, string> = {
   cyan: "0 0 30px rgba(6,182,212,0.35)",
   green: "0 0 30px rgba(34,197,94,0.35)",
-  purple: "0 0 30px rgba(168,85,247,0.35)",
+  purple: "0 0 30px rgba(14,165,233,0.35)",
   amber: "0 0 30px rgba(245,158,11,0.35)",
   blue: "0 0 30px rgba(59,130,246,0.35)",
   pink: "0 0 30px rgba(236,72,153,0.35)",
@@ -110,7 +110,7 @@ const BADGE_STYLES: Record<string, string> = {
   hot: "bg-gradient-to-r from-orange-500 to-rose-500",
   pro: "bg-gradient-to-r from-yellow-500 to-amber-500",
   free: "bg-gradient-to-r from-teal-500 to-cyan-500",
-  nft: "bg-gradient-to-r from-purple-500 to-pink-500",
+  nft: "bg-gradient-to-r from-sky-500 to-pink-500",
   founders: "bg-gradient-to-r from-yellow-500 to-amber-500",
 };
 
@@ -133,7 +133,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     title: "My Garage",
     description: "Complete vehicle fleet management with 7 smart tools",
     icon: Car,
-    gradient: "from-purple-500 to-pink-500",
+    gradient: "from-sky-500 to-pink-500",
     features: [
       { name: "Vehicle Fleet", description: "Add all your vehicles with VIN decoding, manage details, and get vehicle-specific recommendations.", href: "/garage", icon: Car, image: imgMyGarage, glowColor: "purple", featured: true, subFeatures: ["VIN Decoder", "Multi-Vehicle", "Smart Recs", "Passport"] },
       { name: "Warranty Tracker", description: "Track all warranties in one place. Get alerts before they expire so you never miss a claim.", href: "/garage", icon: Shield, image: imgWarrantyTracker, glowColor: "blue", subFeatures: ["Expiry Alerts", "Coverage", "Provider Info", "Mileage Limits"] },
@@ -196,7 +196,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
     title: "Identity & Blockchain",
     description: "Verified digital identity and blockchain certificates",
     icon: Blocks,
-    gradient: "from-purple-500 to-violet-500",
+    gradient: "from-sky-500 to-cyan-500",
     features: [
       { name: "Genesis Hallmark", description: "Blockchain-verified digital certificate on Solana. Early adopters get exclusive Genesis NFTs.", href: "/hallmark", icon: Award, image: imgGenesisHallmarks, glowColor: "purple", badge: "NFT", badgeVariant: "nft", featured: true, subFeatures: ["Solana Blockchain", "QR Verification", "Genesis Cert", "On-Chain"] },
       { name: "Referral Program", description: "Earn points for every friend who signs up. Redeem for Pro membership and exclusive perks.", href: "/invite", icon: Rocket, image: imgReferralProgram, glowColor: "pink", subFeatures: ["Points System", "Pro Rewards", "Invite Link", "Bonuses"] },
@@ -476,7 +476,7 @@ export default function Explore() {
       <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#050810] via-[#0a0f1e] to-[#050810]" />
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/[0.03] rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/[0.03] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-sky-500/[0.03] rounded-full blur-[120px]" />
       </div>
 
       <Nav />
@@ -556,8 +556,8 @@ export default function Explore() {
               <span className="text-[11px] font-mono text-cyan-400">{totalFeatures} Features</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
-              <Blocks className="w-3.5 h-3.5 text-purple-400" />
-              <span className="text-[11px] font-mono text-purple-400">{FEATURE_CATEGORIES.length} Categories</span>
+              <Blocks className="w-3.5 h-3.5 text-sky-400" />
+              <span className="text-[11px] font-mono text-sky-400">{FEATURE_CATEGORIES.length} Categories</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
               <Award className="w-3.5 h-3.5 text-green-400" />
@@ -586,8 +586,8 @@ export default function Explore() {
             transition={{ delay: 0.25 }}
             className="max-w-2xl mx-auto mb-10"
           >
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-500/[0.08] via-purple-500/[0.06] to-cyan-500/[0.08] backdrop-blur-xl border border-cyan-500/20 p-5 sm:p-6">
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.05] via-transparent to-purple-500/[0.05]" />
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-500/[0.08] via-sky-500/[0.06] to-cyan-500/[0.08] backdrop-blur-xl border border-cyan-500/20 p-5 sm:p-6">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.05] via-transparent to-sky-500/[0.05]" />
               <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4">
                 <img src={gbEmblem} alt="" className="w-12 h-12 drop-shadow-[0_0_12px_rgba(6,182,212,0.6)]" />
                 <div className="flex-1 text-center sm:text-left">
@@ -634,7 +634,7 @@ export default function Explore() {
           className="max-w-xl mx-auto mb-8"
         >
           <div className="relative group">
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/15 via-purple-500/15 to-cyan-500/15 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/15 via-sky-500/15 to-cyan-500/15 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-cyan-400 transition-colors" />
               <Input
@@ -825,10 +825,10 @@ export default function Explore() {
           className="mt-16"
         >
           <div className="relative overflow-hidden rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] p-6 sm:p-8 md:p-10">
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.04] via-transparent to-purple-500/[0.04]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.04] via-transparent to-sky-500/[0.04]" />
             <div className="relative z-10 flex flex-col md:flex-row items-center gap-5 sm:gap-6 md:gap-8">
               <div className="flex-shrink-0">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/20 flex items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.15)]">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-sky-500/20 border border-cyan-500/20 flex items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.15)]">
                   <Compass className="w-8 h-8 sm:w-10 sm:h-10 text-cyan-400" />
                 </div>
               </div>

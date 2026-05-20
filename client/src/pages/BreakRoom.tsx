@@ -569,7 +569,7 @@ function CommunityTab() {
   const sections = [
     { id: "speed-traps", label: "Speed Trap Alerts", icon: MapPin, description: "Report and view speed traps near you", color: "text-red-400 bg-red-500/10 border-red-500/20" },
     { id: "fuel", label: "Fuel Prices", icon: Fuel, description: "Report and compare gas prices", color: "text-green-400 bg-green-500/10 border-green-500/20" },
-    { id: "shops", label: "Specialty Shops", icon: Store, description: "Find salvage yards & restoration shops", color: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
+    { id: "shops", label: "Specialty Shops", icon: Store, description: "Find salvage yards & restoration shops", color: "text-sky-400 bg-sky-500/10 border-sky-500/20" },
     { id: "events", label: "Car Shows & Events", icon: Calendar, description: "Find local car shows & meetups", color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
   ];
 
@@ -676,7 +676,7 @@ function CommunityTab() {
                               <Card key={i} className="glass-card p-3" data-testid={`shop-card-${i}`}>
                                 <h5 className="text-sm font-bold text-white">{s.name}</h5>
                                 <p className="text-xs text-zinc-500">{s.address || s.city}</p>
-                                {s.specialty && <Badge className="mt-1 bg-purple-500/10 text-purple-400 border-purple-500/30 text-[10px]">{s.specialty}</Badge>}
+                                {s.specialty && <Badge className="mt-1 bg-sky-500/10 text-sky-400 border-sky-500/30 text-[10px]">{s.specialty}</Badge>}
                               </Card>
                             ))}
                           </div>

@@ -192,7 +192,7 @@ export default function Investors() {
           {/* Comprehensive Roadmap Section */}
           <div className="mb-16">
             <div className="text-center mb-12 section-header-premium">
-              <Badge className="mb-4 bg-purple-500/20 text-purple-400 border-purple-500/30 font-mono">
+              <Badge className="mb-4 bg-sky-500/20 text-sky-400 border-sky-500/30 font-mono">
                 <Calendar className="w-3 h-3 inline mr-1" /> PRODUCT ROADMAP
               </Badge>
               <h2 className="text-3xl font-tech uppercase mb-4">
@@ -205,7 +205,7 @@ export default function Investors() {
 
             <div className="relative">
               {/* Timeline connector */}
-              <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-green-500 via-primary to-purple-500" />
+              <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-green-500 via-primary to-sky-500" />
 
               {/* Phase 1 - Foundation (Completed) */}
               <motion.div 
@@ -360,39 +360,39 @@ export default function Investors() {
                 className="relative mb-12"
               >
                 <div className="flex items-center gap-4 mb-4 md:justify-center md:flex-row-reverse">
-                  <div className="w-16 h-16 rounded-full bg-purple-500/20 border-2 border-purple-500/50 flex items-center justify-center z-10">
-                    <Brain className="w-8 h-8 text-purple-400" />
+                  <div className="w-16 h-16 rounded-full bg-sky-500/20 border-2 border-sky-500/50 flex items-center justify-center z-10">
+                    <Brain className="w-8 h-8 text-sky-400" />
                   </div>
                   <div className="md:absolute md:right-[calc(50%+40px)] md:text-right">
-                    <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 mb-1">2026</Badge>
+                    <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30 mb-1">2026</Badge>
                     <h3 className="text-xl font-tech uppercase">Phase 4: Scale</h3>
                     <p className="text-sm text-muted-foreground">AI & Marketplace</p>
                   </div>
                 </div>
-                <Card className="ml-20 md:ml-[calc(50%+30px)] p-6 glass-card border-purple-500/20">
+                <Card className="ml-20 md:ml-[calc(50%+30px)] p-6 glass-card border-sky-500/20">
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-start gap-2">
-                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
                       <span><strong>AI Predictive Maintenance:</strong> Machine learning for failure prediction</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
                       <span><strong>Parts Marketplace:</strong> P2P used parts marketplace with verification</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
                       <span><strong>Vehicle Passport NFTs:</strong> Transferable ownership records on-chain</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
                       <span><strong>AR Part Identification:</strong> Point your phone at a part to identify it</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
                       <span><strong>Global Expansion:</strong> Launch in Canada, UK, and Australia</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
                       <span><strong>Enterprise Solutions:</strong> White-label platform for dealership groups</span>
                     </li>
                   </ul>
@@ -407,7 +407,7 @@ export default function Investors() {
                 className="relative"
               >
                 <div className="flex items-center justify-center mb-6">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-purple-500 to-green-500 flex items-center justify-center z-10 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-sky-500 to-green-500 flex items-center justify-center z-10 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
                     <Award className="w-10 h-10 text-white" />
                   </div>
                 </div>
@@ -428,7 +428,7 @@ export default function Investors() {
                       <div className="text-xs text-muted-foreground uppercase">ARR Target</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-tech font-bold text-purple-400">100+</div>
+                      <div className="text-3xl font-tech font-bold text-sky-400">100+</div>
                       <div className="text-xs text-muted-foreground uppercase">Retail Partners</div>
                     </div>
                   </div>

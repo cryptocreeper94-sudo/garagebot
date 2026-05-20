@@ -82,7 +82,7 @@ export default function DailyFunFact() {
       data-testid="daily-fun-fact"
     >
       <Card className="bento-glass border-primary/20 overflow-hidden relative group">
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary via-cyan-400 to-purple-500" />
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary via-cyan-400 to-sky-500" />
 
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-primary/5 to-transparent" />
 

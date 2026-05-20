@@ -86,8 +86,8 @@ export default function AffiliateDisclosure() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={sectionVariants}>
             <Card className="p-6 bg-card/50">
               <div className="flex items-start gap-4">
-                <div className="p-2 rounded-lg bg-purple-500/20">
-                  <Link2 className="w-5 h-5 text-purple-400" />
+                <div className="p-2 rounded-lg bg-sky-500/20">
+                  <Link2 className="w-5 h-5 text-sky-400" />
                 </div>
                 <div>
                   <h2 className="text-xl font-tech uppercase mb-3">Pricing Transparency</h2>

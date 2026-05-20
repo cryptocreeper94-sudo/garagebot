@@ -165,8 +165,8 @@ export default function PhotoSearch({ onPartIdentified, vehicleContext }: PhotoS
     <Card className="bg-card border-primary/30 overflow-hidden">
       <div className="p-4 border-b border-border/40">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-purple-400" />
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500/20 to-pink-500/20 border border-sky-500/30 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-sky-400" />
           </div>
           <div>
             <h3 className="font-tech text-lg uppercase text-primary">Photo Search</h3>
@@ -289,7 +289,7 @@ export default function PhotoSearch({ onPartIdentified, vehicleContext }: PhotoS
                 <Button
                   onClick={analyzeImage}
                   disabled={identifyMutation.isPending}
-                  className="w-full font-tech uppercase bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
+                  className="w-full font-tech uppercase bg-gradient-to-r from-sky-600 to-pink-600 hover:from-sky-500 hover:to-pink-500"
                   data-testid="button-analyze-image"
                 >
                   {identifyMutation.isPending ? (

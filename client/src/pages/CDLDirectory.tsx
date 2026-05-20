@@ -358,7 +358,7 @@ function CompanyCard({
             )}
             {company.paidTimeOff && (
               <span className="inline-flex items-center gap-1 text-[10px] text-zinc-400 bg-white/5 rounded px-1.5 py-0.5">
-                <Clock className="w-3 h-3 text-purple-400" />PTO
+                <Clock className="w-3 h-3 text-sky-400" />PTO
               </span>
             )}
             {company.petPolicy && (
@@ -533,7 +533,7 @@ function CompanyDetailModal({
             )}
             {company.paidTimeOff && (
               <Badge variant="outline" className="border-gray-700 text-zinc-300 text-xs">
-                <Clock className="w-3 h-3 mr-1 text-purple-400" />Paid Time Off
+                <Clock className="w-3 h-3 mr-1 text-sky-400" />Paid Time Off
               </Badge>
             )}
             {company.petPolicy && (
@@ -1038,8 +1038,8 @@ export default function CDLDirectory() {
                 <div className="text-[10px] text-zinc-500">CDL Schools</div>
               </div>
               <div className="text-center p-3 glass-card rounded-xl">
-                <MapPin className="w-5 h-5 text-purple-400 mx-auto mb-1" />
-                <div className="text-xl font-bold text-purple-400" data-testid="text-stat-states">
+                <MapPin className="w-5 h-5 text-sky-400 mx-auto mb-1" />
+                <div className="text-xl font-bold text-sky-400" data-testid="text-stat-states">
                   {states.length || "—"}
                 </div>
                 <div className="text-[10px] text-zinc-500">States Covered</div>

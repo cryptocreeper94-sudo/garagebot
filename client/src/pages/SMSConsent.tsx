@@ -113,8 +113,8 @@ export default function SMSConsent() {
 
           <Card className="p-6 bg-card/50">
             <div className="flex items-start gap-4">
-              <div className="p-2 rounded-lg bg-purple-500/20">
-                <HelpCircle className="w-5 h-5 text-purple-400" />
+              <div className="p-2 rounded-lg bg-sky-500/20">
+                <HelpCircle className="w-5 h-5 text-sky-400" />
               </div>
               <div>
                 <h2 className="text-xl font-tech uppercase mb-3" data-testid="text-section-help">Need Help?</h2>
